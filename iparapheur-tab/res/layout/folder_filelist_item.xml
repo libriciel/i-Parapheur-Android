@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/folder_filelist_item_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/folder_filelist_item_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/icon" />
+
+    <TextView
+        android:id="@+id/folder_filelist_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/folder_filelist_item_icon"
+        android:layout_toRightOf="@+id/folder_filelist_item_icon"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="4dp"
+        android:text="Titre" />
+
+</RelativeLayout>

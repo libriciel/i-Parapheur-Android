@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">i-Parapheur</string>
+    <string name="placeholder">Lorem ipsum</string>
+    
+    <string name="demo_summary_left">
+<![CDATA[
+<b>Mairie d\'Arcachon</b><br/>
+Mercredi 28 mars 2012 à 16:00<br/>
+Séance ordinaire du conseil municipal
+]]>
+    </string>
+    <string name="demo_summary_right">
+<![CDATA[
+Département de <b>La Gironde</b><br/>
+Arrondissement d\'<b>Arcachon</b><br/>
+Canton d\'<b>Arcachon</b>
+]]>
+    </string>
+    
+</resources>

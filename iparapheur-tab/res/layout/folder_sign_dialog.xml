@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:id="@+id/folder_sign_dialog_layout_root">
+                  
+    <TextView
+        android:id="@+id/folder_sign_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Séance ordinaire du conseil municipal"
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+            />
+            
+    <View android:layout_width="wrap_content"
+          android:layout_height="2dp" 
+          android:background="@color/grey"
+          />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Annotation publique"
+            />
+            
+    <EditText
+        android:id="@+id/folder_annotation_public"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:lines="8" >
+        <!--requestFocus /-->
+    </EditText>
+
+    <View android:layout_width="wrap_content"
+          android:layout_height="2dp" 
+          android:background="@color/grey"
+          />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Annotation privée"
+        />
+
+    <EditText
+        android:id="@+id/folder_annotation_private"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:lines="8" 
+        />
+
+</LinearLayout>

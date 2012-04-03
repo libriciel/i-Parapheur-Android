@@ -1,0 +1,16 @@
+/target/
+/.settings/
+/.project
+/iparapheur-tab/target/
+/iparapheur-tab/bin/
+/iparapheur-tab/gen/
+/iparapheur-tab/.settings/
+/iparapheur-tab/.classpath
+/iparapheur-tab/.project
+/iparapheur-tab-it/target/
+/iparapheur-tab-it/bin/
+/iparapheur-tab-it/gen/
+/iparapheur-tab-it/.settings/
+/iparapheur-tab-it/.classpath
+/iparapheur-tab-it/.project
+/assets-sources/target
