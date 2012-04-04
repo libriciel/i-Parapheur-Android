@@ -3,6 +3,9 @@ package org.adullact.iparapheur.tab.test;
 import android.app.Activity;
 import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.TouchUtils;
+import android.view.KeyEvent;
+import android.view.View;
 
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 
@@ -20,10 +23,29 @@ public class HelloAndroidActivityTest
     public void testActivity()
             throws InterruptedException
     {
-        FolderActivity activity = startActivitySync( FolderActivity.class );
-        Thread.sleep( 15000 );
+        FolderActivity folderActivity = startActivitySync( FolderActivity.class );
+        assertNotNull( folderActivity );
+
+        Thread.sleep( 2000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder" );
-        assertNotNull( activity );
+
+        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_sign ) );
+        Thread.sleep( 2000 );
+        Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign-Keyboard" );
+
+        sendKeys( KeyEvent.KEYCODE_BACK );;
+        Thread.sleep( 2000 );
+        Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign" );
+
+        sendKeys( KeyEvent.KEYCODE_BACK );;
+        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_reject ) );
+        Thread.sleep( 2000 );
+        Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject-Keyboard" );
+
+        sendKeys( KeyEvent.KEYCODE_BACK );;
+        Thread.sleep( 2000 );
+        Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject" );
+
     }
 
     private <T extends Activity> T startActivitySync( Class<T> clazz )
