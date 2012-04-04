@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PORTRAIT -->
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp" >
+
+    <ImageView
+        android:id="@+id/folder_top_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_folder" 
+            />
+
+    <TextView
+        android:id="@+id/folder_top_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/folder_top_icon"
+        android:layout_marginLeft="8dp" 
+        android:text="Séance ordinaire du conseil municipal"
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+            />
+
+    <TextView
+        android:id="@+id/folder_top_summary_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/folder_top_summary_right"
+        android:layout_marginRight="20dp"
+        android:text="@string/placeholder"
+            />
+        
+    <TextView
+        android:id="@+id/folder_top_summary_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/folder_button_reject"
+        android:layout_marginTop="20dp"
+        android:text="@string/placeholder" 
+            />
+
+    <Button
+        android:id="@+id/folder_button_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@+id/folder_button_reject"
+        android:text="Signer"
+        android:drawableLeft="@drawable/ic_action_sign"
+        android:gravity="left|center_vertical"
+        android:drawablePadding="10dp" 
+            />
+
+    <Button
+        android:id="@+id/folder_button_reject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="Refuser" 
+        android:drawableLeft="@drawable/ic_action_reject"
+        android:gravity="left|center_vertical"
+        android:drawablePadding="10dp" 
+            />
+
+</RelativeLayout>
+
