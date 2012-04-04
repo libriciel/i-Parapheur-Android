@@ -10,8 +10,8 @@
     <name>${project.artifactId}</name>
 
     <modules>
-        <module>iparapheur-tab</module>
-        <module>iparapheur-tab-it</module>
+        <module>application</module>
+        <module>integration-tests</module>
         <module>assets-sources</module>
     </modules>
 
