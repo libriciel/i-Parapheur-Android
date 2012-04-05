@@ -7,10 +7,12 @@
 /application/.settings/
 /application/.classpath
 /application/.project
+/application/.default.properties
 /integration-tests/target/
 /integration-tests/bin/
 /integration-tests/gen/
 /integration-tests/.settings/
 /integration-tests/.classpath
 /integration-tests/.project
+/integration-tests/.default.properties
 /assets-sources/target
