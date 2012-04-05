@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.view.KeyEvent;
-import android.view.View;
 
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 
@@ -38,6 +37,7 @@ public class HelloAndroidActivityTest
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign" );
 
         sendKeys( KeyEvent.KEYCODE_BACK );;
+        Thread.sleep( 1000 );
         TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_reject ) );
         Thread.sleep( 2000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject-Keyboard" );
