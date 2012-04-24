@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.adullact.iparapheur.tab.R;
-import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
+import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 
 public class SplashScreenActivity
         extends Activity
@@ -26,7 +26,8 @@ public class SplashScreenActivity
             @Override
             protected void onPostExecute( Void result )
             {
-                startActivity( new Intent( getApplication(), FolderActivity.class ) );
+                startActivity( new Intent( getApplication(), DashboardActivity.class ) );
+                // startActivity( new Intent( getApplication(), FolderActivity.class ) ); // DEMO
             }
 
         }.execute( new Void[]{} );

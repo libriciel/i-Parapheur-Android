@@ -16,10 +16,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.tab.R;
-import org.adullact.iparapheur.tab.model.Annex;
-import org.adullact.iparapheur.tab.model.Document;
+import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.model.FolderFile;
+import org.adullact.iparapheur.tab.model.FolderAnnex;
+import org.adullact.iparapheur.tab.model.FolderDocument;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 
 public class FolderFileListFragment
@@ -37,12 +37,12 @@ public class FolderFileListFragment
     {
         super.onCreate( savedInstanceState );
         Folder folder = new Folder( "Séance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Matériel" );
-        folder.addAllDocuments( new Document[]{
-                    new Document( "Séance ordinaire du conseil municipal", "file:///android_asset/index.html" )
+        folder.addAllDocuments( new FolderDocument[]{
+                    new FolderDocument( "Séance ordinaire du conseil municipal", "file:///android_asset/index.html" )
                 } );
-        folder.addAllAnnexes( new Annex[]{
-                    new Annex( "Projet de réhabilitation", "file:///android_asset/index.html" ),
-                    new Annex( "Transcript", "file:///android_asset/index.html" )
+        folder.addAllAnnexes( new FolderAnnex[]{
+                    new FolderAnnex( "Projet de réhabilitation", "file:///android_asset/index.html" ),
+                    new FolderAnnex( "Transcript", "file:///android_asset/index.html" )
                 } );
         setListAdapter( new FolderListAdapter( getActivity(), folder.getAllFiles() ) );
     }
@@ -91,14 +91,14 @@ public class FolderFileListFragment
             extends BaseAdapter
     {
 
-        private final List<FolderFile> folderFiles;
+        private final List<AbstractFolderFile> folderFiles;
 
         private LayoutInflater inflater;
 
-        private FolderListAdapter( Context context, Collection<FolderFile> folderFiles )
+        private FolderListAdapter( Context context, Collection<AbstractFolderFile> folderFiles )
         {
             this.inflater = LayoutInflater.from( context );
-            this.folderFiles = new ArrayList<FolderFile>( folderFiles );
+            this.folderFiles = new ArrayList<AbstractFolderFile>( folderFiles );
         }
 
         @Override
@@ -140,10 +140,10 @@ public class FolderFileListFragment
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
             }
 
-            final FolderFile folderFile = folderFiles.get( position );
+            final AbstractFolderFile folderFile = folderFiles.get( position );
 
             dataViews.title.setText( folderFile.getTitle() );
-            if ( folderFile instanceof Document ) {
+            if ( folderFile instanceof FolderDocument ) {
                 convertView.setBackgroundResource( R.color.grey );
                 dataViews.icon.setImageResource( R.drawable.ic_list_document );
             } else {

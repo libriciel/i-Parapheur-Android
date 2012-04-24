@@ -1,13 +1,13 @@
 package org.adullact.iparapheur.tab.model;
 
-public abstract class FolderFile
+public abstract class AbstractFolderFile
 {
 
     private String title;
 
     private String url;
 
-    public FolderFile( String title, String url )
+    public AbstractFolderFile( String title, String url )
     {
         this.title = title;
         this.url = url;

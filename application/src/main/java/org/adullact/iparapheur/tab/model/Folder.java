@@ -8,6 +8,8 @@ import java.util.List;
 public class Folder
 {
 
+    private String identity;
+
     private String title;
 
     private FolderRequestedAction requestedAction;
@@ -16,9 +18,9 @@ public class Folder
 
     private String businessSubType;
 
-    private final List<Document> documents = new ArrayList<Document>();
+    private final List<FolderDocument> documents = new ArrayList<FolderDocument>();
 
-    private final List<Annex> annexes = new ArrayList<Annex>();
+    private final List<FolderAnnex> annexes = new ArrayList<FolderAnnex>();
 
     public Folder( String title, FolderRequestedAction requestedAction, String businessType, String businessSubType )
     {
@@ -26,6 +28,11 @@ public class Folder
         this.requestedAction = requestedAction;
         this.businessType = businessType;
         this.businessSubType = businessSubType;
+    }
+
+    public String getIdentity()
+    {
+        return identity;
     }
 
     public String getTitle()
@@ -68,12 +75,12 @@ public class Folder
         this.requestedAction = requestedAction;
     }
 
-    public boolean addDocument( Document folderDocument )
+    public boolean addDocument( FolderDocument folderDocument )
     {
         return documents.add( folderDocument );
     }
 
-    public boolean addAllDocuments( Document... folderDocuments )
+    public boolean addAllDocuments( FolderDocument... folderDocuments )
     {
         return documents.addAll( Arrays.asList( folderDocuments ) );
     }
@@ -83,17 +90,17 @@ public class Folder
         documents.clear();
     }
 
-    public List<Document> getDocuments()
+    public List<FolderDocument> getDocuments()
     {
         return Collections.unmodifiableList( documents );
     }
 
-    public boolean addAnnex( Annex folderAnnex )
+    public boolean addAnnex( FolderAnnex folderAnnex )
     {
         return annexes.add( folderAnnex );
     }
 
-    public boolean addAllAnnexes( Annex... folderAnnexes )
+    public boolean addAllAnnexes( FolderAnnex... folderAnnexes )
     {
         return annexes.addAll( Arrays.asList( folderAnnexes ) );
     }
@@ -103,14 +110,14 @@ public class Folder
         annexes.clear();
     }
 
-    public List<Annex> getAnnexes()
+    public List<FolderAnnex> getAnnexes()
     {
         return Collections.unmodifiableList( annexes );
     }
 
-    public List<FolderFile> getAllFiles()
+    public List<AbstractFolderFile> getAllFiles()
     {
-        List<FolderFile> allFiles = new ArrayList<FolderFile>( documents );
+        List<AbstractFolderFile> allFiles = new ArrayList<AbstractFolderFile>( documents );
         allFiles.addAll( annexes );
         return Collections.unmodifiableList( allFiles );
     }
