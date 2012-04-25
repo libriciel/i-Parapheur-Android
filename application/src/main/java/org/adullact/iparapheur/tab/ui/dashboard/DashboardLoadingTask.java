@@ -1,31 +1,53 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import android.content.Context;
-
+import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.util.AsyncTaskWithMessageDialog;
 
 public class DashboardLoadingTask
-        extends AsyncTaskWithMessageDialog<Void, Void, List<Office>>
+        extends AsyncTaskWithMessageDialog<Void, String, Map<String, Office>>
 {
 
-    public DashboardLoadingTask( Context context, String message )
+    private final IParapheurHttpClient client;
+
+    public DashboardLoadingTask( DashboardActivity context )
     {
-        super( context, message );
+        super( context, "Veuillez patienter" );
+        this.client = context.client;
     }
 
     @Override
-    protected List<Office> doInBackground( Void... paramss )
+    protected Map<String, Office> doInBackground( Void... paramss )
     {
-        try {
-            Thread.sleep( 1000 );
-        } catch ( InterruptedException ex ) {
-            // Ignored
+        // TODO REMOVE BEGINS
+        List<Account> accounts = new ArrayList<Account>();
+        accounts.add( new Account( "Col.A.Role.A" ) );
+        accounts.add( new Account( "Col.A.Role.C" ) );
+        accounts.add( new Account( "Col.B.Role.D" ) );
+        // TODO REMOVE ENDS
+
+        final Map<String, Office> result = new HashMap<String, Office>();
+
+        for ( Account eachAccount : accounts ) {
+
+            publishProgress( "Chargement des bureaux (" + eachAccount.getTitle() + ")" );
+
+            List<Office> offices = client.getOffices( eachAccount );
+
+            // Store in a Map by community
+            for ( Office eachOffice : offices ) {
+                result.put( eachOffice.getCommunity(), eachOffice );
+            }
+
         }
-        return Collections.emptyList();
+
+        return result;
     }
 
 }

@@ -1,20 +1,27 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
-import java.util.List;
+import java.util.Map;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
+import roboguice.activity.RoboActivity;
+
+import com.google.inject.Inject;
+
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 
 public class DashboardActivity
-        extends Activity
+        extends RoboActivity
 {
 
-    private static final String TAG = DashboardActivity.class.getSimpleName();
+    /* package */ static final String TAG = DashboardActivity.class.getSimpleName();
+
+    @Inject
+    /* package */ IParapheurHttpClient client;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -22,12 +29,13 @@ public class DashboardActivity
         super.onCreate( savedInstanceState );
         Log.i( TAG, "onCreate" );
         setContentView( R.layout.dashboard );
-        new DashboardLoadingTask( this, "Chargement des bureaux" )
+        new DashboardLoadingTask( this )
         {
 
             @Override
-            protected void beforeDialogDismiss( List<Office> result )
+            protected void beforeDialogDismiss( Map<String, Office> result )
             {
+                Log.d( TAG, "Got result: " + result );
                 // TODO Populate views with result
             }
 
