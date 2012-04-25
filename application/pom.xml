@@ -14,18 +14,44 @@
     <name>${project.artifactId}</name>
 
     <dependencies>
+        
+        <!-- Android SDK and Support libraries -->
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
         <dependency>
+            <groupId>android.support</groupId>
+            <artifactId>compatibility-v4</artifactId>
+        </dependency>
+
+        
+        <!-- RoboGuice -->
+        <dependency>
+            <groupId>org.roboguice</groupId>
+            <artifactId>roboguice</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <!-- Androlog is a logging and reporting library for Android -->
+        <dependency>
             <groupId>de.akquinet.android.androlog</groupId>
             <artifactId>androlog</artifactId>
+            <version>1.0.5</version>
         </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>11.0.2</version>
         </dependency>
+            
+        
     </dependencies>
 
     <build>

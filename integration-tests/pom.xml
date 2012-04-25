@@ -24,6 +24,8 @@
     </properties>
 
     <dependencies>
+        
+        <!-- Android SDK -->
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
@@ -32,6 +34,8 @@
             <groupId>com.google.android</groupId>
             <artifactId>android-test</artifactId>
         </dependency>
+        
+        <!-- iparapheur-tab JAR & APK -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>iparapheur-tab</artifactId>
@@ -45,14 +49,20 @@
             <type>jar</type>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- Tests -->
         <dependency>
             <groupId>com.github.rtyley</groupId>
             <artifactId>android-screenshot-celebrity</artifactId>
+            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>provided</scope>
         </dependency>
+        
     </dependencies>
 
     <build>

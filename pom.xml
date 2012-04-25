@@ -21,6 +21,8 @@
 
     <dependencyManagement>
         <dependencies>
+            
+            <!-- Android SDK and Support libraries -->
             <dependency>
                 <groupId>android</groupId>
                 <artifactId>android</artifactId>
@@ -33,31 +35,12 @@
                 <version>4.0.1.2</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!-- Androlog is a logging and reporting library for Android -->
             <dependency>
-                <groupId>de.akquinet.android.androlog</groupId>
-                <artifactId>androlog</artifactId>
-                <version>1.0.5</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>11.0.2</version>
+                <groupId>android.support</groupId>
+                <artifactId>compatibility-v4</artifactId>
+                <version>r6</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.github.rtyley</groupId>
-                <artifactId>android-screenshot-celebrity</artifactId>
-                <version>1.8</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.10</version>
-                <scope>provided</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -67,7 +50,7 @@
                 <plugin>
                     <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>3.1.2-SNAPSHOT</version>
+                    <version>3.2.0</version>
                     <inherited>true</inherited>
                     <configuration>
                         <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
