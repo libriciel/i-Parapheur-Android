@@ -4,15 +4,21 @@
               android:layout_height="match_parent"
               android:orientation="vertical" >
 
-    <include android:id="@+id/folder_top_layout" layout="@layout/folder_top" />
+    <include 
+        android:id="@+id/folder_top_layout" 
+        layout="@layout/folder_top" 
+        />
     
-    <View android:layout_width="wrap_content"
-          android:layout_height="2dp" 
-          android:background="@color/grey_strong"/>
+    <View 
+        android:layout_width="wrap_content"
+        android:layout_height="2dp" 
+        android:background="@color/grey_strong"
+        />
           
-    <LinearLayout android:id="@+id/folder_main_layout"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent" >
+    <LinearLayout 
+        android:id="@+id/folder_main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
         <fragment
             android:id="@+id/folder_list_view"

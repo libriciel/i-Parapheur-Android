@@ -3,13 +3,13 @@ package org.adullact.iparapheur.tab.model;
 public class Office
 {
 
-    private String identity;
+    private final String identity;
 
-    private String title;
+    private final String title;
+
+    private final String community;
 
     private String description;
-
-    private String community;
 
     private String logo; // TODO Who is responsible for the resource inflation ?
 
@@ -17,8 +17,9 @@ public class Office
 
     private Integer lateFolderCount;
 
-    public Office( String title, String community )
+    public Office( String identity, String title, String community )
     {
+        this.identity = identity;
         this.title = title;
         this.community = community;
     }
@@ -56,6 +57,29 @@ public class Office
     public Integer getTodoFolderCount()
     {
         return todoFolderCount;
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( o == null || o instanceof Office == false ) {
+            return false;
+        }
+        return identity.equals( ( ( Office ) o ).identity );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 53 * hash + ( this.identity != null ? this.identity.hashCode() : 0 );
+        return hash;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Office{" + "identity=" + identity + ", title=" + title + ", community=" + community + ", todoFolderCount=" + todoFolderCount + ", lateFolderCount=" + lateFolderCount + '}';
     }
 
 }

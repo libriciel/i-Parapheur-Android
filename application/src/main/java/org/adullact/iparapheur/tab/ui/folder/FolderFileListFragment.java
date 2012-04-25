@@ -84,7 +84,8 @@ public class FolderFileListFragment
     public void onListItemClick( ListView l, View v, int position, long id )
     {
         super.onListItemClick( l, v, position, id );
-        // System.out.println( "ListItemClicked: " + position );
+        System.out.println( "ListItemClicked: " + position );
+        // TODO Handle properly
     }
 
     private static final class FolderListAdapter
