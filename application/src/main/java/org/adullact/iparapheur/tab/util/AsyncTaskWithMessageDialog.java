@@ -8,22 +8,22 @@ public abstract class AsyncTaskWithMessageDialog<Params extends Object, Progress
         extends AsyncTask<Params, Progress, Result>
 {
 
-    private final Context context;
+    protected final Context context;
 
-    private final String message;
+    private final String initialMessage;
 
-    private ProgressDialog wait = null;
+    protected ProgressDialog wait = null;
 
-    public AsyncTaskWithMessageDialog( Context context, String message )
+    public AsyncTaskWithMessageDialog( Context context, String initialMessage )
     {
         this.context = context;
-        this.message = message;
+        this.initialMessage = initialMessage;
     }
 
     @Override
     protected final void onPreExecute()
     {
-        wait = ProgressDialog.show( context, "", message, true, false );
+        wait = ProgressDialog.show( context, "", initialMessage, true, false );
         super.onPreExecute();
     }
 
@@ -34,6 +34,12 @@ public abstract class AsyncTaskWithMessageDialog<Params extends Object, Progress
         beforeDialogDismiss( result );
         wait.dismiss();
         afterDialogDismiss( result );
+    }
+
+    @Override
+    protected final void onProgressUpdate( Progress... values )
+    {
+        wait.setMessage( values[0].toString() );
     }
 
     /**
