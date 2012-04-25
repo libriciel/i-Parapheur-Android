@@ -1,34 +1,33 @@
-Title: iParapheur Tab
+Title: iparapheur-tab
 
-# iParapheur Tab
+# iparapheur-tab
 
-Ce projet contiens les sources de l'application cliente d'iParapheur pour tablettes Android.
+This repository contains source of the Android iParapheur client application.
 
 ## TODO
 
 TODO
 
-## Développer pour iParapheur Tab
+## Build from source
 
-### Prérequis
+### Prerequisites
 
 * Java >= 6
 * Maven >= 3
-* Android SDK dernière version
-* Un terminal
-* Un IDE de votre choix supportant Maven
-* Une tablette Android >=3.0 branchée pour passer les tests d'intégration
+* Up to date Android SDK
+* Shell prompt
+* Java IDE with Maven support of your choice
+* Integration tests require an online Android >=3.0 device
 
-### Système de build
+### Build system
 
-Maven TODO
+TODO Short pointers about Maven
 
-#### Déployer en local les artifacts du SDK android
+#### Install Android SDK artifacts to your local maven repository
 
-Avant de pouvoir utiliser le système de build du projet vous devez installer sur votre poste
-l'ensemble des artifacts du SDK android nécessaires aux plateformes supportées.
-
-Utilisez [maven-android-sdk-deployer](https://github.com/mosabua/maven-android-sdk-deployer) à cet effet :
+Use 
+[maven-android-sdk-deployer](https://github.com/mosabua/maven-android-sdk-deployer)
+to install needed Android SDK artifacts to your local maven repository:
 
     git clone https://github.com/mosabua/maven-android-sdk-deployer.git
     cd maven-android-sdk-deployer
@@ -38,17 +37,30 @@ Utilisez [maven-android-sdk-deployer](https://github.com/mosabua/maven-android-s
     mvn install -P 4.0
     mvn install -P 4.0.3
 
-Le README de ce projet explique clairement comment déployer ces artifacts sur un repository maven
-interne. Utile pour éviter d'avoir à faire cette installation manuellement sur chaque poste de 
-développement.
+The [README](https://github.com/mosabua/maven-android-sdk-deployer#readme) from
+this project clearly describe how to deploy thoses artifacts to a hosted
+maven repository. This can be usefull to prevent the need of the manual 
+installation described above.
 
-#### Maven et Android
+#### Maven & Android
 
-C'est très simple, le projet est basé sur l'archetype "release" fourni par le plugin android utilisé :
+The maven project is based on the "release" archetype provided by the android maven plugin project :
 [android-maven-plugin](http://code.google.com/p/maven-android-plugin).
 
-L'aide intégrée est assez complète :
+Embedded help is quite explicit:
 
     mvn android:help
 
+### Git branching model and release process
+
+We use the git branching model provided by 
+[git-flow](https://github.com/nvie/gitflow#readme) described in 
+[this web page](http://nvie.com/posts/a-successful-git-branching-model/).
+
+### Code conventions
+
+* Don't use class names in android layout files
+    * This one is opiniated and can bother some of you but it makes refactoring much easier and it is considered important.
+    * Each violation of this convention must be argued and documented.
+    * This convention may be dismissed later.
 
