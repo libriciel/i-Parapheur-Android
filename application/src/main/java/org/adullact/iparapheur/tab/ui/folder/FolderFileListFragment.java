@@ -84,10 +84,10 @@ public class FolderFileListFragment
     public void onListItemClick( ListView l, View v, int position, long id )
     {
         super.onListItemClick( l, v, position, id );
-        System.out.println( "ListItemClicked: " + position );
+        // System.out.println( "ListItemClicked: " + position );
     }
 
-    private static class FolderListAdapter
+    private static final class FolderListAdapter
             extends BaseAdapter
     {
 
@@ -153,12 +153,12 @@ public class FolderFileListFragment
             return convertView;
         }
 
-        static class ItemDataViewsHolder
+        private static class ItemDataViewsHolder
         {
 
-            ImageView icon;
+            private ImageView icon;
 
-            TextView title;
+            private TextView title;
 
         }
 
