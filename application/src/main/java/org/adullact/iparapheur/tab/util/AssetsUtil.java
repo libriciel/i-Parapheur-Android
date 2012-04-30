@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 import android.content.res.AssetManager;
 
-import org.adullact.iparapheur.tab.IParapheurException;
+import org.adullact.iparapheur.tab.IParapheurTabException;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -22,7 +22,7 @@ public final class AssetsUtil
             input = assetManager.open( assetPath );
             return CharStreams.toString( new InputStreamReader( input, Charsets.UTF_8 ) );
         } catch ( IOException ex ) {
-            throw new IParapheurException( "Unable to load html PDF viewer", ex );
+            throw new IParapheurTabException( "Unable to load html PDF viewer", ex );
         } finally {
             Closeables.closeQuietly( input );
         }

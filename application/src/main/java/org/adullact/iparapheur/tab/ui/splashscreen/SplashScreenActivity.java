@@ -3,7 +3,8 @@ package org.adullact.iparapheur.tab.ui.splashscreen;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
+import de.akquinet.android.androlog.Log;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
@@ -12,13 +13,13 @@ public class SplashScreenActivity
         extends Activity
 {
 
-    private static final String TAG = SplashScreenActivity.class.getSimpleName();
-
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
+        Log.i( "onCreate" );
+
         super.onCreate( savedInstanceState );
-        Log.i( TAG, "onCreate" );
+
         setContentView( R.layout.splashscreen );
         new SplashScreenTask()
         {
@@ -27,7 +28,6 @@ public class SplashScreenActivity
             protected void onPostExecute( Void result )
             {
                 startActivity( new Intent( getApplication(), DashboardActivity.class ) );
-                // startActivity( new Intent( getApplication(), FolderActivity.class ) ); // DEMO
             }
 
         }.execute( new Void[]{} );

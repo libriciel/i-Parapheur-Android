@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +16,8 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
+
+import de.akquinet.android.androlog.Log;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;

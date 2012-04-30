@@ -2,7 +2,8 @@ package org.adullact.iparapheur.tab.ui.office;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+
+import de.akquinet.android.androlog.Log;
 
 import org.adullact.iparapheur.tab.R;
 
