@@ -31,7 +31,6 @@ public class AccountsActivity
         // Root
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen( this );
         root.setTitle( "Comptes iParapheur" );
-        root.setSummary( "Entrez ici le ou les comptes iParapheur ˆ utiliser avec iParapheurTab." );
 
         for ( Account eachAccount : accountsRepository.all() ) {
 
@@ -112,7 +111,6 @@ public class AccountsActivity
 
         }
 
-        setFinishOnTouchOutside( true ); // Does it work ?
         setPreferenceScreen( root );
 
         // Add a button to the header list.

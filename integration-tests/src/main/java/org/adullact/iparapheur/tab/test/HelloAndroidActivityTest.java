@@ -32,17 +32,17 @@ public class HelloAndroidActivityTest
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign-Keyboard" );
 
-        sendKeys( KeyEvent.KEYCODE_BACK );;
+        sendKeys( KeyEvent.KEYCODE_BACK );
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign" );
 
-        sendKeys( KeyEvent.KEYCODE_BACK );;
+        sendKeys( KeyEvent.KEYCODE_BACK );
         Thread.sleep( 1000 );
         TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_reject ) );
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject-Keyboard" );
 
-        sendKeys( KeyEvent.KEYCODE_BACK );;
+        sendKeys( KeyEvent.KEYCODE_BACK );
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject" );
 

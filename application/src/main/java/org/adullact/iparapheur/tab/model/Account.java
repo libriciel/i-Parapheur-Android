@@ -47,4 +47,10 @@ public class Account
         return password;
     }
 
+    @Override
+    public String toString()
+    {
+        return "Account[ title: " + title + ", url: " + url + ", login: " + login + " ]";
+    }
+
 }

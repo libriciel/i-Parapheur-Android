@@ -83,9 +83,7 @@ public class DashboardActivity
                         public void onItemClick( AdapterView<?> parent, View view, int position, long id )
                         {
                             Office office = offices.get( position );
-                            Log.d( DashboardActivity.this, "Selected Office: " + office );
-                            Log.report( "Somebody selected office: " + office, null );
-                            startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( "office:identity", office.getIdentity() ) );
+                            startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() ) );
                         }
 
                     } );

@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 
 import de.akquinet.android.androlog.Log;
 
-import org.codeartisans.android.toolbox.activity.RoboActivity;
+import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
 import org.adullact.iparapheur.tab.R;
@@ -25,7 +25,7 @@ import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
-        extends RoboActivity
+        extends RoboFragmentActivity
 {
 
     private static final String TAG = FolderActivity.class.getSimpleName();

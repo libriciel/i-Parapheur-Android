@@ -6,17 +6,17 @@ import com.google.inject.Inject;
 
 import de.akquinet.android.androlog.Log;
 
-import org.codeartisans.android.toolbox.activity.RoboActivity;
+import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 
 public class OfficeActivity
-        extends RoboActivity
+        extends RoboFragmentActivity
 {
 
-    private static final String TAG = OfficeActivity.class.getSimpleName();
+    public static final String EXTRA_OFFICE_IDENTITY = "office:identity";
 
     @Inject
     private AndrologInitOnCreateObserver andrologInitOnCreateObserver;
@@ -27,7 +27,8 @@ public class OfficeActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
-        Log.i( TAG, "onCreate" );
+        String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
+        Log.i( "onCreate for office: " + officeIdentity );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
     }
