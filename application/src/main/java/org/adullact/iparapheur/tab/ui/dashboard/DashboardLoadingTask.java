@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.util.AsyncTaskWithMessageDialog;
 
@@ -14,33 +15,29 @@ public class DashboardLoadingTask
         extends AsyncTaskWithMessageDialog<Void, String, Map<String, List<Office>>>
 {
 
+    private final AccountsRepository accountsRepository;
+
     private final IParapheurHttpClient client;
 
     public DashboardLoadingTask( DashboardActivity context )
     {
         super( context, "Veuillez patienter" );
+        this.accountsRepository = context.accountsRepository;
         this.client = context.client;
     }
 
     @Override
     protected Map<String, List<Office>> doInBackground( Void... paramss )
     {
-        // TODO REMOVE BEGINS
-        List<Account> accounts = new ArrayList<Account>();
-        accounts.add( new Account( "Col.A.Role.A" ) );
-        accounts.add( new Account( "Col.A.Role.C" ) );
-        accounts.add( new Account( "Col.B.Role.D" ) );
-        // TODO REMOVE ENDS
-
         final Map<String, List<Office>> result = new HashMap<String, List<Office>>();
 
-        for ( Account eachAccount : accounts ) {
+        for ( Account eachAccount : accountsRepository.all() ) {
 
             publishProgress( "Chargement des bureaux (" + eachAccount.getTitle() + ")" );
 
             List<Office> offices = client.getOffices( eachAccount );
 
-            // Store in a Map by community
+            // Sort by community
             for ( Office eachOffice : offices ) {
                 if ( result.get( eachOffice.getCommunity() ) == null ) {
                     result.put( eachOffice.getCommunity(), new ArrayList<Office>() );

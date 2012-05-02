@@ -35,6 +35,12 @@
         <activity android:name=".ui.folder.FolderActivity">
         </activity>
         
+        <activity android:name=".ui.settings.AccountsActivity">
+        </activity>
+        
+        <activity android:name=".ui.settings.SettingsActivity">
+        </activity>
+        
     </application>
 
 </manifest>

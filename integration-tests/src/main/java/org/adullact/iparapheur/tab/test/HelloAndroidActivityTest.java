@@ -6,9 +6,9 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.view.KeyEvent;
 
-import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
-
 import com.github.rtyley.android.screenshot.celebrity.Screenshots;
+
+import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 
 public class HelloAndroidActivityTest
         extends ActivityInstrumentationTestCase2<FolderActivity>

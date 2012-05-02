@@ -1,6 +1,5 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -8,22 +7,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
+
 import de.akquinet.android.androlog.Log;
 
+import org.codeartisans.android.toolbox.activity.RoboActivity;
+import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
-        extends Activity
+        extends RoboActivity
 {
 
     private static final String TAG = FolderActivity.class.getSimpleName();
@@ -32,11 +34,17 @@ public class FolderActivity
 
     private static final int REJECT_DIALOG_ID = 202;
 
+    @Inject
+    private AndrologInitOnCreateObserver andrologInitOnCreateObserver;
+
+    @Inject
+    private ActionBarActivityObserver actionBarObserver;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
-        super.onCreate( savedInstanceState );
         Log.i( TAG, "onCreate" );
+        super.onCreate( savedInstanceState );
         setTitle( "La Gironde > Arcachon > SŽance ordinaire du conseil municipal" );
         setContentView( R.layout.folder );
 
@@ -73,26 +81,6 @@ public class FolderActivity
             }
 
         } );
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate( R.menu.logged_in, menu );
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
-        switch ( item.getItemId() ) {
-            case R.id.logout:
-                startActivity( new Intent( this, SplashScreenActivity.class ) );
-                return true;
-            default:
-                return super.onOptionsItemSelected( item );
-        }
     }
 
     @Override

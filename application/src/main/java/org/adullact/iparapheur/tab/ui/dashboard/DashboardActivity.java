@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,18 +18,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
 import com.google.inject.Inject;
 
 import de.akquinet.android.androlog.Log;
 
+import org.codeartisans.android.toolbox.activity.RoboActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
+import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 
 public class DashboardActivity
@@ -41,7 +42,13 @@ public class DashboardActivity
     private AndrologInitOnCreateObserver andrologInitOnCreateObserver;
 
     @Inject
+    private ActionBarActivityObserver actionBarObserver;
+
+    @Inject
     /* package */ IParapheurHttpClient client;
+
+    @Inject
+    /* package */ AccountsRepository accountsRepository;
 
     @InjectView( R.id.dashboard_layout )
     private LinearLayout dashboardLayout;
@@ -77,7 +84,7 @@ public class DashboardActivity
                         {
                             Office office = offices.get( position );
                             Log.d( DashboardActivity.this, "Selected Office: " + office );
-                            Log.report( "Somebody select office: " + office, null );
+                            Log.report( "Somebody selected office: " + office, null );
                             startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( "office:identity", office.getIdentity() ) );
                         }
 
@@ -89,12 +96,6 @@ public class DashboardActivity
             }
 
         }.execute( new Void[]{} );
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
-        return super.onCreateOptionsMenu( menu );
     }
 
     public static final class OfficeListAdapter
