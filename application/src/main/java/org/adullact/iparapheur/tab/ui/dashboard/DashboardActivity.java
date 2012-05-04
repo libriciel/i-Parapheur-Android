@@ -28,9 +28,11 @@ import org.codeartisans.android.toolbox.activity.RoboActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
+import org.adullact.iparapheur.tab.services.IParapheurHttpHelper;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 
@@ -45,10 +47,13 @@ public class DashboardActivity
     private ActionBarActivityObserver actionBarObserver;
 
     @Inject
-    /* package */ IParapheurHttpClient client;
+    private IParapheurHttpClient client;
 
     @Inject
-    /* package */ AccountsRepository accountsRepository;
+    private AccountsRepository accountsRepository;
+
+    @Inject
+    private IParapheurHttpHelper iParapheurHttpHelper;
 
     @InjectView( R.id.dashboard_layout )
     private LinearLayout dashboardLayout;
@@ -59,23 +64,32 @@ public class DashboardActivity
         Log.i( this, "onCreate" );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.dashboard );
-        new DashboardLoadingTask( this )
+        iParapheurHttpHelper.getOffices( accountsRepository.all().get( 0 ), new IParapheurHttpHelper.IParapheurServiceCallback()
+        {
+
+            public void onServiceCallback()
+            {
+                System.out.println( "GOT CALLBACK FROM IParapheurHttpHelper!" );
+            }
+
+        } );
+        new DashboardLoadingTask( this, client )
         {
 
             // This method is called on the UI thread
             // Populates UI views
             @Override
-            protected void beforeDialogDismiss( Map<String, List<Office>> officesByCommunity )
+            protected void beforeDialogDismiss( Map<Community, List<Office>> officesByCommunity )
             {
                 Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
-                for ( Map.Entry<String, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
+                for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
 
-                    String community = eachEntry.getKey();
+                    Community community = eachEntry.getKey();
                     final List<Office> offices = eachEntry.getValue();
 
                     DashboardCommunityView eachCommunityView = new DashboardCommunityView( context );
-                    eachCommunityView.getNameTextView().setText( community );
+                    eachCommunityView.getNameTextView().setText( community.getName() );
                     eachCommunityView.getOfficesGridView().setAdapter( new OfficeListAdapter( context, offices ) );
                     eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
                     {

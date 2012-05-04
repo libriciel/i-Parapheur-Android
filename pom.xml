@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>android.support</groupId>
                 <artifactId>compatibility-v4</artifactId>
-                <version>r6</version>
+                <version>r8</version>
             </dependency>
 
         </dependencies>

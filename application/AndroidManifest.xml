@@ -41,6 +41,9 @@
         <activity android:name=".ui.settings.SettingsActivity">
         </activity>
         
+        <service android:name=".services.IParapheurHttpService">
+        </service>
+        
     </application>
 
 </manifest>

@@ -7,7 +7,7 @@ public class Office
 
     private final String title;
 
-    private final String community;
+    private final Community community;
 
     private String description;
 
@@ -21,10 +21,10 @@ public class Office
     {
         this.identity = identity;
         this.title = title;
-        this.community = community;
+        this.community = new Community( community );
     }
 
-    public String getCommunity()
+    public Community getCommunity()
     {
         return community;
     }
