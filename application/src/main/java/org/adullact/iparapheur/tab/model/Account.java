@@ -1,7 +1,12 @@
 package org.adullact.iparapheur.tab.model;
 
+import java.io.Serializable;
+
 public class Account
+        implements Serializable
 {
+
+    public static final long _serialVersionUID = 1L;
 
     private final String identity;
 

@@ -1,12 +1,16 @@
 package org.adullact.iparapheur.tab.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Folder
+        implements Serializable
 {
+
+    public static final long _serialVersionUID = 1L;
 
     private String identity;
 
