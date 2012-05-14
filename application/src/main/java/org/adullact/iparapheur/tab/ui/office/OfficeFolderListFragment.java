@@ -16,18 +16,26 @@ import android.widget.TextView;
 
 import roboguice.fragment.RoboListFragment;
 
+import com.google.inject.Inject;
+
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.FolderDocument;
+import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 
 public class OfficeFolderListFragment
         extends RoboListFragment
 {
 
+    @Inject
+    private IParapheurHttpClient client;
+
     @Override
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
+        String officeIdentity = getActivity().getIntent().getExtras().getString( OfficeActivity.EXTRA_OFFICE_IDENTITY );
+        // TODO
         setListAdapter( new OfficeListAdapter( getActivity(), Collections.<AbstractFolderFile>emptyList() ) );
     }
 
