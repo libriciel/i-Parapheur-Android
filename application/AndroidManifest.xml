@@ -26,23 +26,35 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".ui.dashboard.DashboardActivity">
+        <activity 
+            android:name=".ui.dashboard.DashboardActivity">
         </activity>
         
-        <activity android:name=".ui.office.OfficeActivity">
+        <activity 
+            android:name=".ui.office.OfficeActivity">
         </activity>
         
-        <activity android:name=".ui.folder.FolderActivity">
+        <activity 
+            android:name=".ui.folder.FolderActivity">
         </activity>
         
-        <activity android:name=".ui.settings.AccountsActivity">
+        <activity 
+            android:name=".ui.settings.AccountsActivity">
         </activity>
         
-        <activity android:name=".ui.settings.SettingsActivity">
+        <activity 
+            android:name=".ui.settings.SettingsActivity">
         </activity>
         
-        <service android:name=".services.IParapheurHttpService">
+        <service 
+            android:name=".services.IParapheurHttpService">
         </service>
+        
+        <provider
+            android:authorities="org.adullact.iparapheur.tab.http.contentprovider"
+            android:name=".http.database.HttpResourcesContentProvider"
+            android:exported="false">
+        </provider>
         
     </application>
 

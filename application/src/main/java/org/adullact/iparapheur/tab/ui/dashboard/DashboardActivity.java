@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,9 +31,7 @@ import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
-import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
-import org.adullact.iparapheur.tab.services.IParapheurHttpHelper;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 
@@ -49,12 +48,6 @@ public class DashboardActivity
     @Inject
     private IParapheurHttpClient client;
 
-    @Inject
-    private AccountsRepository accountsRepository;
-
-    @Inject
-    private IParapheurHttpHelper iParapheurHttpHelper;
-
     @InjectView( R.id.dashboard_layout )
     private LinearLayout dashboardLayout;
 
@@ -64,15 +57,6 @@ public class DashboardActivity
         Log.i( this, "onCreate" );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.dashboard );
-        iParapheurHttpHelper.getOffices( accountsRepository.all().get( 0 ), new IParapheurHttpHelper.IParapheurServiceCallback()
-        {
-
-            public void onServiceCallback()
-            {
-                System.out.println( "GOT CALLBACK FROM IParapheurHttpHelper!" );
-            }
-
-        } );
         new DashboardLoadingTask( this, client )
         {
 
@@ -83,27 +67,29 @@ public class DashboardActivity
             {
                 Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
-                for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
+                if ( officesByCommunity != null ) {
+                    for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
 
-                    Community community = eachEntry.getKey();
-                    final List<Office> offices = eachEntry.getValue();
+                        Community community = eachEntry.getKey();
+                        final List<Office> offices = eachEntry.getValue();
 
-                    DashboardCommunityView eachCommunityView = new DashboardCommunityView( context );
-                    eachCommunityView.getNameTextView().setText( community.getName() );
-                    eachCommunityView.getOfficesGridView().setAdapter( new OfficeListAdapter( context, offices ) );
-                    eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
-                    {
-
-                        public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+                        DashboardCommunityView eachCommunityView = new DashboardCommunityView( context );
+                        eachCommunityView.getNameTextView().setText( community.getName() );
+                        eachCommunityView.getOfficesGridView().setAdapter( new OfficeListAdapter( context, offices ) );
+                        eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
                         {
-                            Office office = offices.get( position );
-                            startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() ) );
-                        }
 
-                    } );
+                            public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+                            {
+                                Office office = offices.get( position );
+                                startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() ) );
+                            }
 
-                    dashboardLayout.addView( eachCommunityView );
+                        } );
 
+                        dashboardLayout.addView( eachCommunityView );
+
+                    }
                 }
             }
 

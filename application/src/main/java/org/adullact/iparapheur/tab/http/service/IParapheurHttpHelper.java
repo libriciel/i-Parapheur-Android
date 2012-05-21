@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.tab.services;
+package org.adullact.iparapheur.tab.http.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
 
 import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.http.HttpVerb;
 import org.adullact.iparapheur.tab.model.Account;
 
 @ContextSingleton
@@ -31,7 +32,7 @@ public class IParapheurHttpHelper
     public static interface IParapheurServiceCallback
     {
 
-        void onServiceCallback();
+        void onServiceCallback( int requestId );
 
     }
 
@@ -49,7 +50,7 @@ public class IParapheurHttpHelper
             } else {
                 IParapheurServiceCallback callback = requestCallbacks.get( requestId );
                 if ( callback != null ) {
-                    callback.onServiceCallback();
+                    callback.onServiceCallback( requestId );
                 }
             }
         }
@@ -69,8 +70,10 @@ public class IParapheurHttpHelper
         LocalBroadcastManager.getInstance( context ).unregisterReceiver( receiver );
     }
 
-    public void getOffices( Account account, IParapheurServiceCallback callback )
+    public int getOffices( Account account, IParapheurServiceCallback callback )
     {
+        // TODO Check if the method is already pending
+
         // Generate new Request ID
         final int requestId = REQUEST_COUNT.getAndIncrement();
 
@@ -82,7 +85,7 @@ public class IParapheurHttpHelper
         // Setup HTTP Request Intent
         Intent intent = new Intent( context, IParapheurHttpService.class );
         intent.putExtra( IParapheurHttpService.EXTRA_REQUEST_ID, requestId );
-        intent.putExtra( IParapheurHttpService.EXTRA_REQUEST_VERB, method );
+        intent.putExtra( IParapheurHttpService.EXTRA_REQUEST_VERB, HttpVerb.GET );
         intent.putExtra( IParapheurHttpService.EXTRA_REQUEST_URL, url );
         intent.putExtra( IParapheurHttpService.EXTRA_REQUEST_BODY, body );
 
@@ -95,6 +98,7 @@ public class IParapheurHttpHelper
             requestCallbacks.remove( requestId );
             throw new IParapheurTabException( "Unable to start IParapheurTab Http Intent Service." );
         }
+        return requestId;
     }
 
 }

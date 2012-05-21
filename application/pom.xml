@@ -30,6 +30,12 @@
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
             <version>1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient-cache</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

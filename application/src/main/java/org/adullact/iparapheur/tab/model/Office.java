@@ -64,6 +64,21 @@ public class Office
         return todoFolderCount;
     }
 
+    public void setDescription( String description )
+    {
+        this.description = description;
+    }
+
+    public void setTodoFolderCount( Integer todoFolderCount )
+    {
+        this.todoFolderCount = todoFolderCount;
+    }
+
+    public void setLateFolderCount( Integer lateFolderCount )
+    {
+        this.lateFolderCount = lateFolderCount;
+    }
+
     @Override
     public boolean equals( Object o )
     {

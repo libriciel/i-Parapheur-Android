@@ -1,11 +1,13 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
+import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.util.AsyncTaskWithMessageDialog;
 
 public class DashboardLoadingTask
@@ -24,7 +26,12 @@ public class DashboardLoadingTask
     protected Map<Community, List<Office>> doInBackground( Void... paramss )
     {
         publishProgress( "Chargement des bureaux" );
-        return client.getOffices();
+        try {
+            return client.getOffices();
+        } catch ( IParapheurHttpException ex ) {
+            ex.printStackTrace();
+            return Collections.emptyMap();
+        }
     }
 
 }

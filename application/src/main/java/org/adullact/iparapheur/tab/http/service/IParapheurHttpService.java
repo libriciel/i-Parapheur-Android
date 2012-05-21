@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.tab.services;
+package org.adullact.iparapheur.tab.http.service;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -7,6 +7,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import roboguice.service.RoboIntentService;
 
 import de.akquinet.android.androlog.Log;
+
+import org.adullact.iparapheur.tab.http.HttpVerb;
 
 public class IParapheurHttpService
         extends RoboIntentService
@@ -35,7 +37,7 @@ public class IParapheurHttpService
         // Parse incoming Intent
         Log.d( "Handling Intent: " + intent );
         int requestId = intent.getIntExtra( EXTRA_REQUEST_ID, -1 );
-        String requestVerb = intent.getStringExtra( EXTRA_REQUEST_VERB );
+        HttpVerb requestVerb = ( HttpVerb ) intent.getExtras().get( EXTRA_REQUEST_VERB );
         String requestUrl = intent.getStringExtra( EXTRA_REQUEST_URL );
 
         // TODO
