@@ -69,7 +69,7 @@ public class AccountsRepository
         NullArgumentException.ensureNotEmpty( "Account identity", identity );
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
         Set<String> keySet = sharedPreferences.getAll().keySet();
-        if ( !keySet.contains( identity ) ) {
+        if ( !keySet.contains( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX ) ) {
             return null;
         }
         String title = sharedPreferences.getString( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX, null );

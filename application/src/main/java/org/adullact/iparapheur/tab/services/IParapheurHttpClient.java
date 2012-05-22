@@ -176,22 +176,20 @@ public class IParapheurHttpClient
     {
         NullArgumentException.ensureNotNull( "Account", account );
         if ( !accountSessionTickets.containsKey( account.getIdentity() ) ) {
-            synchronized ( accountSessionTickets ) {
-                try {
-                    HttpPost post = new HttpPost( account.getUrl() + LOGIN_PATH );
-                    HttpEntity data = new StringEntity( "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}", "UTF-8" );
-                    post.setEntity( data );
-                    JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
-                    String ticket = json.getJSONObject( "data" ).getString( "ticket" );
-                    accountSessionTickets.put( account.getIdentity(), ticket );
-                } catch ( IOException ex ) {
-                    throw new IParapheurHttpException( "Unable to login into account '" + account.getTitle() + "'", ex );
-                } catch ( JSONException ex ) {
-                    throw new IParapheurHttpException( "Unable to login into account " + account.getTitle() + "'", ex );
-                }
+            try {
+                HttpPost post = new HttpPost( account.getUrl() + LOGIN_PATH );
+                HttpEntity data = new StringEntity( "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}", "UTF-8" );
+                post.setEntity( data );
+                JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
+                String ticket = json.getJSONObject( "data" ).getString( "ticket" );
+                accountSessionTickets.put( account.getIdentity(), ticket );
+            } catch ( IOException ex ) {
+                throw new IParapheurHttpException( "Unable to login into account '" + account.getTitle() + "'", ex );
+            } catch ( JSONException ex ) {
+                throw new IParapheurHttpException( "Unable to login into account " + account.getTitle() + "'", ex );
             }
         } else {
-            Log.d( "Already logged in" );
+            Log.d( "Already logged-in" );
         }
     }
 

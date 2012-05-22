@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
+import de.akquinet.android.androlog.Log;
+
+import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
@@ -36,6 +39,12 @@ public class OfficeLoadingTask
             this.pageSize = pageSize;
         }
 
+        @Override
+        public String toString()
+        {
+            return "OfficeLoadingTask.Params[" + accountIdentity + ", " + officeIdentity + ", " + page + ", " + pageSize + "]";
+        }
+
     }
 
     private final AccountsRepository accountsRepository;
@@ -50,14 +59,17 @@ public class OfficeLoadingTask
     }
 
     @Override
-    protected List<Folder> doInBackground( Params... params )
+    protected List<Folder> doInBackground( Params... parameters )
     {
         publishProgress( "Chargement des dossiers" );
         try {
-            return iParapheurClient.fetchFolders( accountsRepository.byIdentity( params[0].accountIdentity ),
-                                                  params[0].officeIdentity,
-                                                  params[0].page,
-                                                  params[0].pageSize );
+            Params params = parameters[0];
+            Account account = accountsRepository.byIdentity( params.accountIdentity );
+            Log.d( context, "Will load folders with params: " + params + " using account: " + account );
+            return iParapheurClient.fetchFolders( account,
+                                                  params.officeIdentity,
+                                                  params.page,
+                                                  params.pageSize );
         } catch ( IParapheurHttpException ex ) {
             ex.printStackTrace();
             return Collections.emptyList();
