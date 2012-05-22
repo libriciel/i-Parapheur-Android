@@ -17,6 +17,7 @@
 
     <properties>
         <platform.version>3.0_r2</platform.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
