@@ -45,7 +45,7 @@ public class FolderActivity
     {
         Log.i( TAG, "onCreate" );
         super.onCreate( savedInstanceState );
-        setTitle( "La Gironde > Arcachon > SŽance ordinaire du conseil municipal" );
+        setTitle( "La Gironde > Arcachon > SÃ©ance ordinaire du conseil municipal" );
         setContentView( R.layout.folder );
 
         // Find views

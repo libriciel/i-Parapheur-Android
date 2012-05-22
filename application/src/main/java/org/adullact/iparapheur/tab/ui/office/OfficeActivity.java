@@ -3,6 +3,9 @@ package org.adullact.iparapheur.tab.ui.office;
 import java.util.List;
 
 import android.os.Bundle;
+import android.widget.TextView;
+
+import roboguice.inject.InjectView;
 
 import com.google.inject.Inject;
 
@@ -39,6 +42,9 @@ public class OfficeActivity
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
+    @InjectView( R.id.office_title )
+    private TextView officeTitleView;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -48,6 +54,7 @@ public class OfficeActivity
         Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
+        officeTitleView.setText( officeTitle );
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
         {
 

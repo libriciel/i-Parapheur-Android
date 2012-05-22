@@ -37,12 +37,12 @@ public class FolderFileListFragment
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        Folder folder = new Folder( "123456", "Séance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Matériel" );
+        Folder folder = new Folder( "123456", "S√©ance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Mat√©riel" );
         folder.addAllDocuments( new FolderDocument[]{
-                    new FolderDocument( "Séance ordinaire du conseil municipal", "file:///android_asset/index.html" )
+                    new FolderDocument( "S√©ance ordinaire du conseil municipal", "file:///android_asset/index.html" )
                 } );
         folder.addAllAnnexes( new FolderAnnex[]{
-                    new FolderAnnex( "Projet de réhabilitation", "file:///android_asset/index.html" ),
+                    new FolderAnnex( "Projet de r√©habilitation", "file:///android_asset/index.html" ),
                     new FolderAnnex( "Transcript", "file:///android_asset/index.html" )
                 } );
         setListAdapter( new FolderListAdapter( getActivity(), folder.getAllFiles() ) );

@@ -71,7 +71,7 @@ public class OfficeLoadingTask
                                                   params.page,
                                                   params.pageSize );
         } catch ( IParapheurHttpException ex ) {
-            ex.printStackTrace();
+            Log.w( context, "Unable to load folders, will return an empty list", ex );
             return Collections.emptyList();
         }
     }
