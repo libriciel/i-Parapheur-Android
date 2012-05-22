@@ -58,7 +58,7 @@ public class DashboardLoadingTask
                 Log.w( context, ex.getMessage(), ex );
             }
         }
-        publishProgress( "Chargement des bureaux terminé" );
+        publishProgress( "Chargement des bureaux termin√©" );
         return result;
     }
 

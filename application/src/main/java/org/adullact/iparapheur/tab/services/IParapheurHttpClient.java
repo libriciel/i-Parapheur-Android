@@ -92,7 +92,7 @@ public class IParapheurHttpClient
                     String community = eachBureau.getString( "collectivite" );
                     // BEGIN TODO REMOVE
                     if ( Strings.isEmpty( community ) ) {
-                        community = "Ma collectivité";
+                        community = "Ma collectivit√©";
                     }
                     // END TODO REMOVE
                     String description = eachBureau.getString( "description" );

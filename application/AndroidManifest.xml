@@ -34,7 +34,7 @@
             android:name=".ui.office.OfficeActivity">
         </activity>
         
-        <activity 
+        <activity
             android:name=".ui.folder.FolderActivity">
         </activity>
         
@@ -60,4 +60,3 @@
     </application>
 
 </manifest>
-

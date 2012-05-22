@@ -60,49 +60,65 @@ public class DashboardActivity
         Log.d( this, "onCreate" );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.dashboard );
-        new DashboardLoadingTask( this, accountsRepository, client )
-        {
+        dashboardLayout.removeAllViews();
+        if ( accountsRepository.all().isEmpty() ) {
 
-            // This method is called on the UI thread
-            // Populates UI views
-            @Override
-            protected void beforeDialogDismiss( Map<Community, List<Office>> officesByCommunity )
+            // No account
+            TextView textView = new TextView( this );
+            textView.setText( "Aucun compte iParapheur configuré." );
+            dashboardLayout.addView( textView );
+
+        } else {
+
+            new DashboardLoadingTask( this, accountsRepository, client )
             {
-                Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
-                //dashboardLayout.removeAllViews();
+                // This method is called on the UI thread
+                // Populates UI views
+                @Override
+                protected void beforeDialogDismiss( Map<Community, List<Office>> officesByCommunity )
+                {
+                    Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
-                if ( officesByCommunity != null && !officesByCommunity.isEmpty() ) {
-                    for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
+                    if ( officesByCommunity == null || officesByCommunity.isEmpty() ) {
 
-                        Community community = eachEntry.getKey();
-                        final List<Office> offices = eachEntry.getValue();
+                        // No offices
+                        TextView textView = new TextView( context );
+                        textView.setText( "Aucun bureau." );
+                        dashboardLayout.addView( textView );
 
-                        DashboardCommunityView eachCommunityView = new DashboardCommunityView( context );
-                        eachCommunityView.getNameTextView().setText( community.getName() );
-                        eachCommunityView.getOfficesGridView().setAdapter( new OfficeListAdapter( context, offices ) );
-                        eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
-                        {
+                    } else {
 
-                            public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+                        for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
+
+                            Community community = eachEntry.getKey();
+                            final List<Office> offices = eachEntry.getValue();
+
+                            DashboardCommunityView eachCommunityView = new DashboardCommunityView( context );
+                            eachCommunityView.getNameTextView().setText( community.getName() );
+                            eachCommunityView.getOfficesGridView().setAdapter( new OfficeListAdapter( context, offices ) );
+                            eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
                             {
-                                Office office = offices.get( position );
-                                Intent intent = new Intent( getApplication(), OfficeActivity.class );
-                                intent.putExtra( OfficeActivity.EXTRA_ACCOUNT_IDENTITY, office.getAccountIdentity() );
-                                intent.putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() );
-                                intent.putExtra( OfficeActivity.EXTRA_OFFICE_TITLE, office.getTitle() );
-                                startActivity( intent );
-                            }
 
-                        } );
+                                public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+                                {
+                                    Office office = offices.get( position );
+                                    Intent intent = new Intent( getApplication(), OfficeActivity.class );
+                                    intent.putExtra( OfficeActivity.EXTRA_ACCOUNT_IDENTITY, office.getAccountIdentity() );
+                                    intent.putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() );
+                                    intent.putExtra( OfficeActivity.EXTRA_OFFICE_TITLE, office.getTitle() );
+                                    startActivity( intent );
+                                }
 
-                        dashboardLayout.addView( eachCommunityView );
+                            } );
+                            dashboardLayout.addView( eachCommunityView );
+                        }
 
                     }
                 }
-            }
 
-        }.execute( new Void[]{} );
+            }.execute( new Void[]{} );
+        }
     }
 
     public static final class OfficeListAdapter

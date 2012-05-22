@@ -23,12 +23,12 @@ public class SplashScreenActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
-        Log.i( "onCreate" );
+        Log.d( "onCreate" );
 
         super.onCreate( savedInstanceState );
 
         setContentView( R.layout.splashscreen );
-        new SplashScreenTask()
+        new SplashScreenTask( this )
         {
 
             @Override
