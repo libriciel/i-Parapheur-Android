@@ -56,12 +56,16 @@ public class IParapheurHttpClient
 
     private AndroidHttpClient httpClient;
 
+    public IParapheurHttpClient()
+    {
+        setupHttpClient();
+    }
+
     public void onActivityResume( @Observes OnResumeEvent event )
     {
-        httpClient = AndroidHttpClient.newInstance( "Android" );
-        SchemeRegistry schemeRegistry = ( ( AndroidHttpClient ) httpClient ).getConnectionManager().getSchemeRegistry();
-        schemeRegistry.unregister( "https" );
-        schemeRegistry.register( new Scheme( "https", TrustAllSSLSocketFactory.getSocketFactory(), 443 ) );
+        if ( httpClient == null ) {
+            setupHttpClient();
+        }
     }
 
     public void onActivityPause( @Observes OnPauseEvent event )
@@ -69,6 +73,14 @@ public class IParapheurHttpClient
         httpClient.close();
         httpClient = null;
         accountSessionTickets.clear();
+    }
+
+    private void setupHttpClient()
+    {
+        httpClient = AndroidHttpClient.newInstance( "Android" );
+        SchemeRegistry schemeRegistry = ( ( AndroidHttpClient ) httpClient ).getConnectionManager().getSchemeRegistry();
+        schemeRegistry.unregister( "https" );
+        schemeRegistry.register( new Scheme( "https", TrustAllSSLSocketFactory.getSocketFactory(), 443 ) );
     }
 
     public List<Office> fetchOffices( Account account )

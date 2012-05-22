@@ -169,6 +169,8 @@ public class DashboardActivity
                 dataViews = new ItemDataViewsHolder();
                 dataViews.icon = ( ImageView ) convertView.findViewById( R.id.dashboard_officesgrid_item_icon );
                 dataViews.title = ( TextView ) convertView.findViewById( R.id.dashboard_officesgrid_item_title );
+                dataViews.todo = ( TextView ) convertView.findViewById( R.id.dashboard_officesgrid_item_todo );
+                dataViews.late = ( TextView ) convertView.findViewById( R.id.dashboard_officesgrid_item_late );
                 convertView.setTag( dataViews );
             } else {
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
@@ -177,7 +179,9 @@ public class DashboardActivity
             final Office office = offices.get( position );
 
             dataViews.title.setText( office.getTitle() );
-            dataViews.icon.setImageResource( R.drawable.ic_list_document );
+            dataViews.icon.setImageResource( R.drawable.icon );
+            dataViews.todo.setText( "" + office.getTodoFolderCount() );
+            dataViews.late.setText( "" + office.getLateFolderCount() );
 
             return convertView;
         }
@@ -188,6 +192,10 @@ public class DashboardActivity
             private ImageView icon;
 
             private TextView title;
+
+            private TextView todo;
+
+            private TextView late;
 
         }
 
