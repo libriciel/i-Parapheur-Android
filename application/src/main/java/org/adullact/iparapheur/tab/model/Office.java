@@ -22,11 +22,19 @@ public class Office
 
     private Integer lateFolderCount;
 
-    public Office( String identity, String title, String community )
+    private final String accountIdentity;
+
+    public Office( String identity, String title, String community, String accountIdentity )
     {
         this.identity = identity;
         this.title = title;
         this.community = new Community( community );
+        this.accountIdentity = accountIdentity;
+    }
+
+    public String getAccountIdentity()
+    {
+        return accountIdentity;
     }
 
     public Community getCommunity()

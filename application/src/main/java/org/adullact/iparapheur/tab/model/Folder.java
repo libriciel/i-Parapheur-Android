@@ -12,22 +12,23 @@ public class Folder
 
     public static final long _serialVersionUID = 1L;
 
-    private String identity;
+    private final String identity;
 
-    private String title;
+    private final String title;
 
-    private FolderRequestedAction requestedAction;
+    private final FolderRequestedAction requestedAction;
 
-    private String businessType;
+    private final String businessType;
 
-    private String businessSubType;
+    private final String businessSubType;
 
     private final List<FolderDocument> documents = new ArrayList<FolderDocument>();
 
     private final List<FolderAnnex> annexes = new ArrayList<FolderAnnex>();
 
-    public Folder( String title, FolderRequestedAction requestedAction, String businessType, String businessSubType )
+    public Folder( String identity, String title, FolderRequestedAction requestedAction, String businessType, String businessSubType )
     {
+        this.identity = identity;
         this.title = title;
         this.requestedAction = requestedAction;
         this.businessType = businessType;
@@ -44,19 +45,9 @@ public class Folder
         return title;
     }
 
-    public void setTitle( String title )
-    {
-        this.title = title;
-    }
-
     public String getBusinessType()
     {
         return businessType;
-    }
-
-    public void setBusinessType( String businessType )
-    {
-        this.businessType = businessType;
     }
 
     public String getBusinessSubType()
@@ -64,19 +55,9 @@ public class Folder
         return businessSubType;
     }
 
-    public void setBusinessSubType( String businessSubType )
-    {
-        this.businessSubType = businessSubType;
-    }
-
     public FolderRequestedAction getRequestedAction()
     {
         return requestedAction;
-    }
-
-    public void setRequestedAction( FolderRequestedAction requestedAction )
-    {
-        this.requestedAction = requestedAction;
     }
 
     public boolean addDocument( FolderDocument folderDocument )

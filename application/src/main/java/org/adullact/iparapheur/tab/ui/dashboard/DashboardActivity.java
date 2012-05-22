@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,6 +30,7 @@ import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
@@ -46,6 +46,9 @@ public class DashboardActivity
     private ActionBarActivityObserver actionBarObserver;
 
     @Inject
+    private AccountsRepository accountsRepository;
+
+    @Inject
     private IParapheurHttpClient client;
 
     @InjectView( R.id.dashboard_layout )
@@ -54,10 +57,10 @@ public class DashboardActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
-        Log.i( this, "onCreate" );
+        Log.d( this, "onCreate" );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.dashboard );
-        new DashboardLoadingTask( this, client )
+        new DashboardLoadingTask( this, accountsRepository, client )
         {
 
             // This method is called on the UI thread
@@ -67,7 +70,9 @@ public class DashboardActivity
             {
                 Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
-                if ( officesByCommunity != null ) {
+                //dashboardLayout.removeAllViews();
+
+                if ( officesByCommunity != null && !officesByCommunity.isEmpty() ) {
                     for ( Map.Entry<Community, List<Office>> eachEntry : officesByCommunity.entrySet() ) {
 
                         Community community = eachEntry.getKey();
@@ -82,7 +87,11 @@ public class DashboardActivity
                             public void onItemClick( AdapterView<?> parent, View view, int position, long id )
                             {
                                 Office office = offices.get( position );
-                                startActivity( new Intent( getApplication(), OfficeActivity.class ).putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() ) );
+                                Intent intent = new Intent( getApplication(), OfficeActivity.class );
+                                intent.putExtra( OfficeActivity.EXTRA_ACCOUNT_IDENTITY, office.getAccountIdentity() );
+                                intent.putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, office.getIdentity() );
+                                intent.putExtra( OfficeActivity.EXTRA_OFFICE_TITLE, office.getTitle() );
+                                startActivity( intent );
                             }
 
                         } );

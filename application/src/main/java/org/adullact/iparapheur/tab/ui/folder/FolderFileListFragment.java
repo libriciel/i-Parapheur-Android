@@ -37,7 +37,7 @@ public class FolderFileListFragment
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        Folder folder = new Folder( "Séance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Matériel" );
+        Folder folder = new Folder( "123456", "Séance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Matériel" );
         folder.addAllDocuments( new FolderDocument[]{
                     new FolderDocument( "Séance ordinaire du conseil municipal", "file:///android_asset/index.html" )
                 } );
