@@ -2,7 +2,6 @@ package org.adullact.iparapheur.tab.ui.office;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -19,8 +18,7 @@ import roboguice.fragment.RoboListFragment;
 import com.google.inject.Inject;
 
 import org.adullact.iparapheur.tab.R;
-import org.adullact.iparapheur.tab.model.AbstractFolderFile;
-import org.adullact.iparapheur.tab.model.FolderDocument;
+import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 
 public class OfficeFolderListFragment
@@ -34,9 +32,6 @@ public class OfficeFolderListFragment
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        String officeIdentity = getActivity().getIntent().getExtras().getString( OfficeActivity.EXTRA_OFFICE_IDENTITY );
-        // TODO
-        setListAdapter( new OfficeListAdapter( getActivity(), Collections.<AbstractFolderFile>emptyList() ) );
     }
 
     @Override
@@ -45,18 +40,18 @@ public class OfficeFolderListFragment
         return inflater.inflate( R.layout.office_folderlist, container, false );
     }
 
-    private static final class OfficeListAdapter
+    /* package */ static final class OfficeFolderListAdapter
             extends BaseAdapter
     {
 
-        private final List<AbstractFolderFile> folderFiles;
+        private final List<Folder> folderFiles;
 
         private LayoutInflater inflater;
 
-        private OfficeListAdapter( Context context, Collection<AbstractFolderFile> folderFiles )
+        /* package */ OfficeFolderListAdapter( Context context, Collection<Folder> folderFiles )
         {
             this.inflater = LayoutInflater.from( context );
-            this.folderFiles = new ArrayList<AbstractFolderFile>( folderFiles );
+            this.folderFiles = new ArrayList<Folder>( folderFiles );
         }
 
         @Override
@@ -98,15 +93,10 @@ public class OfficeFolderListFragment
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
             }
 
-            final AbstractFolderFile folderFile = folderFiles.get( position );
+            final Folder folderFile = folderFiles.get( position );
 
             dataViews.title.setText( folderFile.getTitle() );
-            if ( folderFile instanceof FolderDocument ) {
-                convertView.setBackgroundResource( R.color.grey );
-                dataViews.icon.setImageResource( R.drawable.ic_list_document );
-            } else {
-                dataViews.icon.setImageResource( R.drawable.ic_list_annex );
-            }
+            dataViews.icon.setImageResource( R.drawable.ic_list_document );
 
             return convertView;
         }

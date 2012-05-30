@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.akquinet.android.androlog.Log;
+
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;

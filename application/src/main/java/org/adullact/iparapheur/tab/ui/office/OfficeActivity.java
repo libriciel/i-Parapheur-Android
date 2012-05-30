@@ -5,6 +5,7 @@ import java.util.List;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
 
 import com.google.inject.Inject;
@@ -45,13 +46,16 @@ public class OfficeActivity
     @InjectView( R.id.office_title )
     private TextView officeTitleView;
 
+    @InjectFragment( R.id.office_list_view )
+    private OfficeFolderListFragment officeFolderListFragment;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
         String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
-        Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity );
+        Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
         officeTitleView.setText( officeTitle );
@@ -65,7 +69,7 @@ public class OfficeActivity
             {
                 Log.d( OfficeActivity.this, "Got result: " + folders );
                 if ( folders != null && !folders.isEmpty() ) {
-                    // TODO Populates UI views
+                    officeFolderListFragment.setListAdapter( new OfficeFolderListFragment.OfficeFolderListAdapter( context, folders ) );
                 }
             }
 
