@@ -107,4 +107,10 @@ public class Folder
         return Collections.unmodifiableList( allFiles );
     }
 
+    @Override
+    public String toString()
+    {
+        return "Folder{" + "identity=" + identity + ", title=" + title + ", requestedAction=" + requestedAction + '}';
+    }
+
 }

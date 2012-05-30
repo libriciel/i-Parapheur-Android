@@ -93,9 +93,9 @@ public class OfficeFolderListFragment
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
             }
 
-            final Folder folderFile = folderFiles.get( position );
-
-            dataViews.title.setText( folderFile.getTitle() );
+            final Folder folder = folderFiles.get( position );
+            
+            dataViews.title.setText( folder.getTitle() );
             dataViews.icon.setImageResource( R.drawable.ic_list_document );
 
             return convertView;

@@ -39,12 +39,54 @@
             android:layout_height="wrap_content"
             />
 
-        <WebView
-            android:id="@+id/office_details_webview"
+        <RelativeLayout
+            android:id="@+id/office_folder_layout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
-            />
+            android:layout_weight="3" >
+
+            <TextView
+                android:id="@+id/office_folder_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Office"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Button
+                android:id="@+id/office_folder_open_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Ouvrir" />
+
+            <Button
+                android:id="@+id/office_folder_negative_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/office_folder_open_button"
+                android:layout_alignBottom="@+id/office_folder_open_button"
+                android:layout_marginRight="20dp"
+                android:layout_toLeftOf="@+id/office_folder_open_button"
+                android:text="Negatif" />
+
+            <Button
+                android:id="@+id/office_folder_positive_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/office_folder_negative_button"
+                android:layout_alignBottom="@+id/office_folder_negative_button"
+                android:layout_marginRight="20dp"
+                android:layout_toLeftOf="@+id/office_folder_negative_button"
+                android:text="Positif" />
+            
+        </RelativeLayout>
         
     </LinearLayout>
 

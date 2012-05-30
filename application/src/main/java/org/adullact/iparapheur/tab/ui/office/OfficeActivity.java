@@ -3,6 +3,10 @@ package org.adullact.iparapheur.tab.ui.office;
 import java.util.List;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import roboguice.inject.InjectFragment;
@@ -49,6 +53,51 @@ public class OfficeActivity
     @InjectFragment( R.id.office_list_view )
     private OfficeFolderListFragment officeFolderListFragment;
 
+    @InjectView( R.id.office_folder_layout )
+    private RelativeLayout folderLayout;
+
+    @InjectView( R.id.office_folder_title )
+    private TextView folderTitleView;
+
+    @InjectView( R.id.office_folder_positive_button )
+    private Button folderPositiveButton;
+
+    @InjectView( R.id.office_folder_negative_button )
+    private Button folderNegativeButton;
+
+    @InjectView( R.id.office_folder_open_button )
+    private Button folderOpenButton;
+
+    private final AdapterView.OnItemClickListener folderClickListener = new AdapterView.OnItemClickListener()
+    {
+
+        public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
+        {
+            folderDetailVisibility( true );
+            Log.i( "CLICKED ITEM: " + officeFolderListFragment.getListAdapter().getItem( position ) );
+            Folder folder = ( Folder ) officeFolderListFragment.getListAdapter().getItem( position );
+            folderTitleView.setText( folder.getTitle() );
+            switch ( folder.getRequestedAction() ) {
+                case SIGNATURE:
+                    folderPositiveButton.setText( "Signer" );
+                    break;
+                case VISA:
+                    folderPositiveButton.setText( "Viser" );
+                    break;
+            }
+            folderNegativeButton.setText( "Rejeter" );
+        }
+
+    };
+
+    private void folderDetailVisibility( boolean visible )
+    {
+        for ( int idx = 0; idx < folderLayout.getChildCount(); idx++ ) {
+            folderLayout.getChildAt( idx ).setVisibility( visible ? View.VISIBLE : View.INVISIBLE );
+
+        }
+    }
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -58,6 +107,7 @@ public class OfficeActivity
         Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
+        folderDetailVisibility( false );
         officeTitleView.setText( officeTitle );
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
         {
@@ -70,6 +120,7 @@ public class OfficeActivity
                 Log.d( OfficeActivity.this, "Got result: " + folders );
                 if ( folders != null && !folders.isEmpty() ) {
                     officeFolderListFragment.setListAdapter( new OfficeFolderListFragment.OfficeFolderListAdapter( context, folders ) );
+                    officeFolderListFragment.getListView().setOnItemClickListener( folderClickListener );
                 }
             }
 

@@ -143,15 +143,10 @@ public class IParapheurHttpClient
                 JSONArray dossiers = json.getJSONObject( "data" ).getJSONArray( "dossiers" );
                 for ( int idx = 0; idx < dossiers.length(); idx++ ) {
                     JSONObject eachDossier = dossiers.getJSONObject( idx );
-                    String identity = eachDossier.getString( "dossierRef" );
-                    String title = eachDossier.getString( "titre" );
-                    String requestedAction = eachDossier.getString( "actionDemandee" );
-                    String type = eachDossier.getString( "type" );
-                    String subtype = eachDossier.getString( "sousType" );
-                    String dueDate = eachDossier.getString( "dateLimite" );
-
-                    Folder folder = new Folder( identity, title, FolderRequestedAction.SIGNATURE, type, subtype );
-                    result.add( folder );
+                    Folder folder = parseFolder( eachDossier );
+                    if ( folder != null ) {
+                        result.add( folder );
+                    }
                 }
             }
             return result;
@@ -161,7 +156,51 @@ public class IParapheurHttpClient
         } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Unable to load Folders", ex );
         }
+    }
 
+    public Folder fetchFolder( Account account, String folderIdentity )
+            throws IParapheurHttpException
+    {
+        ensureLoggedIn( account );
+        try {
+            HttpPost post = new HttpPost( buildUrl( account, FOLDER_PATH ) );
+            HttpEntity data = new StringEntity( "{'dossierRef': '" + folderIdentity + "'}" );
+            post.setEntity( data );
+            JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
+
+            if ( !json.has( "data" ) ) {
+                return null;
+            }
+
+            JSONObject dossier = json.getJSONObject( "data" );
+            return parseFolder( dossier );
+
+        } catch ( JSONException ex ) {
+            throw new IParapheurHttpException( "Unable to load Folder", ex );
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Unable to load Folder", ex );
+        }
+    }
+
+    private Folder parseFolder( JSONObject dossier )
+            throws JSONException
+    {
+        String identity = dossier.getString( "dossierRef" );
+        String title = dossier.getString( "titre" );
+        String actionDemandee = dossier.getString( "actionDemandee" );
+        String type = dossier.getString( "type" );
+        String subtype = dossier.getString( "sousType" );
+        String dueDate = dossier.getString( "dateLimite" );
+        FolderRequestedAction requestedAction = null;
+        if ( "VISA".equals( actionDemandee ) ) {
+            requestedAction = FolderRequestedAction.VISA;
+        } else if ( "SIGNATURE".equals( actionDemandee ) ) {
+            requestedAction = FolderRequestedAction.SIGNATURE;
+        } else {
+            Log.w( "Unsupported FolderRequestedAction(" + actionDemandee + ") SKIPPING this Folder: " + identity );
+            return null;
+        }
+        return new Folder( identity, title, requestedAction, type, subtype );
     }
 
     private String buildUrl( Account account, String path )
