@@ -190,7 +190,7 @@ public class IParapheurHttpClient
         String actionDemandee = dossier.getString( "actionDemandee" );
         String type = dossier.getString( "type" );
         String subtype = dossier.getString( "sousType" );
-        // String dueDate = dossier.getString( "dateLimite" );
+        // String dueDate = dossier.getString( "dateLimite" ); // FIXME Decomment, parse XMLDate
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;

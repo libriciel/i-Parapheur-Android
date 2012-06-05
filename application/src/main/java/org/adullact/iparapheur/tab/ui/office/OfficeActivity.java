@@ -68,14 +68,13 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
 
-    private final AdapterView.OnItemClickListener folderClickListener = new AdapterView.OnItemClickListener()
+    private final AdapterView.OnItemClickListener folderListItemClickListener = new AdapterView.OnItemClickListener()
     {
 
         public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
         {
-            folderDetailVisibility( false );
-            Log.i( "CLICKED ITEM: " + officeFolderListFragment.getListAdapter().getItem( position ) );
-            Folder folder = ( Folder ) officeFolderListFragment.getListAdapter().getItem( position );
+            Log.i( "CLICKED FOLDER: " + officeFolderListFragment.getListAdapter().getItem( position ) );
+            final Folder folder = ( Folder ) officeFolderListFragment.getListAdapter().getItem( position );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
             if ( folder.getRequestedAction() != null ) {
@@ -87,19 +86,55 @@ public class OfficeActivity
                         folderPositiveButton.setText( "Viser" );
                         break;
                 }
-                folderNegativeButton.setText( "Rejeter" );
+                folderPositiveButton.setOnClickListener( new View.OnClickListener()
+                {
+
+                    public void onClick( View view )
+                    {
+                        positiveAction( folder );
+                    }
+
+                } );
                 folderPositiveButton.setVisibility( View.VISIBLE );
+                folderNegativeButton.setText( "Rejeter" );
+                folderNegativeButton.setOnClickListener( new View.OnClickListener()
+                {
+
+                    public void onClick( View view )
+                    {
+                        negativeAction( folder );
+                    }
+
+                } );
                 folderNegativeButton.setVisibility( View.VISIBLE );
             }
+            folderOpenButton.setVisibility( View.VISIBLE );
+            folderOpenButton.setOnClickListener( new View.OnClickListener()
+            {
+
+                public void onClick( View view )
+                {
+                    openAction( folder );
+                }
+
+            } );
         }
 
     };
 
-    private void folderDetailVisibility( boolean visible )
+    private void positiveAction( Folder folder )
     {
-        for ( int idx = 0; idx < folderLayout.getChildCount(); idx++ ) {
-            folderLayout.getChildAt( idx ).setVisibility( visible ? View.VISIBLE : View.INVISIBLE );
-        }
+        Log.i( "POSITIVE ACTION on " + folder );
+    }
+
+    private void negativeAction( Folder folder )
+    {
+        Log.i( "NEGATIVE ACTION on " + folder );
+    }
+
+    private void openAction( Folder folder )
+    {
+        Log.i( "OPEN ACTION on " + folder );
     }
 
     @Override
@@ -111,7 +146,7 @@ public class OfficeActivity
         Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
-        folderDetailVisibility( false );
+        folderDetailReset();
         officeTitleView.setText( officeTitle );
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
         {
@@ -124,11 +159,21 @@ public class OfficeActivity
                 Log.d( OfficeActivity.this, "Got result: " + folders );
                 if ( folders != null && !folders.isEmpty() ) {
                     officeFolderListFragment.setListAdapter( new OfficeFolderListFragment.OfficeFolderListAdapter( context, folders ) );
-                    officeFolderListFragment.getListView().setOnItemClickListener( folderClickListener );
+                    officeFolderListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
                 }
             }
 
         }.execute( new OfficeLoadingTask.Params( accountIdentity, officeIdentity, 1, 10 ) );
+    }
+
+    private void folderDetailReset()
+    {
+        for ( int idx = 0; idx < folderLayout.getChildCount(); idx++ ) {
+            folderLayout.getChildAt( idx ).setVisibility( View.INVISIBLE );
+        }
+        folderPositiveButton.setOnClickListener( null );
+        folderNegativeButton.setOnClickListener( null );
+        folderOpenButton.setOnClickListener( null );
     }
 
 }
