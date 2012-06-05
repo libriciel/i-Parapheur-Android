@@ -190,15 +190,14 @@ public class IParapheurHttpClient
         String actionDemandee = dossier.getString( "actionDemandee" );
         String type = dossier.getString( "type" );
         String subtype = dossier.getString( "sousType" );
-        String dueDate = dossier.getString( "dateLimite" );
+        // String dueDate = dossier.getString( "dateLimite" );
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
         } else if ( "SIGNATURE".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.SIGNATURE;
         } else {
-            Log.w( "Unsupported FolderRequestedAction(" + actionDemandee + ") SKIPPING this Folder: " + identity );
-            return null;
+            Log.w( "Unsupported FolderRequestedAction(" + actionDemandee + "). This Folder (" + identity + ") will have no requested action." );
         }
         return new Folder( identity, title, requestedAction, type, subtype );
     }

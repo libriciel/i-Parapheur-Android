@@ -73,19 +73,24 @@ public class OfficeActivity
 
         public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
         {
-            folderDetailVisibility( true );
+            folderDetailVisibility( false );
             Log.i( "CLICKED ITEM: " + officeFolderListFragment.getListAdapter().getItem( position ) );
             Folder folder = ( Folder ) officeFolderListFragment.getListAdapter().getItem( position );
             folderTitleView.setText( folder.getTitle() );
-            switch ( folder.getRequestedAction() ) {
-                case SIGNATURE:
-                    folderPositiveButton.setText( "Signer" );
-                    break;
-                case VISA:
-                    folderPositiveButton.setText( "Viser" );
-                    break;
+            folderTitleView.setVisibility( View.VISIBLE );
+            if ( folder.getRequestedAction() != null ) {
+                switch ( folder.getRequestedAction() ) {
+                    case SIGNATURE:
+                        folderPositiveButton.setText( "Signer" );
+                        break;
+                    case VISA:
+                        folderPositiveButton.setText( "Viser" );
+                        break;
+                }
+                folderNegativeButton.setText( "Rejeter" );
+                folderPositiveButton.setVisibility( View.VISIBLE );
+                folderNegativeButton.setVisibility( View.VISIBLE );
             }
-            folderNegativeButton.setText( "Rejeter" );
         }
 
     };
@@ -94,7 +99,6 @@ public class OfficeActivity
     {
         for ( int idx = 0; idx < folderLayout.getChildCount(); idx++ ) {
             folderLayout.getChildAt( idx ).setVisibility( visible ? View.VISIBLE : View.INVISIBLE );
-
         }
     }
 
