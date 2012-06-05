@@ -2,6 +2,7 @@ package org.adullact.iparapheur.tab.ui.office;
 
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +26,7 @@ import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -185,7 +187,11 @@ public class OfficeActivity
 
     private void openAction( Folder folder )
     {
-        Log.i( "OPEN ACTION on " + folder ); // TODO Implement
+        Intent intent = new Intent( this, FolderActivity.class );
+        intent.putExtra( FolderActivity.EXTRA_ACCOUNT_IDENTITY, getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY ) );
+        intent.putExtra( FolderActivity.EXTRA_FOLDER_IDENTITY, folder.getIdentity() );
+        intent.putExtra( FolderActivity.EXTRA_FOLDER_TITLE, folder.getTitle() );
+        startActivity( intent );
     }
 
 }

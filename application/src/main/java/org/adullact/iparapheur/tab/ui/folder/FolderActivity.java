@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import com.google.inject.Inject;
 
-import de.akquinet.android.androlog.Log;
-
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
@@ -28,7 +26,11 @@ public class FolderActivity
         extends RoboFragmentActivity
 {
 
-    private static final String TAG = FolderActivity.class.getSimpleName();
+    public static final String EXTRA_ACCOUNT_IDENTITY = "account:identity";
+
+    public static final String EXTRA_FOLDER_IDENTITY = "folder:identity";
+
+    public static final String EXTRA_FOLDER_TITLE = "folder:title";
 
     private static final int SIGN_DIALOG_ID = 101;
 
@@ -43,17 +45,19 @@ public class FolderActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
-        Log.i( TAG, "onCreate" );
         super.onCreate( savedInstanceState );
         setTitle( "La Gironde > Arcachon > Séance ordinaire du conseil municipal" );
         setContentView( R.layout.folder );
 
         // Find views
+        TextView title = ( TextView ) findViewById( R.id.folder_top_title );
         TextView topSummaryLeft = ( TextView ) findViewById( R.id.folder_top_summary_left );
         TextView topSummaryRight = ( TextView ) findViewById( R.id.folder_top_summary_right );
-        Button buttonSign = ( Button ) findViewById( R.id.folder_button_sign );
-        Button buttonReject = ( Button ) findViewById( R.id.folder_button_reject );
+        Button positiveButton = ( Button ) findViewById( R.id.folder_button_positive );
+        Button negativeButton = ( Button ) findViewById( R.id.folder_button_negative );
         WebView fileWebView = ( WebView ) findViewById( R.id.folder_details_webview );
+
+        title.setText( getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
 
         // Set HTML to views from ressources
         topSummaryLeft.setText( Html.fromHtml( getString( R.string.demo_summary_left ) ) );
@@ -63,7 +67,7 @@ public class FolderActivity
         fileWebView.loadUrl( "file:///android_asset/index.html" );
 
         // Handle buttons
-        buttonSign.setOnClickListener( new View.OnClickListener()
+        positiveButton.setOnClickListener( new View.OnClickListener()
         {
 
             public void onClick( View view )
@@ -72,7 +76,7 @@ public class FolderActivity
             }
 
         } );
-        buttonReject.setOnClickListener( new View.OnClickListener()
+        negativeButton.setOnClickListener( new View.OnClickListener()
         {
 
             public void onClick( View view )

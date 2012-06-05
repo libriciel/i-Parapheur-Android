@@ -23,7 +23,7 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/folder_top_icon"
         android:layout_marginLeft="8dp" 
-        android:text="Séance ordinaire du conseil municipal"
+        android:text="Folder Title"
         android:textAppearance="?android:attr/textAppearanceLarge" 
             />
 
@@ -43,17 +43,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@+id/folder_button_sign"
+        android:layout_toLeftOf="@+id/folder_button_positive"
         android:text="@string/placeholder" 
             />
 
     <Button
-        android:id="@+id/folder_button_sign"
+        android:id="@+id/folder_button_positive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@+id/folder_button_reject"
+        android:layout_toLeftOf="@+id/folder_button_negative"
         android:text="Signer"
         android:drawableLeft="@drawable/ic_action_sign"
         android:gravity="left|center_vertical"
@@ -61,7 +61,7 @@
             />
 
     <Button
-        android:id="@+id/folder_button_reject"
+        android:id="@+id/folder_button_negative"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
