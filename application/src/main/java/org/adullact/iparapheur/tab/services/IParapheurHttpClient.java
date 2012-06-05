@@ -121,9 +121,9 @@ public class IParapheurHttpClient
             return result;
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Unable to load Offices from account '" + account.getTitle() + "'", ex );
+            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Unable to load Offices from account '" + account.getTitle() + "'", ex );
+            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
         }
     }
 
@@ -152,9 +152,9 @@ public class IParapheurHttpClient
             return result;
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Unable to load Folders", ex );
+            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Unable to load Folders", ex );
+            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
         }
     }
 
@@ -176,9 +176,9 @@ public class IParapheurHttpClient
             return parseFolder( dossier );
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Unable to load Folder", ex );
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Unable to load Folder", ex );
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
         }
     }
 
@@ -190,7 +190,7 @@ public class IParapheurHttpClient
         String actionDemandee = dossier.getString( "actionDemandee" );
         String type = dossier.getString( "type" );
         String subtype = dossier.getString( "sousType" );
-        // String dueDate = dossier.getString( "dateLimite" ); // FIXME Decomment, parse XMLDate
+        String dueDate = dossier.getString( "dateLimite" );
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
@@ -222,9 +222,9 @@ public class IParapheurHttpClient
                 String ticket = json.getJSONObject( "data" ).getString( "ticket" );
                 accountSessionTickets.put( account.getIdentity(), ticket );
             } catch ( IOException ex ) {
-                throw new IParapheurHttpException( "Unable to login into account '" + account.getTitle() + "'", ex );
+                throw new IParapheurHttpException( account.getTitle() + " : " + ex.getMessage(), ex );
             } catch ( JSONException ex ) {
-                throw new IParapheurHttpException( "Unable to login into account " + account.getTitle() + "'", ex );
+                throw new IParapheurHttpException( account.getTitle() + " : " + ex.getMessage(), ex );
             }
         } else {
             Log.d( "Already logged-in" );

@@ -7,16 +7,18 @@ import java.util.Map;
 
 import de.akquinet.android.androlog.Log;
 
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
+
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
-import org.adullact.iparapheur.tab.util.AsyncTaskWithMessageDialog;
 
 public class DashboardLoadingTask
-        extends AsyncTaskWithMessageDialog<Void, String, Map<Community, List<Office>>>
+        extends AsyncTaskWithMessageDialog<Void, String, AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException>>
 {
 
     private final AccountsRepository accountsRepository;
@@ -31,12 +33,13 @@ public class DashboardLoadingTask
     }
 
     @Override
-    protected Map<Community, List<Office>> doInBackground( Void... paramss )
+    protected AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException> doInBackground( Void... paramss )
     {
         publishProgress( "Chargement des bureaux" );
 
         final Map<Community, List<Office>> result = new HashMap<Community, List<Office>>();
         List<Account> accounts = accountsRepository.all();
+        List<IParapheurHttpException> errors = new ArrayList<IParapheurHttpException>();
         Log.d( context, "Will load offices from " + accounts.size() + " accounts" );
         for ( Account eachAccount : accounts ) {
             try {
@@ -57,10 +60,11 @@ public class DashboardLoadingTask
 
             } catch ( IParapheurHttpException ex ) {
                 Log.w( context, ex.getMessage(), ex );
+                errors.add( ex );
             }
         }
         publishProgress( "Chargement des bureaux terminé" );
-        return result;
+        return new AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException>( result, errors );
     }
 
 }

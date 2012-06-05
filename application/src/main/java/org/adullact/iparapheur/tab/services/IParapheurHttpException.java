@@ -9,6 +9,11 @@ public class IParapheurHttpException
         super( string );
     }
 
+    public IParapheurHttpException( Throwable thrwbl )
+    {
+        super( thrwbl.getMessage(), thrwbl );
+    }
+
     public IParapheurHttpException( String string, Throwable thrwbl )
     {
         super( string, thrwbl );
