@@ -9,7 +9,6 @@ public class IParapheurNotifications
 
     public static void notifyRemoteError( IParapheurHttpException ex )
     {
-        
     }
 
     private IParapheurNotifications()

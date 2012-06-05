@@ -6,12 +6,13 @@ import java.util.List;
 
 import de.akquinet.android.androlog.Log;
 
+import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
+
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
-import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
 public class OfficeLoadingTask
         extends AsyncTaskWithMessageDialog<OfficeLoadingTask.Params, String, List<Folder>>

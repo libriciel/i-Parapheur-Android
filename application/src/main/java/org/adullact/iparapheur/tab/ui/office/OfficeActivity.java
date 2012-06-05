@@ -122,21 +122,6 @@ public class OfficeActivity
 
     };
 
-    private void positiveAction( Folder folder )
-    {
-        Log.i( "POSITIVE ACTION on " + folder );
-    }
-
-    private void negativeAction( Folder folder )
-    {
-        Log.i( "NEGATIVE ACTION on " + folder );
-    }
-
-    private void openAction( Folder folder )
-    {
-        Log.i( "OPEN ACTION on " + folder );
-    }
-
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -148,6 +133,11 @@ public class OfficeActivity
         setContentView( R.layout.office );
         folderDetailReset();
         officeTitleView.setText( officeTitle );
+        loadData( accountIdentity, officeIdentity );
+    }
+
+    private void loadData( String accountIdentity, String officeIdentity )
+    {
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
         {
 
@@ -174,6 +164,21 @@ public class OfficeActivity
         folderPositiveButton.setOnClickListener( null );
         folderNegativeButton.setOnClickListener( null );
         folderOpenButton.setOnClickListener( null );
+    }
+
+    private void positiveAction( Folder folder )
+    {
+        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement
+    }
+
+    private void negativeAction( Folder folder )
+    {
+        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement
+    }
+
+    private void openAction( Folder folder )
+    {
+        Log.i( "OPEN ACTION on " + folder ); // TODO Implement
     }
 
 }
