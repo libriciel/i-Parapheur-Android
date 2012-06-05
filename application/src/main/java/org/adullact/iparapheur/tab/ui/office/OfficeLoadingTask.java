@@ -64,6 +64,7 @@ public class OfficeLoadingTask
     {
         publishProgress( "Chargement des dossiers" );
         try {
+
             Params params = parameters[0];
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will load folders with params: " + params + " using account: " + account );
@@ -71,9 +72,12 @@ public class OfficeLoadingTask
                                                   params.officeIdentity,
                                                   params.page,
                                                   params.pageSize );
+
         } catch ( IParapheurHttpException ex ) {
+
             Log.w( context, "Unable to load folders, will return an empty list", ex );
             return Collections.emptyList();
+
         }
     }
 

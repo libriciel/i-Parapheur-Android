@@ -15,24 +15,12 @@ import android.widget.TextView;
 
 import roboguice.fragment.RoboListFragment;
 
-import com.google.inject.Inject;
-
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 
 public class OfficeFolderListFragment
         extends RoboListFragment
 {
-
-    @Inject
-    private IParapheurHttpClient client;
-
-    @Override
-    public void onCreate( Bundle savedInstanceState )
-    {
-        super.onCreate( savedInstanceState );
-    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState )
@@ -94,7 +82,7 @@ public class OfficeFolderListFragment
             }
 
             final Folder folder = folderFiles.get( position );
-            
+
             dataViews.title.setText( folder.getTitle() );
             dataViews.icon.setImageResource( R.drawable.ic_list_document );
 

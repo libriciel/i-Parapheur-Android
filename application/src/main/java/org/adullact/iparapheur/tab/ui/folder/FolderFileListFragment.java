@@ -48,37 +48,10 @@ public class FolderFileListFragment
         setListAdapter( new FolderListAdapter( getActivity(), folder.getAllFiles() ) );
     }
 
-    /**
-     * The system calls this when it's time for the fragment to draw its user
-     * interface for the first time.
-     * 
-     * @return The root of the fragment's layout.
-     */
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState )
     {
         return inflater.inflate( R.layout.folder_filelist, container, false );
-    }
-
-    @Override
-    public void onActivityCreated( Bundle savedInstanceState )
-    {
-        super.onActivityCreated( savedInstanceState );
-    }
-
-    /**
-     * The system calls this method as the first indication that the user is
-     * leaving the fragment (though it does not always mean the fragment is
-     * being destroyed).
-     * 
-     * This is usually where you should commit any changes that should be
-     * persisted beyond the current user session (because the user might not
-     * come back).
-     */
-    @Override
-    public void onPause()
-    {
-        super.onPause();
     }
 
     @Override

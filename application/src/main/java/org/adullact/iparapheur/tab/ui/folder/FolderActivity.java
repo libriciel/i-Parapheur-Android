@@ -17,13 +17,20 @@ import com.google.inject.Inject;
 
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.services.AccountsRepository;
+import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
+import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
         extends RoboFragmentActivity
+        implements Refreshable
 {
 
     public static final String EXTRA_ACCOUNT_IDENTITY = "account:identity";
@@ -41,6 +48,12 @@ public class FolderActivity
 
     @Inject
     private ActionBarActivityObserver actionBarObserver;
+
+    @Inject
+    private AccountsRepository accountsRepository;
+
+    @Inject
+    private IParapheurHttpClient iParapheurClient;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -85,6 +98,34 @@ public class FolderActivity
             }
 
         } );
+    }
+
+    public void refresh()
+    {
+        // TODO Clear view state
+        new FolderLoadingTask( this, accountsRepository, iParapheurClient )
+        {
+
+            @Override
+            protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
+            {
+                if ( result.getResult() != null ) {
+                    // TODO Handle result
+                    System.out.println( result.getResult() );
+                }
+            }
+
+            @Override
+            protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
+            {
+                if ( result.hasError() ) {
+                    // TODO Handle error to the user
+                    System.out.println( result.getErrors() );
+                }
+            }
+
+        }.execute( new FolderLoadingTask.Params( getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY ),
+                                                 getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY ) ) );
     }
 
     @Override
