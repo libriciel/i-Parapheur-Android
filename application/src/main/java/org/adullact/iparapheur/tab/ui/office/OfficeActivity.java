@@ -23,10 +23,12 @@ import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
+import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 
 public class OfficeActivity
         extends RoboFragmentActivity
+        implements Refreshable
 {
 
     public static final String EXTRA_ACCOUNT_IDENTITY = "account:identity";
@@ -125,12 +127,17 @@ public class OfficeActivity
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.office );
+        refresh();
+    }
+
+    public void refresh()
+    {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
         String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
-        Log.i( "onCreate for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
-        super.onCreate( savedInstanceState );
-        setContentView( R.layout.office );
+        Log.i( "Refresh for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
         folderDetailReset();
         officeTitleView.setText( officeTitle );
         loadData( accountIdentity, officeIdentity );

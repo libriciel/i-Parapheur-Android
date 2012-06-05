@@ -37,12 +37,14 @@ import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
 
 public class DashboardActivity
         extends RoboActivity
+        implements Refreshable
 {
 
     @Inject
@@ -66,6 +68,11 @@ public class DashboardActivity
         Log.d( this, "onCreate" );
         super.onCreate( savedInstanceState );
         setContentView( R.layout.dashboard );
+        refresh();
+    }
+
+    public void refresh()
+    {
         dashboardLayout.removeAllViews();
         if ( accountsRepository.all().isEmpty() ) {
 
