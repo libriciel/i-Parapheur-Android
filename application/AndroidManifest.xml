@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.adullact.iparapheur.tab" 
-    android:versionCode="1" 
-    android:versionName="1.0-SNAPSHOT">
+<manifest  xmlns:android="http://schemas.android.com/apk/res/android"
+           package="org.adullact.iparapheur.tab" 
+           android:versionCode="1" 
+           android:versionName="1.0-SNAPSHOT">
               
-    <uses-sdk 
-        android:targetSdkVersion="11" 
-        android:minSdkVersion="11"/>
+    <uses-sdk  android:targetSdkVersion="11" 
+               android:minSdkVersion="11"/>
     
-    <uses-permission 
-        android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <application 
-        android:name=".IParapheurTabApplication"
-        android:icon="@drawable/icon" 
-        android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.Light"
-        android:allowClearUserData="false" >
+    <application android:name=".IParapheurTabApplication"
+                 android:icon="@drawable/icon" 
+                 android:label="@string/app_name"
+                 android:theme="@android:style/Theme.Holo.Light"
+                 android:allowClearUserData="false">
         
         <activity android:name=".ui.splashscreen.SplashScreenActivity">
             <intent-filter>
@@ -25,35 +21,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity 
-            android:name=".ui.dashboard.DashboardActivity">
-        </activity>
-        
-        <activity 
-            android:name=".ui.office.OfficeActivity">
-        </activity>
-        
-        <activity
-            android:name=".ui.folder.FolderActivity">
-        </activity>
-        
-        <activity 
-            android:name=".ui.settings.AccountsActivity">
-        </activity>
-        
-        <activity 
-            android:name=".ui.settings.SettingsActivity">
+        <activity android:name=".ui.dashboard.DashboardActivity"></activity>
+        <activity android:name=".ui.office.OfficeActivity"></activity>
+        <activity android:name=".ui.folder.FolderActivity"></activity>
+        <activity android:name=".ui.settings.AccountsActivity"
+                  android:noHistory="true"
+                  android:excludeFromRecents="true">
         </activity>
         
         <!--
-        <service 
-            android:name=".services.IParapheurHttpService">
-        </service>
-        <provider
-            android:authorities="org.adullact.iparapheur.tab.http.contentprovider"
-            android:name=".http.database.HttpResourcesContentProvider"
-            android:exported="false">
+        <service android:name=".services.IParapheurHttpService"></service>
+        <provider android:authorities="org.adullact.iparapheur.tab.http.contentprovider"
+                  android:name=".http.database.HttpResourcesContentProvider"
+                  android:exported="false">
         </provider>
         -->
         

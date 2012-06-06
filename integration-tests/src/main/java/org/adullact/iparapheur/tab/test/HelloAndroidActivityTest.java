@@ -28,7 +28,7 @@ public class HelloAndroidActivityTest
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder" );
 
-        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_sign ) );
+        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_positive ) );
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Sign-Keyboard" );
 
@@ -38,7 +38,7 @@ public class HelloAndroidActivityTest
 
         sendKeys( KeyEvent.KEYCODE_BACK );
         Thread.sleep( 1000 );
-        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_reject ) );
+        TouchUtils.clickView( this, folderActivity.findViewById( org.adullact.iparapheur.tab.R.id.folder_button_negative ) );
         Thread.sleep( 1000 );
         Screenshots.poseForScreenshotNamed( "iParapheurTab-Folder-Reject-Keyboard" );
 

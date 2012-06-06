@@ -1,6 +1,10 @@
 package org.adullact.iparapheur.tab.model;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.codeartisans.java.toolbox.Strings;
 
 public class Account
         implements Serializable
@@ -56,6 +60,25 @@ public class Account
     public String toString()
     {
         return "Account[ title: " + title + ", url: " + url + ", login: " + login + " ]";
+    }
+
+    public boolean validates()
+    {
+        return !( Strings.isEmpty( title )
+                  || Strings.isEmpty( url )
+                  || Strings.isEmpty( login )
+                  || Strings.isEmpty( password ) )
+               && validUrl( url );
+    }
+
+    private static boolean validUrl( String url )
+    {
+        try {
+            new URL( url );
+            return true;
+        } catch ( MalformedURLException ignored ) {
+            return false;
+        }
     }
 
 }

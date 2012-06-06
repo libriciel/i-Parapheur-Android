@@ -10,6 +10,7 @@ import de.akquinet.android.androlog.Log;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
@@ -18,7 +19,7 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 
 public class DashboardLoadingTask
-        extends AsyncTaskWithMessageDialog<Void, String, AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException>>
+        extends AsyncTaskWithMessageDialog<Void, String, AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException>>
 {
 
     private final AccountsRepository accountsRepository;
@@ -33,15 +34,22 @@ public class DashboardLoadingTask
     }
 
     @Override
-    protected AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException> doInBackground( Void... paramss )
+    protected AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> doInBackground( Void... paramss )
     {
         publishProgress( "Chargement des bureaux" );
 
         final Map<Community, List<Office>> result = new HashMap<Community, List<Office>>();
         List<Account> accounts = accountsRepository.all();
-        List<IParapheurHttpException> errors = new ArrayList<IParapheurHttpException>();
+        List<IParapheurTabException> errors = new ArrayList<IParapheurTabException>();
+
         Log.d( context, "Will load offices from " + accounts.size() + " accounts" );
         for ( Account eachAccount : accounts ) {
+
+            if ( !eachAccount.validates() ) {
+                Log.w( context, "Account '" + eachAccount + "' is not valid, skipping." );
+                continue;
+            }
+
             try {
 
                 publishProgress( "Chargement des bureaux (" + eachAccount.getTitle() + ")" );
@@ -59,12 +67,15 @@ public class DashboardLoadingTask
                 }
 
             } catch ( IParapheurHttpException ex ) {
+
                 Log.w( context, ex.getMessage(), ex );
                 errors.add( ex );
+
             }
+
         }
         publishProgress( "Chargement des bureaux terminé" );
-        return new AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException>( result, errors );
+        return new AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException>( result, errors );
     }
 
 }

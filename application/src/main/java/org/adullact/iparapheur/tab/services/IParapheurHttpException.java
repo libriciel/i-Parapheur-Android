@@ -1,7 +1,9 @@
 package org.adullact.iparapheur.tab.services;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
+
 public class IParapheurHttpException
-        extends Exception
+        extends IParapheurTabException
 {
 
     public IParapheurHttpException( String string )

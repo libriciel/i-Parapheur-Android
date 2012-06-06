@@ -1,7 +1,10 @@
 package org.adullact.iparapheur.tab.ui.office;
 
+import java.util.Collections;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,14 +22,19 @@ import de.akquinet.android.androlog.Log;
 
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
+import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
+import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -153,12 +161,46 @@ public class OfficeActivity
             // This method is called on the UI thread
             // Populates UI views
             @Override
-            protected void beforeDialogDismiss( List<Folder> folders )
+            protected void beforeDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
             {
-                Log.d( OfficeActivity.this, "Got result: " + folders );
-                if ( folders != null && !folders.isEmpty() ) {
-                    officeFolderListFragment.setListAdapter( new OfficeFolderListFragment.OfficeFolderListAdapter( context, folders ) );
-                    officeFolderListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
+                Log.d( OfficeActivity.this, "Got result: AsynkTaskResult[ result: " + result.getResult() + ", errors: " + result.getErrors() + "]" );
+                List<Folder> folders = result.getResult();
+                if ( folders == null ) {
+                    folders = Collections.emptyList();
+                }
+
+                officeFolderListFragment.setListAdapter( new OfficeFolderListAdapter( context, folders ) );
+                officeFolderListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
+            }
+
+            @Override
+            protected void afterDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
+            {
+                Log.d( OfficeActivity.this, "Got result: AsynkTaskResult[ result: " + result.getResult() + ", errors: " + result.getErrors() + "]" );
+                if ( result.hasError() ) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
+                    builder.setTitle( "Le chargement de ce bureau a échoué" ).
+                            setMessage( result.buildErrorMessages() ).
+                            setCancelable( false ).
+                            setPositiveButton( "Tableau de bord", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            startActivity( new Intent( context, DashboardActivity.class ) );
+                        }
+
+                    } ).setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface di, int i )
+                        {
+                            startActivity( new Intent( context, AccountsActivity.class ) );
+                        }
+
+                    } );
+                    AlertDialog alert = builder.create();
+                    alert.show();
                 }
             }
 

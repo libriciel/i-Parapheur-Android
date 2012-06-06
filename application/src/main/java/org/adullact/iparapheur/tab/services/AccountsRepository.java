@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,6 +21,11 @@ import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 
 import org.adullact.iparapheur.tab.model.Account;
 
+/**
+ * Accounts Repository.
+ * 
+ * Loads accounts data from SharedPreferences.
+ */
 @ContextSingleton
 public class AccountsRepository
 {
@@ -64,6 +70,22 @@ public class AccountsRepository
         accountIdentities = null;
     }
 
+    public Account addNewAccount()
+    {
+        String identity = UUID.randomUUID().toString();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX, "Nouveau Compte" );
+        editor.putString( PREFS_PREFIX + identity + PREFS_URL_SUFFIX, "" );
+        editor.putString( PREFS_PREFIX + identity + PREFS_LOGIN_SUFFIX, "" );
+        editor.putString( PREFS_PREFIX + identity + PREFS_PASSWORD_SUFFIX, "" );
+        editor.apply();
+        editor.commit();
+
+        return byIdentity( identity );
+    }
+
     public Account byIdentity( String identity )
     {
         NullArgumentException.ensureNotEmpty( "Account identity", identity );
@@ -80,13 +102,29 @@ public class AccountsRepository
 
     }
 
+    public void deleteAccount( String identity )
+    {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+        Set<String> keySet = sharedPreferences.getAll().keySet();
+        if ( !keySet.contains( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX ) ) {
+            return;
+        }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX );
+        editor.remove( PREFS_PREFIX + identity + PREFS_URL_SUFFIX );
+        editor.remove( PREFS_PREFIX + identity + PREFS_LOGIN_SUFFIX );
+        editor.remove( PREFS_PREFIX + identity + PREFS_PASSWORD_SUFFIX );
+        editor.apply();
+        editor.commit();
+    }
+
     public List<Account> all()
     {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
         List<Account> accounts = new ArrayList<Account>();
 
         for ( String eachAccountIdentity : ensureAccountIdentities() ) {
-            System.out.println( eachAccountIdentity );
             String title = sharedPreferences.getString( PREFS_PREFIX + eachAccountIdentity + PREFS_TITLE_SUFFIX, null );
             String url = sharedPreferences.getString( PREFS_PREFIX + eachAccountIdentity + PREFS_URL_SUFFIX, null );
             String login = sharedPreferences.getString( PREFS_PREFIX + eachAccountIdentity + PREFS_LOGIN_SUFFIX, null );

@@ -29,14 +29,13 @@ import de.akquinet.android.androlog.Log;
 import org.codeartisans.android.toolbox.activity.RoboActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.java.toolbox.Strings;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
-import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
@@ -89,7 +88,7 @@ public class DashboardActivity
                 // This method is called on the UI thread
                 // Populates UI views
                 @Override
-                protected void beforeDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException> result )
+                protected void beforeDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> result )
                 {
                     Map<Community, List<Office>> officesByCommunity = result.getResult();
                     Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
@@ -132,17 +131,13 @@ public class DashboardActivity
                 }
 
                 @Override
-                protected void afterDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurHttpException> result )
+                protected void afterDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> result )
                 {
                     // Error handling to user
                     if ( result.hasError() ) {
-                        StringBuilder sb = new StringBuilder();
-                        for ( IParapheurHttpException ex : result.getErrors() ) {
-                            sb.append( ex.getMessage() ).append( Strings.NEWLINE );
-                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder( context );
                         builder.setTitle( "Le chargement de certains bureaux à échoué" ).
-                                setMessage( sb.toString() ).
+                                setMessage( result.buildErrorMessages() ).
                                 setCancelable( false ).
                                 setPositiveButton( "Continuer", new DialogInterface.OnClickListener()
                         {
