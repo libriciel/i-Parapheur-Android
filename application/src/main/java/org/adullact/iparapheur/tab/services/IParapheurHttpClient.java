@@ -165,15 +165,7 @@ public class IParapheurHttpClient
 
     private String buildFilters( Map<OfficeFacet, Collection<String>> facetSelection )
     {
-        // Do we need filtering
-        boolean doFilter = false;
-        for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
-            if ( !entry.getValue().isEmpty() ) {
-                doFilter = true;
-                break;
-            }
-        }
-        if ( !doFilter ) {
+        if ( facetSelection.isEmpty() ) {
             return "{}";
         }
 

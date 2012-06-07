@@ -59,16 +59,6 @@ public class OfficeFacetsFragment
     @InjectView( R.id.office_facet_summary )
     private TextView facetSummary;
 
-    public OfficeFacetsFragment()
-    {
-        super();
-        facetSelection.put( OfficeFacet.STATE, new ArrayList<String>() );
-        facetSelection.put( OfficeFacet.TYPE, new ArrayList<String>() );
-        facetSelection.put( OfficeFacet.SUBTYPE, new ArrayList<String>() );
-        facetSelection.put( OfficeFacet.ACTION, new ArrayList<String>() );
-        facetSelection.put( OfficeFacet.SCHEDULE, new ArrayList<String>() );
-    }
-
     public Map<OfficeFacet, Collection<String>> getFacetSelection()
     {
         return Collections.unmodifiableMap( facetSelection );
@@ -182,7 +172,7 @@ public class OfficeFacetsFragment
         boolean[] initial = new boolean[ choices.length ];
         for ( int idx = 0; idx < choices.length; idx++ ) {
             String choice = choices[idx];
-            if ( facetSelection.get( facet ).contains( choice ) ) {
+            if ( facetSelection.containsKey( facet ) && facetSelection.get( facet ).contains( choice ) ) {
                 initial[idx] = true;
                 selectedItems.add( choice );
             } else {
@@ -243,8 +233,11 @@ public class OfficeFacetsFragment
 
     private void fireFacetSelectionChanged( OfficeFacet facet, List<String> facetSelectedItems )
     {
-        facetSelection.get( facet ).clear();
-        facetSelection.get( facet ).addAll( facetSelectedItems );
+        if ( facetSelectedItems.isEmpty() ) {
+            facetSelection.remove( facet );
+        } else {
+            facetSelection.put( facet, new ArrayList<String>( facetSelectedItems ) );
+        }
 
         updateFilterSummary();
 
@@ -255,15 +248,7 @@ public class OfficeFacetsFragment
 
     private void updateFilterSummary()
     {
-        boolean doFilter = false;
-        int facetCount = 0;
-        for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
-            if ( !entry.getValue().isEmpty() ) {
-                doFilter = true;
-                facetCount++;
-            }
-        }
-        if ( !doFilter ) {
+        if ( facetSelection.isEmpty() ) {
             facetSummary.setText( "Aucun filtre." );
         } else {
             facetSummary.setText( "Filtre: " + facetSelection.toString() );
