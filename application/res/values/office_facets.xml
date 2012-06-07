@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Resources for OfficeFacets -->
+<resources>
+
+    <!-- STATE -->
+    <string name="office_facets_state_button">Étât</string>
+    <string name="office_facets_state_title">Filtrer par Étât</string>
+    
+    <string name="office_facets_state_todo">A traîter</string>
+    <string name="office_facets_state_late">En retard</string>
+    <string name="office_facets_state_recoverable">Récupérable</string>
+    <string name="office_facets_state_tocome">À venir</string>
+    <string name="office_facets_state_done">Déjà traîté</string>
+    
+
+    <!-- TYPE -->
+    <string name="office_facets_type_button">Type</string>
+    <string name="office_facets_type_title">Filtrer par Type</string>
+
+
+    <!-- SUBTYPE -->
+    <string name="office_facets_subtype_button">Sous-type</string>
+    <string name="office_facets_subtype_title">Filtrer par Sous-type</string>
+
+
+    <!-- ACTION -->
+    <string name="office_facets_action_button">Action</string>
+    <string name="office_facets_action_title">Filtrer par Action</string>
+    
+    <string name="office_facets_action_sign">Signature</string>
+    <string name="office_facets_action_visa">Visa</string>
+
+
+    <!-- SCHEDULE -->
+    <string name="office_facets_schedule_button">Échéance</string>
+    <string name="office_facets_schedule_title">Filtrer par Échéance</string>
+    
+    <string name="office_facets_schedule_today">Aujourd\'hui</string>
+    <string name="office_facets_schedule_week">Cette semaine</string>
+    <string name="office_facets_schedule_nextweek">La semaine prochaine</string>
+    <string name="office_facets_schedule_month">Ce mois-ci</string>
+    <string name="office_facets_schedule_nextmonth">Le mois prochain</string>
+    
+    <!-- SUMMARY -->
+    <string name="office_facets_summary_none">Aucun filtre.</string>
+    
+
+</resources>
