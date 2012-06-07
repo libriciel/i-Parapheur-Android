@@ -102,7 +102,7 @@ public class FolderActivity
 
     public void refresh()
     {
-        // TODO Clear view state
+        // TODO FolderActivity story: Clear view state
         new FolderLoadingTask( this, accountsRepository, iParapheurClient )
         {
 
@@ -110,7 +110,7 @@ public class FolderActivity
             protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
             {
                 if ( result.getResult() != null ) {
-                    // TODO Handle result
+                    // TODO FolderActivity story: Handle result
                     System.out.println( result.getResult() );
                 }
             }
@@ -119,7 +119,7 @@ public class FolderActivity
             protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
             {
                 if ( result.hasError() ) {
-                    // TODO Handle error to the user
+                    // TODO FolderActivity story: Handle error to the user
                     System.out.println( result.getErrors() );
                 }
             }

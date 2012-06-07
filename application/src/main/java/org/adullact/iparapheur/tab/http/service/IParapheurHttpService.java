@@ -40,19 +40,12 @@ public class IParapheurHttpService
         HttpVerb requestVerb = ( HttpVerb ) intent.getExtras().get( EXTRA_REQUEST_VERB );
         String requestUrl = intent.getStringExtra( EXTRA_REQUEST_URL );
 
-        // TODO
+        // TODO Finish REST/SQL based iParapheur client?
         // Dispatch
         // Create request body
         // Pass it to the IParapheurHttpProcessor that:
         //      Store pending status/data row in local database
         //      Attempt to run the HttpMethod
-
-        // TODO REMOVE BEGIN
-        try {
-            Thread.sleep( 2000 );
-        } catch ( InterruptedException ex ) {
-        }
-        // TODO REMOVE END
 
         // Setup callback Intent
         Intent callback = new Intent( CALLBACK_BROADCAST_ACTION );

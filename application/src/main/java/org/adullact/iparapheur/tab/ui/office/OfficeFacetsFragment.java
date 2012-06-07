@@ -16,15 +16,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
+
+import com.google.inject.Inject;
 
 import org.codeartisans.java.toolbox.ObjectHolder;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacets;
 
 public class OfficeFacetsFragment
         extends RoboFragment
@@ -37,9 +39,30 @@ public class OfficeFacetsFragment
 
     }
 
+    private class OnFacetClickListener
+            implements View.OnClickListener
+    {
+
+        private final OfficeFacet facet;
+
+        public OnFacetClickListener( OfficeFacet facet )
+        {
+            this.facet = facet;
+        }
+
+        public void onClick( View view )
+        {
+            buildDialog( facet ).show();
+        }
+
+    }
+
     private final Map<OfficeFacet, Collection<String>> facetSelection = new EnumMap<OfficeFacet, Collection<String>>( OfficeFacet.class );
 
     private OnSelectionChangeListener selectionChangeListener;
+
+    @Inject
+    private OfficeFacets officeFacets;
 
     @InjectView( R.id.office_facet_state )
     private Button stateButton;
@@ -79,90 +102,20 @@ public class OfficeFacetsFragment
     public void onViewCreated( View view, Bundle savedInstanceState )
     {
         super.onViewCreated( view, savedInstanceState );
-        stateButton.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View view )
-            {
-                getDialog( OfficeFacet.STATE ).show();
-            }
-
-        } );
-        typeButton.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View view )
-            {
-                getDialog( OfficeFacet.TYPE ).show();
-            }
-
-        } );
-        subtypeButton.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View view )
-            {
-                getDialog( OfficeFacet.SUBTYPE ).show();
-            }
-
-        } );
-        actionButton.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View view )
-            {
-                getDialog( OfficeFacet.ACTION ).show();
-            }
-
-        } );
-        scheduleButton.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View view )
-            {
-                getDialog( OfficeFacet.SCHEDULE ).show();
-            }
-
-        } );
+        stateButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.STATE ) );
+        typeButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.TYPE ) );
+        subtypeButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.SUBTYPE ) );
+        actionButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.ACTION ) );
+        scheduleButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.SCHEDULE ) );
     }
 
-    @Override
-    public void onDestroy()
-    {
-        facetSelection.clear();
-        super.onDestroy();
-    }
-
-    private synchronized Dialog getDialog( final OfficeFacet facet )
+    private synchronized Dialog buildDialog( final OfficeFacet facet )
     {
         AlertDialog.Builder builder = new AlertDialog.Builder( getActivity() );
 
         // Titles & Choices
-        final String[] choices;
-        switch ( facet ) {
-            case STATE:
-                builder.setTitle( "Filtrer par Etât" );
-                choices = new String[]{ "A traiter", "En retard", "Récupérables", "A venir", "Déjà traités" };
-                break;
-            case TYPE:
-                builder.setTitle( "Filtrer par Type" );
-                choices = new String[]{ "Foo", "Bar", "Baz" };
-                break;
-            case SUBTYPE:
-                builder.setTitle( "Filtrer par Sous-type" );
-                choices = new String[]{ "Yo", "Howdy", "M8" };
-                break;
-            case ACTION:
-                builder.setTitle( "Filtrer par Action" );
-                choices = new String[]{ "Signature", "Visa" };
-                break;
-            case SCHEDULE:
-                builder.setTitle( "Filtrer par Échéance" );
-                choices = new String[]{ "Aujourd'hui", "Cette semaine", "La semaine prochaine", "Ce mois-ci", "Le mois prochain" };
-                break;
-            default:
-                throw new InternalError( "Unknown Facet " + facet + ", this should not happen." );
-        }
+        builder.setTitle( officeFacets.title( facet ) );
+        final String[] choices = officeFacets.choices( facet ).toArray( new String[]{} );
 
         // Dialog State
         final List<String> selectedItems = new ArrayList<String>();
@@ -210,13 +163,13 @@ public class OfficeFacetsFragment
             {
                 if ( dirtyHolder.getHolded() ) {
                     fireFacetSelectionChanged( facet, selectedItems );
-                    Toast.makeText( getActivity(), selectedItems.toString(), Toast.LENGTH_SHORT ).show();
                 }
             }
 
         } );
 
         // Cancel
+        // TODO Change Facet Cancel button to Facet Reset
         builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
         {
 
@@ -242,17 +195,14 @@ public class OfficeFacetsFragment
         updateFilterSummary();
 
         if ( selectionChangeListener != null ) {
-            selectionChangeListener.facetSelectionChanged( facetSelection );
+            // Use getter so we pass a reference to an unmodifiable Map
+            selectionChangeListener.facetSelectionChanged( getFacetSelection() );
         }
     }
 
     private void updateFilterSummary()
     {
-        if ( facetSelection.isEmpty() ) {
-            facetSummary.setText( "Aucun filtre." );
-        } else {
-            facetSummary.setText( "Filtre: " + facetSelection.toString() );
-        }
+        facetSummary.setText( officeFacets.summary( facetSelection ) );
     }
 
 }

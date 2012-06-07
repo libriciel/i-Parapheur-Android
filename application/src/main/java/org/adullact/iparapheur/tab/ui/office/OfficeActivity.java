@@ -89,7 +89,6 @@ public class OfficeActivity
 
         public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
         {
-            Log.i( "CLICKED FOLDER: " + officeListFragment.getListAdapter().getItem( position ) );
             final Folder folder = ( Folder ) officeListFragment.getListAdapter().getItem( position );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
@@ -231,12 +230,12 @@ public class OfficeActivity
 
     private void positiveAction( Folder folder )
     {
-        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement action on OfficeActivity
+        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement positive action
     }
 
     private void negativeAction( Folder folder )
     {
-        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement action on OfficeActivity
+        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement negative action
     }
 
     private void openAction( Folder folder )

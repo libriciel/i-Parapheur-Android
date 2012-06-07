@@ -14,6 +14,8 @@ import roboguice.activity.event.OnResumeEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContextSingleton;
 
+import com.google.inject.Inject;
+
 import de.akquinet.android.androlog.Log;
 
 import org.apache.http.HttpEntity;
@@ -58,8 +60,12 @@ public class IParapheurHttpClient
 
     private AndroidHttpClient httpClient;
 
-    public IParapheurHttpClient()
+    private final FolderFilterMapper folderFilterMapper;
+
+    @Inject
+    public IParapheurHttpClient( FolderFilterMapper folderFilterMapper )
     {
+        this.folderFilterMapper = folderFilterMapper;
         setupHttpClient();
     }
 
@@ -104,11 +110,11 @@ public class IParapheurHttpClient
                     String identity = eachBureau.getString( "nodeRef" );
                     String title = eachBureau.getString( "name" );
                     String community = eachBureau.getString( "collectivite" );
-                    // BEGIN TODO REMOVE
+                    // BEGIN TODO Remove default community name
                     if ( Strings.isEmpty( community ) ) {
                         community = "Ma collectivité";
                     }
-                    // END TODO REMOVE
+                    // END REMOVE
                     String description = eachBureau.getString( "description" );
                     Integer todoFolderCount = eachBureau.getInt( "a_traiter" );
                     Integer lateFolderCount = eachBureau.getInt( "en_retard" );
@@ -137,7 +143,7 @@ public class IParapheurHttpClient
 
             HttpPost post = new HttpPost( buildUrl( account, FOLDERS_PATH ) );
             HttpEntity data = new StringEntity( "{'bureauRef': '" + officeIdentity
-                                                + "', filters: " + buildFilters( facetSelection )
+                                                + "', filters: " + folderFilterMapper.buildFilters( facetSelection )
                                                 + ", 'page': " + page
                                                 + ", 'pageSize': " + pageSize + "}" );
             post.setEntity( data );
@@ -160,50 +166,6 @@ public class IParapheurHttpClient
             throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
-        }
-    }
-
-    private String buildFilters( Map<OfficeFacet, Collection<String>> facetSelection )
-    {
-        if ( facetSelection.isEmpty() ) {
-            return "{}";
-        }
-
-        // TODO Implement AndroidFacets / iParapheurFilters mapping
-        try {
-            JSONObject filters = new JSONObject();
-            for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
-                OfficeFacet facet = entry.getKey();
-                Collection<String> selection = entry.getValue();
-                switch ( facet ) {
-                    case STATE:
-                        // TODO Map State
-                        break;
-                    case TYPE:
-                        if ( false ) {
-                            for ( String filter : selection ) {
-                                filters.put( "cm:type", filter );
-                            }
-                        }
-                        break;
-                    case SUBTYPE:
-                        if ( false ) {
-                            for ( String filter : selection ) {
-                                filters.put( "cm:sousType", filter );
-                            }
-                        }
-                        break;
-                    case ACTION:
-                        // TODO Map Action
-                        break;
-                    case SCHEDULE:
-                        // TODO Map Schedule
-                        break;
-                }
-            }
-            return filters.toString();
-        } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Unable to build filters: " + ex.getMessage(), ex );
         }
     }
 

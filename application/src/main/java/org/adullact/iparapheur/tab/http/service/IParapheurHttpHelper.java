@@ -72,13 +72,13 @@ public class IParapheurHttpHelper
 
     public int getOffices( Account account, IParapheurServiceCallback callback )
     {
-        // TODO Check if the method is already pending
+        // TODO Check if the method is already pending in REST/SQL based iParapheur client
 
         // Generate new Request ID
         final int requestId = REQUEST_COUNT.getAndIncrement();
 
         // Build HTTP Request Intent parameters
-        String method = "GET"; // TODO enum
+        String method = "GET"; // TODO Enum for REST/SQL based iParapheur client
         String url = account.getUrl() + "/offices";
         String body = null;
 

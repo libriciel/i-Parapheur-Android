@@ -16,7 +16,7 @@ public class Office
 
     private String description;
 
-    private String logo; // TODO Who is responsible for the resource inflation ?
+    private String logo; // TODO Who is responsible for the model resources inflation ?
 
     private Integer todoFolderCount;
 

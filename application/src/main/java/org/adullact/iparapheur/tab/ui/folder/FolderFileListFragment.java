@@ -59,7 +59,7 @@ public class FolderFileListFragment
     {
         super.onListItemClick( l, v, position, id );
         System.out.println( "ListItemClicked: " + position );
-        // TODO Handle properly
+        // TODO FolderActivity story: Handle document switching
     }
 
     private static final class FolderListAdapter
