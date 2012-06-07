@@ -189,21 +189,21 @@ public class OfficeActivity
                     builder.setTitle( "Le chargement de ce bureau a échoué" ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
-                    builder.setPositiveButton( "Tableau de bord", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            refresh();
+                        }
+
+                    } );
+                    builder.setNegativeButton( "Tableau de bord", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
                         {
                             startActivity( new Intent( context, DashboardActivity.class ) );
-                        }
-
-                    } );
-                    builder.setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( DialogInterface dialog, int id )
-                        {
-                            startActivity( new Intent( context, AccountsActivity.class ) );
                         }
 
                     } );

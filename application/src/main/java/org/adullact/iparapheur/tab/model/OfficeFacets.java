@@ -42,23 +42,42 @@ public class OfficeFacets
             switch ( facet ) {
                 case STATE:
                     titles.put( facet, string( R.string.office_facets_state_title ) );
-                    choices.put( facet, Arrays.asList( new String[]{ "A traiter", "En retard", "Récupérables", "A venir", "Déjà traités" } ) );
+                    choices.put( facet, Arrays.asList( new String[]{
+                                string( R.string.office_facets_state_todo ),
+                                string( R.string.office_facets_state_late ),
+                                string( R.string.office_facets_state_recoverable ),
+                                string( R.string.office_facets_state_tocome ),
+                                string( R.string.office_facets_state_done ) } ) );
                     break;
                 case TYPE:
                     titles.put( facet, string( R.string.office_facets_type_title ) );
-                    choices.put( facet, Arrays.asList( new String[]{ "Test", "Actes", "Demandes internes", "Helios Fast" } ) );
+                    choices.put( facet, Arrays.asList( new String[]{
+                                "Test",
+                                "Actes",
+                                "Demandes internes",
+                                "Helios Fast" } ) );
                     break;
                 case SUBTYPE:
                     titles.put( facet, string( R.string.office_facets_subtype_title ) );
-                    choices.put( facet, Arrays.asList( new String[]{ "FAST", "Arrêté du personnel", "Commande de matériel" } ) );
+                    choices.put( facet, Arrays.asList( new String[]{
+                                "FAST",
+                                "Arrêté du personnel",
+                                "Commande de matériel" } ) );
                     break;
                 case ACTION:
                     titles.put( facet, string( R.string.office_facets_action_title ) );
-                    choices.put( facet, Arrays.asList( new String[]{ "Signature", "Visa" } ) );
+                    choices.put( facet, Arrays.asList( new String[]{
+                                string( R.string.office_facets_action_sign ),
+                                string( R.string.office_facets_action_visa ) } ) );
                     break;
                 case SCHEDULE:
                     titles.put( facet, string( R.string.office_facets_schedule_title ) );
-                    choices.put( facet, Arrays.asList( new String[]{ "Aujourd'hui", "Cette semaine", "La semaine prochaine", "Ce mois-ci", "Le mois prochain" } ) );
+                    choices.put( facet, Arrays.asList( new String[]{
+                                string( R.string.office_facets_schedule_today ),
+                                string( R.string.office_facets_schedule_week ),
+                                string( R.string.office_facets_schedule_nextweek ),
+                                string( R.string.office_facets_schedule_month ),
+                                string( R.string.office_facets_schedule_nextmonth ) } ) );
                     break;
                 default:
                     throw new InternalError( "Unknown Facet " + facet + ", this should not happen." );

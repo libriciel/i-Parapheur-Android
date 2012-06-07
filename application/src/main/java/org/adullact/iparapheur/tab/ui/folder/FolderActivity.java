@@ -26,6 +26,7 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
@@ -119,8 +120,30 @@ public class FolderActivity
             protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
             {
                 if ( result.hasError() ) {
-                    // TODO FolderActivity story: Handle error to the user
-                    System.out.println( result.getErrors() );
+                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
+                    builder.setTitle( "Le chargement de ce dossier a échoué" ).
+                            setMessage( result.buildErrorMessages() ).
+                            setCancelable( false );
+                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            refresh();
+                        }
+
+                    } );
+                    builder.setNegativeButton( "Tableau de bord", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            startActivity( new Intent( context, DashboardActivity.class ) );
+                        }
+
+                    } );
+                    AlertDialog alert = builder.create();
+                    alert.show();
                 }
             }
 
