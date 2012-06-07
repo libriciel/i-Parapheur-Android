@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp" >
+            
+    <LinearLayout android:id="@+id/office_facet_layout"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_centerHorizontal="true"
+                  android:orientation="horizontal" >
+
+        <!-- Facet: State -->
+        <Button android:id="@+id/office_facet_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Etât" />
+            
+        <!-- Facet: BusinessType -->
+        <Button android:id="@+id/office_facet_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Type" />
+        
+        <!-- Facet: BusinessSubType -->
+        <Button android:id="@+id/office_facet_subtype"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Sous-type" />
+        
+        <!-- Facet: RequestedAction -->
+        <Button android:id="@+id/office_facet_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Action" />
+            
+        <!-- Facet: Schedule -->
+        <Button android:id="@+id/office_facet_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:text="Échéance" />
+
+    </LinearLayout>
+    
+    <TextView android:id="@+id/office_folder_facet_summary"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/office_facet_layout"
+              android:layout_centerHorizontal="true"
+              android:layout_marginTop="8dp"
+              android:text="Aucun filtre." />
+
+</RelativeLayout>

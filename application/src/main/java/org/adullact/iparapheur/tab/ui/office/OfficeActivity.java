@@ -59,9 +59,6 @@ public class OfficeActivity
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
-    @InjectView( R.id.office_title )
-    private TextView officeTitleView;
-
     @InjectFragment( R.id.office_list_view )
     private OfficeFolderListFragment officeFolderListFragment;
 
@@ -149,7 +146,6 @@ public class OfficeActivity
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
         Log.i( "Refresh for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
         folderDetailReset();
-        officeTitleView.setText( officeTitle );
         loadData( accountIdentity, officeIdentity );
     }
 
@@ -193,7 +189,7 @@ public class OfficeActivity
                     } ).setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
                     {
 
-                        public void onClick( DialogInterface di, int i )
+                        public void onClick( DialogInterface dialog, int id )
                         {
                             startActivity( new Intent( context, AccountsActivity.class ) );
                         }
