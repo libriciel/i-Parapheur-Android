@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import roboguice.fragment.RoboFragment;
@@ -23,21 +24,22 @@ import roboguice.inject.InjectView;
 import org.codeartisans.java.toolbox.ObjectHolder;
 
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.OfficeFacet;
 
 public class OfficeFacetsFragment
         extends RoboFragment
 {
 
-    public static enum Facet
+    public static interface OnSelectionChangeListener
     {
 
-        STATE, TYPE, SUBTYPE, ACTION, SCHEDULE
+        void facetSelectionChanged( Map<OfficeFacet, Collection<String>> selection );
 
     }
 
-    private final Map<Facet, Dialog> dialogs = new EnumMap<Facet, Dialog>( Facet.class );
+    private final Map<OfficeFacet, Collection<String>> facetSelection = new EnumMap<OfficeFacet, Collection<String>>( OfficeFacet.class );
 
-    private final Map<Facet, Collection<String>> facetSelection = new EnumMap<Facet, Collection<String>>( Facet.class );
+    private OnSelectionChangeListener selectionChangeListener;
 
     @InjectView( R.id.office_facet_state )
     private Button stateButton;
@@ -54,19 +56,27 @@ public class OfficeFacetsFragment
     @InjectView( R.id.office_facet_schedule )
     private Button scheduleButton;
 
+    @InjectView( R.id.office_facet_summary )
+    private TextView facetSummary;
+
     public OfficeFacetsFragment()
     {
         super();
-        facetSelection.put( Facet.STATE, new ArrayList<String>() );
-        facetSelection.put( Facet.TYPE, new ArrayList<String>() );
-        facetSelection.put( Facet.SUBTYPE, new ArrayList<String>() );
-        facetSelection.put( Facet.ACTION, new ArrayList<String>() );
-        facetSelection.put( Facet.SCHEDULE, new ArrayList<String>() );
+        facetSelection.put( OfficeFacet.STATE, new ArrayList<String>() );
+        facetSelection.put( OfficeFacet.TYPE, new ArrayList<String>() );
+        facetSelection.put( OfficeFacet.SUBTYPE, new ArrayList<String>() );
+        facetSelection.put( OfficeFacet.ACTION, new ArrayList<String>() );
+        facetSelection.put( OfficeFacet.SCHEDULE, new ArrayList<String>() );
     }
 
-    public Map<Facet, Collection<String>> getFacetSelection()
+    public Map<OfficeFacet, Collection<String>> getFacetSelection()
     {
         return Collections.unmodifiableMap( facetSelection );
+    }
+
+    public void setOnSelectionChangedListener( OnSelectionChangeListener listener )
+    {
+        selectionChangeListener = listener;
     }
 
     @Override
@@ -84,7 +94,7 @@ public class OfficeFacetsFragment
 
             public void onClick( View view )
             {
-                getDialog( Facet.STATE ).show();
+                getDialog( OfficeFacet.STATE ).show();
             }
 
         } );
@@ -93,7 +103,7 @@ public class OfficeFacetsFragment
 
             public void onClick( View view )
             {
-                getDialog( Facet.TYPE ).show();
+                getDialog( OfficeFacet.TYPE ).show();
             }
 
         } );
@@ -102,7 +112,7 @@ public class OfficeFacetsFragment
 
             public void onClick( View view )
             {
-                getDialog( Facet.SUBTYPE ).show();
+                getDialog( OfficeFacet.SUBTYPE ).show();
             }
 
         } );
@@ -111,7 +121,7 @@ public class OfficeFacetsFragment
 
             public void onClick( View view )
             {
-                getDialog( Facet.ACTION ).show();
+                getDialog( OfficeFacet.ACTION ).show();
             }
 
         } );
@@ -120,7 +130,7 @@ public class OfficeFacetsFragment
 
             public void onClick( View view )
             {
-                getDialog( Facet.SCHEDULE ).show();
+                getDialog( OfficeFacet.SCHEDULE ).show();
             }
 
         } );
@@ -129,17 +139,12 @@ public class OfficeFacetsFragment
     @Override
     public void onDestroy()
     {
-        dialogs.clear();
         facetSelection.clear();
         super.onDestroy();
     }
 
-    private synchronized Dialog getDialog( final Facet facet )
+    private synchronized Dialog getDialog( final OfficeFacet facet )
     {
-//        if ( dialogs.containsKey( facet ) ) {
-//            // Cached dialog that keep selection state
-//            return dialogs.get( facet );
-//        }
         AlertDialog.Builder builder = new AlertDialog.Builder( getActivity() );
 
         // Titles & Choices
@@ -147,7 +152,7 @@ public class OfficeFacetsFragment
         switch ( facet ) {
             case STATE:
                 builder.setTitle( "Filtrer par Etât" );
-                choices = new String[]{ "Red", "Green", "Blue" };
+                choices = new String[]{ "A traiter", "En retard", "Récupérables", "A venir", "Déjà traités" };
                 break;
             case TYPE:
                 builder.setTitle( "Filtrer par Type" );
@@ -233,16 +238,36 @@ public class OfficeFacetsFragment
         } );
 
         AlertDialog alert = builder.create();
-        // dialogs.put( facet, alert );
         return alert;
     }
 
-    private void fireFacetSelectionChanged( Facet facet, List<String> facetSelectedItems )
+    private void fireFacetSelectionChanged( OfficeFacet facet, List<String> facetSelectedItems )
     {
         facetSelection.get( facet ).clear();
         facetSelection.get( facet ).addAll( facetSelectedItems );
-        System.out.println( "NEW FACET SELECTION IS: " + facetSelection );
-        // TODO call listeners
+
+        updateFilterSummary();
+
+        if ( selectionChangeListener != null ) {
+            selectionChangeListener.facetSelectionChanged( facetSelection );
+        }
+    }
+
+    private void updateFilterSummary()
+    {
+        boolean doFilter = false;
+        int facetCount = 0;
+        for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
+            if ( !entry.getValue().isEmpty() ) {
+                doFilter = true;
+                facetCount++;
+            }
+        }
+        if ( !doFilter ) {
+            facetSummary.setText( "Aucun filtre." );
+        } else {
+            facetSummary.setText( "Filtre: " + facetSelection.toString() );
+        }
     }
 
 }

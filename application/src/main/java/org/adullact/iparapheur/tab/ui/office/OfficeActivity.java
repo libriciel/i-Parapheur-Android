@@ -1,7 +1,9 @@
 package org.adullact.iparapheur.tab.ui.office;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -27,12 +29,14 @@ import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
+import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionChangeListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
 
@@ -59,8 +63,11 @@ public class OfficeActivity
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
-    @InjectFragment( R.id.office_list_view )
-    private OfficeFolderListFragment officeFolderListFragment;
+    @InjectFragment( R.id.office_facet_fragment )
+    private OfficeFacetsFragment officeFacetsFragment;
+
+    @InjectFragment( R.id.office_list_fragment )
+    private OfficeFolderListFragment officeListFragment;
 
     @InjectView( R.id.office_folder_layout )
     private RelativeLayout folderLayout;
@@ -82,8 +89,8 @@ public class OfficeActivity
 
         public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
         {
-            Log.i( "CLICKED FOLDER: " + officeFolderListFragment.getListAdapter().getItem( position ) );
-            final Folder folder = ( Folder ) officeFolderListFragment.getListAdapter().getItem( position );
+            Log.i( "CLICKED FOLDER: " + officeListFragment.getListAdapter().getItem( position ) );
+            final Folder folder = ( Folder ) officeListFragment.getListAdapter().getItem( position );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
             if ( folder.getRequestedAction() != null ) {
@@ -136,6 +143,15 @@ public class OfficeActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
+        officeFacetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
+        {
+
+            public void facetSelectionChanged( Map<OfficeFacet, Collection<String>> selection )
+            {
+                refresh();
+            }
+
+        } );
         refresh();
     }
 
@@ -145,17 +161,14 @@ public class OfficeActivity
         String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
         Log.i( "Refresh for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
-        folderDetailReset();
-        loadData( accountIdentity, officeIdentity );
-    }
 
-    private void loadData( String accountIdentity, String officeIdentity )
-    {
+        // Reset View
+        folderDetailReset();
+
+        // Load Data
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
         {
 
-            // This method is called on the UI thread
-            // Populates UI views
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
             {
@@ -165,20 +178,19 @@ public class OfficeActivity
                     folders = Collections.emptyList();
                 }
 
-                officeFolderListFragment.setListAdapter( new OfficeFolderListAdapter( context, folders ) );
-                officeFolderListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
+                officeListFragment.setListAdapter( new OfficeFolderListAdapter( context, folders ) );
+                officeListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
             }
 
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
             {
-                Log.d( OfficeActivity.this, "Got result: AsynkTaskResult[ result: " + result.getResult() + ", errors: " + result.getErrors() + "]" );
                 if ( result.hasError() ) {
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
                     builder.setTitle( "Le chargement de ce bureau a échoué" ).
                             setMessage( result.buildErrorMessages() ).
-                            setCancelable( false ).
-                            setPositiveButton( "Tableau de bord", new DialogInterface.OnClickListener()
+                            setCancelable( false );
+                    builder.setPositiveButton( "Tableau de bord", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -186,7 +198,8 @@ public class OfficeActivity
                             startActivity( new Intent( context, DashboardActivity.class ) );
                         }
 
-                    } ).setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
+                    } );
+                    builder.setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -200,7 +213,10 @@ public class OfficeActivity
                 }
             }
 
-        }.execute( new OfficeLoadingTask.Params( accountIdentity, officeIdentity, 1, 10 ) );
+        }.execute( new OfficeLoadingTask.Params( accountIdentity,
+                                                 officeIdentity,
+                                                 officeFacetsFragment.getFacetSelection(),
+                                                 1, 10 ) );
     }
 
     private void folderDetailReset()
@@ -215,12 +231,12 @@ public class OfficeActivity
 
     private void positiveAction( Folder folder )
     {
-        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement
+        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement action on OfficeActivity
     }
 
     private void negativeAction( Folder folder )
     {
-        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement
+        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement action on OfficeActivity
     }
 
     private void openAction( Folder folder )

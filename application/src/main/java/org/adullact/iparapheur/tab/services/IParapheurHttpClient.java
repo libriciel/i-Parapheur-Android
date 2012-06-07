@@ -2,6 +2,7 @@ package org.adullact.iparapheur.tab.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 
 @ContextSingleton
@@ -127,14 +129,17 @@ public class IParapheurHttpClient
         }
     }
 
-    public List<Folder> fetchFolders( Account account, String officeIdentity, int page, int pageSize )
+    public List<Folder> fetchFolders( Account account, String officeIdentity, Map<OfficeFacet, Collection<String>> facetSelection, int page, int pageSize )
             throws IParapheurHttpException
     {
         ensureLoggedIn( account );
         try {
 
             HttpPost post = new HttpPost( buildUrl( account, FOLDERS_PATH ) );
-            HttpEntity data = new StringEntity( "{'bureauRef': '" + officeIdentity + "', 'page': " + page + ", 'pageSize': " + pageSize + "}" );
+            HttpEntity data = new StringEntity( "{'bureauRef': '" + officeIdentity
+                                                + "', filters: " + buildFilters( facetSelection )
+                                                + ", 'page': " + page
+                                                + ", 'pageSize': " + pageSize + "}" );
             post.setEntity( data );
             JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
 
@@ -155,6 +160,58 @@ public class IParapheurHttpClient
             throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
+        }
+    }
+
+    private String buildFilters( Map<OfficeFacet, Collection<String>> facetSelection )
+    {
+        // Do we need filtering
+        boolean doFilter = false;
+        for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
+            if ( !entry.getValue().isEmpty() ) {
+                doFilter = true;
+                break;
+            }
+        }
+        if ( !doFilter ) {
+            return "{}";
+        }
+
+        // TODO Implement AndroidFacets / iParapheurFilters mapping
+        try {
+            JSONObject filters = new JSONObject();
+            for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
+                OfficeFacet facet = entry.getKey();
+                Collection<String> selection = entry.getValue();
+                switch ( facet ) {
+                    case STATE:
+                        // TODO Map State
+                        break;
+                    case TYPE:
+                        if ( false ) {
+                            for ( String filter : selection ) {
+                                filters.put( "cm:type", filter );
+                            }
+                        }
+                        break;
+                    case SUBTYPE:
+                        if ( false ) {
+                            for ( String filter : selection ) {
+                                filters.put( "cm:sousType", filter );
+                            }
+                        }
+                        break;
+                    case ACTION:
+                        // TODO Map Action
+                        break;
+                    case SCHEDULE:
+                        // TODO Map Schedule
+                        break;
+                }
+            }
+            return filters.toString();
+        } catch ( JSONException ex ) {
+            throw new IParapheurHttpException( "Unable to build filters: " + ex.getMessage(), ex );
         }
     }
 

@@ -1,8 +1,10 @@
 package org.adullact.iparapheur.tab.ui.office;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import de.akquinet.android.androlog.Log;
 
@@ -12,6 +14,7 @@ import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
@@ -30,14 +33,17 @@ public class OfficeLoadingTask
 
         public final String officeIdentity;
 
+        public final Map<OfficeFacet, Collection<String>> facetSelection;
+
         public final int page;
 
         public final int pageSize;
 
-        public Params( String accountIdentity, String officeIdentity, int page, int pageSize )
+        public Params( String accountIdentity, String officeIdentity, Map<OfficeFacet, Collection<String>> facetSelection, int page, int pageSize )
         {
             this.accountIdentity = accountIdentity;
             this.officeIdentity = officeIdentity;
+            this.facetSelection = facetSelection;
             this.page = page;
             this.pageSize = pageSize;
         }
@@ -45,7 +51,7 @@ public class OfficeLoadingTask
         @Override
         public String toString()
         {
-            return "OfficeLoadingTask.Params[" + accountIdentity + ", " + officeIdentity + ", " + page + ", " + pageSize + "]";
+            return "OfficeLoadingTask.Params[" + accountIdentity + ", " + officeIdentity + ", " + facetSelection + ", " + page + ", " + pageSize + "]";
         }
 
     }
@@ -78,6 +84,7 @@ public class OfficeLoadingTask
             Log.d( context, "Will load folders with params: " + params + " using account: " + account );
             List<Folder> folders = iParapheurClient.fetchFolders( account,
                                                                   params.officeIdentity,
+                                                                  params.facetSelection,
                                                                   params.page,
                                                                   params.pageSize );
             return new AsyncTaskResult<List<Folder>, IParapheurTabException>( folders );

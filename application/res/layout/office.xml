@@ -19,7 +19,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent" >
 
-        <fragment android:id="@+id/office_list_view"
+        <fragment android:id="@+id/office_list_fragment"
                   android:name="org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment"
                   android:layout_weight="1"
                   android:layout_width="0dp"
