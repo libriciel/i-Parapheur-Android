@@ -18,10 +18,7 @@ import roboguice.fragment.RoboListFragment;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
-import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.model.FolderAnnex;
 import org.adullact.iparapheur.tab.model.FolderDocument;
-import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 
 public class FolderFileListFragment
         extends RoboListFragment

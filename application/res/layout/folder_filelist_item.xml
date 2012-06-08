@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/icon" />
+        android:src="@drawable/ic_list_document" />
 
     <TextView
         android:id="@+id/folder_filelist_item_title"

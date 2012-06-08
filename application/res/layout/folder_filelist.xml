@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:choiceMode="singleChoice"
-        android:clickable="true">
-    </ListView>
+        android:clickable="true" />
 
 </LinearLayout>

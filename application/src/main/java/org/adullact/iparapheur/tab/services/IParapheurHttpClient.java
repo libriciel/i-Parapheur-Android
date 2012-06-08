@@ -219,6 +219,7 @@ public class IParapheurHttpClient
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
                 folder.addDocument( new FolderDocument( docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
+                // folder.addDocument( new FolderDocument( "2_" + docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
             }
         }
         return folder;

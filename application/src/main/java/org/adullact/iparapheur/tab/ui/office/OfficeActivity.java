@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +37,8 @@ import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionChangeListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
+import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderDisplayRequestListener;
+import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderSelectionChange;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -63,10 +64,10 @@ public class OfficeActivity
     private IParapheurHttpClient iParapheurClient;
 
     @InjectFragment( R.id.office_facet_fragment )
-    private OfficeFacetsFragment officeFacetsFragment;
+    private OfficeFacetsFragment facetsFragment;
 
     @InjectFragment( R.id.office_list_fragment )
-    private OfficeFolderListFragment officeListFragment;
+    private OfficeFolderListFragment listFragment;
 
     @InjectView( R.id.office_folder_layout )
     private RelativeLayout folderLayout;
@@ -83,12 +84,13 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
 
-    private final AdapterView.OnItemClickListener folderListItemClickListener = new AdapterView.OnItemClickListener()
+    private final OnFolderDisplayRequestListener folderDisplayRequestListener = new OnFolderDisplayRequestListener()
     {
 
-        public void onItemClick( AdapterView<?> parentView, View childView, int position, long id )
+        public void onFolderDisplayRequest( final Folder folder )
         {
-            final Folder folder = ( Folder ) officeListFragment.getListAdapter().getItem( position );
+            System.out.println( "FOLDER DISPLAY REQUEST FOR: " + folder );
+            listFragment.shadeFolder( folder );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
             if ( folder.getRequestedAction() != null ) {
@@ -136,12 +138,22 @@ public class OfficeActivity
 
     };
 
+    private OnFolderSelectionChange onFolderSelectionChange = new OnFolderSelectionChange()
+    {
+
+        public void onFolderSelectionChange( List<Folder> selectedFolders )
+        {
+            System.out.println( "SELECTED FOLDERS: " + selectedFolders );
+        }
+
+    };
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
-        officeFacetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
+        facetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
         {
 
             public void facetSelectionChanged( Map<OfficeFacet, List<OfficeFacetChoice>> selection )
@@ -151,6 +163,8 @@ public class OfficeActivity
             }
 
         } );
+        listFragment.setOnFolderDisplayRequestListener( folderDisplayRequestListener );
+        listFragment.setOnFolderSelectionChangeListener( onFolderSelectionChange );
         refresh();
     }
 
@@ -162,7 +176,7 @@ public class OfficeActivity
         Log.i( "Refresh for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
 
         // Reset View
-        folderDetailReset();
+        resetViews();
 
         // Load Data
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
@@ -177,8 +191,7 @@ public class OfficeActivity
                     folders = Collections.emptyList();
                 }
 
-                officeListFragment.setListAdapter( new OfficeFolderListAdapter( context, folders ) );
-                officeListFragment.getListView().setOnItemClickListener( folderListItemClickListener );
+                listFragment.setListAdapter( new OfficeFolderListAdapter( listFragment, folders ) );
             }
 
             @Override
@@ -214,11 +227,11 @@ public class OfficeActivity
 
         }.execute( new OfficeLoadingTask.Params( accountIdentity,
                                                  officeIdentity,
-                                                 officeFacetsFragment.getFacetSelection(),
+                                                 facetsFragment.getFacetSelection(),
                                                  1, 10 ) );
     }
 
-    private void folderDetailReset()
+    private void resetViews()
     {
         for ( int idx = 0; idx < folderLayout.getChildCount(); idx++ ) {
             folderLayout.getChildAt( idx ).setVisibility( View.INVISIBLE );
