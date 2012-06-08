@@ -1,9 +1,6 @@
 package org.adullact.iparapheur.tab.ui.office;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +19,13 @@ import roboguice.inject.InjectView;
 
 import com.google.inject.Inject;
 
+import org.codeartisans.java.toolbox.Couple;
 import org.codeartisans.java.toolbox.ObjectHolder;
 
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.model.OfficeFacets;
 
 public class OfficeFacetsFragment
@@ -35,7 +35,7 @@ public class OfficeFacetsFragment
     public static interface OnSelectionChangeListener
     {
 
-        void facetSelectionChanged( Map<OfficeFacet, Collection<String>> selection );
+        void facetSelectionChanged( Map<OfficeFacet, List<OfficeFacetChoice>> selection );
 
     }
 
@@ -57,7 +57,7 @@ public class OfficeFacetsFragment
 
     }
 
-    private final Map<OfficeFacet, Collection<String>> facetSelection = new EnumMap<OfficeFacet, Collection<String>>( OfficeFacet.class );
+    private final OfficeFacetChoices facetSelection = new OfficeFacetChoices();
 
     private OnSelectionChangeListener selectionChangeListener;
 
@@ -82,9 +82,9 @@ public class OfficeFacetsFragment
     @InjectView( R.id.office_facet_summary )
     private TextView facetSummary;
 
-    public Map<OfficeFacet, Collection<String>> getFacetSelection()
+    public OfficeFacetChoices getFacetSelection()
     {
-        return Collections.unmodifiableMap( facetSelection );
+        return facetSelection;
     }
 
     public void setOnSelectionChangedListener( OnSelectionChangeListener listener )
@@ -115,40 +115,42 @@ public class OfficeFacetsFragment
 
         // Titles & Choices
         builder.setTitle( officeFacets.title( facet ) );
-        final String[] choices = officeFacets.choices( facet ).toArray( new String[]{} );
+        Couple<String[], Integer[]> rawChoices = officeFacets.rawChoices( facet );
+        final String[] choicesNames = rawChoices.left();
+        final Integer[] choicesIds = rawChoices.right();
 
         // Dialog State
-        final List<String> selectedItems = new ArrayList<String>();
+        final List<OfficeFacetChoice> selectedItems = new ArrayList<OfficeFacetChoice>();
         final ObjectHolder<Boolean> dirtyHolder = new ObjectHolder<Boolean>( Boolean.FALSE );
 
         // Initial Selection
-        boolean[] initial = new boolean[ choices.length ];
-        for ( int idx = 0; idx < choices.length; idx++ ) {
-            String choice = choices[idx];
-            if ( facetSelection.containsKey( facet ) && facetSelection.get( facet ).contains( choice ) ) {
-                initial[idx] = true;
-                selectedItems.add( choice );
+        boolean[] initial = new boolean[ choicesNames.length ];
+        for ( int index = 0; index < choicesNames.length; index++ ) {
+            int choiceId = choicesIds[index];
+            if ( facetSelection.contains( facet, choiceId ) ) {
+                initial[index] = true;
+                selectedItems.add( facetSelection.get( facet, choiceId ) );
             } else {
-                initial[idx] = false;
+                initial[index] = false;
             }
         }
 
         // Dialog Control
-        builder.setMultiChoiceItems( choices, initial, new DialogInterface.OnMultiChoiceClickListener()
+        builder.setMultiChoiceItems( choicesNames, initial, new DialogInterface.OnMultiChoiceClickListener()
         {
 
             public void onClick( DialogInterface dialog, int index, boolean selected )
             {
-                String choice = choices[index];
+                OfficeFacetChoice newChoice = new OfficeFacetChoice( choicesNames[index], choicesIds[index] );
                 if ( selected ) {
-                    if ( !selectedItems.contains( choice ) ) {
+                    if ( !selectedItems.contains( newChoice ) ) {
                         dirtyHolder.setHolded( Boolean.TRUE );
-                        selectedItems.add( choice );
+                        selectedItems.add( newChoice );
                     }
                 } else {
-                    if ( selectedItems.contains( choice ) ) {
+                    if ( selectedItems.contains( newChoice ) ) {
                         dirtyHolder.setHolded( Boolean.TRUE );
-                        selectedItems.remove( choice );
+                        selectedItems.remove( newChoice );
                     }
                 }
             }
@@ -184,12 +186,12 @@ public class OfficeFacetsFragment
         return alert;
     }
 
-    private void fireFacetSelectionChanged( OfficeFacet facet, List<String> facetSelectedItems )
+    private void fireFacetSelectionChanged( OfficeFacet facet, List<OfficeFacetChoice> facetSelectedItems )
     {
         if ( facetSelectedItems.isEmpty() ) {
             facetSelection.remove( facet );
         } else {
-            facetSelection.put( facet, new ArrayList<String>( facetSelectedItems ) );
+            facetSelection.put( facet, new ArrayList<OfficeFacetChoice>( facetSelectedItems ) );
         }
 
         updateFilterSummary();

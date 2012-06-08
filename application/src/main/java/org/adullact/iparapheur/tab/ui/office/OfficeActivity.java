@@ -1,6 +1,5 @@
 package org.adullact.iparapheur.tab.ui.office;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
@@ -38,7 +38,6 @@ import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionChangeListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
-import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -145,7 +144,7 @@ public class OfficeActivity
         officeFacetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
         {
 
-            public void facetSelectionChanged( Map<OfficeFacet, Collection<String>> selection )
+            public void facetSelectionChanged( Map<OfficeFacet, List<OfficeFacetChoice>> selection )
             {
                 refresh();
             }

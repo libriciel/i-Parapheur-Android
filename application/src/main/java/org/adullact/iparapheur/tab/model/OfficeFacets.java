@@ -1,8 +1,9 @@
 package org.adullact.iparapheur.tab.model;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
@@ -10,6 +11,8 @@ import android.content.Context;
 import roboguice.inject.ContextSingleton;
 
 import com.google.inject.Inject;
+
+import org.codeartisans.java.toolbox.Couple;
 
 import org.adullact.iparapheur.tab.R;
 
@@ -25,11 +28,11 @@ public class OfficeFacets
 
     private final Context context;
 
+    private final Map<Integer, String> stringsCache = new HashMap<Integer, String>();
+
     private final Map<OfficeFacet, String> titles = new EnumMap<OfficeFacet, String>( OfficeFacet.class );
 
-    private final Map<OfficeFacet, Map<String, Integer>> choices = new EnumMap<OfficeFacet, Map<String, Integer>>( OfficeFacet.class );
-
-    private final Map<Integer, String> stringsCache = new HashMap<Integer, String>();
+    private final OfficeFacetChoices choices = new OfficeFacetChoices();
 
     @Inject
     public OfficeFacets( Context context )
@@ -37,41 +40,41 @@ public class OfficeFacets
         this.context = context;
         for ( OfficeFacet facet : OfficeFacet.values() ) {
             String facetTitle;
-            Map<String, Integer> facetChoices = new HashMap<String, Integer>();
+            List<OfficeFacetChoice> facetChoices = new ArrayList<OfficeFacetChoice>();
             switch ( facet ) {
                 case STATE:
                     facetTitle = string( R.string.office_facets_state_title );
-                    facetChoices.put( string( R.string.office_facets_state_todo ), R.string.office_facets_state_todo );
-                    facetChoices.put( string( R.string.office_facets_state_late ), R.string.office_facets_state_late );
-                    facetChoices.put( string( R.string.office_facets_state_recoverable ), R.string.office_facets_state_recoverable );
-                    facetChoices.put( string( R.string.office_facets_state_tocome ), R.string.office_facets_state_tocome );
-                    facetChoices.put( string( R.string.office_facets_state_done ), R.string.office_facets_state_done );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_todo ), R.string.office_facets_state_todo ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_late ), R.string.office_facets_state_late ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_recoverable ), R.string.office_facets_state_recoverable ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_tocome ), R.string.office_facets_state_tocome ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_done ), R.string.office_facets_state_done ) );
                     break;
                 case TYPE:
                     facetTitle = string( R.string.office_facets_type_title );
-                    facetChoices.put( "Test", null );
-                    facetChoices.put( "Actes", null );
-                    facetChoices.put( "Demandes internes", null );
-                    facetChoices.put( "Helios Fast", null );
+                    facetChoices.add( new OfficeFacetChoice( "Test", R.string.office_facets_type_title + 1 ) );
+                    facetChoices.add( new OfficeFacetChoice( "Actes", R.string.office_facets_type_title + 2 ) );
+                    facetChoices.add( new OfficeFacetChoice( "Demandes internes", R.string.office_facets_type_title + 3 ) );
+                    facetChoices.add( new OfficeFacetChoice( "Helios Fast", R.string.office_facets_type_title + 4 ) );
                     break;
                 case SUBTYPE:
                     facetTitle = string( R.string.office_facets_subtype_title );
-                    facetChoices.put( "FAST", null );
-                    facetChoices.put( "Arrêté du personnel", null );
-                    facetChoices.put( "Commande de matériel", null );
+                    facetChoices.add( new OfficeFacetChoice( "FAST", R.string.office_facets_subtype_title + 1 ) );
+                    facetChoices.add( new OfficeFacetChoice( "Arrêté du personnel", R.string.office_facets_subtype_title + 2 ) );
+                    facetChoices.add( new OfficeFacetChoice( "Commande de matériel", R.string.office_facets_subtype_title + 3 ) );
                     break;
                 case ACTION:
                     facetTitle = string( R.string.office_facets_action_title );
-                    facetChoices.put( string( R.string.office_facets_action_sign ), R.string.office_facets_action_sign );
-                    facetChoices.put( string( R.string.office_facets_action_visa ), R.string.office_facets_action_visa );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_action_sign ), R.string.office_facets_action_sign ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_action_visa ), R.string.office_facets_action_visa ) );
                     break;
                 case SCHEDULE:
                     facetTitle = string( R.string.office_facets_schedule_title );
-                    facetChoices.put( string( R.string.office_facets_schedule_today ), R.string.office_facets_schedule_today );
-                    facetChoices.put( string( R.string.office_facets_schedule_week ), R.string.office_facets_schedule_week );
-                    facetChoices.put( string( R.string.office_facets_schedule_nextweek ), R.string.office_facets_schedule_nextweek );
-                    facetChoices.put( string( R.string.office_facets_schedule_month ), R.string.office_facets_schedule_month );
-                    facetChoices.put( string( R.string.office_facets_schedule_nextmonth ), R.string.office_facets_schedule_nextmonth );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_schedule_today ), R.string.office_facets_schedule_today ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_schedule_week ), R.string.office_facets_schedule_week ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_schedule_nextweek ), R.string.office_facets_schedule_nextweek ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_schedule_month ), R.string.office_facets_schedule_month ) );
+                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_schedule_nextmonth ), R.string.office_facets_schedule_nextmonth ) );
                     break;
                 default:
                     throw new InternalError( "Unknown Facet " + facet + ", this should not happen." );
@@ -86,12 +89,20 @@ public class OfficeFacets
         return titles.get( facet );
     }
 
-    public Collection<String> choices( OfficeFacet facet )
+    public Couple<String[], Integer[]> rawChoices( OfficeFacet facet )
     {
-        return choices.get( facet ).keySet();
+        String[] choicesNames = new String[ choices.get( facet ).size() ];
+        Integer[] choicesIds = new Integer[ choices.get( facet ).size() ];
+        int index = 0;
+        for ( OfficeFacetChoice choice : choices.get( facet ) ) {
+            choicesNames[index] = choice.displayName;
+            choicesIds[index] = choice.id;
+            index++;
+        }
+        return new Couple<String[], Integer[]>( choicesNames, choicesIds );
     }
 
-    public String summary( Map<OfficeFacet, Collection<String>> facetSelection )
+    public String summary( OfficeFacetChoices facetSelection )
     {
         if ( facetSelection.isEmpty() ) {
             return context.getResources().getString( R.string.office_facets_summary_none );

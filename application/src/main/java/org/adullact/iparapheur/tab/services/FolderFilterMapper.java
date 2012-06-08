@@ -1,6 +1,6 @@
 package org.adullact.iparapheur.tab.services;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
@@ -9,10 +9,15 @@ import roboguice.inject.ContextSingleton;
 
 import com.google.inject.Inject;
 
+import de.akquinet.android.androlog.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.model.OfficeFacets;
 
 @ContextSingleton
@@ -30,7 +35,7 @@ public class FolderFilterMapper
         this.officeFacets = officeFacets;
     }
 
-    public JSONObject buildFilters( Map<OfficeFacet, Collection<String>> facetSelection )
+    public JSONObject buildFilters( OfficeFacetChoices facetSelection )
     {
         if ( facetSelection.isEmpty() ) {
             return new JSONObject();
@@ -40,9 +45,9 @@ public class FolderFilterMapper
         try {
             JSONObject filters = new JSONObject();
             if ( false ) { // TODO Activate OfficeFacets / FolderFilters mapping
-                for ( Map.Entry<OfficeFacet, Collection<String>> entry : facetSelection.entrySet() ) {
+                for ( Map.Entry<OfficeFacet, List<OfficeFacetChoice>> entry : facetSelection.entrySet() ) {
                     OfficeFacet facet = entry.getKey();
-                    Collection<String> selection = entry.getValue();
+                    List<OfficeFacetChoice> selection = entry.getValue();
                     switch ( facet ) {
                         case STATE:
                             applyStateSelection( filters, selection );
@@ -70,34 +75,72 @@ public class FolderFilterMapper
         }
     }
 
-    private void applyGenericSelection( JSONObject filters, Collection<String> selection, String filterName )
+    private void applyGenericSelection( JSONObject filters, List<OfficeFacetChoice> selection, String filterName )
             throws JSONException
     {
-        for ( String filter : selection ) {
-            filters.put( filterName, filter );
+        for ( OfficeFacetChoice filter : selection ) {
+            filters.put( filterName, filter.displayName );
         }
     }
 
-    private void applyStateSelection( JSONObject filters, Collection<String> selection )
+    private void applyStateSelection( JSONObject filters, List<OfficeFacetChoice> selection )
             throws JSONException
     {
         // TODO Map State OfficeFacets / FolderFilters
+        for ( OfficeFacetChoice choice : selection ) {
+            switch ( choice.id ) {
+                case R.string.office_facets_state_todo:
+                    break;
+                case R.string.office_facets_state_late:
+                    break;
+                case R.string.office_facets_state_recoverable:
+                    break;
+                case R.string.office_facets_state_tocome:
+                    break;
+                case R.string.office_facets_state_done:
+                    break;
+                default:
+                    Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
+            }
+        }
     }
 
-    private void applyActionSelection( JSONObject filters, Collection<String> selection )
+    private void applyActionSelection( JSONObject filters, List<OfficeFacetChoice> selection )
             throws JSONException
     {
-        for ( String item : selection ) {
-            
-            
-        }
         // TODO Map Action OfficeFacets / FolderFilters
+        for ( OfficeFacetChoice choice : selection ) {
+            switch ( choice.id ) {
+                case R.string.office_facets_action_sign:
+                    break;
+                case R.string.office_facets_action_visa:
+                    break;
+                default:
+                    Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
+            }
+        }
     }
 
-    private void applyScheduleSelection( JSONObject filters, Collection<String> selection )
+    private void applyScheduleSelection( JSONObject filters, List<OfficeFacetChoice> selection )
             throws JSONException
     {
         // TODO Map Schedule OfficeFacets / FolderFilters
+        for ( OfficeFacetChoice choice : selection ) {
+            switch ( choice.id ) {
+                case R.string.office_facets_schedule_today:
+                    break;
+                case R.string.office_facets_schedule_week:
+                    break;
+                case R.string.office_facets_schedule_nextweek:
+                    break;
+                case R.string.office_facets_schedule_month:
+                    break;
+                case R.string.office_facets_schedule_nextmonth:
+                    break;
+                default:
+                    Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
+            }
+        }
     }
 
 }

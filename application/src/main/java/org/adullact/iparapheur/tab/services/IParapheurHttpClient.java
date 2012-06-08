@@ -2,7 +2,6 @@ package org.adullact.iparapheur.tab.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,8 @@ import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 
 @ContextSingleton
@@ -135,7 +136,7 @@ public class IParapheurHttpClient
         }
     }
 
-    public List<Folder> fetchFolders( Account account, String officeIdentity, Map<OfficeFacet, Collection<String>> facetSelection, int page, int pageSize )
+    public List<Folder> fetchFolders( Account account, String officeIdentity, OfficeFacetChoices facetSelection, int page, int pageSize )
             throws IParapheurHttpException
     {
         ensureLoggedIn( account );

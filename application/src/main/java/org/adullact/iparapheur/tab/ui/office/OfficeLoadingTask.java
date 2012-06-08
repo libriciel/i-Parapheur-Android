@@ -1,10 +1,8 @@
 package org.adullact.iparapheur.tab.ui.office;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import de.akquinet.android.androlog.Log;
 
@@ -14,7 +12,7 @@ import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.model.OfficeFacet;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
@@ -33,13 +31,13 @@ public class OfficeLoadingTask
 
         public final String officeIdentity;
 
-        public final Map<OfficeFacet, Collection<String>> facetSelection;
+        public final OfficeFacetChoices facetSelection;
 
         public final int page;
 
         public final int pageSize;
 
-        public Params( String accountIdentity, String officeIdentity, Map<OfficeFacet, Collection<String>> facetSelection, int page, int pageSize )
+        public Params( String accountIdentity, String officeIdentity, OfficeFacetChoices facetSelection, int page, int pageSize )
         {
             this.accountIdentity = accountIdentity;
             this.officeIdentity = officeIdentity;
