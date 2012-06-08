@@ -9,9 +9,9 @@ public class FolderDocument
 
     public static final long _serialVersionUID = 1L;
 
-    public FolderDocument( String title, String url )
+    public FolderDocument( String title, Integer size, String url )
     {
-        super( title, url );
+        super( title, size, url );
     }
 
 }

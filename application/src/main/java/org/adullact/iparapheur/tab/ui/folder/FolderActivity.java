@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
+import java.util.Collections;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -13,13 +15,19 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import roboguice.inject.InjectFragment;
+import roboguice.inject.InjectView;
+
 import com.google.inject.Inject;
+
+import de.akquinet.android.androlog.Log;
 
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
@@ -27,6 +35,7 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
+import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.FolderListAdapter;
 import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
@@ -56,6 +65,27 @@ public class FolderActivity
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
+    @InjectFragment( R.id.folder_list_fragment )
+    private FolderFileListFragment folderFileListFragment;
+
+    @InjectView( R.id.folder_top_title )
+    private TextView title;
+
+    @InjectView( R.id.folder_top_summary_left )
+    private TextView topSummaryLeft;
+
+    @InjectView( R.id.folder_top_summary_right )
+    private TextView topSummaryRight;
+
+    @InjectView( R.id.folder_button_positive )
+    private Button positiveButton;
+
+    @InjectView( R.id.folder_button_negative )
+    private Button negativeButton;
+
+    @InjectView( R.id.folder_details_webview )
+    private WebView fileWebView;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -63,22 +93,12 @@ public class FolderActivity
         setTitle( "La Gironde > Arcachon > Séance ordinaire du conseil municipal" );
         setContentView( R.layout.folder );
 
-        // Find views
-        TextView title = ( TextView ) findViewById( R.id.folder_top_title );
-        TextView topSummaryLeft = ( TextView ) findViewById( R.id.folder_top_summary_left );
-        TextView topSummaryRight = ( TextView ) findViewById( R.id.folder_top_summary_right );
-        Button positiveButton = ( Button ) findViewById( R.id.folder_button_positive );
-        Button negativeButton = ( Button ) findViewById( R.id.folder_button_negative );
-        WebView fileWebView = ( WebView ) findViewById( R.id.folder_details_webview );
-
+        // Set title
         title.setText( getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
 
         // Set HTML to views from ressources
         topSummaryLeft.setText( Html.fromHtml( getString( R.string.demo_summary_left ) ) );
         topSummaryRight.setText( Html.fromHtml( getString( R.string.demo_summary_right ) ) );
-
-        // Load document in WebView
-        fileWebView.loadUrl( "file:///android_asset/index.html" );
 
         // Handle buttons
         positiveButton.setOnClickListener( new View.OnClickListener()
@@ -99,20 +119,28 @@ public class FolderActivity
             }
 
         } );
+        refresh();
     }
 
     public void refresh()
     {
         // TODO FolderActivity story: Clear view state
+        folderFileListFragment.setListAdapter( new FolderListAdapter( this, Collections.<AbstractFolderFile>emptyList() ) );
+        fileWebView.clearView();
         new FolderLoadingTask( this, accountsRepository, iParapheurClient )
         {
 
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
             {
+                Log.d( context, "Got result: " + result );
                 if ( result.getResult() != null ) {
-                    // TODO FolderActivity story: Handle result
-                    System.out.println( result.getResult() );
+                    // Update view state
+                    Folder folder = result.getResult();
+                    folderFileListFragment.setListAdapter( new FolderListAdapter( context, folder.getAllFiles() ) );
+                    if ( !folder.getAllFiles().isEmpty() ) {
+                        fileWebView.loadUrl( folder.getAllFiles().get( 0 ).getUrl() );
+                    }
                 }
             }
 

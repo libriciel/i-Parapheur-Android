@@ -36,10 +36,9 @@ import org.json.JSONObject;
 
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.model.FolderDocument;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 import org.adullact.iparapheur.tab.model.Office;
-import org.adullact.iparapheur.tab.model.OfficeFacet;
-import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 
@@ -202,7 +201,8 @@ public class IParapheurHttpClient
         String actionDemandee = dossier.getString( "actionDemandee" );
         String type = dossier.getString( "type" );
         String subtype = dossier.getString( "sousType" );
-        String dueDate = dossier.getString( "dateLimite" );
+        String creationDate = dossier.getString( "dateCreation" );
+        String dueDate = dossier.optString( "dateLimite" );
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
@@ -211,7 +211,17 @@ public class IParapheurHttpClient
         } else {
             Log.w( "Unsupported FolderRequestedAction(" + actionDemandee + "). This Folder (" + identity + ") will have no requested action." );
         }
-        return new Folder( identity, title, requestedAction, type, subtype );
+        Folder folder = new Folder( identity, title, requestedAction, type, subtype );
+        if ( dossier.has( "documents" ) ) {
+            JSONArray documents = dossier.getJSONArray( "documents" );
+            for ( int index = 0; index < documents.length(); index++ ) {
+                JSONObject doc = documents.getJSONObject( index );
+                String docName = doc.getString( "name" );
+                Integer docSize = doc.getInt( "size" );
+                folder.addDocument( new FolderDocument( docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
+            }
+        }
+        return folder;
     }
 
     private String buildUrl( Account account, String path )
@@ -260,7 +270,9 @@ public class IParapheurHttpClient
                     throw new HttpResponseException( statusLine.getStatusCode(), "NO RESPONSE" );
                 }
                 String data = EntityUtils.toString( entity );
-                return new JSONObject( data );
+                JSONObject json = new JSONObject( data );
+                Log.d( IParapheurHttpClient.class, "RESPONSE: " + json.toString() );
+                return json;
             } catch ( JSONException ex ) {
                 throw new IOException( "Unable to parse returned JSON", ex );
             }

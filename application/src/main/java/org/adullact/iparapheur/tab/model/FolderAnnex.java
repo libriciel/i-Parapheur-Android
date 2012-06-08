@@ -9,9 +9,9 @@ public class FolderAnnex
 
     public static final long _serialVersionUID = 1L;
 
-    public FolderAnnex( String title, String url )
+    public FolderAnnex( String title, Integer size, String url )
     {
-        super( title, url );
+        super( title, size, url );
     }
 
 }

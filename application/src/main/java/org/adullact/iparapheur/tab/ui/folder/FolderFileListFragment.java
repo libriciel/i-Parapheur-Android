@@ -37,15 +37,6 @@ public class FolderFileListFragment
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        Folder folder = new Folder( "123456", "Séance ordinaire du conseil municipal", FolderRequestedAction.SIGNATURE, "Achat", "Matériel" );
-        folder.addAllDocuments( new FolderDocument[]{
-                    new FolderDocument( "Séance ordinaire du conseil municipal", "file:///android_asset/index.html" )
-                } );
-        folder.addAllAnnexes( new FolderAnnex[]{
-                    new FolderAnnex( "Projet de réhabilitation", "file:///android_asset/index.html" ),
-                    new FolderAnnex( "Transcript", "file:///android_asset/index.html" )
-                } );
-        setListAdapter( new FolderListAdapter( getActivity(), folder.getAllFiles() ) );
     }
 
     @Override
@@ -62,7 +53,7 @@ public class FolderFileListFragment
         // TODO FolderActivity story: Handle document switching
     }
 
-    private static final class FolderListAdapter
+    /* package */ static final class FolderListAdapter
             extends BaseAdapter
     {
 
@@ -70,7 +61,7 @@ public class FolderFileListFragment
 
         private LayoutInflater inflater;
 
-        private FolderListAdapter( Context context, Collection<AbstractFolderFile> folderFiles )
+        /* package */ FolderListAdapter( Context context, Collection<AbstractFolderFile> folderFiles )
         {
             this.inflater = LayoutInflater.from( context );
             this.folderFiles = new ArrayList<AbstractFolderFile>( folderFiles );

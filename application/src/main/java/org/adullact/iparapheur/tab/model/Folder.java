@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class Folder
@@ -110,7 +111,23 @@ public class Folder
     @Override
     public String toString()
     {
-        return "Folder{" + "identity=" + identity + ", title=" + title + ", requestedAction=" + requestedAction + '}';
+        StringBuilder sb = new StringBuilder( "Folder{" );
+        sb.append( "identity=" ).append( identity ).append( ", " );
+        sb.append( "title=" ).append( title ).append( ", " );
+        sb.append( "requestedAction=" ).append( requestedAction );
+        if ( !documents.isEmpty() ) {
+            sb.append( ", document=[" );
+            Iterator<FolderDocument> it = documents.iterator();
+            while ( it.hasNext() ) {
+                sb.append( it.next().getTitle() );
+                if ( it.hasNext() ) {
+                    sb.append( ", " );
+                }
+            }
+            sb.append( ']' );
+        }
+        sb.append( '}' );
+        return sb.toString();
     }
 
 }

@@ -146,7 +146,8 @@ public class OfficeActivity
 
             public void facetSelectionChanged( Map<OfficeFacet, List<OfficeFacetChoice>> selection )
             {
-                refresh();
+                // TODO Activate refresh when FacetSelection changed
+                // refresh();
             }
 
         } );
