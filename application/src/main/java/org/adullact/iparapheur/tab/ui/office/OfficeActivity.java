@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
@@ -69,6 +70,9 @@ public class OfficeActivity
     @InjectFragment( R.id.office_list_fragment )
     private OfficeFolderListFragment listFragment;
 
+    @InjectView( R.id.office_details_flipper )
+    private ViewFlipper detailsFlipper;
+
     @InjectView( R.id.office_folder_layout )
     private RelativeLayout folderLayout;
 
@@ -83,6 +87,36 @@ public class OfficeActivity
 
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
+
+    @InjectView( R.id.office_batch_layout )
+    private RelativeLayout batchLayout;
+
+    @InjectView( R.id.office_batch_title )
+    private TextView batchTitle;
+
+    private Folder currentFolder;
+
+    private RelativeLayout currentDetailLayout;
+
+    private void flipToFolderDetail()
+    {
+        if ( folderLayout != currentDetailLayout ) {
+            detailsFlipper.setInAnimation( this, R.anim.in_from_right );
+            detailsFlipper.setOutAnimation( this, R.anim.out_to_left );
+            detailsFlipper.showPrevious();
+            currentDetailLayout = folderLayout;
+        }
+    }
+
+    private void flipToBatchDetail()
+    {
+        if ( batchLayout != currentDetailLayout ) {
+            detailsFlipper.setInAnimation( this, R.anim.in_from_left );
+            detailsFlipper.setOutAnimation( this, R.anim.out_to_right );
+            detailsFlipper.showNext();
+            currentDetailLayout = batchLayout;
+        }
+    }
 
     private final OnFolderDisplayRequestListener folderDisplayRequestListener = new OnFolderDisplayRequestListener()
     {
@@ -134,6 +168,8 @@ public class OfficeActivity
                 }
 
             } );
+            flipToFolderDetail();
+            currentFolder = folder;
         }
 
     };
@@ -143,7 +179,13 @@ public class OfficeActivity
 
         public void onFolderSelectionChange( List<Folder> selectedFolders )
         {
-            System.out.println( "SELECTED FOLDERS: " + selectedFolders );
+            if ( selectedFolders.isEmpty() ) {
+                listFragment.shadeFolder( currentFolder );
+                flipToFolderDetail();
+            } else {
+                listFragment.shadeFolder( selectedFolders.toArray( new Folder[ selectedFolders.size() ] ) );
+                flipToBatchDetail();
+            }
         }
 
     };
@@ -153,6 +195,7 @@ public class OfficeActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.office );
+        currentDetailLayout = folderLayout;
         facetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
         {
 
@@ -239,6 +282,7 @@ public class OfficeActivity
         folderPositiveButton.setOnClickListener( null );
         folderNegativeButton.setOnClickListener( null );
         folderOpenButton.setOnClickListener( null );
+        flipToFolderDetail();
     }
 
     private void positiveAction( Folder folder )

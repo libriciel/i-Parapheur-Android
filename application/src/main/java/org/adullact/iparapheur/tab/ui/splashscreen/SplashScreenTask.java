@@ -21,7 +21,7 @@ public class SplashScreenTask
     protected Void doInBackground( Void... paramss )
     {
         try {
-            Thread.sleep( 1000 );
+            Thread.sleep( 500 );
         } catch ( InterruptedException ex ) {
             // Ignored
         }
@@ -35,13 +35,6 @@ public class SplashScreenTask
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "http://parapheur.test.adullact.org/alfresco/service" );
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_LOGIN_SUFFIX, "eperalta" );
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_PASSWORD_SUFFIX, "secret" );
-
-            /*
-            editor.putString( PREFS_PREFIX + "AccountTest1" + PREFS_TITLE_SUFFIX, "Mairie de Montpellier" );
-            editor.putString( PREFS_PREFIX + "AccountTest1" + PREFS_URL_SUFFIX, "http://iparapheur.montpellier.fr" );
-            editor.putString( PREFS_PREFIX + "AccountTest1" + PREFS_LOGIN_SUFFIX, "john.doe" );
-            editor.putString( PREFS_PREFIX + "AccountTest1" + PREFS_PASSWORD_SUFFIX, "changeit" );
-            */
 
             editor.apply();
             editor.commit();
