@@ -37,7 +37,7 @@ public class FolderFilterMapper
 
     public JSONObject buildFilters( OfficeFacetChoices facetSelection )
     {
-        if ( facetSelection.isEmpty() ) {
+        if ( facetSelection == null || facetSelection.isEmpty() ) {
             return new JSONObject();
         }
 

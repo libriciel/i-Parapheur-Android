@@ -2,6 +2,7 @@ package org.adullact.iparapheur.tab.services;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderDocument;
@@ -55,6 +57,10 @@ public class IParapheurHttpClient
     private static final String FOLDERS_PATH = "/parapheur/api/getDossiersHeaders";
 
     private static final String FOLDER_PATH = "/parapheur/api/getDossier";
+
+    private static final String VISA_PATH = "/parapheur/api/visa";
+
+    private static final String REJECT_PATH = "/parapheur/api/reject";
 
     private final Map<String, String> accountSessionTickets = new HashMap<String, String>();
 
@@ -138,6 +144,7 @@ public class IParapheurHttpClient
     public List<Folder> fetchFolders( Account account, String officeIdentity, OfficeFacetChoices facetSelection, int page, int pageSize )
             throws IParapheurHttpException
     {
+        NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
         ensureLoggedIn( account );
         try {
 
@@ -172,6 +179,7 @@ public class IParapheurHttpClient
     public Folder fetchFolder( Account account, String folderIdentity )
             throws IParapheurHttpException
     {
+        NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
         ensureLoggedIn( account );
         try {
             HttpPost post = new HttpPost( buildUrl( account, FOLDER_PATH ) );
@@ -191,6 +199,77 @@ public class IParapheurHttpClient
         } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
         }
+    }
+
+    public void visa( Account account, String pubAnnotation, String privAnnotation, Folder... folders )
+    {
+        visa( account, pubAnnotation, privAnnotation, folderIdentities( folders ) );
+    }
+
+    public void reject( Account account, String pubAnnotation, String privAnnotation, Folder... folders )
+    {
+        reject( account, pubAnnotation, privAnnotation, folderIdentities( folders ) );
+    }
+
+    public void visa( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    {
+        ensureLoggedIn( account );
+        try {
+            HttpPost post = new HttpPost( buildUrl( account, VISA_PATH ) );
+            HttpEntity data = new StringEntity( prepareSignVisaRejectEntity( pubAnnotation, privAnnotation, folderIdentities ) );
+            post.setEntity( data );
+            HttpResponse response = httpClient.execute( post );
+            if ( response.getStatusLine().getStatusCode() != 200 ) {
+                throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities )
+                                                   + " HTTP/" + response.getStatusLine().getStatusCode()
+                                                   + " " + response.getStatusLine().getReasonPhrase() );
+            }
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+        }
+    }
+
+    public void reject( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    {
+        ensureLoggedIn( account );
+        try {
+            HttpPost post = new HttpPost( buildUrl( account, REJECT_PATH ) );
+            HttpEntity data = new StringEntity( prepareSignVisaRejectEntity( pubAnnotation, privAnnotation, folderIdentities ) );
+            post.setEntity( data );
+            HttpResponse response = httpClient.execute( post );
+            if ( response.getStatusLine().getStatusCode() != 200 ) {
+                throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities )
+                                                   + " HTTP/" + response.getStatusLine().getStatusCode()
+                                                   + " " + response.getStatusLine().getReasonPhrase() );
+            }
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+        }
+    }
+
+    private String prepareSignVisaRejectEntity( String pubAnnotation, String privAnnotation, String... folderIdentities )
+    {
+        NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
+        try {
+            JSONObject json = new JSONObject();
+            json.put( "dossiers", folderIdentities );
+            json.put( "annotPub", pubAnnotation == null ? Strings.EMPTY : pubAnnotation );
+            json.put( "annotPriv", privAnnotation == null ? Strings.EMPTY : privAnnotation );
+            return json.toString();
+        } catch ( JSONException ex ) {
+            throw new IParapheurTabException( "Unable to prepare request JSON entity: " + ex.getMessage(), ex );
+        }
+    }
+
+    private String[] folderIdentities( Folder... folders )
+    {
+        String[] folderIdentities = new String[ folders.length ];
+        int index = 0;
+        for ( Folder folder : folders ) {
+            folderIdentities[index] = folder.getIdentity();
+            index++;
+        }
+        return folderIdentities;
     }
 
     private Folder parseFolder( JSONObject dossier )

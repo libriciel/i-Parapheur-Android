@@ -1,16 +1,11 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import java.util.Collections;
-
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,16 +22,15 @@ import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
 import org.adullact.iparapheur.tab.R;
-import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.actions.ActionsDialogFactory;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.FolderListAdapter;
-import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -49,10 +43,6 @@ public class FolderActivity
 
     public static final String EXTRA_FOLDER_TITLE = "folder:title";
 
-    private static final int SIGN_DIALOG_ID = 101;
-
-    private static final int REJECT_DIALOG_ID = 202;
-
     @Inject
     private AndrologInitOnCreateObserver andrologInitOnCreateObserver;
 
@@ -64,6 +54,9 @@ public class FolderActivity
 
     @Inject
     private IParapheurHttpClient iParapheurClient;
+
+    @Inject
+    private ActionsDialogFactory actionsDialogFactory;
 
     @InjectFragment( R.id.folder_list_fragment )
     private FolderFileListFragment folderFileListFragment;
@@ -86,6 +79,8 @@ public class FolderActivity
     @InjectView( R.id.folder_details_webview )
     private WebView fileWebView;
 
+    private Folder currentFolder;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -106,7 +101,7 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                showDialog( SIGN_DIALOG_ID );
+                actionsDialogFactory.buildActionDialog( currentFolder ).show();
             }
 
         } );
@@ -115,7 +110,7 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                showDialog( REJECT_DIALOG_ID );
+                actionsDialogFactory.buildRejectDialog( currentFolder ).show();
             }
 
         } );
@@ -125,7 +120,6 @@ public class FolderActivity
     public void refresh()
     {
         // TODO FolderActivity story: Clear view state
-        folderFileListFragment.setListAdapter( new FolderListAdapter( this, Collections.<AbstractFolderFile>emptyList() ) );
         fileWebView.clearView();
         new FolderLoadingTask( this, accountsRepository, iParapheurClient )
         {
@@ -141,6 +135,9 @@ public class FolderActivity
                     if ( !folder.getAllFiles().isEmpty() ) {
                         fileWebView.loadUrl( folder.getAllFiles().get( 0 ).getUrl() );
                     }
+                    currentFolder = folder;
+                } else {
+                    currentFolder = null;
                 }
             }
 
@@ -177,56 +174,6 @@ public class FolderActivity
 
         }.execute( new FolderLoadingTask.Params( getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY ),
                                                  getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY ) ) );
-    }
-
-    @Override
-    protected Dialog onCreateDialog( int id )
-    {
-        Dialog dialog;
-        LayoutInflater inflater = ( LayoutInflater ) getSystemService( LAYOUT_INFLATER_SERVICE );
-        View layout = inflater.inflate( R.layout.folder_sign_dialog, ( ViewGroup ) findViewById( R.id.folder_sign_dialog_layout_root ) );
-        AlertDialog.Builder builder = new AlertDialog.Builder( this );
-        builder.setView( layout );
-        builder.setCancelable( true );
-        builder.setNeutralButton( "Annuler", null );
-
-        switch ( id ) {
-            case REJECT_DIALOG_ID:
-
-                builder.setIcon( R.drawable.ic_action_reject );
-                builder.setTitle( "Refus d'un dossier" );
-                builder.setPositiveButton( "Refuser", new DialogInterface.OnClickListener()
-                {
-
-                    public void onClick( DialogInterface di, int i )
-                    {
-                        startActivity( new Intent( FolderActivity.this, SplashScreenActivity.class ) );
-                    }
-
-                } );
-                dialog = builder.create();
-                break;
-
-            case SIGN_DIALOG_ID:
-
-                builder.setIcon( R.drawable.ic_action_sign );
-                builder.setTitle( "Signature d'un dossier" );
-                builder.setPositiveButton( "Signer", new DialogInterface.OnClickListener()
-                {
-
-                    public void onClick( DialogInterface di, int i )
-                    {
-                        startActivity( new Intent( FolderActivity.this, SplashScreenActivity.class ) );
-                    }
-
-                } );
-                dialog = builder.create();
-                break;
-
-            default:
-                dialog = null;
-        }
-        return dialog;
     }
 
 }

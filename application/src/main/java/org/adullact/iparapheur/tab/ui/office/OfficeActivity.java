@@ -34,6 +34,7 @@ import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.actions.ActionsDialogFactory;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionChangeListener;
@@ -63,6 +64,9 @@ public class OfficeActivity
 
     @Inject
     private IParapheurHttpClient iParapheurClient;
+
+    @Inject
+    private ActionsDialogFactory actionsDialogFactory;
 
     @InjectFragment( R.id.office_facet_fragment )
     private OfficeFacetsFragment facetsFragment;
@@ -287,12 +291,12 @@ public class OfficeActivity
 
     private void positiveAction( Folder folder )
     {
-        Log.i( "POSITIVE ACTION on " + folder ); // TODO Implement positive action
+        actionsDialogFactory.buildActionDialog( folder ).show();
     }
 
     private void negativeAction( Folder folder )
     {
-        Log.i( "NEGATIVE ACTION on " + folder ); // TODO Implement negative action
+        actionsDialogFactory.buildRejectDialog( folder ).show();
     }
 
     private void openAction( Folder folder )
