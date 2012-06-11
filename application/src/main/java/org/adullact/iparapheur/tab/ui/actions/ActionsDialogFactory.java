@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
-import org.adullact.iparapheur.tab.ui.splashscreen.SplashScreenActivity;
 
 @ContextSingleton
 public class ActionsDialogFactory
@@ -79,7 +77,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            activity.startActivity( new Intent( activity, SplashScreenActivity.class ) );
+                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
                         }
 
                     } );
@@ -106,7 +104,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            activity.startActivity( new Intent( activity, SplashScreenActivity.class ) );
+                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
                         }
 
                     } );
@@ -129,6 +127,112 @@ public class ActionsDialogFactory
         }
 
         return builder.create();
+    }
+
+    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )
+    {
+        new SignTask( activity, accountsRepository, iParapheurClient )
+        {
+
+            @Override
+            protected void beforeDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
+            {
+                if ( activity instanceof Refreshable ) {
+                    ( ( Refreshable ) activity ).refresh();
+                }
+                rejectDialog.dismiss();
+            }
+
+            @Override
+            protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
+            {
+                if ( result.hasError() ) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
+                    builder.setTitle( "La signature de ce dossier a échoué" ).
+                            setMessage( result.buildErrorMessages() ).
+                            setCancelable( false );
+                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            dialog.dismiss();
+                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentity );
+                        }
+
+                    } );
+                    builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            if ( activity instanceof Refreshable ) {
+                                ( ( Refreshable ) activity ).refresh();
+                            }
+                            dialog.dismiss();
+                            rejectDialog.dismiss();
+                        }
+
+                    } );
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            }
+
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentity ) );
+    }
+
+    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )
+    {
+        new VisaTask( activity, accountsRepository, iParapheurClient )
+        {
+
+            @Override
+            protected void beforeDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
+            {
+                if ( activity instanceof Refreshable ) {
+                    ( ( Refreshable ) activity ).refresh();
+                }
+                rejectDialog.dismiss();
+            }
+
+            @Override
+            protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
+            {
+                if ( result.hasError() ) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
+                    builder.setTitle( "Le visa de ce dossier a échoué" ).
+                            setMessage( result.buildErrorMessages() ).
+                            setCancelable( false );
+                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            dialog.dismiss();
+                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentity );
+                        }
+
+                    } );
+                    builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+                    {
+
+                        public void onClick( DialogInterface dialog, int id )
+                        {
+                            if ( activity instanceof Refreshable ) {
+                                ( ( Refreshable ) activity ).refresh();
+                            }
+                            dialog.dismiss();
+                            rejectDialog.dismiss();
+                        }
+
+                    } );
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            }
+
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentity ) );
     }
 
     private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )

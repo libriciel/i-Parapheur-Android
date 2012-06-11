@@ -252,10 +252,6 @@ public class IParapheurHttpClient
             String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
 
-            if ( true ) {
-                throw new InternalError( "FUCK BARRIER" );
-            }
-
             // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, VISA_PATH ) );
             HttpEntity data = new StringEntity( requestBody, "UTF-8" );
