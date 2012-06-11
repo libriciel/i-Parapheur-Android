@@ -101,7 +101,8 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                actionsDialogFactory.buildActionDialog( currentFolder ).show();
+                String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+                actionsDialogFactory.buildActionDialog( accountIdentity, currentFolder ).show();
             }
 
         } );
@@ -110,7 +111,8 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                actionsDialogFactory.buildRejectDialog( currentFolder ).show();
+                String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+                actionsDialogFactory.buildRejectDialog( accountIdentity, currentFolder ).show();
             }
 
         } );

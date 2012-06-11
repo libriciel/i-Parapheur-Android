@@ -44,6 +44,23 @@ import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 
+/**
+ * Service used to access iParapheur HTTP API.
+ * 
+ * TODO Split in a facade using a static singleton for HTTP operations and session ticket management.
+ * Response parsing should be kept bound to the context for localisation support.
+ * 
+ * ----
+ * 
+ * Static fields are attached to the Class instance as a whole, which is in turn attached to the ClassLoader which
+ * loaded the class. the_instance would be unloaded when the entire ClassLoader is reclaimed. I am 90% sure this happens
+ * when Android destroys the app (not when it goes into the background, or pauses, but is completely shut down.)
+ * 
+ * It'll be retained until your entire process is destroyed. When your process is revived, your singleton will reappear!
+ * 
+ * It should be noted that the singleton will be recreated, but the original state of the singleton is not automaticaly
+ * restored. This would have to be done manually.
+ */
 @ContextSingleton
 public class IParapheurHttpClient
 {
@@ -103,11 +120,17 @@ public class IParapheurHttpClient
         ensureLoggedIn( account );
         try {
 
+            // Prepare request body
+            String requestBody = "{'username': '" + account.getLogin() + "'}";
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, OFFICES_PATH ) );
-            HttpEntity data = new StringEntity( "{'username': '" + account.getLogin() + "'}", "UTF-8" );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
             JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
 
+            // Process response
             List<Office> result = new ArrayList<Office>();
             if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "bureaux" ) ) {
                 JSONArray bureaux = json.getJSONObject( "data" ).getJSONArray( "bureaux" );
@@ -134,9 +157,9 @@ public class IParapheurHttpClient
             }
             return result;
 
-        } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
         } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
+        } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
         }
     }
@@ -148,20 +171,26 @@ public class IParapheurHttpClient
         ensureLoggedIn( account );
         try {
 
+            // Prepare request body
+            String requestBody = "{'bureauRef': '" + officeIdentity
+                                 + "', filters: " + folderFilterMapper.buildFilters( facetSelection )
+                                 + ", 'page': " + page
+                                 + ", 'pageSize': " + pageSize + "}";
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, FOLDERS_PATH ) );
-            HttpEntity data = new StringEntity( "{'bureauRef': '" + officeIdentity
-                                                + "', filters: " + folderFilterMapper.buildFilters( facetSelection )
-                                                + ", 'page': " + page
-                                                + ", 'pageSize': " + pageSize + "}" );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
             JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
 
+            // Process response
             List<Folder> result = new ArrayList<Folder>();
             if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "dossiers" ) ) {
                 JSONArray dossiers = json.getJSONObject( "data" ).getJSONArray( "dossiers" );
                 for ( int idx = 0; idx < dossiers.length(); idx++ ) {
                     JSONObject eachDossier = dossiers.getJSONObject( idx );
-                    Folder folder = parseFolder( eachDossier );
+                    Folder folder = folderFromJSON( eachDossier );
                     if ( folder != null ) {
                         result.add( folder );
                     }
@@ -182,17 +211,20 @@ public class IParapheurHttpClient
         NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
         ensureLoggedIn( account );
         try {
+
+            // Prepare request body
+            String requestBody = "{'dossierRef': '" + folderIdentity + "'}";
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, FOLDER_PATH ) );
-            HttpEntity data = new StringEntity( "{'dossierRef': '" + folderIdentity + "'}" );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
             JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
 
-            if ( !json.has( "data" ) ) {
-                return null;
-            }
-
+            // Process response
             JSONObject dossier = json.getJSONObject( "data" );
-            return parseFolder( dossier );
+            return folderFromJSON( dossier );
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
@@ -215,15 +247,28 @@ public class IParapheurHttpClient
     {
         ensureLoggedIn( account );
         try {
+
+            // Prepare request body
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            if ( true ) {
+                throw new InternalError( "FUCK BARRIER" );
+            }
+
+            // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, VISA_PATH ) );
-            HttpEntity data = new StringEntity( prepareSignVisaRejectEntity( pubAnnotation, privAnnotation, folderIdentities ) );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
             HttpResponse response = httpClient.execute( post );
+
+            // Process response
             if ( response.getStatusLine().getStatusCode() != 200 ) {
                 throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities )
                                                    + " HTTP/" + response.getStatusLine().getStatusCode()
                                                    + " " + response.getStatusLine().getReasonPhrase() );
             }
+
         } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
         }
@@ -233,10 +278,18 @@ public class IParapheurHttpClient
     {
         ensureLoggedIn( account );
         try {
+
+            // Prepare request body
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
             HttpPost post = new HttpPost( buildUrl( account, REJECT_PATH ) );
-            HttpEntity data = new StringEntity( prepareSignVisaRejectEntity( pubAnnotation, privAnnotation, folderIdentities ) );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
             HttpResponse response = httpClient.execute( post );
+
+            // Process response
             if ( response.getStatusLine().getStatusCode() != 200 ) {
                 throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities )
                                                    + " HTTP/" + response.getStatusLine().getStatusCode()
@@ -247,21 +300,27 @@ public class IParapheurHttpClient
         }
     }
 
-    private String prepareSignVisaRejectEntity( String pubAnnotation, String privAnnotation, String... folderIdentities )
+    private String prepareSignVisaRejectRequestBody( String pubAnnotation, String privAnnotation, String... folderIdentities )
     {
         NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
         try {
             JSONObject json = new JSONObject();
-            json.put( "dossiers", folderIdentities );
+            JSONArray dossiers = new JSONArray();
+            for ( int index = 0; index < folderIdentities.length; index++ ) {
+                String folderId = folderIdentities[index];
+                dossiers.put( folderId );
+            }
+            json.put( "dossiers", dossiers );
             json.put( "annotPub", pubAnnotation == null ? Strings.EMPTY : pubAnnotation );
             json.put( "annotPriv", privAnnotation == null ? Strings.EMPTY : privAnnotation );
             return json.toString();
         } catch ( JSONException ex ) {
-            throw new IParapheurTabException( "Unable to prepare request JSON entity: " + ex.getMessage(), ex );
+            // This should not happen but we don't want to fail silently!
+            throw new IParapheurTabException( "Unable to prepare request JSON body: " + ex.getMessage(), ex );
         }
     }
 
-    private String[] folderIdentities( Folder... folders )
+    private static String[] folderIdentities( Folder... folders )
     {
         String[] folderIdentities = new String[ folders.length ];
         int index = 0;
@@ -272,7 +331,7 @@ public class IParapheurHttpClient
         return folderIdentities;
     }
 
-    private Folder parseFolder( JSONObject dossier )
+    private static Folder folderFromJSON( JSONObject dossier )
             throws JSONException
     {
         String identity = dossier.getString( "dossierRef" );
@@ -288,7 +347,8 @@ public class IParapheurHttpClient
         } else if ( "SIGNATURE".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.SIGNATURE;
         } else {
-            Log.w( "Unsupported FolderRequestedAction(" + actionDemandee + "). This Folder (" + identity + ") will have no requested action." );
+            // WARN Unsupported FolderRequestedAction
+            requestedAction = FolderRequestedAction.UNSUPPORTED;
         }
         Folder folder = new Folder( identity, title, requestedAction, type, subtype );
         if ( dossier.has( "documents" ) ) {
@@ -298,7 +358,6 @@ public class IParapheurHttpClient
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
                 folder.addDocument( new FolderDocument( docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
-                // folder.addDocument( new FolderDocument( "2_" + docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
             }
         }
         return folder;

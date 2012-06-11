@@ -61,6 +61,11 @@ public class Folder
         return requestedAction;
     }
 
+    public boolean requestedActionSupported()
+    {
+        return requestedAction != FolderRequestedAction.UNSUPPORTED;
+    }
+
     public boolean addDocument( FolderDocument folderDocument )
     {
         return documents.add( folderDocument );

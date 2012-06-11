@@ -4,6 +4,7 @@ public enum FolderRequestedAction
 {
 
     SIGNATURE,
-    VISA
+    VISA,
+    UNSUPPORTED
 
 }

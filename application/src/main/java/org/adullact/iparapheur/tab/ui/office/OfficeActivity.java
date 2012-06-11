@@ -127,11 +127,11 @@ public class OfficeActivity
 
         public void onFolderDisplayRequest( final Folder folder )
         {
-            System.out.println( "FOLDER DISPLAY REQUEST FOR: " + folder );
+            // System.out.println( "FOLDER DISPLAY REQUEST FOR: " + folder ); // TODO Make it a DEBUG level log
             listFragment.shadeFolder( folder );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
-            if ( folder.getRequestedAction() != null ) {
+            if ( folder.requestedActionSupported() ) {
                 switch ( folder.getRequestedAction() ) {
                     case SIGNATURE:
                         folderPositiveButton.setText( "Signer" );
@@ -291,12 +291,14 @@ public class OfficeActivity
 
     private void positiveAction( Folder folder )
     {
-        actionsDialogFactory.buildActionDialog( folder ).show();
+        String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+        actionsDialogFactory.buildActionDialog( accountIdentity, folder ).show();
     }
 
     private void negativeAction( Folder folder )
     {
-        actionsDialogFactory.buildRejectDialog( folder ).show();
+        String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+        actionsDialogFactory.buildRejectDialog( accountIdentity, folder ).show();
     }
 
     private void openAction( Folder folder )

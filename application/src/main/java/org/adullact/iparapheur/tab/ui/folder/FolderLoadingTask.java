@@ -36,7 +36,7 @@ public class FolderLoadingTask
         @Override
         public String toString()
         {
-            return "FolderLoadingTask.Params[" + accountIdentity + ", " + folderIdentity + "]";
+            return "FolderLoadingTask.Params{" + accountIdentity + ", " + folderIdentity + "}";
         }
 
     }
