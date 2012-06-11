@@ -3,54 +3,64 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:id="@+id/folder_sign_dialog_layout_root">
+              android:id="@+id/folder_sign_dialog_layout_root"
+              android:padding="8dp" >
                   
-    <TextView
-        android:id="@+id/folder_sign_dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Séance ordinaire du conseil municipal"
-        android:textAppearance="?android:attr/textAppearanceLarge" 
-            />
+    <TextView android:id="@+id/folder_sign_dialog_title"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="Séance ordinaire du conseil municipal"
+              android:textAppearance="?android:attr/textAppearanceLarge" />
             
     <View android:layout_width="wrap_content"
-          android:layout_height="2dp" 
-          android:background="@color/grey"
-          />
+          android:layout_height="2dp"
+          android:background="@color/grey" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Annotation publique"
-            />
-            
-    <EditText
-        android:id="@+id/folder_annotation_public"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:lines="8" >
-        <!--requestFocus /-->
-    </EditText>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+        
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content" 
+                      android:layout_weight="1"
+                      android:orientation="vertical"
+                      android:padding="8dp"
+                      android:minWidth="300dp" >
+        
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Annotation publique" />
+	            
+            <EditText android:id="@+id/folder_annotation_public"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:ems="10"
+                      android:inputType="textMultiLine"
+                      android:lines="8"
+                      android:gravity="top|left" />
+	
+        </LinearLayout>
 
-    <View android:layout_width="wrap_content"
-          android:layout_height="2dp" 
-          android:background="@color/grey"
-          />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Annotation privée"
-        />
-
-    <EditText
-        android:id="@+id/folder_annotation_private"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:lines="8" 
-        />
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content" 
+                      android:layout_weight="1"
+                      android:orientation="vertical"
+                      android:padding="8dp"
+                      android:minWidth="300dp">
+                          
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="Annotation privée" />
+                      
+            <EditText android:id="@+id/folder_annotation_private"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:inputType="textMultiLine"
+                      android:lines="8" 
+                      android:gravity="top|left" />
+                      
+        </LinearLayout>
+	    
+    </LinearLayout>
 
 </LinearLayout>
