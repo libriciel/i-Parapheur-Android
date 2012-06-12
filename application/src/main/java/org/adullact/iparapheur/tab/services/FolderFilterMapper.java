@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 
 import de.akquinet.android.androlog.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,46 +45,52 @@ public class FolderFilterMapper
         // Map OfficeFacet selection to iParapheur FolderFilters
         try {
             JSONObject filters = new JSONObject();
-            if ( false ) { // TODO Activate OfficeFacets / FolderFilters mapping
-                for ( Map.Entry<OfficeFacet, List<OfficeFacetChoice>> entry : facetSelection.entrySet() ) {
-                    OfficeFacet facet = entry.getKey();
-                    List<OfficeFacetChoice> selection = entry.getValue();
-                    switch ( facet ) {
-                        case STATE:
-                            applyStateSelection( filters, selection );
-                            break;
-                        case TYPE:
-                            applyGenericSelection( filters, selection, "cm:type" );
-                            break;
-                        case SUBTYPE:
-                            applyGenericSelection( filters, selection, "cm:sousType" );
-                            break;
-                        case ACTION:
-                            applyActionSelection( filters, selection );
-                            break;
-                        case SCHEDULE:
-                            applyScheduleSelection( filters, selection );
-                            break;
-                        default:
-                            throw new InternalError( "Unknown Facet " + facet + ", this should not happen." );
-                    }
+            JSONArray and = new JSONArray();
+            for ( Map.Entry<OfficeFacet, List<OfficeFacetChoice>> entry : facetSelection.entrySet() ) {
+                JSONObject orWrapper = new JSONObject();
+                JSONArray or = new JSONArray();
+                OfficeFacet facet = entry.getKey();
+                List<OfficeFacetChoice> selection = entry.getValue();
+                switch ( facet ) {
+                    case STATE:
+                        applyStateSelection( or, selection );
+                        break;
+                    case TYPE:
+                        applyGenericSelection( or, selection, "ph:typeMetier" );
+                        break;
+                    case SUBTYPE:
+                        applyGenericSelection( or, selection, "ph:sousTypeMetier" );
+                        break;
+                    case ACTION:
+                        applyActionSelection( or, selection );
+                        break;
+                    case SCHEDULE:
+                        applyScheduleSelection( or, selection );
+                        break;
+                    default:
+                        throw new InternalError( "Unknown Facet " + facet + ", this should not happen." );
                 }
+                orWrapper.put( "or", or );
+                and.put( orWrapper );
             }
+            filters.put( "and", and );
             return filters;
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Unable to build filters: " + ex.getMessage(), ex );
         }
     }
 
-    private void applyGenericSelection( JSONObject filters, List<OfficeFacetChoice> selection, String filterName )
+    private void applyGenericSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection, String filterName )
             throws JSONException
     {
         for ( OfficeFacetChoice filter : selection ) {
-            filters.put( filterName, filter.displayName );
+            JSONObject jsonfilter = new JSONObject();
+            jsonfilter.put( filterName, filter.displayName );
+            filterHolder.put( jsonfilter );
         }
     }
 
-    private void applyStateSelection( JSONObject filters, List<OfficeFacetChoice> selection )
+    private void applyStateSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
         // TODO Map State OfficeFacets / FolderFilters
@@ -105,7 +112,7 @@ public class FolderFilterMapper
         }
     }
 
-    private void applyActionSelection( JSONObject filters, List<OfficeFacetChoice> selection )
+    private void applyActionSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
         // TODO Map Action OfficeFacets / FolderFilters
@@ -121,7 +128,7 @@ public class FolderFilterMapper
         }
     }
 
-    private void applyScheduleSelection( JSONObject filters, List<OfficeFacetChoice> selection )
+    private void applyScheduleSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
         // TODO Map Schedule OfficeFacets / FolderFilters

@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import android.net.http.AndroidHttpClient;
 
@@ -71,9 +74,13 @@ public class IParapheurHttpClient
 
     private static final String OFFICES_PATH = "/parapheur/api/getBureaux";
 
+    private static final String TYPOLOGY_PATH = "/parapheur/api/getTypologie";
+
     private static final String FOLDERS_PATH = "/parapheur/api/getDossiersHeaders";
 
     private static final String FOLDER_PATH = "/parapheur/api/getDossier";
+
+    private static final String SIGN_PATH = "/parapheur/api/sign";
 
     private static final String VISA_PATH = "/parapheur/api/visa";
 
@@ -164,6 +171,48 @@ public class IParapheurHttpClient
         }
     }
 
+    public SortedMap<String, List<String>> fetchOfficeTypology( Account account, String officeIdentity )
+    {
+        NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
+        ensureLoggedIn( account );
+        try {
+
+            // Prepare request body
+            String requestBody = "{'bureauRef': '" + officeIdentity + "'}";
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
+            HttpPost post = new HttpPost( buildUrl( account, TYPOLOGY_PATH ) );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
+            post.setEntity( data );
+            JSONObject json = httpClient.execute( post, JSON_RESPONSE_HANDLER );
+
+            // Process response
+            SortedMap<String, List<String>> result = new TreeMap<String, List<String>>();
+            if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "typology" ) ) {
+                JSONObject typology = json.getJSONObject( "data" ).getJSONObject( "typology" );
+                Iterator<String> it = typology.keys();
+                while ( it.hasNext() ) {
+                    String type = it.next();
+                    List<String> subtypes = new ArrayList<String>();
+                    JSONArray subtypesJson = typology.optJSONArray( type );
+                    if ( subtypesJson != null ) {
+                        for ( int index = 0; index < subtypesJson.length(); index++ ) {
+                            subtypes.add( subtypesJson.getString( index ) );
+                        }
+                    }
+                    result.put( type, subtypes );
+                }
+            }
+            return result;
+
+        } catch ( JSONException ex ) {
+            throw new IParapheurHttpException( "Office Typology " + officeIdentity + " : " + ex.getMessage(), ex );
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Office Typology" + officeIdentity + " : " + ex.getMessage(), ex );
+        }
+    }
+
     public List<Folder> fetchFolders( Account account, String officeIdentity, OfficeFacetChoices facetSelection, int page, int pageSize )
             throws IParapheurHttpException
     {
@@ -233,14 +282,31 @@ public class IParapheurHttpClient
         }
     }
 
-    public void visa( Account account, String pubAnnotation, String privAnnotation, Folder... folders )
+    public void sign( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
     {
-        visa( account, pubAnnotation, privAnnotation, folderIdentities( folders ) );
-    }
+        ensureLoggedIn( account );
+        try {
 
-    public void reject( Account account, String pubAnnotation, String privAnnotation, Folder... folders )
-    {
-        reject( account, pubAnnotation, privAnnotation, folderIdentities( folders ) );
+            // Prepare request body
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+
+            // Execute HTTP request
+            HttpPost post = new HttpPost( buildUrl( account, SIGN_PATH ) );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
+            post.setEntity( data );
+            HttpResponse response = httpClient.execute( post );
+
+            // Process response
+            if ( response.getStatusLine().getStatusCode() != 200 ) {
+                throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities )
+                                                   + " HTTP/" + response.getStatusLine().getStatusCode()
+                                                   + " " + response.getStatusLine().getReasonPhrase() );
+            }
+
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+        }
     }
 
     public void visa( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
@@ -314,17 +380,6 @@ public class IParapheurHttpClient
             // This should not happen but we don't want to fail silently!
             throw new IParapheurTabException( "Unable to prepare request JSON body: " + ex.getMessage(), ex );
         }
-    }
-
-    private static String[] folderIdentities( Folder... folders )
-    {
-        String[] folderIdentities = new String[ folders.length ];
-        int index = 0;
-        for ( Folder folder : folders ) {
-            folderIdentities[index] = folder.getIdentity();
-            index++;
-        }
-        return folderIdentities;
     }
 
     private static Folder folderFromJSON( JSONObject dossier )

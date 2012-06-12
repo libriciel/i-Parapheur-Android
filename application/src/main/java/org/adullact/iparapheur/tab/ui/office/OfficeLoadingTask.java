@@ -1,8 +1,8 @@
 package org.adullact.iparapheur.tab.ui.office;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 
 import de.akquinet.android.androlog.Log;
 
@@ -18,7 +18,7 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 
 public class OfficeLoadingTask
-        extends AsyncTaskWithMessageDialog<OfficeLoadingTask.Params, String, AsyncTaskResult<List<Folder>, IParapheurTabException>>
+        extends AsyncTaskWithMessageDialog<OfficeLoadingTask.Params, String, AsyncTaskResult<OfficeData, IParapheurTabException>>
 {
 
     public static class Params
@@ -66,7 +66,7 @@ public class OfficeLoadingTask
     }
 
     @Override
-    protected AsyncTaskResult<List<Folder>, IParapheurTabException> doInBackground( Params... parameters )
+    protected AsyncTaskResult<OfficeData, IParapheurTabException> doInBackground( Params... parameters )
     {
         publishProgress( "Chargement des dossiers" );
         try {
@@ -74,23 +74,25 @@ public class OfficeLoadingTask
             Params params = parameters[0];
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             if ( account == null ) {
-                return new AsyncTaskResult<List<Folder>, IParapheurTabException>( Collections.<Folder>emptyList(), new IParapheurTabException( "Le compte concerné n'existe plus." ) );
+                return new AsyncTaskResult<OfficeData, IParapheurTabException>( OfficeData.EMPTY, new IParapheurTabException( "Le compte concerné n'existe plus." ) );
             }
             if ( !account.validates() ) {
-                return new AsyncTaskResult<List<Folder>, IParapheurTabException>( Collections.<Folder>emptyList(), new IParapheurTabException( "Le compte concerné n'est plus valide, veuillez le compléter." ) );
+                return new AsyncTaskResult<OfficeData, IParapheurTabException>( OfficeData.EMPTY, new IParapheurTabException( "Le compte concerné n'est plus valide, veuillez le compléter." ) );
             }
             Log.d( context, "Will load folders with params: " + params + " using account: " + account );
+            SortedMap<String, List<String>> typology = iParapheurClient.fetchOfficeTypology( account, params.officeIdentity );
             List<Folder> folders = iParapheurClient.fetchFolders( account,
                                                                   params.officeIdentity,
                                                                   params.facetSelection,
                                                                   params.page,
                                                                   params.pageSize );
-            return new AsyncTaskResult<List<Folder>, IParapheurTabException>( folders );
+            OfficeData data = new OfficeData( typology, folders );
+            return new AsyncTaskResult<OfficeData, IParapheurTabException>( data );
 
         } catch ( IParapheurHttpException ex ) {
 
             Log.w( context, "Unable to load folders", ex );
-            return new AsyncTaskResult<List<Folder>, IParapheurTabException>( Collections.<Folder>emptyList(), ex );
+            return new AsyncTaskResult<OfficeData, IParapheurTabException>( OfficeData.EMPTY, ex );
 
         }
     }

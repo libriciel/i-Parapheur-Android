@@ -3,6 +3,7 @@ package org.adullact.iparapheur.tab.ui.office;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -82,6 +83,13 @@ public class OfficeFacetsFragment
     @InjectView( R.id.office_facet_summary )
     private TextView facetSummary;
 
+    private SortedMap<String, List<String>> typology;
+
+    void setOfficeTypology( SortedMap<String, List<String>> typology )
+    {
+        this.typology = typology;
+    }
+
     public OfficeFacetChoices getFacetSelection()
     {
         return facetSelection;
@@ -115,7 +123,7 @@ public class OfficeFacetsFragment
 
         // Titles & Choices
         builder.setTitle( officeFacets.title( facet ) );
-        Couple<String[], Integer[]> rawChoices = officeFacets.rawChoices( facet );
+        Couple<String[], Integer[]> rawChoices = officeFacets.rawChoices( facet, typology );
         final String[] choicesNames = rawChoices.left();
         final Integer[] choicesIds = rawChoices.right();
 

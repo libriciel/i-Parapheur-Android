@@ -5,6 +5,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.SortedMap;
 
 import android.content.Context;
 
@@ -26,6 +28,10 @@ import org.adullact.iparapheur.tab.R;
 public class OfficeFacets
 {
 
+    private final int typeRandomId;
+
+    private final int subtypeRandomId;
+
     private final Context context;
 
     private final Map<Integer, String> stringsCache = new HashMap<Integer, String>();
@@ -38,6 +44,9 @@ public class OfficeFacets
     public OfficeFacets( Context context )
     {
         this.context = context;
+        Random rand = new Random();
+        typeRandomId = rand.nextInt( Integer.MAX_VALUE - 100 );
+        subtypeRandomId = rand.nextInt( Integer.MAX_VALUE - 100 );
         for ( OfficeFacet facet : OfficeFacet.values() ) {
             String facetTitle;
             List<OfficeFacetChoice> facetChoices = new ArrayList<OfficeFacetChoice>();
@@ -52,16 +61,20 @@ public class OfficeFacets
                     break;
                 case TYPE:
                     facetTitle = string( R.string.office_facets_type_title );
-                    facetChoices.add( new OfficeFacetChoice( "Test", R.string.office_facets_type_title + 1 ) );
-                    facetChoices.add( new OfficeFacetChoice( "Actes", R.string.office_facets_type_title + 2 ) );
-                    facetChoices.add( new OfficeFacetChoice( "Demandes internes", R.string.office_facets_type_title + 3 ) );
-                    facetChoices.add( new OfficeFacetChoice( "Helios Fast", R.string.office_facets_type_title + 4 ) );
+                    /*
+                     facetChoices.add( new OfficeFacetChoice( "Test", R.string.office_facets_type_title + 1 ) );
+                     facetChoices.add( new OfficeFacetChoice( "Actes", R.string.office_facets_type_title + 2 ) );
+                     facetChoices.add( new OfficeFacetChoice( "Demandes internes", R.string.office_facets_type_title + 3 ) );
+                     facetChoices.add( new OfficeFacetChoice( "Helios Fast", R.string.office_facets_type_title + 4 ) );
+                     */
                     break;
                 case SUBTYPE:
                     facetTitle = string( R.string.office_facets_subtype_title );
-                    facetChoices.add( new OfficeFacetChoice( "FAST", R.string.office_facets_subtype_title + 1 ) );
-                    facetChoices.add( new OfficeFacetChoice( "Arrêté du personnel", R.string.office_facets_subtype_title + 2 ) );
-                    facetChoices.add( new OfficeFacetChoice( "Commande de matériel", R.string.office_facets_subtype_title + 3 ) );
+                    /*
+                     facetChoices.add( new OfficeFacetChoice( "FAST", R.string.office_facets_subtype_title + 1 ) );
+                     facetChoices.add( new OfficeFacetChoice( "Arrêté du personnel", R.string.office_facets_subtype_title + 2 ) );
+                     facetChoices.add( new OfficeFacetChoice( "Commande de matériel", R.string.office_facets_subtype_title + 3 ) );
+                     */
                     break;
                 case ACTION:
                     facetTitle = string( R.string.office_facets_action_title );
@@ -89,15 +102,47 @@ public class OfficeFacets
         return titles.get( facet );
     }
 
-    public Couple<String[], Integer[]> rawChoices( OfficeFacet facet )
+    public Couple<String[], Integer[]> rawChoices( OfficeFacet facet, SortedMap<String, List<String>> typology )
     {
-        String[] choicesNames = new String[ choices.get( facet ).size() ];
-        Integer[] choicesIds = new Integer[ choices.get( facet ).size() ];
-        int index = 0;
-        for ( OfficeFacetChoice choice : choices.get( facet ) ) {
-            choicesNames[index] = choice.displayName;
-            choicesIds[index] = choice.id;
-            index++;
+        String[] choicesNames;
+        Integer[] choicesIds;
+        switch ( facet ) {
+            case SUBTYPE:
+                List<String> subtypes = new ArrayList<String>();
+                for ( Map.Entry<String, List<String>> entry : typology.entrySet() ) {
+                    for ( String subtype : entry.getValue() ) {
+                        // subtypes.add( subtype + " (" + entry.getKey() + ")" ); // TODO FixMe - This would break filter mappings
+                        subtypes.add( subtype );
+                    }
+                }
+                choicesNames = new String[ subtypes.size() ];
+                choicesIds = new Integer[ choicesNames.length ];
+                int subtypeIndex = 0;
+                for ( String type : subtypes ) {
+                    choicesNames[subtypeIndex] = type;
+                    choicesIds[subtypeIndex] = subtypeRandomId + subtypeIndex;
+                    subtypeIndex++;
+                }
+                break;
+            case TYPE:
+                choicesNames = new String[ typology.keySet().size() ];
+                choicesIds = new Integer[ choicesNames.length ];
+                int typeIndex = 0;
+                for ( String type : typology.keySet() ) {
+                    choicesNames[typeIndex] = type;
+                    choicesIds[typeIndex] = typeRandomId + typeIndex;
+                    typeIndex++;
+                }
+                break;
+            default:
+                choicesNames = new String[ choices.get( facet ).size() ];
+                choicesIds = new Integer[ choicesNames.length ];
+                int choiceIndex = 0;
+                for ( OfficeFacetChoice choice : choices.get( facet ) ) {
+                    choicesNames[choiceIndex] = choice.displayName;
+                    choicesIds[choiceIndex] = choice.id;
+                    choiceIndex++;
+                }
         }
         return new Couple<String[], Integer[]>( choicesNames, choicesIds );
     }

@@ -205,8 +205,7 @@ public class OfficeActivity
 
             public void facetSelectionChanged( Map<OfficeFacet, List<OfficeFacetChoice>> selection )
             {
-                // TODO Activate refresh when FacetSelection changed
-                // refresh();
+                refresh();
             }
 
         } );
@@ -230,19 +229,19 @@ public class OfficeActivity
         {
 
             @Override
-            protected void beforeDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
+            protected void beforeDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
             {
                 Log.d( OfficeActivity.this, "Got result: AsynkTaskResult[ result: " + result.getResult() + ", errors: " + result.getErrors() + "]" );
-                List<Folder> folders = result.getResult();
+                List<Folder> folders = result.getResult().getFolders();
                 if ( folders == null ) {
                     folders = Collections.emptyList();
                 }
-
+                facetsFragment.setOfficeTypology( result.getResult().getTypology() );
                 listFragment.setListAdapter( new OfficeFolderListAdapter( listFragment, folders ) );
             }
 
             @Override
-            protected void afterDialogDismiss( AsyncTaskResult<List<Folder>, IParapheurTabException> result )
+            protected void afterDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );

@@ -30,9 +30,10 @@ public class SignTask
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will sign folder with params: " + params + " using account: " + account );
             if ( true ) {
+                // TODO Implement signature
                 throw new IParapheurHttpException( "La signature n'est pas supportée." );
             }
-            // iParapheurClient.sign( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities ); // TODO Implement signature
+            iParapheurClient.sign( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities );
             return new AsyncTaskResult<Void, IParapheurHttpException>( ( Void ) null );
 
         } catch ( IParapheurHttpException ex ) {
