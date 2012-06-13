@@ -3,8 +3,8 @@
 <resources>
 
     <!-- STATE -->
-    <string name="office_facets_state_button">Étât</string>
-    <string name="office_facets_state_title">Filtrer par Étât</string>
+    <string name="office_facets_state_button">État</string>
+    <string name="office_facets_state_title">Filtrer par État</string>
     
     <string name="office_facets_state_todo">A traîter</string>
     <string name="office_facets_state_late">En retard</string>
