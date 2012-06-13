@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -92,6 +93,12 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
 
+    @InjectView( R.id.office_folder_type_details )
+    private TextView folderTypeDetails;
+
+    @InjectView( R.id.office_folder_date_details )
+    private TextView folderDateDetails;
+
     @InjectView( R.id.office_batch_layout )
     private RelativeLayout batchLayout;
 
@@ -172,6 +179,18 @@ public class OfficeActivity
                 }
 
             } );
+            StringBuilder typeDetails = new StringBuilder();
+            typeDetails.append( "<p><b>Type</b> " ).append( folder.getBusinessType() ).append( "</p>" );
+            typeDetails.append( "<p><b>Sous-type</b> " ).append( folder.getBusinessSubType() ).append( "</p>" );
+            folderTypeDetails.setText( Html.fromHtml( typeDetails.toString() ) );
+            folderTypeDetails.setVisibility( View.VISIBLE );
+            StringBuilder dateDetails = new StringBuilder();
+            dateDetails.append( "<p style='text-align:right'><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
+            if ( folder.getDueDate() != null ) {
+                dateDetails.append( "<p style='text-align:right'><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
+            }
+            folderDateDetails.setText( Html.fromHtml( dateDetails.toString() ) );
+            folderDateDetails.setVisibility( View.VISIBLE );
             flipToFolderDetail();
             currentFolder = folder;
         }

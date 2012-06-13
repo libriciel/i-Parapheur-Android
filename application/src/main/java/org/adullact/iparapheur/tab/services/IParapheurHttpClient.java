@@ -1,8 +1,11 @@
 package org.adullact.iparapheur.tab.services;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -392,6 +395,9 @@ public class IParapheurHttpClient
         String subtype = dossier.getString( "sousType" );
         String creationDate = dossier.getString( "dateCreation" );
         String dueDate = dossier.optString( "dateLimite" );
+        if ( Strings.isEmpty( dueDate ) || "null".equals( dueDate ) ) { // TODO Report bad API format
+            dueDate = null;
+        }
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
@@ -401,7 +407,7 @@ public class IParapheurHttpClient
             // WARN Unsupported FolderRequestedAction
             requestedAction = FolderRequestedAction.UNSUPPORTED;
         }
-        Folder folder = new Folder( identity, title, requestedAction, type, subtype );
+        Folder folder = new Folder( identity, title, requestedAction, type, subtype, parseISO8601Date( creationDate ), parseISO8601Date( dueDate ) );
         if ( dossier.has( "documents" ) ) {
             JSONArray documents = dossier.getJSONArray( "documents" );
             for ( int index = 0; index < documents.length(); index++ ) {
@@ -412,6 +418,19 @@ public class IParapheurHttpClient
             }
         }
         return folder;
+    }
+
+    private static Date parseISO8601Date( String iso8601Date )
+    {
+        if ( Strings.isEmpty( iso8601Date ) ) {
+            return null;
+        }
+        try {
+            return new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss" ).parse( iso8601Date );
+        } catch ( ParseException ex ) {
+            Log.w( IParapheurHttpClient.class, "Unable to parse iParapheur date (" + iso8601Date + ")", ex );
+            return null;
+        }
     }
 
     private String buildUrl( Account account, String path )

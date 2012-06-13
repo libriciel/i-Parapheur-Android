@@ -1,11 +1,15 @@
 package org.adullact.iparapheur.tab.model;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.codeartisans.java.toolbox.Strings;
 
 public class Folder
         implements Serializable
@@ -23,17 +27,23 @@ public class Folder
 
     private final String businessSubType;
 
+    private final Date creationDate;
+
+    private final Date dueDate;
+
     private final List<FolderDocument> documents = new ArrayList<FolderDocument>();
 
     private final List<FolderAnnex> annexes = new ArrayList<FolderAnnex>();
 
-    public Folder( String identity, String title, FolderRequestedAction requestedAction, String businessType, String businessSubType )
+    public Folder( String identity, String title, FolderRequestedAction requestedAction, String businessType, String businessSubType, Date creationDate, Date dueDate )
     {
         this.identity = identity;
         this.title = title;
         this.requestedAction = requestedAction;
         this.businessType = businessType;
         this.businessSubType = businessSubType;
+        this.creationDate = creationDate;
+        this.dueDate = dueDate;
     }
 
     public String getIdentity()
@@ -64,6 +74,34 @@ public class Folder
     public boolean requestedActionSupported()
     {
         return requestedAction != FolderRequestedAction.UNSUPPORTED;
+    }
+
+    public Date getCreationDate()
+    {
+        return creationDate;
+    }
+
+    public Date getDueDate()
+    {
+        return dueDate;
+    }
+
+    public String getDisplayCreationDate()
+    {
+        return toDisplayDate( creationDate );
+    }
+
+    public String getDisplayDueDate()
+    {
+        if ( dueDate == null ) {
+            return Strings.EMPTY;
+        }
+        return toDisplayDate( dueDate );
+    }
+
+    private static String toDisplayDate( Date date )
+    {
+        return DateFormat.getDateInstance().format( date );
     }
 
     public boolean addDocument( FolderDocument folderDocument )
