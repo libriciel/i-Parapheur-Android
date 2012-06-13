@@ -4,7 +4,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="10dp" >
+                android:padding="8dp" >
 
     <ImageView android:id="@+id/folder_top_icon"
                android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentTop="true"
-              android:layout_marginRight="20dp"
+              android:layout_marginRight="16dp"
               android:layout_toLeftOf="@+id/folder_top_summary_right"
               android:text="@string/placeholder" />
         
@@ -34,7 +34,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentTop="true"
-              android:layout_marginRight="20dp"
+              android:layout_marginRight="16dp"
               android:layout_toLeftOf="@+id/folder_button_positive"
               android:text="@string/placeholder" />
 
@@ -42,12 +42,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="16dp"
             android:layout_toLeftOf="@+id/folder_button_negative"
             android:text="Signer"
             android:drawableLeft="@drawable/ic_action_sign"
             android:gravity="left|center_vertical"
-            android:drawablePadding="10dp" />
+            android:drawablePadding="8dp" />
 
     <Button android:id="@+id/folder_button_negative"
             android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
             android:text="Refuser" 
             android:drawableLeft="@drawable/ic_action_reject"
             android:gravity="left|center_vertical"
-            android:drawablePadding="10dp" />
+            android:drawablePadding="8dp" />
 
 </RelativeLayout>
 

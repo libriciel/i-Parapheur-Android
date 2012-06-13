@@ -102,6 +102,24 @@ public class OfficeFacets
         return titles.get( facet );
     }
 
+    public int iconId( OfficeFacet facet )
+    {
+        switch ( facet ) {
+            case STATE:
+                return R.drawable.ic_facet_state;
+            case TYPE:
+                return R.drawable.ic_facet_type;
+            case SUBTYPE:
+                return R.drawable.ic_facet_subtype;
+            case ACTION:
+                return R.drawable.ic_facet_action;
+            case SCHEDULE:
+                return R.drawable.ic_facet_schedule;
+            default:
+                return R.drawable.icon;
+        }
+    }
+
     public Couple<String[], Integer[]> rawChoices( OfficeFacet facet, SortedMap<String, List<String>> typology )
     {
         String[] choicesNames;

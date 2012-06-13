@@ -5,22 +5,20 @@
                 android:layout_height="match_parent"
                 android:padding="5dp" >
 
-    <ImageView
-        android:id="@+id/folder_filelist_item_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/ic_list_document" />
+    <ImageView android:id="@+id/folder_filelist_item_icon"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_alignParentLeft="true"
+               android:layout_alignParentTop="true"
+               android:src="@drawable/ic_list_document" />
 
-    <TextView
-        android:id="@+id/folder_filelist_item_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/folder_filelist_item_icon"
-        android:layout_toRightOf="@+id/folder_filelist_item_icon"
-        android:layout_marginTop="7dp"
-        android:layout_marginLeft="4dp"
-        android:text="Titre" />
+    <TextView android:id="@+id/folder_filelist_item_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignTop="@+id/folder_filelist_item_icon"
+              android:layout_toRightOf="@+id/folder_filelist_item_icon"
+              android:layout_marginTop="7dp"
+              android:layout_marginLeft="4dp"
+              android:text="Titre" />
 
 </RelativeLayout>

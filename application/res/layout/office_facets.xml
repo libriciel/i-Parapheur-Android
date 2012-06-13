@@ -2,13 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp" >
+                android:orientation="horizontal" >
             
     <LinearLayout android:id="@+id/office_facet_layout"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_centerHorizontal="true"
+                  android:layout_alignParentLeft="true"
+                  android:layout_alignParentTop="true"
                   android:orientation="horizontal" >
 
         <!-- Facet: State -->
@@ -17,8 +17,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_facet_state"
+                android:gravity="left|center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Etât" />
             
         <!-- Facet: BusinessType -->
@@ -27,8 +30,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_facet_type"
+                android:gravity="left|center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Type" />
         
         <!-- Facet: BusinessSubType -->
@@ -37,8 +43,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_facet_subtype"
+                android:gravity="left|center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Sous-type" />
         
         <!-- Facet: RequestedAction -->
@@ -47,8 +56,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_facet_action"
+                android:gravity="left|center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Action" />
             
         <!-- Facet: Schedule -->
@@ -57,8 +69,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
+                android:drawableLeft="@drawable/ic_facet_schedule"
+                android:gravity="left|center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Échéance" />
 
     </LinearLayout>
@@ -67,7 +82,7 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@+id/office_facet_layout"
-              android:layout_centerHorizontal="true"
+              android:layout_alignParentLeft="true"
               android:layout_marginTop="8dp"
               android:text="Aucun filtre." />
 

@@ -3,7 +3,7 @@
                 android:id="@+id/office_folderlist_item_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="5dp" >
+                android:padding="4dp" >
 
     <ImageView
         android:id="@+id/office_folderlist_item_icon"
@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/office_folderlist_item_icon"
         android:layout_toRightOf="@+id/office_folderlist_item_icon"
-        android:layout_marginTop="7dp"
         android:layout_marginLeft="4dp"
         android:text="Titre" />
 

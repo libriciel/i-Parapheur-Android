@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -69,6 +70,9 @@ public class OfficeActivity
     @Inject
     private ActionsDialogFactory actionsDialogFactory;
 
+    @InjectView( R.id.office_top_title )
+    private TextView topTitle;
+
     @InjectFragment( R.id.office_facet_fragment )
     private OfficeFacetsFragment facetsFragment;
 
@@ -81,8 +85,14 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_layout )
     private RelativeLayout folderLayout;
 
+    @InjectView( R.id.office_folder_icon )
+    private ImageView folderIconView;
+
     @InjectView( R.id.office_folder_title )
     private TextView folderTitleView;
+
+    @InjectView( R.id.office_folder_type_details )
+    private TextView folderTypeDetails;
 
     @InjectView( R.id.office_folder_positive_button )
     private Button folderPositiveButton;
@@ -92,9 +102,6 @@ public class OfficeActivity
 
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
-
-    @InjectView( R.id.office_folder_type_details )
-    private TextView folderTypeDetails;
 
     @InjectView( R.id.office_folder_date_details )
     private TextView folderDateDetails;
@@ -136,6 +143,7 @@ public class OfficeActivity
         {
             // System.out.println( "FOLDER DISPLAY REQUEST FOR: " + folder ); // TODO Make it a DEBUG level log
             listFragment.shadeFolder( folder );
+            folderIconView.setVisibility( View.VISIBLE );
             folderTitleView.setText( folder.getTitle() );
             folderTitleView.setVisibility( View.VISIBLE );
             if ( folder.requestedActionSupported() ) {
@@ -185,9 +193,9 @@ public class OfficeActivity
             folderTypeDetails.setText( Html.fromHtml( typeDetails.toString() ) );
             folderTypeDetails.setVisibility( View.VISIBLE );
             StringBuilder dateDetails = new StringBuilder();
-            dateDetails.append( "<p style='text-align:right'><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
+            dateDetails.append( "<p><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
             if ( folder.getDueDate() != null ) {
-                dateDetails.append( "<p style='text-align:right'><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
+                dateDetails.append( "<p><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
             }
             folderDateDetails.setText( Html.fromHtml( dateDetails.toString() ) );
             folderDateDetails.setVisibility( View.VISIBLE );
@@ -240,8 +248,9 @@ public class OfficeActivity
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
         Log.i( "Refresh for office: " + accountIdentity + " / " + officeIdentity + " / " + officeTitle );
 
-        // Reset View
+        // Reset Views
         resetViews();
+        topTitle.setText( officeTitle );
 
         // Load Data
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )

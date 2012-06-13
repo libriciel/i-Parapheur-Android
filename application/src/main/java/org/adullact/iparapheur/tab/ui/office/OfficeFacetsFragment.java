@@ -123,6 +123,7 @@ public class OfficeFacetsFragment
 
         // Titles & Choices
         builder.setTitle( officeFacets.title( facet ) );
+        builder.setIcon( officeFacets.iconId( facet ) );
         Couple<String[], Integer[]> rawChoices = officeFacets.rawChoices( facet, typology );
         final String[] choicesNames = rawChoices.left();
         final Integer[] choicesIds = rawChoices.right();

@@ -3,11 +3,43 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical" >
+                  
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal" >
+                      
+        <RelativeLayout android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="8dp">
+                            
+            <ImageView android:id="@+id/office_top_icon"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_alignParentLeft="true"
+                       android:layout_alignParentTop="true"
+                       android:layout_marginLeft="8dp"
+                       android:src="@drawable/icon" />
 
-    <fragment android:id="@+id/office_facet_fragment"
-              android:name="org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content" />
+            <TextView android:id="@+id/office_top_title"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_alignParentTop="true"
+                      android:layout_toRightOf="@+id/office_top_icon"
+                      android:layout_marginLeft="8dp" 
+                      android:text="Office Title"
+                      android:textAppearance="?android:attr/textAppearanceLarge" />
+                          
+        </RelativeLayout>
+
+        <fragment android:id="@+id/office_facet_fragment"
+                  android:name="org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="2"
+                  android:layout_marginBottom="8dp"/>
+              
+    </LinearLayout>
 
     <View android:layout_width="wrap_content"
           android:layout_height="1dp" 
@@ -36,23 +68,43 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" >
 
+                <ImageView android:id="@+id/office_folder_icon"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_alignParentLeft="true"
+                           android:layout_alignParentTop="true"
+                           android:layout_marginTop="8dp"
+                           android:layout_marginLeft="8dp"
+                           android:src="@drawable/ic_folder" />
+			
                 <TextView android:id="@+id/office_folder_title"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_alignParentLeft="true"
-                          android:layout_alignParentTop="true"
-                          android:layout_marginLeft="20dp"
-                          android:layout_marginTop="20dp"
-                          android:text="Office"
+                          android:layout_toRightOf="@+id/office_folder_icon"
+                          android:layout_alignTop="@+id/office_folder_icon"
+                          android:layout_marginLeft="8dp"
+                          android:layout_marginTop="4dp"
+                          android:text="Folder"
                           android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <TextView android:id="@+id/office_folder_type_details"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignLeft="@+id/office_folder_icon"
+                          android:layout_below="@+id/office_folder_icon"
+                          android:layout_marginTop="32dp"
+                          android:text="Détails des types" />
 
                 <Button android:id="@+id/office_folder_open_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentTop="true"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="8dp"
+                        android:drawableLeft="@drawable/ic_folder_open"
+                        android:gravity="left|center_vertical"
+                        android:drawablePadding="8dp"
                         android:text="Ouvrir" />
 
                 <Button android:id="@+id/office_folder_negative_button"
@@ -60,8 +112,11 @@
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@+id/office_folder_open_button"
                         android:layout_alignBottom="@+id/office_folder_open_button"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginRight="16dp"
                         android:layout_toLeftOf="@+id/office_folder_open_button"
+                        android:drawableLeft="@drawable/ic_action_reject"
+                        android:gravity="left|center_vertical"
+                        android:drawablePadding="8dp"
                         android:text="Negatif" />
 
                 <Button android:id="@+id/office_folder_positive_button"
@@ -69,26 +124,21 @@
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@+id/office_folder_negative_button"
                         android:layout_alignBottom="@+id/office_folder_negative_button"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginRight="16dp"
                         android:layout_toLeftOf="@+id/office_folder_negative_button"
+                        android:drawableLeft="@drawable/ic_action_sign"
+                        android:gravity="left|center_vertical"
+                        android:drawablePadding="8dp"
                         android:text="Positif" />
                     
-                <TextView android:id="@+id/office_folder_type_details"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_alignLeft="@+id/office_folder_title"
-                          android:layout_below="@+id/office_folder_title"
-                          android:layout_marginTop="40dp"
-                          android:text="Détails des types" />
-
                 <TextView android:id="@+id/office_folder_date_details"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_alignRight="@+id/office_folder_positive_button"
-                          android:layout_below="@+id/office_folder_positive_button"
-                          android:layout_marginTop="20dp"
+                          android:layout_alignRight="@+id/office_folder_open_button"
+                          android:layout_below="@+id/office_folder_open_button"
+                          android:layout_marginTop="16dp"
                           android:gravity="right"
-                          android:text="Détails des dates" />
+                          android:text="Détails des dates" />            
 
             </RelativeLayout>
             
