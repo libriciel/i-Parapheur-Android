@@ -15,6 +15,7 @@ import de.akquinet.android.androlog.Log;
 import org.codeartisans.android.toolbox.activity.event.OnCreateOptionsMenuEvent;
 import org.codeartisans.android.toolbox.activity.event.OnOptionsItemSelectedEvent;
 
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
@@ -34,6 +35,7 @@ public class ActionBarActivityObserver
         Menu menu = event.getMenu();
         if ( activity instanceof Refreshable ) {
             MenuItem refresh = menu.add( "Rafraichir" );
+            refresh.setIcon( R.drawable.ic_refresh );
             refresh.setShowAsAction( MenuItem.SHOW_AS_ACTION_ALWAYS );
             refresh.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener()
             {
@@ -47,6 +49,7 @@ public class ActionBarActivityObserver
             } );
         }
         MenuItem accounts = menu.add( "Comptes" );
+        accounts.setIcon( R.drawable.ic_accounts ); // Won't be shown as Android don't want icons in the overflow menu
         accounts.setShowAsAction( MenuItem.SHOW_AS_ACTION_NEVER );
         accounts.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener()
         {

@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import static org.adullact.iparapheur.tab.services.AccountsRepository.*;
@@ -85,6 +86,7 @@ public class AccountsActivity
     {
         final PreferenceScreen accountScreen = getPreferenceManager().createPreferenceScreen( this );
         accountScreen.setTitle( account.getTitle() );
+        accountScreen.setIcon( R.drawable.ic_accounts );
         accountScreen.setSummary( buildAccountSummary( account ) );
         parent.addPreference( accountScreen );
 
@@ -97,6 +99,7 @@ public class AccountsActivity
         final EditTextPreference titlePref = new EditTextPreference( this );
         titlePref.setDialogTitle( "Nom du compte" );
         titlePref.setTitle( account.getTitle() );
+        titlePref.setIcon( android.R.drawable.ic_menu_info_details );
         titlePref.setText( account.getTitle() );
         titlePref.setSummary( "Nom du compte" );
         titlePref.setKey( titlePrefKey );
@@ -120,6 +123,7 @@ public class AccountsActivity
         final EditTextPreference urlPref = new EditTextPreference( this );
         urlPref.setDialogTitle( "Adresse du serveur iParapheur" );
         urlPref.setTitle( account.getUrl() );
+        urlPref.setIcon( android.R.drawable.ic_menu_compass );
         urlPref.setText( account.getUrl() );
         urlPref.setSummary( "Adresse du serveur iParapheur" );
         urlPref.setKey( urlPrefKey );
@@ -140,6 +144,7 @@ public class AccountsActivity
         final EditTextPreference loginPref = new EditTextPreference( this );
         loginPref.setDialogTitle( "Identifiant" );
         loginPref.setTitle( account.getLogin() );
+        loginPref.setIcon( android.R.drawable.ic_menu_myplaces );
         loginPref.setText( account.getLogin() );
         loginPref.setSummary( "Identifiant" );
         loginPref.setKey( loginPrefKey );
@@ -161,6 +166,7 @@ public class AccountsActivity
         passwordPref.getEditText().setTransformationMethod( PasswordTransformationMethod.getInstance() );
         passwordPref.setDialogTitle( "Mot de passe" );
         passwordPref.setTitle( "************" );
+        passwordPref.setIcon( android.R.drawable.ic_menu_preferences );
         passwordPref.setText( account.getPassword() );
         passwordPref.setSummary( "Mot de passe" );
         passwordPref.setKey( passwordPrefKey );

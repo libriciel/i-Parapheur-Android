@@ -25,7 +25,7 @@
             <artifactId>compatibility-v4</artifactId>
         </dependency>
 
-        <!-- CodeArtisans Android Toolbox -->
+        <!-- Android Toolbox https://github.com/eskatos/android-toolbox -->
         <dependency>
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
@@ -38,12 +38,19 @@
             </exclusions>
         </dependency>
 
+        <!-- Guava http://code.google.com/p/guava-libraries/ -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>11.0.2</version>
         </dependency>
-            
+        
+        <!-- Bouncy/Spongy/Castle http://rtyley.github.com/spongycastle/ -->
+        <dependency>
+            <groupId>com.madgag</groupId>
+            <artifactId>scprov-jdk15on</artifactId>
+            <version>1.47.0.2</version>
+        </dependency>
         
     </dependencies>
 

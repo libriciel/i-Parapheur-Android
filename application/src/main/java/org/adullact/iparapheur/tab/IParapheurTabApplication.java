@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab;
 
+import java.security.Security;
+
 import android.app.Application;
 import android.content.res.Configuration;
 
@@ -20,6 +22,7 @@ public class IParapheurTabApplication
     public void onCreate()
     {
         Log.i( this, "Application is about to be created." );
+        Security.addProvider( new org.spongycastle.jce.provider.BouncyCastleProvider() );
         super.onCreate();
         Log.i( this, "Application has been created." );
     }
