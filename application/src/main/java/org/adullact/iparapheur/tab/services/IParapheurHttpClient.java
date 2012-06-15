@@ -225,7 +225,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = "{'bureauRef': '" + officeIdentity
-                                 + "', filters: " + folderFilterMapper.buildFilters( facetSelection )
+                                 + "', 'filters': " + folderFilterMapper.buildFilters( facetSelection )
                                  + ", 'page': " + page
                                  + ", 'pageSize': " + pageSize + "}";
             Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );

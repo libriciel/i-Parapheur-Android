@@ -302,7 +302,7 @@ public class OfficeActivity
         }.execute( new OfficeLoadingTask.Params( accountIdentity,
                                                  officeIdentity,
                                                  facetsFragment.getFacetSelection(),
-                                                 1, 10 ) );
+                                                 0, 20 ) );
     }
 
     private void resetViews()
