@@ -42,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderDocument;
