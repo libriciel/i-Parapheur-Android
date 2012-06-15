@@ -7,6 +7,8 @@ import android.content.res.Configuration;
 
 import de.akquinet.android.androlog.Log;
 
+import org.adullact.iparapheur.tab.services.StaticHttpClient;
+
 public class IParapheurTabApplication
         extends Application
 {
@@ -31,6 +33,7 @@ public class IParapheurTabApplication
     public void onLowMemory()
     {
         Log.i( this, "Application is running low on memory." );
+        StaticHttpClient.releaseInstance();
         super.onLowMemory();
     }
 
