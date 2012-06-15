@@ -65,17 +65,14 @@ public class OfficeFacetsFragment
     @Inject
     private OfficeFacets officeFacets;
 
-    @InjectView( R.id.office_facet_state )
-    private Button stateButton;
+    @InjectView( R.id.office_facet_action )
+    private Button actionButton;
 
     @InjectView( R.id.office_facet_type )
     private Button typeButton;
 
     @InjectView( R.id.office_facet_subtype )
     private Button subtypeButton;
-
-    @InjectView( R.id.office_facet_action )
-    private Button actionButton;
 
     @InjectView( R.id.office_facet_schedule )
     private Button scheduleButton;
@@ -110,10 +107,12 @@ public class OfficeFacetsFragment
     public void onViewCreated( View view, Bundle savedInstanceState )
     {
         super.onViewCreated( view, savedInstanceState );
-        stateButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.STATE ) );
+        actionButton.setEnabled( false ); // TODO Activate Action Facet Button when action filters are available
+        if ( false ) {
+            actionButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.ACTION ) );
+        }
         typeButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.TYPE ) );
         subtypeButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.SUBTYPE ) );
-        actionButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.ACTION ) );
         scheduleButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.SCHEDULE ) );
     }
 

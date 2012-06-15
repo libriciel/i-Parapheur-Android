@@ -52,17 +52,14 @@ public class FolderFilterMapper
                 OfficeFacet facet = entry.getKey();
                 List<OfficeFacetChoice> selection = entry.getValue();
                 switch ( facet ) {
-                    case STATE:
-                        applyStateSelection( or, selection );
+                    case ACTION:
+                        applyActionSelection( or, selection );
                         break;
                     case TYPE:
                         applyGenericSelection( or, selection, "ph:typeMetier" );
                         break;
                     case SUBTYPE:
                         applyGenericSelection( or, selection, "ph:sousTypeMetier" );
-                        break;
-                    case ACTION:
-                        applyActionSelection( or, selection );
                         break;
                     case SCHEDULE:
                         applyScheduleSelection( or, selection );
@@ -80,38 +77,6 @@ public class FolderFilterMapper
         }
     }
 
-    private void applyGenericSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection, String filterName )
-            throws JSONException
-    {
-        for ( OfficeFacetChoice filter : selection ) {
-            JSONObject jsonfilter = new JSONObject();
-            jsonfilter.put( filterName, filter.displayName );
-            filterHolder.put( jsonfilter );
-        }
-    }
-
-    private void applyStateSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
-            throws JSONException
-    {
-        // TODO Map State OfficeFacets / FolderFilters
-        for ( OfficeFacetChoice choice : selection ) {
-            switch ( choice.id ) {
-                case R.string.office_facets_state_todo:
-                    break;
-                case R.string.office_facets_state_late:
-                    break;
-                case R.string.office_facets_state_recoverable:
-                    break;
-                case R.string.office_facets_state_tocome:
-                    break;
-                case R.string.office_facets_state_done:
-                    break;
-                default:
-                    Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
-            }
-        }
-    }
-
     private void applyActionSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
@@ -125,6 +90,16 @@ public class FolderFilterMapper
                 default:
                     Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
             }
+        }
+    }
+
+    private void applyGenericSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection, String filterName )
+            throws JSONException
+    {
+        for ( OfficeFacetChoice filter : selection ) {
+            JSONObject jsonfilter = new JSONObject();
+            jsonfilter.put( filterName, filter.displayName );
+            filterHolder.put( jsonfilter );
         }
     }
 

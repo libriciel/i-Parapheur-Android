@@ -11,18 +11,18 @@
                   android:layout_alignParentTop="true"
                   android:orientation="horizontal" >
 
-        <!-- Facet: State -->
-        <Button android:id="@+id/office_facet_state"
+        <!-- Facet: RequestedAction -->
+        <Button android:id="@+id/office_facet_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="8dp"
-                android:drawableLeft="@drawable/ic_facet_state"
+                android:drawableLeft="@drawable/ic_facet_action"
                 android:gravity="left|center_vertical"
                 android:drawablePadding="8dp"
-                android:text="Etât" />
+                android:text="Action" />
             
         <!-- Facet: BusinessType -->
         <Button android:id="@+id/office_facet_type"
@@ -50,19 +50,6 @@
                 android:drawablePadding="8dp"
                 android:text="Sous-type" />
         
-        <!-- Facet: RequestedAction -->
-        <Button android:id="@+id/office_facet_action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:drawableLeft="@drawable/ic_facet_action"
-                android:gravity="left|center_vertical"
-                android:drawablePadding="8dp"
-                android:text="Action" />
-            
         <!-- Facet: Schedule -->
         <Button android:id="@+id/office_facet_schedule"
                 android:layout_width="wrap_content"

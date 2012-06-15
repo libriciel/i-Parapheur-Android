@@ -51,35 +51,16 @@ public class OfficeFacets
             String facetTitle;
             List<OfficeFacetChoice> facetChoices = new ArrayList<OfficeFacetChoice>();
             switch ( facet ) {
-                case STATE:
-                    facetTitle = string( R.string.office_facets_state_title );
-                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_todo ), R.string.office_facets_state_todo ) );
-                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_late ), R.string.office_facets_state_late ) );
-                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_recoverable ), R.string.office_facets_state_recoverable ) );
-                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_tocome ), R.string.office_facets_state_tocome ) );
-                    facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_state_done ), R.string.office_facets_state_done ) );
-                    break;
-                case TYPE:
-                    facetTitle = string( R.string.office_facets_type_title );
-                    /*
-                     facetChoices.add( new OfficeFacetChoice( "Test", R.string.office_facets_type_title + 1 ) );
-                     facetChoices.add( new OfficeFacetChoice( "Actes", R.string.office_facets_type_title + 2 ) );
-                     facetChoices.add( new OfficeFacetChoice( "Demandes internes", R.string.office_facets_type_title + 3 ) );
-                     facetChoices.add( new OfficeFacetChoice( "Helios Fast", R.string.office_facets_type_title + 4 ) );
-                     */
-                    break;
-                case SUBTYPE:
-                    facetTitle = string( R.string.office_facets_subtype_title );
-                    /*
-                     facetChoices.add( new OfficeFacetChoice( "FAST", R.string.office_facets_subtype_title + 1 ) );
-                     facetChoices.add( new OfficeFacetChoice( "Arrêté du personnel", R.string.office_facets_subtype_title + 2 ) );
-                     facetChoices.add( new OfficeFacetChoice( "Commande de matériel", R.string.office_facets_subtype_title + 3 ) );
-                     */
-                    break;
                 case ACTION:
                     facetTitle = string( R.string.office_facets_action_title );
                     facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_action_sign ), R.string.office_facets_action_sign ) );
                     facetChoices.add( new OfficeFacetChoice( string( R.string.office_facets_action_visa ), R.string.office_facets_action_visa ) );
+                    break;
+                case TYPE:
+                    facetTitle = string( R.string.office_facets_type_title );
+                    break;
+                case SUBTYPE:
+                    facetTitle = string( R.string.office_facets_subtype_title );
                     break;
                 case SCHEDULE:
                     facetTitle = string( R.string.office_facets_schedule_title );
@@ -105,14 +86,12 @@ public class OfficeFacets
     public int iconId( OfficeFacet facet )
     {
         switch ( facet ) {
-            case STATE:
-                return R.drawable.ic_facet_state;
+            case ACTION:
+                return R.drawable.ic_facet_action;
             case TYPE:
                 return R.drawable.ic_facet_type;
             case SUBTYPE:
                 return R.drawable.ic_facet_subtype;
-            case ACTION:
-                return R.drawable.ic_facet_action;
             case SCHEDULE:
                 return R.drawable.ic_facet_schedule;
             default:
