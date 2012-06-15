@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.tab.ui.office;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -178,8 +179,19 @@ public class OfficeFacetsFragment
 
         } );
 
+        // Réinit
+        builder.setNeutralButton( "Réinitialiser", new DialogInterface.OnClickListener()
+        {
+
+            public void onClick( DialogInterface dialog, int id )
+            {
+                fireFacetSelectionChanged( facet, Collections.<OfficeFacetChoice>emptyList() );
+                dialog.cancel();
+            }
+
+        } );
+
         // Cancel
-        // TODO Change Facet Cancel button to Facet Reset
         builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
         {
 
