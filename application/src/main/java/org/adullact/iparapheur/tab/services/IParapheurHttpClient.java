@@ -395,9 +395,6 @@ public class IParapheurHttpClient
         String subtype = dossier.getString( "sousType" );
         String creationDate = dossier.getString( "dateCreation" );
         String dueDate = dossier.optString( "dateLimite" );
-        if ( Strings.isEmpty( dueDate ) || "null".equals( dueDate ) ) { // TODO Report bad API format
-            dueDate = null;
-        }
         FolderRequestedAction requestedAction = null;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
@@ -414,7 +411,18 @@ public class IParapheurHttpClient
                 JSONObject doc = documents.getJSONObject( index );
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
-                folder.addDocument( new FolderDocument( docName, docSize, "file:///android_asset/index.html" ) ); // TODO Parse document pages URLs
+                FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/index.html" );
+                if ( doc.has( "images" ) ) {
+                    List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
+                    JSONArray images = doc.getJSONArray( "images" );
+                    for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
+                        JSONObject image = images.getJSONObject( indexImages );
+                        FolderFilePageImage folderFilePageImage = new FolderFilePageImage( image.getString( "image" ) );
+                        pageImages.add( folderFilePageImage );
+                    }
+                    folderDocument.setPageImages( pageImages );
+                }
+                folder.addDocument( folderDocument );
             }
         }
         return folder;
