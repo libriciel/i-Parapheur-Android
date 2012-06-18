@@ -3,9 +3,16 @@
            package="org.adullact.iparapheur.tab" 
            android:versionCode="1" 
            android:versionName="1.0-SNAPSHOT">
-              
+    
+    <!-- Android >= 3.x -->
     <uses-sdk  android:targetSdkVersion="11" 
                android:minSdkVersion="11"/>
+               
+    <!-- Only supports Tablets -->
+    <supports-screens android:smallScreens="false"
+                      android:normalScreens="false"
+                      android:largeScreens="true"
+                      android:xlargeScreens="true" />
     
     <uses-permission android:name="android.permission.INTERNET" />
 
