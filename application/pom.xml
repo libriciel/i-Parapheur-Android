@@ -61,6 +61,23 @@
                 <artifactId>android-maven-plugin</artifactId>
                 <extensions>true</extensions>
             </plugin>
+            <plugin>
+                <groupId>org.codeartisans</groupId>
+                <artifactId>artifactinfo-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>artifactinfo</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <packageName>org.adullact.iparapheur.tab</packageName>
+                            <className>IParapheurTabBuildInfo</className>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
