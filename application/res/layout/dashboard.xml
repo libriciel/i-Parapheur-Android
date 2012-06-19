@@ -3,30 +3,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-        
+    android:orientation="vertical" >
+
     <ViewFlipper
+        android:id="@+id/dashboard_flipper"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/dashboard_flipper">
+        android:layout_height="fill_parent" >
 
         <ScrollView
             android:id="@+id/dashboard_content_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" >
 
             <LinearLayout
                 android:id="@+id/dashboard_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp" >
-                
+                android:padding="16dp" >
             </LinearLayout>
-        
         </ScrollView>
-
     </ViewFlipper>
-
-                  
 </LinearLayout>

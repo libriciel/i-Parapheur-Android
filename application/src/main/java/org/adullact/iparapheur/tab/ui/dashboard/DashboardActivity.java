@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,6 +36,7 @@ import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.adullact.iparapheur.tab.ui.dashboard.FluidGridView.OnItemClickListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
 
@@ -113,7 +112,7 @@ public class DashboardActivity
                             eachCommunityView.getOfficesGridView().setOnItemClickListener( new OnItemClickListener()
                             {
 
-                                public void onItemClick( AdapterView<?> parent, View view, int position, long id )
+                                public void onItemClick( FluidGridView fluidGridView, View itemView, int position, long id )
                                 {
                                     Office office = offices.get( position );
                                     Intent intent = new Intent( getApplication(), OfficeActivity.class );
@@ -222,9 +221,8 @@ public class DashboardActivity
             }
 
             final Office office = offices.get( position );
-
+            dataViews.icon.setImageResource( R.drawable.ic_office ); // TODO Use Office icon provided by the API
             dataViews.title.setText( office.getTitle() );
-            dataViews.icon.setImageResource( R.drawable.icon );
             dataViews.todo.setText( "" + office.getTodoFolderCount() );
             dataViews.late.setText( "" + office.getLateFolderCount() );
 

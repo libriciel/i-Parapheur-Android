@@ -2,7 +2,6 @@ package org.adullact.iparapheur.tab.ui.dashboard;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,7 +13,7 @@ public class DashboardCommunityView
 
     private TextView nameTextView;
 
-    private GridView officesGridView;
+    private FluidGridView officesGridView;
 
     public DashboardCommunityView( Context context )
     {
@@ -39,7 +38,7 @@ public class DashboardCommunityView
         setOrientation( VERTICAL );
         inflate( getContext(), R.layout.dashboard_community, this );
         nameTextView = ( TextView ) findViewById( R.id.dashboard_community_name );
-        officesGridView = ( GridView ) findViewById( R.id.dashboard_community_gridview );
+        officesGridView = ( FluidGridView ) findViewById( R.id.dashboard_community_gridview );
     }
 
     public TextView getNameTextView()
@@ -47,7 +46,7 @@ public class DashboardCommunityView
         return nameTextView;
     }
 
-    public GridView getOfficesGridView()
+    public FluidGridView getOfficesGridView()
     {
         return officesGridView;
     }
