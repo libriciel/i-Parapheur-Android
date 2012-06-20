@@ -19,7 +19,7 @@ import org.adullact.iparapheur.tab.R;
  * It's not meant to be extended.
  * 
  * To support different screen size, use the layout selection mecanism provided
- * the platform and set the column count in layout files.
+ * by the platform and set the column count in layout files.
  */
 public final class FluidGridView
         extends TableLayout

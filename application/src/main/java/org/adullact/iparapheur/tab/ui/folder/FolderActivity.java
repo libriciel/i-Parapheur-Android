@@ -39,6 +39,10 @@ public class FolderActivity
 
     public static final String EXTRA_ACCOUNT_IDENTITY = "account:identity";
 
+    public static final String EXTRA_OFFICE_IDENTITY = "office:identity";
+
+    public static final String EXTRA_OFFICE_TITLE = "office:title";
+
     public static final String EXTRA_FOLDER_IDENTITY = "folder:identity";
 
     public static final String EXTRA_FOLDER_TITLE = "folder:title";
@@ -85,7 +89,8 @@ public class FolderActivity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setTitle( "La Gironde > Arcachon > Séance ordinaire du conseil municipal" );
+        setTitle( getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
+        getActionBar().setDisplayHomeAsUpEnabled( true );
         setContentView( R.layout.folder );
 
         // Set title

@@ -70,9 +70,6 @@ public class OfficeActivity
     @Inject
     private ActionsDialogFactory actionsDialogFactory;
 
-    @InjectView( R.id.office_top_title )
-    private TextView topTitle;
-
     @InjectFragment( R.id.office_facet_fragment )
     private OfficeFacetsFragment facetsFragment;
 
@@ -225,6 +222,8 @@ public class OfficeActivity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
+        setTitle( getIntent().getExtras().getString( EXTRA_OFFICE_TITLE ) );
+        getActionBar().setDisplayHomeAsUpEnabled( true );
         setContentView( R.layout.office );
         currentDetailLayout = folderLayout;
         facetsFragment.setOnSelectionChangedListener( new OnSelectionChangeListener()
@@ -250,7 +249,6 @@ public class OfficeActivity
 
         // Reset Views
         resetViews();
-        topTitle.setText( officeTitle );
 
         // Load Data
         new OfficeLoadingTask( this, accountsRepository, iParapheurClient )
@@ -332,6 +330,8 @@ public class OfficeActivity
     {
         Intent intent = new Intent( this, FolderActivity.class );
         intent.putExtra( FolderActivity.EXTRA_ACCOUNT_IDENTITY, getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY ) );
+        intent.putExtra( FolderActivity.EXTRA_OFFICE_IDENTITY, getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY ) );
+        intent.putExtra( FolderActivity.EXTRA_OFFICE_TITLE, getIntent().getExtras().getString( EXTRA_OFFICE_TITLE ) );
         intent.putExtra( FolderActivity.EXTRA_FOLDER_IDENTITY, folder.getIdentity() );
         intent.putExtra( FolderActivity.EXTRA_FOLDER_TITLE, folder.getTitle() );
         startActivity( intent );

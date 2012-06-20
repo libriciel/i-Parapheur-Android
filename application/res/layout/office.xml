@@ -4,42 +4,11 @@
               android:layout_height="match_parent"
               android:orientation="vertical" >
                   
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal" >
-                      
-        <RelativeLayout android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="8dp">
-                            
-            <ImageView android:id="@+id/office_top_icon"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_alignParentLeft="true"
-                       android:layout_alignParentTop="true"
-                       android:layout_marginLeft="8dp"
-                       android:src="@drawable/icon" />
-
-            <TextView android:id="@+id/office_top_title"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_alignParentTop="true"
-                      android:layout_toRightOf="@+id/office_top_icon"
-                      android:layout_marginLeft="8dp" 
-                      android:text="Office Title"
-                      android:textAppearance="?android:attr/textAppearanceLarge" />
-                          
-        </RelativeLayout>
-
-        <fragment android:id="@+id/office_facet_fragment"
-                  android:name="org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment"
-                  android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="2"
-                  android:layout_marginBottom="8dp"/>
-              
-    </LinearLayout>
+    <fragment android:id="@+id/office_facet_fragment"
+              android:name="org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="8dp" />
 
     <View android:layout_width="wrap_content"
           android:layout_height="1dp" 
@@ -51,7 +20,7 @@
 
         <fragment android:id="@+id/office_list_fragment"
                   android:name="org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment"
-                  android:layout_weight="1"
+                  android:layout_weight="4"
                   android:layout_width="0dp"
                   android:layout_height="wrap_content" />
 
@@ -62,7 +31,7 @@
         <ViewFlipper android:id="@+id/office_details_flipper"
                      android:layout_width="0dp"
                      android:layout_height="match_parent"
-                     android:layout_weight="3" >
+                     android:layout_weight="11" >
     
             <RelativeLayout android:id="@+id/office_folder_layout"
                             android:layout_width="match_parent"
