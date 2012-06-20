@@ -15,7 +15,7 @@
                android:src="@drawable/ic_office" />
 
     <TextView android:id="@+id/dashboard_officesgrid_item_title"
-              android:layout_width="wrap_content"
+              android:layout_width="256dp"
               android:layout_height="wrap_content"
               android:layout_below="@+id/dashboard_officesgrid_item_icon"
               android:layout_marginTop="0dp"
