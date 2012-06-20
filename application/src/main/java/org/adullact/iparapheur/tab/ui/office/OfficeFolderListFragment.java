@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.tab.ui.office;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -146,9 +147,11 @@ public class OfficeFolderListFragment
             if ( convertView == null ) {
                 convertView = inflater.inflate( R.layout.office_folderlist_item, null );
                 dataViews = new ItemDataViewsHolder();
+                dataViews.checkbox = ( CheckBox ) convertView.findViewById( R.id.office_folderlist_item_checkbox );
                 dataViews.icon = ( ImageView ) convertView.findViewById( R.id.office_folderlist_item_icon );
                 dataViews.title = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_title );
-                dataViews.checkbox = ( CheckBox ) convertView.findViewById( R.id.office_folderlist_item_checkbox );
+                dataViews.details = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_details );
+                dataViews.date = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_date );
                 convertView.setTag( dataViews );
             } else {
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
@@ -156,8 +159,6 @@ public class OfficeFolderListFragment
 
             final Folder folder = folderFiles.get( position );
 
-            dataViews.title.setText( folder.getTitle() );
-            dataViews.icon.setImageResource( R.drawable.ic_folder );
             dataViews.checkbox.setTag( folder );
             dataViews.checkbox.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener()
             {
@@ -178,6 +179,18 @@ public class OfficeFolderListFragment
                 }
 
             } );
+            dataViews.icon.setImageResource( R.drawable.ic_folder );
+            dataViews.title.setText( folder.getTitle() );
+            StringBuilder details = new StringBuilder();
+            details.append( folder.getBusinessType() ).append( " / " ).append( folder.getBusinessSubType() );
+            dataViews.details.setText( details );
+            if ( folder.getDueDate() == null ) {
+                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getCreationDate() ) );
+                dataViews.date.setTextColor( R.color.black );
+            } else {
+                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getDueDate() ) );
+                dataViews.date.setTextColor( R.color.red );
+            }
 
             return convertView;
         }
@@ -185,11 +198,15 @@ public class OfficeFolderListFragment
         private static class ItemDataViewsHolder
         {
 
+            private CheckBox checkbox;
+
             private ImageView icon;
 
             private TextView title;
 
-            private CheckBox checkbox;
+            private TextView details;
+
+            private TextView date;
 
         }
 
