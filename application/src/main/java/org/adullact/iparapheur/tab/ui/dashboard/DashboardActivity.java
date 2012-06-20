@@ -223,8 +223,20 @@ public class DashboardActivity
             final Office office = offices.get( position );
             dataViews.icon.setImageResource( R.drawable.ic_office ); // TODO Use Office icon provided by the API
             dataViews.title.setText( office.getTitle() );
-            dataViews.todo.setText( "" + office.getTodoFolderCount() );
-            dataViews.late.setText( "" + office.getLateFolderCount() );
+            if ( office.getTodoFolderCount() > 0 ) {
+                dataViews.todo.setText( "" + office.getTodoFolderCount() );
+                dataViews.todo.setVisibility( View.VISIBLE );
+            } else {
+                dataViews.todo.setText( "" );
+                dataViews.todo.setVisibility( View.INVISIBLE );
+            }
+            if ( office.getLateFolderCount() > 0 ) {
+                dataViews.late.setText( "" + office.getLateFolderCount() );
+                dataViews.late.setVisibility( View.VISIBLE );
+            } else {
+                dataViews.late.setText( "" );
+                dataViews.late.setVisibility( View.INVISIBLE );
+            }
 
             return convertView;
         }

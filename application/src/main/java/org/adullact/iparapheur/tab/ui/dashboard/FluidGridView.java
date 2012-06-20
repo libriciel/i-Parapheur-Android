@@ -92,13 +92,15 @@ public final class FluidGridView
     private TableRow newTableRow()
     {
         TableRow tr = new TableRow( getContext() );
-        tr.setLayoutParams( new TableRow.LayoutParams( TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT ) );
+        tr.setLayoutParams( new TableRow.LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT ) );
         return tr;
     }
 
     private void addRow( TableRow row )
     {
-        addView( row, new TableLayout.LayoutParams( TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT ) );
+        LayoutParams layoutParams = new TableLayout.LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT );
+        layoutParams.setMargins( 0, 0, 0, 32 );
+        addView( row, layoutParams );
     }
 
     public void setOnItemClickListener( OnItemClickListener listener )
