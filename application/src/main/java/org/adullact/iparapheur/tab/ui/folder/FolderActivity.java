@@ -1,6 +1,5 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +16,7 @@ import roboguice.inject.InjectView;
 import com.google.inject.Inject;
 
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import org.codeartisans.android.toolbox.webkit.WebChromeSupport.AutoQuotaGrowWebChromeClient;
@@ -25,13 +25,13 @@ import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ConsoleAndrologW
 import org.codeartisans.android.toolbox.webkit.WebViewSupport.JSInjectWebViewClient;
 import org.json.JSONObject;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
-import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.actions.ActionsDialogFactory;
@@ -169,7 +169,7 @@ public class FolderActivity
         {
 
             @Override
-            protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
+            protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurTabException> result )
             {
                 if ( result.getResult() != null ) {
 
@@ -191,34 +191,32 @@ public class FolderActivity
 
             }
 
+            private DialogInterface.OnClickListener refresh = new DialogInterface.OnClickListener()
+            {
+
+                public void onClick( DialogInterface dialog, int id )
+                {
+                    refresh();
+                }
+
+            };
+
+            private DialogInterface.OnClickListener dashboard = new DialogInterface.OnClickListener()
+            {
+
+                public void onClick( DialogInterface dialog, int id )
+                {
+                    startActivity( new Intent( context, DashboardActivity.class ) );
+                }
+
+            };
+
             @Override
-            protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
+            protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( "Le chargement de ce dossier a échoué" ).
-                            setMessage( result.buildErrorMessages() ).
-                            setCancelable( false );
-                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( DialogInterface dialog, int id )
-                        {
-                            refresh();
-                        }
-
-                    } );
-                    builder.setNegativeButton( "Tableau de bord", new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( DialogInterface dialog, int id )
-                        {
-                            startActivity( new Intent( context, DashboardActivity.class ) );
-                        }
-
-                    } );
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                    UserErrorDialogFactory.show( context, "Le chargement de ce dossier a échoué", result.getErrors(),
+                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
                 }
             }
 

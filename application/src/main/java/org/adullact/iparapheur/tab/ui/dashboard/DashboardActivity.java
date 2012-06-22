@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +24,7 @@ import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
 
 import org.codeartisans.android.toolbox.activity.RoboActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
@@ -128,35 +128,33 @@ public class DashboardActivity
                     }
                 }
 
+                private DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener()
+                {
+
+                    public void onClick( DialogInterface dialog, int id )
+                    {
+                        dialog.cancel();
+                    }
+
+                };
+
+                private DialogInterface.OnClickListener accounts = new DialogInterface.OnClickListener()
+                {
+
+                    public void onClick( DialogInterface dialog, int id )
+                    {
+                        startActivity( new Intent( context, AccountsActivity.class ) );
+                    }
+
+                };
+
                 @Override
                 protected void afterDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> result )
                 {
                     // Error handling to user
                     if ( result.hasError() ) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                        builder.setTitle( "Le chargement de certains bureaux à échoué" ).
-                                setMessage( result.buildErrorMessages() ).
-                                setCancelable( false ).
-                                setPositiveButton( "Continuer", new DialogInterface.OnClickListener()
-                        {
-
-                            public void onClick( DialogInterface dialog, int id )
-                            {
-                                dialog.cancel();
-                            }
-
-                        } ).
-                                setNegativeButton( "Comptes", new DialogInterface.OnClickListener()
-                        {
-
-                            public void onClick( DialogInterface dialog, int id )
-                            {
-                                startActivity( new Intent( context, AccountsActivity.class ) );
-                            }
-
-                        } );
-                        AlertDialog alert = builder.create();
-                        alert.show();
+                        UserErrorDialogFactory.show( context, "Le chargement de certains bureaux à échoué", result.getErrors(),
+                                                     "Continuer", cancel, "Comptes", accounts );
                     }
                 }
 

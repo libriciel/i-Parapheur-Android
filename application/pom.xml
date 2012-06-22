@@ -30,12 +30,6 @@
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
             <version>1.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codeartisans.android-toolbox</groupId>
-            <artifactId>android-toolbox</artifactId>
-            <version>1.4</version>
             <type>apklib</type>
         </dependency>
 

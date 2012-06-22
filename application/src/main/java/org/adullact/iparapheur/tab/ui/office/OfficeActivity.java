@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
 
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
@@ -265,34 +265,32 @@ public class OfficeActivity
                 listFragment.setListAdapter( new OfficeFolderListAdapter( listFragment, folders ) );
             }
 
+            private DialogInterface.OnClickListener refresh = new DialogInterface.OnClickListener()
+            {
+
+                public void onClick( DialogInterface dialog, int id )
+                {
+                    refresh();
+                }
+
+            };
+
+            private DialogInterface.OnClickListener dashboard = new DialogInterface.OnClickListener()
+            {
+
+                public void onClick( DialogInterface dialog, int id )
+                {
+                    startActivity( new Intent( context, DashboardActivity.class ) );
+                }
+
+            };
+
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( "Le chargement de ce bureau a échoué" ).
-                            setMessage( result.buildErrorMessages() ).
-                            setCancelable( false );
-                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( DialogInterface dialog, int id )
-                        {
-                            refresh();
-                        }
-
-                    } );
-                    builder.setNegativeButton( "Tableau de bord", new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( DialogInterface dialog, int id )
-                        {
-                            startActivity( new Intent( context, DashboardActivity.class ) );
-                        }
-
-                    } );
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                    UserErrorDialogFactory.show( context, "Le chargement de ce bureau a échoué", result.getErrors(),
+                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
                 }
             }
 

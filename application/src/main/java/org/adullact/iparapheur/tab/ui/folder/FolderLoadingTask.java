@@ -7,6 +7,7 @@ import de.akquinet.android.androlog.Log;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
+import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
@@ -14,7 +15,7 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 
 public class FolderLoadingTask
-        extends AsyncTaskWithMessageDialog<FolderLoadingTask.Params, String, AsyncTaskResult<Folder, IParapheurHttpException>>
+        extends AsyncTaskWithMessageDialog<FolderLoadingTask.Params, String, AsyncTaskResult<Folder, IParapheurTabException>>
 {
 
     public static class Params
@@ -53,7 +54,7 @@ public class FolderLoadingTask
     }
 
     @Override
-    protected AsyncTaskResult<Folder, IParapheurHttpException> doInBackground( Params... parameters )
+    protected AsyncTaskResult<Folder, IParapheurTabException> doInBackground( Params... parameters )
     {
         publishProgress( "Chargement du dossier" );
         try {
@@ -62,12 +63,12 @@ public class FolderLoadingTask
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will load folder with params: " + params + " using account: " + account );
             Folder folder = iParapheurClient.fetchFolder( account, params.folderIdentity );
-            return new AsyncTaskResult<Folder, IParapheurHttpException>( folder );
+            return new AsyncTaskResult<Folder, IParapheurTabException>( folder );
 
         } catch ( IParapheurHttpException ex ) {
 
             Log.w( context, "Unable to load folder, will return an error.", ex );
-            return new AsyncTaskResult<Folder, IParapheurHttpException>( ex );
+            return new AsyncTaskResult<Folder, IParapheurTabException>( ex );
 
         }
     }
