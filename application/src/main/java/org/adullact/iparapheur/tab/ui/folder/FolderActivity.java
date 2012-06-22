@@ -89,7 +89,7 @@ public class FolderActivity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setTitle( getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
+        setTitle( getIntent().getExtras().getString( EXTRA_OFFICE_TITLE ) + " > " + getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
         getActionBar().setDisplayHomeAsUpEnabled( true );
         setContentView( R.layout.folder );
 
