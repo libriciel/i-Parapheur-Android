@@ -16,7 +16,7 @@
                android:layout_below="@+id/splash_throbber"
                android:layout_centerHorizontal="true"
                android:layout_marginTop="20dp"
-               android:src="@drawable/logo_iparapheur" />
+               android:src="@drawable/logo" />
 
     <TextView android:id="@+id/wait_msg"
               android:layout_width="wrap_content"
