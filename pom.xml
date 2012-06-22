@@ -217,5 +217,12 @@
             </properties>
         </profile>
     </profiles>
+    
+    <repositories>
+        <repository>
+            <id>oss.sonatype.releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
 </project>
