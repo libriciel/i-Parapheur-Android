@@ -29,13 +29,14 @@
         <dependency>
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
-            <version>1.3.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient-cache</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codeartisans.android-toolbox</groupId>
+            <artifactId>android-toolbox</artifactId>
+            <version>1.4</version>
+            <type>apklib</type>
         </dependency>
 
         <!-- Guava http://code.google.com/p/guava-libraries/ -->

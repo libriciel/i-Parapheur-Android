@@ -257,7 +257,6 @@ public class OfficeActivity
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
             {
-                Log.d( OfficeActivity.this, "Got result: AsynkTaskResult[ result: " + result.getResult() + ", errors: " + result.getErrors() + "]" );
                 List<Folder> folders = result.getResult().getFolders();
                 if ( folders == null ) {
                     folders = Collections.emptyList();

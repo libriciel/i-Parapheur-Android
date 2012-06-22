@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,14 +16,19 @@ import roboguice.inject.InjectView;
 
 import com.google.inject.Inject;
 
-import de.akquinet.android.androlog.Log;
-
 import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.AutoQuotaGrowWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ChainedWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ConsoleAndrologWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebViewSupport.JSInjectWebViewClient;
+import org.json.JSONObject;
 
 import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.model.FolderRequestedAction;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
@@ -85,28 +91,53 @@ public class FolderActivity
 
     private Folder currentFolder;
 
+    private String accountIdentity;
+
+    private String folderIdentity;
+
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setTitle( getIntent().getExtras().getString( EXTRA_OFFICE_TITLE ) + " > " + getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
+
+        // Gather Intent Extras
+        accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+        String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
+        String folderTitle = getIntent().getExtras().getString( EXTRA_FOLDER_TITLE );
+        folderIdentity = getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY );
+
+        // Setup Activity
+        setTitle( officeTitle + " > " + folderTitle );
         getActionBar().setDisplayHomeAsUpEnabled( true );
         setContentView( R.layout.folder );
 
         // Set title
-        title.setText( getIntent().getExtras().getString( EXTRA_FOLDER_TITLE ) );
+        title.setText( folderTitle );
 
         // Set HTML to views from ressources
         topSummaryLeft.setText( Html.fromHtml( getString( R.string.demo_summary_left ) ) );
         topSummaryRight.setText( Html.fromHtml( getString( R.string.demo_summary_right ) ) );
 
-        // Handle buttons
+        // Setup WebView
+        fileWebView.getSettings().setJavaScriptEnabled( true );
+        fileWebView.getSettings().setSupportZoom( true );
+        fileWebView.getSettings().setBuiltInZoomControls( true );
+        fileWebView.getSettings().setDomStorageEnabled( true );
+        fileWebView.getSettings().setAppCachePath( getApplicationContext().getCacheDir().getAbsolutePath() );
+        fileWebView.getSettings().setAllowFileAccess( true );
+        fileWebView.getSettings().setAppCacheMaxSize( 1024 * 1024 * 12 ); // 12MB
+        fileWebView.getSettings().setAppCacheEnabled( true );
+        fileWebView.getSettings().setCacheMode( WebSettings.LOAD_CACHE_ELSE_NETWORK );
+        fileWebView.setWebChromeClient( new ChainedWebChromeClient( new ConsoleAndrologWebChromeClient(),
+                                                                    new AutoQuotaGrowWebChromeClient( 2 ) ) );
+
+        // Create button listeners
         positiveButton.setOnClickListener( new View.OnClickListener()
         {
 
             public void onClick( View view )
             {
-                String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+                String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
                 actionsDialogFactory.buildActionDialog( accountIdentity, currentFolder ).show();
             }
 
@@ -116,36 +147,48 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+                String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
                 actionsDialogFactory.buildRejectDialog( accountIdentity, currentFolder ).show();
             }
 
         } );
+
         refresh();
     }
 
     public void refresh()
     {
-        // TODO FolderActivity story: Clear view state
+        // Clear View
+        positiveButton.setVisibility( View.INVISIBLE );
+        negativeButton.setVisibility( View.INVISIBLE );
         fileWebView.clearView();
+        fileWebView.freeMemory();
+
+        // Load Folder
         new FolderLoadingTask( this, accountsRepository, iParapheurClient )
         {
 
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<Folder, IParapheurHttpException> result )
             {
-                Log.d( context, "Got result: " + result );
                 if ( result.getResult() != null ) {
+
                     // Update view state
                     Folder folder = result.getResult();
+                    if ( folder.getRequestedAction() != FolderRequestedAction.UNSUPPORTED ) {
+                        positiveButton.setVisibility( View.VISIBLE );
+                        negativeButton.setVisibility( View.VISIBLE );
+                    }
                     folderFileListFragment.setListAdapter( new FolderListAdapter( context, folder.getAllFiles() ) );
                     if ( !folder.getAllFiles().isEmpty() ) {
-                        fileWebView.loadUrl( folder.getAllFiles().get( 0 ).getUrl() );
+                        loadFile( folder.getAllFiles().get( 0 ) );
                     }
                     currentFolder = folder;
+
                 } else {
                     currentFolder = null;
                 }
+
             }
 
             @Override
@@ -179,8 +222,14 @@ public class FolderActivity
                 }
             }
 
-        }.execute( new FolderLoadingTask.Params( getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY ),
-                                                 getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY ) ) );
+        }.execute( new FolderLoadingTask.Params( accountIdentity, folderIdentity ) );
+    }
+
+    private void loadFile( AbstractFolderFile file )
+    {
+        JSONObject json = file.getPageImagesJSON();
+        fileWebView.setWebViewClient( new JSInjectWebViewClient( "injectData(" + json.toString() + ");" ) );
+        fileWebView.loadUrl( file.getUrl() );
     }
 
 }

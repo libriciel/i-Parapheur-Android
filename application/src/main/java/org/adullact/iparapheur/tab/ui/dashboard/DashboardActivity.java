@@ -90,7 +90,6 @@ public class DashboardActivity
                 protected void beforeDialogDismiss( AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> result )
                 {
                     Map<Community, List<Office>> officesByCommunity = result.getResult();
-                    Log.d( DashboardActivity.this, "Got result: " + officesByCommunity );
 
                     if ( officesByCommunity == null || officesByCommunity.isEmpty() ) {
 

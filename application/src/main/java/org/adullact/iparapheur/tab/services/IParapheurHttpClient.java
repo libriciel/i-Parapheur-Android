@@ -366,7 +366,7 @@ public class IParapheurHttpClient
                 JSONObject doc = documents.getJSONObject( index );
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
-                FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/index.html" );
+                FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/html/file_viewer.html" );
                 if ( doc.has( "images" ) ) {
                     List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
                     JSONArray images = doc.getJSONArray( "images" );

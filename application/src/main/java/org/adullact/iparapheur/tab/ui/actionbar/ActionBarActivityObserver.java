@@ -129,7 +129,7 @@ public class ActionBarActivityObserver
             {
                 View aboutLayout = activity.getLayoutInflater().inflate( R.layout.about_dialog, null );
                 WebView aboutWebView = ( WebView ) aboutLayout.findViewById( R.id.about_webview );
-                aboutWebView.loadUrl( "file:///android_asset/about/index.html" );
+                aboutWebView.loadUrl( "file:///android_asset/html/about.html" );
 
                 StringBuilder title = new StringBuilder();
                 title.append( IParapheurTabBuildInfo.DESCRIPTION ).
