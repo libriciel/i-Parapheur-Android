@@ -3,6 +3,7 @@ package org.adullact.iparapheur.tab.model;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -149,8 +150,54 @@ public class OfficeFacets
         if ( facetSelection.isEmpty() ) {
             return context.getResources().getString( R.string.office_facets_summary_none );
         }
-        // TODO Implement filter summary generation
-        return "Filtre: " + facetSelection.toString();
+        StringBuilder summary = new StringBuilder();
+        for ( Map.Entry<OfficeFacet, List<OfficeFacetChoice>> entry : facetSelection.entrySet() ) {
+            switch ( entry.getKey() ) {
+                case ACTION:
+                    // TODO ACTION facet is unsupported for now, no filter summary generation
+                    break;
+                case TYPE:
+                    if ( !entry.getValue().isEmpty() ) {
+                        summary.append( "Dossiers du type métier " );
+                        Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
+                        while ( it.hasNext() ) {
+                            summary.append( it.next().displayName );
+                            if ( it.hasNext() ) {
+                                summary.append( " ou " );
+                            }
+                        }
+                        summary.append( ".\n" );
+                    }
+                    break;
+                case SUBTYPE:
+                    if ( !entry.getValue().isEmpty() ) {
+                        summary.append( "Dossiers du sous-type métier " );
+                        Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
+                        while ( it.hasNext() ) {
+                            summary.append( it.next().displayName );
+                            if ( it.hasNext() ) {
+                                summary.append( " ou " );
+                            }
+                        }
+                        summary.append( ".\n" );
+                    }
+                    break;
+                case SCHEDULE:
+                    if ( !entry.getValue().isEmpty() ) {
+                        summary.append( "Dossiers à traiter " );
+                        Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
+                        while ( it.hasNext() ) {
+                            summary.append( it.next().displayName.toLowerCase() );
+                            if ( it.hasNext() ) {
+                                summary.append( " ou " );
+                            }
+                        }
+                        summary.append( ".\n" );
+                    }
+                    break;
+            }
+        }
+        return summary.toString();
     }
 
     private String string( int id )
