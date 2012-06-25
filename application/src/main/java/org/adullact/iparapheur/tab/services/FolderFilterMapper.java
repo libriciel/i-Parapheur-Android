@@ -1,9 +1,13 @@
 package org.adullact.iparapheur.tab.services;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 
 import roboguice.inject.ContextSingleton;
 
@@ -24,6 +28,12 @@ import org.adullact.iparapheur.tab.model.OfficeFacets;
 @ContextSingleton
 public class FolderFilterMapper
 {
+
+    private static final String TYPE_FILTER = "ph:typeMetier";
+
+    private static final String SUBTYPE_FILTER = "ph:sousTypeMetier";
+
+    private static final String DUE_DATE_FILTER = "ph:dateLimite";
 
     private final Context context;
 
@@ -56,10 +66,10 @@ public class FolderFilterMapper
                         applyActionSelection( or, selection );
                         break;
                     case TYPE:
-                        applyGenericSelection( or, selection, "ph:typeMetier" );
+                        applyGenericSelection( or, selection, TYPE_FILTER );
                         break;
                     case SUBTYPE:
-                        applyGenericSelection( or, selection, "ph:sousTypeMetier" );
+                        applyGenericSelection( or, selection, SUBTYPE_FILTER );
                         break;
                     case SCHEDULE:
                         applyScheduleSelection( or, selection );
@@ -106,23 +116,39 @@ public class FolderFilterMapper
     private void applyScheduleSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
-        // TODO Map Schedule OfficeFacets / FolderFilters
+        long now = System.currentTimeMillis();
+        DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
+        JSONObject jsonFilter = new JSONObject();
         for ( OfficeFacetChoice choice : selection ) {
             switch ( choice.id ) {
                 case R.string.office_facets_schedule_today:
+                    String filter = "[" + dateFormat.format( new Date( now - ( DateUtils.WEEK_IN_MILLIS * 4 ) ) )
+                                    + " TO " + dateFormat.format( new Date() ) + "]";
+                    jsonFilter.put( DUE_DATE_FILTER, filter );
                     break;
                 case R.string.office_facets_schedule_week:
+                    filter = "[NOW TO " + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS ) ) + "]";
+                    jsonFilter.put( DUE_DATE_FILTER, filter );
                     break;
                 case R.string.office_facets_schedule_nextweek:
+                    filter = "[" + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS ) )
+                             + " TO " + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS * 2 ) ) + "]";
+                    jsonFilter.put( DUE_DATE_FILTER, filter );
                     break;
                 case R.string.office_facets_schedule_month:
+                    filter = "[NOW TO " + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS * 4 ) ) + "]";
+                    jsonFilter.put( DUE_DATE_FILTER, filter );
                     break;
                 case R.string.office_facets_schedule_nextmonth:
+                    filter = "[" + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS * 4 ) )
+                             + " TO " + dateFormat.format( new Date( now + DateUtils.WEEK_IN_MILLIS * 8 ) ) + "]";
+                    jsonFilter.put( DUE_DATE_FILTER, filter );
                     break;
                 default:
                     Log.w( this, "Ignored unknown OfficeFacetChoice: " + choice );
             }
         }
+        filterHolder.put( jsonFilter );
     }
 
 }
