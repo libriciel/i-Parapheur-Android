@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import roboguice.fragment.RoboListFragment;
 
@@ -168,6 +169,14 @@ public class OfficeFolderListFragment
                     if ( checkbox.getTag() instanceof Folder ) {
                         Folder folder = ( Folder ) checkbox.getTag();
                         if ( checked ) {
+                            if ( !selectedFolders.isEmpty() ) {
+                                // Ensure same bulk action
+                                if ( selectedFolders.get( 0 ).getRequestedAction() != folder.getRequestedAction() ) {
+                                    checkbox.setChecked( false );
+                                    Toast.makeText( listFragment.getActivity(), "Vous ne pouvez pas séléctionner des dossiers dont les actions demandées sont différentes.", Toast.LENGTH_SHORT ).show();
+                                    return;
+                                }
+                            }
                             selectedFolders.add( folder );
                         } else {
                             selectedFolders.remove( folder );

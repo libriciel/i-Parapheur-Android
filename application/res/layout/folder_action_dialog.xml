@@ -3,10 +3,10 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:id="@+id/folder_sign_dialog_layout_root"
+              android:id="@+id/folder_action_dialog_layout_root"
               android:padding="8dp" >
                   
-    <TextView android:id="@+id/folder_sign_dialog_title"
+    <TextView android:id="@+id/folder_action_dialog_title"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:text="Séance ordinaire du conseil municipal"

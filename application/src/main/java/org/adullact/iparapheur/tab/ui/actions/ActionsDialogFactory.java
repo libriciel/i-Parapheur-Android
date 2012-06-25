@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab.ui.actions;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -38,27 +40,32 @@ public class ActionsDialogFactory
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
-    public Dialog buildActionDialog( String accountIdentity, Folder folder )
+    public Dialog buildActionDialog( String accountIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folder, true );
+        return buildDialog( accountIdentity, folders, true );
     }
 
-    public Dialog buildRejectDialog( String accountIdentity, Folder folder )
+    public Dialog buildRejectDialog( String accountIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folder, false );
+        return buildDialog( accountIdentity, folders, false );
     }
 
-    private Dialog buildDialog( final String accountIdentity, final Folder folder, boolean accept )
+    private Dialog buildDialog( final String accountIdentity, final List<Folder> folders, boolean accept )
     {
-        if ( !folder.requestedActionSupported() ) {
-            throw new IllegalArgumentException( "Folder{" + folder.getIdentity() + "} RequestedAction{" + folder.getRequestedAction() + "} is UNSUPPORTED" );
+        if ( folders == null || folders.isEmpty() ) {
+            throw new IllegalArgumentException( "Cannot build an Action Dialog without any Folder." );
+        }
+        boolean single = folders.size() == 1;
+        Folder lambda = folders.get( 0 );
+        if ( !lambda.requestedActionSupported() ) {
+            throw new IllegalArgumentException( "Folder{" + lambda.getIdentity() + "} RequestedAction{" + lambda.getRequestedAction() + "} is UNSUPPORTED" );
         }
 
         LayoutInflater inflater = ( LayoutInflater ) activity.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        View layout = inflater.inflate( R.layout.folder_sign_dialog, ( ViewGroup ) activity.findViewById( R.id.folder_sign_dialog_layout_root ) );
+        View layout = inflater.inflate( R.layout.folder_action_dialog, ( ViewGroup ) activity.findViewById( R.id.folder_action_dialog_layout_root ) );
 
-        TextView folderTitle = ( TextView ) layout.findViewById( R.id.folder_sign_dialog_title );
-        folderTitle.setText( folder.getTitle() );
+        TextView folderTitle = ( TextView ) layout.findViewById( R.id.folder_action_dialog_title );
+        folderTitle.setText( single ? lambda.getTitle() : "Lot de " + folders.size() + " dossiers" );
 
         final EditText pubAnnotation = ( EditText ) layout.findViewById( R.id.folder_annotation_public );
         final EditText privAnnotation = ( EditText ) layout.findViewById( R.id.folder_annotation_private );
@@ -67,29 +74,29 @@ public class ActionsDialogFactory
         builder.setView( layout );
         builder.setCancelable( true );
         builder.setNeutralButton( "Annuler", null );
-        switch ( folder.getRequestedAction() ) {
+        switch ( lambda.getRequestedAction() ) {
             case SIGNATURE:
                 if ( accept ) {
                     builder.setIcon( R.drawable.ic_action_sign );
                     builder.setTitle( "Signature" );
-                    builder.setPositiveButton( "Signer", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( single ? "Signer" : "Signer le lot", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
+                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
                         }
 
                     } );
                 } else {
                     builder.setIcon( R.drawable.ic_action_reject );
                     builder.setTitle( "Rejet de signature" );
-                    builder.setPositiveButton( "Rejeter", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( single ? "Rejeter" : "Rejeter le lot", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
                         }
 
                     } );
@@ -99,37 +106,48 @@ public class ActionsDialogFactory
                 if ( accept ) {
                     builder.setIcon( R.drawable.ic_action_sign );
                     builder.setTitle( "Visa" );
-                    builder.setPositiveButton( "Viser", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( single ? "Viser" : "Viser le lot", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
+                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
                         }
 
                     } );
                 } else {
                     builder.setIcon( R.drawable.ic_action_reject );
                     builder.setTitle( "Rejet de visa" );
-                    builder.setPositiveButton( "Rejeter", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( single ? "Rejeter" : "Rejeter le lot", new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), folder.getIdentity() );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
                         }
 
                     } );
                 }
                 break;
             default:
-                throw new IParapheurTabException( "Unknown action '" + folder.getRequestedAction() + "'. This should not happen." );
+                throw new IParapheurTabException( "Unknown action '" + lambda.getRequestedAction() + "'. This should not happen." );
         }
 
         return builder.create();
     }
 
-    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )
+    private String[] identities( List<Folder> folders )
+    {
+        String[] identities = new String[ folders.size() ];
+        int index = 0;
+        for ( Folder folder : folders ) {
+            identities[index] = folder.getIdentity();
+            index++;
+        }
+        return identities;
+    }
+
+    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
     {
         new SignTask( activity, accountsRepository, iParapheurClient )
         {
@@ -147,8 +165,9 @@ public class ActionsDialogFactory
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
                 if ( result.hasError() ) {
+                    boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( "La signature de ce dossier a échoué" ).
+                    builder.setTitle( single ? "La signature de ce dossier a échoué" : "La signature de ce lot a échoué" ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
                     builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
@@ -157,7 +176,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentity );
+                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
                         }
 
                     } );
@@ -179,10 +198,10 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentity ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
     }
 
-    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )
+    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
     {
         new VisaTask( activity, accountsRepository, iParapheurClient )
         {
@@ -200,8 +219,9 @@ public class ActionsDialogFactory
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
                 if ( result.hasError() ) {
+                    boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( "Le visa de ce dossier a échoué" ).
+                    builder.setTitle( single ? "Le visa de ce dossier a échoué" : "Le visa de ce lot a échoué" ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
                     builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
@@ -210,7 +230,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentity );
+                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
                         }
 
                     } );
@@ -232,10 +252,10 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentity ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
     }
 
-    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String folderIdentity )
+    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
     {
         new RejectTask( activity, accountsRepository, iParapheurClient )
         {
@@ -253,8 +273,9 @@ public class ActionsDialogFactory
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
                 if ( result.hasError() ) {
+                    boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( "Le rejet de ce dossier a échoué" ).
+                    builder.setTitle( single ? "Le rejet de ce dossier a échoué" : "Le rejet de ce lot a échoué" ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
                     builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
@@ -263,7 +284,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentity );
+                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
                         }
 
                     } );
@@ -285,7 +306,7 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentity ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
     }
 
 }

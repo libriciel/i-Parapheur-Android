@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
+import java.util.Collections;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -138,7 +140,7 @@ public class FolderActivity
             public void onClick( View view )
             {
                 String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
-                actionsDialogFactory.buildActionDialog( accountIdentity, currentFolder ).show();
+                actionsDialogFactory.buildActionDialog( accountIdentity, Collections.singletonList( currentFolder ) ).show();
             }
 
         } );
@@ -148,7 +150,7 @@ public class FolderActivity
             public void onClick( View view )
             {
                 String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
-                actionsDialogFactory.buildRejectDialog( accountIdentity, currentFolder ).show();
+                actionsDialogFactory.buildRejectDialog( accountIdentity, Collections.singletonList( currentFolder ) ).show();
             }
 
         } );

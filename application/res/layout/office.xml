@@ -56,13 +56,14 @@
                           android:text="Folder"
                           android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <TextView android:id="@+id/office_folder_type_details"
+                <TextView android:id="@+id/office_folder_details"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_alignLeft="@+id/office_folder_icon"
-                          android:layout_below="@+id/office_folder_icon"
-                          android:layout_marginTop="32dp"
-                          android:text="Détails des types" />
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentTop="true"
+                          android:layout_marginTop="140dp"
+                          android:layout_marginLeft="64dp"
+                          android:text="Détails" />
 
                 <Button android:id="@+id/office_folder_open_button"
                         android:layout_width="wrap_content"
@@ -100,28 +101,63 @@
                         android:drawablePadding="8dp"
                         android:text="Positif" />
                     
-                <TextView android:id="@+id/office_folder_date_details"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_alignRight="@+id/office_folder_open_button"
-                          android:layout_below="@+id/office_folder_open_button"
-                          android:layout_marginTop="16dp"
-                          android:gravity="right"
-                          android:text="Détails des dates" />            
-
             </RelativeLayout>
             
             <RelativeLayout android:id="@+id/office_batch_layout"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" >
 
+                <ImageView android:id="@+id/office_batch_icon"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_alignParentLeft="true"
+                           android:layout_alignParentTop="true"
+                           android:layout_marginTop="8dp"
+                           android:layout_marginLeft="8dp"
+                           android:src="@drawable/ic_folder" />
+			
                 <TextView android:id="@+id/office_batch_title"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_centerHorizontal="true"
-                          android:layout_centerVertical="true"
-                          android:text="Batch processing still to be done."
-                          android:textAppearance="?android:attr/textAppearanceLarge" />/>
+                          android:layout_toRightOf="@+id/office_batch_icon"
+                          android:layout_alignTop="@+id/office_batch_icon"
+                          android:layout_marginLeft="8dp"
+                          android:layout_marginTop="4dp"
+                          android:text="Traitement par lots"
+                          android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <TextView android:id="@+id/office_batch_details"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentTop="true"
+                          android:layout_marginTop="140dp"
+                          android:layout_marginLeft="64dp"
+                          android:text="Détails" />
+
+                <Button android:id="@+id/office_batch_negative_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="8dp"
+                        android:drawableLeft="@drawable/ic_action_reject"
+                        android:gravity="left|center_vertical"
+                        android:drawablePadding="8dp"
+                        android:text="Negatif" />
+
+                <Button android:id="@+id/office_batch_positive_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/office_batch_negative_button"
+                        android:layout_alignBottom="@+id/office_batch_negative_button"
+                        android:layout_marginRight="16dp"
+                        android:layout_toLeftOf="@+id/office_batch_negative_button"
+                        android:drawableLeft="@drawable/ic_action_sign"
+                        android:gravity="left|center_vertical"
+                        android:drawablePadding="8dp"
+                        android:text="Positif" />
 
             </RelativeLayout>        
             

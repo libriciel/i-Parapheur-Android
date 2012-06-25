@@ -88,8 +88,8 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_title )
     private TextView folderTitleView;
 
-    @InjectView( R.id.office_folder_type_details )
-    private TextView folderTypeDetails;
+    @InjectView( R.id.office_folder_details )
+    private TextView folderDetails;
 
     @InjectView( R.id.office_folder_positive_button )
     private Button folderPositiveButton;
@@ -100,14 +100,17 @@ public class OfficeActivity
     @InjectView( R.id.office_folder_open_button )
     private Button folderOpenButton;
 
-    @InjectView( R.id.office_folder_date_details )
-    private TextView folderDateDetails;
-
     @InjectView( R.id.office_batch_layout )
     private RelativeLayout batchLayout;
 
-    @InjectView( R.id.office_batch_title )
-    private TextView batchTitle;
+    @InjectView( R.id.office_batch_positive_button )
+    private Button batchPositiveButton;
+
+    @InjectView( R.id.office_batch_negative_button )
+    private Button batchNegativeButton;
+
+    @InjectView( R.id.office_batch_details )
+    private TextView batchDetails;
 
     private Folder currentFolder;
 
@@ -157,7 +160,7 @@ public class OfficeActivity
 
                     public void onClick( View view )
                     {
-                        positiveAction( folder );
+                        positiveAction( Collections.singletonList( folder ) );
                     }
 
                 } );
@@ -168,7 +171,7 @@ public class OfficeActivity
 
                     public void onClick( View view )
                     {
-                        negativeAction( folder );
+                        negativeAction( Collections.singletonList( folder ) );
                     }
 
                 } );
@@ -184,18 +187,15 @@ public class OfficeActivity
                 }
 
             } );
-            StringBuilder typeDetails = new StringBuilder();
-            typeDetails.append( "<p><b>Type</b> " ).append( folder.getBusinessType() ).append( "</p>" );
-            typeDetails.append( "<p><b>Sous-type</b> " ).append( folder.getBusinessSubType() ).append( "</p>" );
-            folderTypeDetails.setText( Html.fromHtml( typeDetails.toString() ) );
-            folderTypeDetails.setVisibility( View.VISIBLE );
-            StringBuilder dateDetails = new StringBuilder();
-            dateDetails.append( "<p><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
+            StringBuilder details = new StringBuilder();
+            details.append( "<p><b>Type</b> " ).append( folder.getBusinessType() ).append( "</p>" );
+            details.append( "<p><b>Sous-type</b> " ).append( folder.getBusinessSubType() ).append( "</p>" );
+            details.append( "<p><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
             if ( folder.getDueDate() != null ) {
-                dateDetails.append( "<p><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
+                details.append( "<p><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
             }
-            folderDateDetails.setText( Html.fromHtml( dateDetails.toString() ) );
-            folderDateDetails.setVisibility( View.VISIBLE );
+            folderDetails.setText( Html.fromHtml( details.toString() ) );
+            folderDetails.setVisibility( View.VISIBLE );
             flipToFolderDetail();
             currentFolder = folder;
         }
@@ -205,13 +205,48 @@ public class OfficeActivity
     private OnFolderSelectionChange onFolderSelectionChange = new OnFolderSelectionChange()
     {
 
-        public void onFolderSelectionChange( List<Folder> selectedFolders )
+        public void onFolderSelectionChange( final List<Folder> selectedFolders )
         {
             if ( selectedFolders.isEmpty() ) {
                 listFragment.shadeFolder( currentFolder );
                 flipToFolderDetail();
             } else {
                 listFragment.shadeFolder( selectedFolders.toArray( new Folder[ selectedFolders.size() ] ) );
+                Folder lambda = selectedFolders.get( 0 );
+                if ( lambda.requestedActionSupported() ) {
+                    switch ( lambda.getRequestedAction() ) {
+                        case SIGNATURE:
+                            batchPositiveButton.setText( "Signer le lot" );
+                            break;
+                        case VISA:
+                            batchPositiveButton.setText( "Viser le lot" );
+                            break;
+                    }
+                    batchNegativeButton.setText( "Rejeter le lot" );
+                    batchPositiveButton.setOnClickListener( new View.OnClickListener()
+                    {
+
+                        public void onClick( View view )
+                        {
+                            positiveAction( selectedFolders );
+                        }
+
+                    } );
+                    batchNegativeButton.setOnClickListener( new View.OnClickListener()
+                    {
+
+                        public void onClick( View view )
+                        {
+                            negativeAction( selectedFolders );
+                        }
+
+                    } );
+                    batchPositiveButton.setVisibility( View.VISIBLE );
+                    batchNegativeButton.setVisibility( View.VISIBLE );
+                } else {
+                    batchPositiveButton.setVisibility( View.INVISIBLE );
+                    batchNegativeButton.setVisibility( View.INVISIBLE );
+                }
                 flipToBatchDetail();
             }
         }
@@ -311,16 +346,16 @@ public class OfficeActivity
         flipToFolderDetail();
     }
 
-    private void positiveAction( Folder folder )
+    private void positiveAction( List<Folder> folders )
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
-        actionsDialogFactory.buildActionDialog( accountIdentity, folder ).show();
+        actionsDialogFactory.buildActionDialog( accountIdentity, folders ).show();
     }
 
-    private void negativeAction( Folder folder )
+    private void negativeAction( List<Folder> folders )
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
-        actionsDialogFactory.buildRejectDialog( accountIdentity, folder ).show();
+        actionsDialogFactory.buildRejectDialog( accountIdentity, folders ).show();
     }
 
     private void openAction( Folder folder )
