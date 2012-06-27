@@ -13,8 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_folder" 
-            />
+        android:src="@drawable/ic_folder" />
 
     <TextView
         android:id="@+id/folder_top_title"
@@ -24,8 +23,7 @@
         android:layout_toRightOf="@+id/folder_top_icon"
         android:layout_marginLeft="8dp" 
         android:text="Folder Title"
-        android:textAppearance="?android:attr/textAppearanceLarge" 
-            />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/folder_top_summary_left"
@@ -33,8 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/folder_top_summary_right"
         android:layout_marginRight="16dp"
-        android:text="@string/placeholder"
-            />
+        android:text="Summary Left" />
         
     <TextView
         android:id="@+id/folder_top_summary_right"
@@ -43,8 +40,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/folder_button_negative"
         android:layout_marginTop="16dp"
-        android:text="@string/placeholder" 
-            />
+        android:text="Summary Right" />
 
     <Button
         android:id="@+id/folder_button_positive"
@@ -56,8 +52,7 @@
         android:text="Signer"
         android:drawableLeft="@drawable/ic_action_sign"
         android:gravity="left|center_vertical"
-        android:drawablePadding="8dp" 
-            />
+        android:drawablePadding="8dp" />
 
     <Button
         android:id="@+id/folder_button_negative"
@@ -68,8 +63,7 @@
         android:text="Refuser" 
         android:drawableLeft="@drawable/ic_action_reject"
         android:gravity="left|center_vertical"
-        android:drawablePadding="8dp" 
-            />
+        android:drawablePadding="8dp" />
 
 </RelativeLayout>
 

@@ -117,10 +117,6 @@ public class FolderActivity
         // Set title
         title.setText( folderTitle );
 
-        // Set HTML to views from ressources
-        topSummaryLeft.setText( Html.fromHtml( getString( R.string.demo_summary_left ) ) );
-        topSummaryRight.setText( Html.fromHtml( getString( R.string.demo_summary_right ) ) );
-
         // Setup WebView
         fileWebView.getSettings().setJavaScriptEnabled( true );
         fileWebView.getSettings().setSupportZoom( true );
@@ -162,6 +158,8 @@ public class FolderActivity
     public void refresh()
     {
         // Clear View
+        topSummaryLeft.setText( "" );
+        topSummaryRight.setText( "" );
         positiveButton.setVisibility( View.INVISIBLE );
         negativeButton.setVisibility( View.INVISIBLE );
         fileWebView.clearView();
@@ -182,6 +180,13 @@ public class FolderActivity
                         positiveButton.setVisibility( View.VISIBLE );
                         negativeButton.setVisibility( View.VISIBLE );
                     }
+                    topSummaryLeft.setText( Html.fromHtml( "<b>" + folder.getBusinessType() + "</b><br/>" + folder.getBusinessSubType() ) );
+                    StringBuilder summaryRight = new StringBuilder();
+                    summaryRight.append( "<b>Créé le</b> " ).append( folder.getDisplayCreationDate() );
+                    if ( folder.getDueDate() != null ) {
+                        summaryRight.append( "<br/><b>A traiter avant le</b> " ).append( folder.getDisplayDueDate() );
+                    }
+                    topSummaryRight.setText( Html.fromHtml( summaryRight.toString() ) );
                     folderFileListFragment.setListAdapter( new FolderListAdapter( context, folder.getAllFiles() ) );
                     folderFileListFragment.setOnFileDisplayRequestListener( new OnFileDisplayRequestListener()
                     {
