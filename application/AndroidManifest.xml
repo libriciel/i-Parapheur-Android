@@ -36,14 +36,6 @@
                   android:excludeFromRecents="true">
         </activity>
         
-        <!--
-        <service android:name=".services.IParapheurHttpService"></service>
-        <provider android:authorities="org.adullact.iparapheur.tab.http.contentprovider"
-                  android:name=".http.database.HttpResourcesContentProvider"
-                  android:exported="false">
-        </provider>
-        -->
-        
     </application>
 
 </manifest>

@@ -1,16 +1,21 @@
 package org.adullact.iparapheur.tab.ui.office;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -109,8 +114,8 @@ public class OfficeActivity
     @InjectView( R.id.office_batch_negative_button )
     private Button batchNegativeButton;
 
-    @InjectView( R.id.office_batch_details )
-    private TextView batchDetails;
+    @InjectView( R.id.office_batch_list )
+    private ListView batchList;
 
     private Folder currentFolder;
 
@@ -243,10 +248,13 @@ public class OfficeActivity
                     } );
                     batchPositiveButton.setVisibility( View.VISIBLE );
                     batchNegativeButton.setVisibility( View.VISIBLE );
+                    batchList.setVisibility( View.VISIBLE );
                 } else {
                     batchPositiveButton.setVisibility( View.INVISIBLE );
                     batchNegativeButton.setVisibility( View.INVISIBLE );
+                    batchList.setVisibility( View.INVISIBLE );
                 }
+                batchList.setAdapter( new BatchListAdapter( listFragment.getActivity(), selectedFolders ) );
                 flipToBatchDetail();
             }
         }
@@ -367,6 +375,87 @@ public class OfficeActivity
         intent.putExtra( FolderActivity.EXTRA_FOLDER_IDENTITY, folder.getIdentity() );
         intent.putExtra( FolderActivity.EXTRA_FOLDER_TITLE, folder.getTitle() );
         startActivity( intent );
+    }
+
+    private static class BatchListAdapter
+            extends BaseAdapter
+    {
+
+        private final Activity activity;
+
+        private final List<Folder> folders;
+
+        private BatchListAdapter( Activity activity, List<Folder> folders )
+        {
+            this.activity = activity;
+            this.folders = folders;
+        }
+
+        @Override
+        public int getCount()
+        {
+            return folders.size();
+        }
+
+        @Override
+        public Object getItem( int position )
+        {
+            return folders.get( position );
+        }
+
+        @Override
+        public long getItemId( int position )
+        {
+            return position;
+        }
+
+        public View getView( int position, View convertView, ViewGroup vg )
+        {
+
+            final ItemDataViewsHolder dataViews;
+            if ( convertView == null ) {
+                convertView = activity.getLayoutInflater().inflate( R.layout.office_batchlist_item, null );
+                dataViews = new ItemDataViewsHolder();
+                dataViews.icon = ( ImageView ) convertView.findViewById( R.id.office_batchlist_item_icon );
+                dataViews.title = ( TextView ) convertView.findViewById( R.id.office_batchlist_item_title );
+                dataViews.details = ( TextView ) convertView.findViewById( R.id.office_batchlist_item_details );
+                dataViews.date = ( TextView ) convertView.findViewById( R.id.office_batchlist_item_date );
+                convertView.setTag( dataViews );
+            } else {
+                dataViews = ( ItemDataViewsHolder ) convertView.getTag();
+            }
+
+            final Folder folder = folders.get( position );
+
+            dataViews.icon.setImageResource( R.drawable.ic_folder );
+            dataViews.title.setText( folder.getTitle() );
+            StringBuilder details = new StringBuilder();
+            details.append( folder.getBusinessType() ).append( " / " ).append( folder.getBusinessSubType() );
+            dataViews.details.setText( details );
+            if ( folder.getDueDate() == null ) {
+                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getCreationDate() ) );
+                dataViews.date.setTextColor( R.color.black );
+            } else {
+                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getDueDate() ) );
+                dataViews.date.setTextColor( R.color.red );
+            }
+
+            return convertView;
+        }
+
+        private static class ItemDataViewsHolder
+        {
+
+            private ImageView icon;
+
+            private TextView title;
+
+            private TextView details;
+
+            private TextView date;
+
+        }
+
     }
 
 }
