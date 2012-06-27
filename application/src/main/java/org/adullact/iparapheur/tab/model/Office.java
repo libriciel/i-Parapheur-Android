@@ -16,7 +16,7 @@ public class Office
 
     private String description;
 
-    private String logo; // TODO Who is responsible for the model resources inflation ?
+    private String logoUrl;
 
     private Integer todoFolderCount;
 
@@ -57,9 +57,9 @@ public class Office
         return lateFolderCount;
     }
 
-    public String getLogo()
+    public String getLogoUrl()
     {
-        return logo;
+        return logoUrl;
     }
 
     public String getTitle()
@@ -75,6 +75,11 @@ public class Office
     public void setDescription( String description )
     {
         this.description = description;
+    }
+
+    public void setLogoUrl( String logoUrl )
+    {
+        this.logoUrl = logoUrl;
     }
 
     public void setTodoFolderCount( Integer todoFolderCount )

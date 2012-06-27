@@ -68,9 +68,11 @@ public class StaticHttpClient
     private StaticHttpClient()
     {
         httpClient = AndroidHttpClient.newInstance( "Android" );
-        SchemeRegistry schemeRegistry = ( ( AndroidHttpClient ) httpClient ).getConnectionManager().getSchemeRegistry();
-        schemeRegistry.unregister( "https" );
-        schemeRegistry.register( new Scheme( "https", TrustAllSSLSocketFactory.getSocketFactory(), 443 ) );
+        if ( false ) { // WARN This activates TRUST ALL SSL support
+            SchemeRegistry schemeRegistry = ( ( AndroidHttpClient ) httpClient ).getConnectionManager().getSchemeRegistry();
+            schemeRegistry.unregister( "https" );
+            schemeRegistry.register( new Scheme( "https", TrustAllSSLSocketFactory.getSocketFactory(), 443 ) );
+        }
     }
 
     /* package */ synchronized void ensureLoggedIn( Account account )

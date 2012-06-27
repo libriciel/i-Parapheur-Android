@@ -94,18 +94,22 @@ public class IParapheurHttpClient
                     JSONObject eachBureau = bureaux.getJSONObject( idx );
                     String identity = eachBureau.getString( "nodeRef" );
                     String title = eachBureau.getString( "name" );
-                    String community = eachBureau.getString( "collectivite" );
+                    String community = eachBureau.optString( "collectivite" );
                     // BEGIN TODO Remove default community name
                     if ( Strings.isEmpty( community ) ) {
                         community = "Ma collectivité";
                     }
                     // END REMOVE
                     String description = eachBureau.getString( "description" );
+                    String image = eachBureau.optString( "image" );
                     Integer todoFolderCount = eachBureau.getInt( "a_traiter" );
                     Integer lateFolderCount = eachBureau.getInt( "en_retard" );
 
                     Office office = new Office( identity, title, community, account.getIdentity() );
                     office.setDescription( description );
+                    if ( !Strings.isEmpty( image ) ) {
+                        office.setLogoUrl( image );
+                    }
                     office.setTodoFolderCount( todoFolderCount );
                     office.setLateFolderCount( lateFolderCount );
                     result.add( office );

@@ -8,6 +8,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import roboguice.inject.InjectView;
+import roboguice.util.Strings;
 
 import com.google.inject.Inject;
 
@@ -204,7 +206,7 @@ public class DashboardActivity
         public View getView( int position, View convertView, ViewGroup parent )
         {
 
-            ItemDataViewsHolder dataViews;
+            final ItemDataViewsHolder dataViews;
             if ( convertView == null ) {
                 convertView = inflater.inflate( R.layout.dashboard_officesgrid_item, null );
                 dataViews = new ItemDataViewsHolder();
@@ -218,7 +220,21 @@ public class DashboardActivity
             }
 
             final Office office = offices.get( position );
-            dataViews.icon.setImageResource( R.drawable.ic_office ); // TODO Use Office icon provided by the API
+            dataViews.icon.setImageResource( R.drawable.ic_office );
+            if ( !Strings.isEmpty( office.getLogoUrl() ) ) {
+                new OfficeLogoLoadingTask()
+                {
+
+                    @Override
+                    protected void onPostExecute( Bitmap result )
+                    {
+                        if ( result != null ) {
+                            dataViews.icon.setImageBitmap( result );
+                        }
+                    }
+
+                }.execute( office.getLogoUrl() );
+            }
             dataViews.title.setText( office.getTitle() );
             if ( office.getTodoFolderCount() > 0 ) {
                 dataViews.todo.setText( "" + office.getTodoFolderCount() );
