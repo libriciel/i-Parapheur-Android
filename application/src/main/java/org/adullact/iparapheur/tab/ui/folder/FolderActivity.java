@@ -39,6 +39,7 @@ import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.actions.ActionsDialogFactory;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.FolderListAdapter;
+import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.OnFileDisplayRequestListener;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -182,8 +183,17 @@ public class FolderActivity
                         negativeButton.setVisibility( View.VISIBLE );
                     }
                     folderFileListFragment.setListAdapter( new FolderListAdapter( context, folder.getAllFiles() ) );
+                    folderFileListFragment.setOnFileDisplayRequestListener( new OnFileDisplayRequestListener()
+                    {
+
+                        public void onFileDisplayRequest( AbstractFolderFile file )
+                        {
+                            displayFile( file );
+                        }
+
+                    } );
                     if ( !folder.getAllFiles().isEmpty() ) {
-                        loadFile( folder.getAllFiles().get( 0 ) );
+                        displayFile( folder.getAllFiles().get( 0 ) );
                     }
                     currentFolder = folder;
 
@@ -225,8 +235,9 @@ public class FolderActivity
         }.execute( new FolderLoadingTask.Params( accountIdentity, folderIdentity ) );
     }
 
-    private void loadFile( AbstractFolderFile file )
+    private void displayFile( AbstractFolderFile file )
     {
+        folderFileListFragment.shadeFiles( file );
         JSONObject json = file.getPageImagesJSON();
         fileWebView.setWebViewClient( new JSInjectWebViewClient( "injectData(" + json.toString() + ");" ) );
         fileWebView.loadUrl( file.getUrl() );

@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,16 +25,18 @@ public class FolderFileListFragment
         extends RoboListFragment
 {
 
-    /**
-     * The system calls this when creating the fragment.
-     * 
-     * Initialize essential components of the fragment that will be kept when
-     * the fragment is paused or stopped, then resumed.
-     */
-    @Override
-    public void onCreate( Bundle savedInstanceState )
+    public static interface OnFileDisplayRequestListener
     {
-        super.onCreate( savedInstanceState );
+
+        void onFileDisplayRequest( AbstractFolderFile file );
+
+    }
+
+    private OnFileDisplayRequestListener onFileDisplayRequestListener;
+
+    public void setOnFileDisplayRequestListener( OnFileDisplayRequestListener onFileDisplayRequestListener )
+    {
+        this.onFileDisplayRequestListener = onFileDisplayRequestListener;
     }
 
     @Override
@@ -46,8 +49,25 @@ public class FolderFileListFragment
     public void onListItemClick( ListView l, View v, int position, long id )
     {
         super.onListItemClick( l, v, position, id );
-        System.out.println( "ListItemClicked: " + position );
-        // TODO FolderActivity story: Handle document switching
+        if ( onFileDisplayRequestListener != null ) {
+            onFileDisplayRequestListener.onFileDisplayRequest( ( AbstractFolderFile ) getListAdapter().getItem( position ) );
+        }
+    }
+
+    public void shadeFiles( AbstractFolderFile... files )
+    {
+        List<AbstractFolderFile> fileList = Arrays.asList( files );
+        for ( int index = 0; index < getListView().getChildCount(); index++ ) {
+            View listChild = getListView().getChildAt( index );
+            View titleView = listChild.findViewById( R.id.folder_filelist_item_title );
+            if ( fileList.contains( ( AbstractFolderFile ) titleView.getTag() ) ) {
+                // System.out.println( folderList + " CONTAINS " + checkbox.getTag() ); // TODO Make it a DEBUG level log
+                listChild.setBackgroundResource( R.color.grey );
+            } else {
+                // System.out.println( folderList + " DOES'NT CONTAIN " + checkbox.getTag() ); // TODO Make it a DEBUG level log
+                listChild.setBackgroundResource( R.color.white );
+            }
+        }
     }
 
     /* package */ static final class FolderListAdapter
@@ -106,8 +126,8 @@ public class FolderFileListFragment
             final AbstractFolderFile folderFile = folderFiles.get( position );
 
             dataViews.title.setText( folderFile.getTitle() );
+            dataViews.title.setTag( folderFile );
             if ( folderFile instanceof FolderDocument ) {
-                convertView.setBackgroundResource( R.color.grey );
                 dataViews.icon.setImageResource( R.drawable.ic_list_document );
             } else {
                 dataViews.icon.setImageResource( R.drawable.ic_list_annex );

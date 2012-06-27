@@ -3,7 +3,6 @@ package org.adullact.iparapheur.tab.model;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -109,16 +108,6 @@ public class Folder
         return documents.add( folderDocument );
     }
 
-    public boolean addAllDocuments( FolderDocument... folderDocuments )
-    {
-        return documents.addAll( Arrays.asList( folderDocuments ) );
-    }
-
-    public void clearDocuments()
-    {
-        documents.clear();
-    }
-
     public List<FolderDocument> getDocuments()
     {
         return Collections.unmodifiableList( documents );
@@ -127,16 +116,6 @@ public class Folder
     public boolean addAnnex( FolderAnnex folderAnnex )
     {
         return annexes.add( folderAnnex );
-    }
-
-    public boolean addAllAnnexes( FolderAnnex... folderAnnexes )
-    {
-        return annexes.addAll( Arrays.asList( folderAnnexes ) );
-    }
-
-    public void clearAnnexes()
-    {
-        annexes.clear();
     }
 
     public List<FolderAnnex> getAnnexes()
