@@ -62,10 +62,8 @@ public class OfficeFolderListFragment
             View listChild = getListView().getChildAt( index );
             View checkbox = listChild.findViewById( R.id.office_folderlist_item_checkbox );
             if ( folderList.contains( ( Folder ) checkbox.getTag() ) ) {
-                // System.out.println( folderList + " CONTAINS " + checkbox.getTag() ); // TODO Make it a DEBUG level log
                 listChild.setBackgroundResource( R.color.grey );
             } else {
-                // System.out.println( folderList + " DOES'NT CONTAIN " + checkbox.getTag() ); // TODO Make it a DEBUG level log
                 listChild.setBackgroundResource( R.color.white );
             }
         }

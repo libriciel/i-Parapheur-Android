@@ -108,7 +108,7 @@ public class OfficeFacetsFragment
     public void onViewCreated( View view, Bundle savedInstanceState )
     {
         super.onViewCreated( view, savedInstanceState );
-        actionButton.setEnabled( false ); // TODO Activate Action Facet Button when action filters are available
+        actionButton.setEnabled( false ); // TODO ACTION facet is unsupported for now, Activate Facet Button when action filters are available
         if ( false ) {
             actionButton.setOnClickListener( new OnFacetClickListener( OfficeFacet.ACTION ) );
         }

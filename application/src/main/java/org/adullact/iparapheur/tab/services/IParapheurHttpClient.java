@@ -95,11 +95,9 @@ public class IParapheurHttpClient
                     String identity = eachBureau.getString( "nodeRef" );
                     String title = eachBureau.getString( "name" );
                     String community = eachBureau.optString( "collectivite" );
-                    // BEGIN TODO Remove default community name
                     if ( Strings.isEmpty( community ) ) {
                         community = "Ma collectivité";
                     }
-                    // END REMOVE
                     String description = eachBureau.getString( "description" );
                     String image = eachBureau.optString( "image" );
                     Integer todoFolderCount = eachBureau.getInt( "a_traiter" );

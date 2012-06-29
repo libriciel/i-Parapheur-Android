@@ -90,7 +90,7 @@ public class FolderFilterMapper
     private void applyActionSelection( JSONArray filterHolder, List<OfficeFacetChoice> selection )
             throws JSONException
     {
-        // TODO Map Action OfficeFacets / FolderFilters
+        // TODO ACTION facet is unsupported for now, Map OfficeFacets / FolderFilters
         for ( OfficeFacetChoice choice : selection ) {
             switch ( choice.id ) {
                 case R.string.office_facets_action_sign:

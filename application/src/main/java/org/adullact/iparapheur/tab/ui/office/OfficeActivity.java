@@ -146,7 +146,7 @@ public class OfficeActivity
 
         public void onFolderDisplayRequest( final Folder folder )
         {
-            // System.out.println( "FOLDER DISPLAY REQUEST FOR: " + folder ); // TODO Make it a DEBUG level log
+            Log.d( OfficeActivity.this, "FOLDER DISPLAY REQUEST FOR: " + folder );
             listFragment.shadeFolder( folder );
             folderIconView.setVisibility( View.VISIBLE );
             folderTitleView.setText( folder.getTitle() );

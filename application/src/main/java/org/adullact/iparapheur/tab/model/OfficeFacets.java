@@ -109,7 +109,6 @@ public class OfficeFacets
                 List<String> subtypes = new ArrayList<String>();
                 for ( Map.Entry<String, List<String>> entry : typology.entrySet() ) {
                     for ( String subtype : entry.getValue() ) {
-                        // subtypes.add( subtype + " (" + entry.getKey() + ")" ); // TODO FixMe - This would break filter mappings
                         subtypes.add( subtype );
                     }
                 }

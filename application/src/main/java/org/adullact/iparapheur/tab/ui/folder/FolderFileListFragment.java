@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import roboguice.fragment.RoboListFragment;
 
+import de.akquinet.android.androlog.Log;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.FolderDocument;
@@ -61,10 +62,8 @@ public class FolderFileListFragment
             View listChild = getListView().getChildAt( index );
             View titleView = listChild.findViewById( R.id.folder_filelist_item_title );
             if ( fileList.contains( ( AbstractFolderFile ) titleView.getTag() ) ) {
-                // System.out.println( folderList + " CONTAINS " + checkbox.getTag() ); // TODO Make it a DEBUG level log
                 listChild.setBackgroundResource( R.color.grey );
             } else {
-                // System.out.println( folderList + " DOES'NT CONTAIN " + checkbox.getTag() ); // TODO Make it a DEBUG level log
                 listChild.setBackgroundResource( R.color.white );
             }
         }
