@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,15 +43,25 @@ public class ActionsDialogFactory
 
     public Dialog buildActionDialog( String accountIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folders, true );
+        return buildDialog( accountIdentity, folders, true, null );
     }
 
     public Dialog buildRejectDialog( String accountIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folders, false );
+        return buildDialog( accountIdentity, folders, false, null );
     }
 
-    private Dialog buildDialog( final String accountIdentity, final List<Folder> folders, boolean accept )
+    public Dialog buildActionDialog( String accountIdentity, List<Folder> folders, Intent successIntent )
+    {
+        return buildDialog( accountIdentity, folders, true, successIntent );
+    }
+
+    public Dialog buildRejectDialog( String accountIdentity, List<Folder> folders, Intent successIntent )
+    {
+        return buildDialog( accountIdentity, folders, false, successIntent );
+    }
+
+    private Dialog buildDialog( final String accountIdentity, final List<Folder> folders, boolean accept, final Intent successIntent )
     {
         if ( folders == null || folders.isEmpty() ) {
             throw new IllegalArgumentException( "Cannot build an Action Dialog without any Folder." );
@@ -84,7 +95,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
+                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
                         }
 
                     } );
@@ -96,7 +107,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
                         }
 
                     } );
@@ -111,7 +122,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
+                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
                         }
 
                     } );
@@ -123,7 +134,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), identities( folders ) );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
                         }
 
                     } );
@@ -147,7 +158,7 @@ public class ActionsDialogFactory
         return identities;
     }
 
-    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
+    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
     {
         new SignTask( activity, accountsRepository, iParapheurClient )
         {
@@ -155,7 +166,7 @@ public class ActionsDialogFactory
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
-                if ( activity instanceof Refreshable ) {
+                if ( successIntent == null && activity instanceof Refreshable ) {
                     ( ( Refreshable ) activity ).refresh();
                 }
                 rejectDialog.dismiss();
@@ -164,6 +175,10 @@ public class ActionsDialogFactory
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
+                if ( !result.hasError() && successIntent != null ) {
+                    activity.startActivity( successIntent );
+                    return;
+                }
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
@@ -176,7 +191,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
+                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
                         }
 
                     } );
@@ -201,7 +216,7 @@ public class ActionsDialogFactory
         }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
     }
 
-    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
+    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
     {
         new VisaTask( activity, accountsRepository, iParapheurClient )
         {
@@ -209,7 +224,7 @@ public class ActionsDialogFactory
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
-                if ( activity instanceof Refreshable ) {
+                if ( successIntent == null && activity instanceof Refreshable ) {
                     ( ( Refreshable ) activity ).refresh();
                 }
                 rejectDialog.dismiss();
@@ -218,6 +233,10 @@ public class ActionsDialogFactory
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
+                if ( !result.hasError() && successIntent != null ) {
+                    activity.startActivity( successIntent );
+                    return;
+                }
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
@@ -230,7 +249,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
+                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
                         }
 
                     } );
@@ -255,7 +274,7 @@ public class ActionsDialogFactory
         }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
     }
 
-    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String... folderIdentities )
+    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
     {
         new RejectTask( activity, accountsRepository, iParapheurClient )
         {
@@ -263,7 +282,7 @@ public class ActionsDialogFactory
             @Override
             protected void beforeDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
-                if ( activity instanceof Refreshable ) {
+                if ( successIntent == null && activity instanceof Refreshable ) {
                     ( ( Refreshable ) activity ).refresh();
                 }
                 rejectDialog.dismiss();
@@ -272,6 +291,10 @@ public class ActionsDialogFactory
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<Void, IParapheurHttpException> result )
             {
+                if ( !result.hasError() && successIntent != null ) {
+                    activity.startActivity( successIntent );
+                    return;
+                }
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
@@ -284,7 +307,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, folderIdentities );
+                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
                         }
 
                     } );

@@ -118,9 +118,9 @@ public class IParapheurHttpClient
             return result;
 
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -161,9 +161,9 @@ public class IParapheurHttpClient
             return result;
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Office Typology " + officeIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Office Typology " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Office Typology" + officeIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Office Typology" + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -203,9 +203,9 @@ public class IParapheurHttpClient
             return result;
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -232,9 +232,9 @@ public class IParapheurHttpClient
             return folderFromJSON( dossier );
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -262,7 +262,7 @@ public class IParapheurHttpClient
             }
 
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -290,7 +290,7 @@ public class IParapheurHttpClient
             }
 
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -317,7 +317,7 @@ public class IParapheurHttpClient
                                                    + " " + response.getStatusLine().getReasonPhrase() );
             }
         } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities ) + " : " + ex.getMessage(), ex );
+            throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -337,7 +337,7 @@ public class IParapheurHttpClient
             return json.toString();
         } catch ( JSONException ex ) {
             // This should not happen but we don't want to fail silently!
-            throw new IParapheurTabException( "Unable to prepare request JSON body: " + ex.getMessage(), ex );
+            throw new IParapheurTabException( "Unable to prepare request JSON body: " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 

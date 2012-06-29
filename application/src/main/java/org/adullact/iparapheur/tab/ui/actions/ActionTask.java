@@ -24,4 +24,12 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpException;
         this.iParapheurClient = iParapheurClient;
     }
 
+    protected final void sleep( int seconds )
+    {
+        try {
+            Thread.sleep( seconds * 1000 );
+        } catch ( InterruptedException ignored ) {
+        }
+    }
+
 }

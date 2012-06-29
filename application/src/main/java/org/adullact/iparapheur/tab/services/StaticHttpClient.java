@@ -19,6 +19,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.codeartisans.java.toolbox.Strings;
 import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,9 +89,9 @@ public class StaticHttpClient
                 String ticket = json.getJSONObject( "data" ).getString( "ticket" );
                 accountSessionTickets.put( account.getIdentity(), ticket );
             } catch ( IOException ex ) {
-                throw new IParapheurHttpException( account.getTitle() + " : " + ex.getMessage(), ex );
+                throw new IParapheurHttpException( account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
             } catch ( JSONException ex ) {
-                throw new IParapheurHttpException( account.getTitle() + " : " + ex.getMessage(), ex );
+                throw new IParapheurHttpException( account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
             }
         } else {
             Log.d( "Already logged-in" );

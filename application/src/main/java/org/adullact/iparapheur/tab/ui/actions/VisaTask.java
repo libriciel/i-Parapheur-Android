@@ -30,6 +30,7 @@ public class VisaTask
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will visa folder with params: " + params + " using account: " + account );
             iParapheurClient.visa( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities );
+            sleep( 1 );
             return new AsyncTaskResult<Void, IParapheurHttpException>( ( Void ) null );
 
         } catch ( IParapheurHttpException ex ) {

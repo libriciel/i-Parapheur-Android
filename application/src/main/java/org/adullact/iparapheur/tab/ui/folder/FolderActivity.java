@@ -40,6 +40,7 @@ import org.adullact.iparapheur.tab.ui.actions.ActionsDialogFactory;
 import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.FolderListAdapter;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.OnFileDisplayRequestListener;
+import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -106,6 +107,7 @@ public class FolderActivity
         // Gather Intent Extras
         accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
+        String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
         String folderTitle = getIntent().getExtras().getString( EXTRA_FOLDER_TITLE );
         folderIdentity = getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY );
 
@@ -131,13 +133,16 @@ public class FolderActivity
                                                                     new AutoQuotaGrowWebChromeClient( 2 ) ) );
 
         // Create button listeners
+        final Intent successIntent = new Intent( FolderActivity.this, OfficeActivity.class );
+        successIntent.putExtra( OfficeActivity.EXTRA_ACCOUNT_IDENTITY, accountIdentity );
+        successIntent.putExtra( OfficeActivity.EXTRA_OFFICE_TITLE, officeTitle );
+        successIntent.putExtra( OfficeActivity.EXTRA_OFFICE_IDENTITY, officeIdentity );
         positiveButton.setOnClickListener( new View.OnClickListener()
         {
 
             public void onClick( View view )
             {
-                String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
-                actionsDialogFactory.buildActionDialog( accountIdentity, Collections.singletonList( currentFolder ) ).show();
+                actionsDialogFactory.buildActionDialog( accountIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
             }
 
         } );
@@ -146,8 +151,7 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                String accountIdentity = getIntent().getExtras().getString( FolderActivity.this.accountIdentity );
-                actionsDialogFactory.buildRejectDialog( accountIdentity, Collections.singletonList( currentFolder ) ).show();
+                actionsDialogFactory.buildRejectDialog( accountIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
             }
 
         } );
@@ -179,6 +183,14 @@ public class FolderActivity
                     if ( folder.getRequestedAction() != FolderRequestedAction.UNSUPPORTED ) {
                         positiveButton.setVisibility( View.VISIBLE );
                         negativeButton.setVisibility( View.VISIBLE );
+                    }
+                    switch ( folder.getRequestedAction() ) {
+                        case SIGNATURE:
+                            positiveButton.setText( "Signer" );
+                            break;
+                        case VISA:
+                            positiveButton.setText( "Viser" );
+                            break;
                     }
                     topSummaryLeft.setText( Html.fromHtml( "<b>" + folder.getBusinessType() + "</b><br/>" + folder.getBusinessSubType() ) );
                     StringBuilder summaryRight = new StringBuilder();

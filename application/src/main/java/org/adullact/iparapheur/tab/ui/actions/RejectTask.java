@@ -30,6 +30,7 @@ public class RejectTask
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will reject folder with params: " + params + " using account: " + account );
             iParapheurClient.reject( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities );
+            sleep( 1 );
             return new AsyncTaskResult<Void, IParapheurHttpException>( ( Void ) null );
 
         } catch ( IParapheurHttpException ex ) {
