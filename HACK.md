@@ -83,6 +83,14 @@ We use the git branching model provided by
 
 **TODO** Sync release process to Adullact conventions and describe it here.
 
+#### Using a release Certificate to sign the APK
+
+Issueing the following command in the application/ subfolder will generate a signed APK.
+
+    mvn clean install -Prelease -Dsign.alias=my-alias -Dsign.storepass=changeit -Dsign.keypass=changeit -Dsign.keystore=/path/to/keystore.jks
+
+Remember to change values according to your KeyStore.
+
 
 ### Code conventions
 
@@ -97,15 +105,24 @@ None for now.
 
 ### Architecture Overview
 
-TO BE DONE
+Development follows Android recommendations. The application is composed of Activities only. In other words there's no
+Services and the application is not exposing APIs to other applications.
 
-#### Network & Http
+Logging is done through the Androlog library that can be found here: http://akquinet.github.com/androlog/
 
-http://www.google.com/events/io/2010/sessions/developing-RESTful-android-apps.html
+Activities and their composited objects (views, fragments etc...) use the RoboGuice library to leverage the IoC
+pattern. The library and it's documentation can be found here: http://code.google.com/p/roboguice/
 
+#### Packages Overview
 
-
-
-
-
+    .
+    └── org
+        └── adullact
+            └── iparapheur
+                └── tab
+                    ├── logging     Logging support.
+                    ├── model       Domain Model.
+                    ├── services    HTTP API consumer service and helpers.
+                    ├── ui          User Interface
+                    └── util        Utility code.
 
