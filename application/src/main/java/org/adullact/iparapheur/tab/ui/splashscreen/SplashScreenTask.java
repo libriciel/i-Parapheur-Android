@@ -22,8 +22,7 @@ public class SplashScreenTask
     {
         try {
             Thread.sleep( 500 );
-        } catch ( InterruptedException ex ) {
-            // Ignored
+        } catch ( InterruptedException ignored ) {
         }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
@@ -32,7 +31,7 @@ public class SplashScreenTask
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_TITLE_SUFFIX, "iParapheur de DEV" );
-            editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "http://parapheur.test.adullact.org/alfresco/service" );
+            editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "http://parapheur.test.adullact.org" );
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_LOGIN_SUFFIX, "eperalta" );
             editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_PASSWORD_SUFFIX, "secret" );
 

@@ -78,7 +78,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = "{'username': '" + account.getLogin() + "'}";
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + OFFICES_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, OFFICES_PATH ) );
@@ -131,7 +131,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = "{'bureauRef': '" + officeIdentity + "'}";
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + TYPOLOGY_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, TYPOLOGY_PATH ) );
@@ -178,7 +178,7 @@ public class IParapheurHttpClient
                                  + "', 'filters': " + folderFilterMapper.buildFilters( facetSelection )
                                  + ", 'page': " + page
                                  + ", 'pageSize': " + pageSize + "}";
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, FOLDERS_PATH ) );
@@ -217,7 +217,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = "{'dossierRef': '" + folderIdentity + "'}";
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDER_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, FOLDER_PATH ) );
@@ -244,7 +244,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + SIGN_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, SIGN_PATH ) );
@@ -272,7 +272,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + VISA_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, VISA_PATH ) );
@@ -300,7 +300,7 @@ public class IParapheurHttpClient
 
             // Prepare request body
             String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
-            Log.d( IParapheurHttpClient.class, "REQUEST: " + requestBody );
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + REJECT_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, REJECT_PATH ) );

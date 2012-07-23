@@ -76,13 +76,16 @@ public class StaticHttpClient
         }
     }
 
+    private static final String BASE_PATH = "/alfresco/service";
+
     /* package */ synchronized void ensureLoggedIn( Account account )
             throws IParapheurHttpException
     {
         NullArgumentException.ensureNotNull( "Account", account );
         if ( !accountSessionTickets.containsKey( account.getIdentity() ) ) {
             try {
-                HttpPost post = new HttpPost( account.getUrl() + IParapheurHttpClient.LOGIN_PATH );
+                Log.d( IParapheurHttpClient.class, "REQUEST to " + BASE_PATH + IParapheurHttpClient.LOGIN_PATH );
+                HttpPost post = new HttpPost( account.getUrl() + BASE_PATH + IParapheurHttpClient.LOGIN_PATH );
                 HttpEntity data = new StringEntity( "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}", "UTF-8" );
                 post.setEntity( data );
                 JSONObject json = StaticHttpClient.getInstance().httpClient.execute( post, JSON_RESPONSE_HANDLER );
@@ -102,7 +105,7 @@ public class StaticHttpClient
     {
         NullArgumentException.ensureNotNull( "Account", account );
         NullArgumentException.ensureNotEmpty( "Path", path );
-        return account.getUrl() + path + "?alf_ticket=" + accountSessionTickets.get( account.getIdentity() );
+        return account.getUrl() + BASE_PATH + path + "?alf_ticket=" + accountSessionTickets.get( account.getIdentity() );
     }
 
 
@@ -116,7 +119,14 @@ public class StaticHttpClient
                 StatusLine statusLine = response.getStatusLine();
                 HttpEntity entity = response.getEntity();
                 if ( statusLine.getStatusCode() >= 300 ) {
-                    EntityUtils.toByteArray( entity );
+                    // Clear sessions on error, this is a bit harsh but simple and safe
+                    StaticHttpClient.getInstance().accountSessionTickets.clear();
+
+                    // Consume response before throwing if needed
+                    if ( entity != null ) {
+                        EntityUtils.toByteArray( entity );
+                    }
+
                     throw new HttpResponseException( statusLine.getStatusCode(), statusLine.getReasonPhrase() );
                 }
                 if ( entity == null ) {
