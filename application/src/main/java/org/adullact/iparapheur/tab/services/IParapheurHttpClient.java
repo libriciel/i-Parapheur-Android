@@ -192,7 +192,7 @@ public class IParapheurHttpClient
                 JSONArray dossiers = json.getJSONObject( "data" ).getJSONArray( "dossiers" );
                 for ( int idx = 0; idx < dossiers.length(); idx++ ) {
                     JSONObject eachDossier = dossiers.getJSONObject( idx );
-                    Folder folder = folderFromJSON( eachDossier );
+                    Folder folder = folderFromJSON( account, eachDossier );
                     if ( folder != null ) {
                         result.add( folder );
                     }
@@ -227,7 +227,7 @@ public class IParapheurHttpClient
 
             // Process response
             JSONObject dossier = json.getJSONObject( "data" );
-            return folderFromJSON( dossier );
+            return folderFromJSON( account, dossier );
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
@@ -339,7 +339,7 @@ public class IParapheurHttpClient
         }
     }
 
-    private static Folder folderFromJSON( JSONObject dossier )
+    private static Folder folderFromJSON( Account account, JSONObject dossier )
             throws JSONException
     {
         String identity = dossier.getString( "dossierRef" );
@@ -374,7 +374,7 @@ public class IParapheurHttpClient
                     JSONArray images = doc.getJSONArray( "images" );
                     for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
                         JSONObject image = images.getJSONObject( indexImages );
-                        FolderFilePageImage folderFilePageImage = new FolderFilePageImage( image.getString( "image" ) );
+                        FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
                         pageImages.add( folderFilePageImage );
                     }
                     folderDocument.setPageImages( pageImages );
