@@ -16,10 +16,10 @@
     <name>${project.artifactId}</name>
 
     <properties>
-      <!--
-        When not running a release, we are deploying the plain artifact (so no classifier)
-        This is overridden during the release.
-      -->
+        <!--
+            When not running a release, we are deploying the plain artifact (so no classifier)
+            This is overridden during the release.
+        -->
         <zipaligned-classifier></zipaligned-classifier>
     </properties>
 
@@ -42,15 +42,27 @@
             <type>apk</type>
             <version>${project.version}</version>
             <classifier>${zipaligned-classifier}</classifier> <!--  classifier set according to the ran profile -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>iparapheur-tab</artifactId>
             <type>jar</type>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         
-        <!-- Tests -->
+        <!-- Transitive APKLIB dependencies JARs -->
+        <!-- WARN Only needed so that IDEs pick the sources in classpath, the build works without theses. -->
+        <dependency>
+            <groupId>org.codeartisans.android-toolbox</groupId>
+            <artifactId>android-toolbox</artifactId>
+            <version>${android.toolbox.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Tests dependencies -->
         <dependency>
             <groupId>com.github.rtyley</groupId>
             <artifactId>android-screenshot-celebrity</artifactId>
@@ -79,9 +91,9 @@
         <profile>
             <id>release</id>
             <properties>
-        <!--
-          When running a release, we must deployed the final artifact (signed and zipaligned).
-        -->
+                <!--
+                    When running a release, we must deploy the final artifact (signed and zipaligned).
+                -->
                 <zipaligned-classifier>aligned</zipaligned-classifier>
             </properties>
             <build>

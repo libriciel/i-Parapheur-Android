@@ -12,7 +12,7 @@
     <artifactId>iparapheur-tab</artifactId>
     <packaging>apk</packaging>
     <name>${project.artifactId}</name>
-
+    
     <dependencies>
         
         <!-- Android SDK and Support libraries -->
@@ -20,16 +20,12 @@
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
-        <dependency>
-            <groupId>android.support</groupId>
-            <artifactId>compatibility-v4</artifactId>
-        </dependency>
 
         <!-- Android Toolbox https://github.com/eskatos/android-toolbox -->
         <dependency>
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
-            <version>1.4</version>
+            <version>${android.toolbox.version}</version>
             <type>apklib</type>
         </dependency>
 
@@ -79,14 +75,14 @@
                 <version>1.7</version>
                 <executions>
                     <execution>
-                        <id>add-apklib-source</id>
+                        <id>add-apklibs-source</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/unpack/apklibs/org.codeartisans.android-toolbox_android-toolbox_apklib_1.4/src</source>
+                                <source>${project.build.directory}/unpack/apklibs/org.codeartisans.android-toolbox_android-toolbox_apklib_${android.toolbox.version}/src</source>
                             </sources>
                         </configuration>
                     </execution>

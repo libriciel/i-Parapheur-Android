@@ -22,6 +22,8 @@ iparapheur-tab build system is based on [Maven](http://maven.apache.org). If
 you need to get started about it, check the
 [Sonatype books](http://www.sonatype.com/Support/Books).
 
+Documentation specific to Android can be found here: http://www.sonatype.com/books/mvnref-book/reference/android-dev.html
+
 The project is split in two modules, *application* and *integration-tests*. Their
 names should be self-explanatory.
 
