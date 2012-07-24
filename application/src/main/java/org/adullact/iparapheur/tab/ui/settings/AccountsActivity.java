@@ -7,9 +7,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.text.method.PasswordTransformationMethod;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import roboguice.activity.RoboPreferenceActivity;
 
@@ -44,8 +46,9 @@ public class AccountsActivity
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        Button add = new Button( this );
-        add.setText( "Ajouter un compte" );
+        LayoutInflater inflater = LayoutInflater.from( this );
+        RelativeLayout footerLayout = ( RelativeLayout ) inflater.inflate( R.layout.accounts_footer, null );
+        Button add = ( Button ) footerLayout.findViewById( R.id.accounts_add_button );
         add.setOnClickListener( new View.OnClickListener()
         {
 
@@ -56,7 +59,7 @@ public class AccountsActivity
             }
 
         } );
-        setListFooter( add );
+        setListFooter( footerLayout );
     }
 
     @Override
@@ -195,8 +198,10 @@ public class AccountsActivity
         public View getView( View convertView, ViewGroup parent )
         {
             if ( convertView == null ) {
-                Button delete = new Button( getContext() );
-                delete.setText( "Supprimer ce compte" );
+                LayoutInflater inflater = LayoutInflater.from( getContext() );
+                RelativeLayout footerLayout = ( RelativeLayout ) inflater.inflate( R.layout.account_footer, null );
+                Button delete = ( Button ) footerLayout.findViewById( R.id.accounts_del_button );
+
                 delete.setOnClickListener( new View.OnClickListener()
                 {
 
@@ -207,7 +212,7 @@ public class AccountsActivity
                     }
 
                 } );
-                convertView = delete;
+                convertView = footerLayout;
             }
             return convertView;
         }
