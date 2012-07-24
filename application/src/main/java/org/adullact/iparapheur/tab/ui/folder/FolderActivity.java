@@ -123,6 +123,10 @@ public class FolderActivity
         fileWebView.getSettings().setJavaScriptEnabled( true );
         fileWebView.getSettings().setSupportZoom( true );
         fileWebView.getSettings().setBuiltInZoomControls( true );
+        fileWebView.getSettings().setUseWideViewPort( true );
+        fileWebView.getSettings().setLoadWithOverviewMode( true );
+        fileWebView.getSettings().setDefaultZoom( WebSettings.ZoomDensity.FAR );
+        fileWebView.setInitialScale( 50 );
         fileWebView.getSettings().setDomStorageEnabled( true );
         fileWebView.getSettings().setAppCachePath( getApplicationContext().getCacheDir().getAbsolutePath() );
         fileWebView.getSettings().setAllowFileAccess( true );
