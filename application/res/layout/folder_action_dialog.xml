@@ -36,7 +36,7 @@
                       android:layout_height="wrap_content"
                       android:ems="10"
                       android:inputType="textMultiLine"
-                      android:lines="8"
+                      android:lines="5"
                       android:gravity="top|left" />
 	
         </LinearLayout>
@@ -56,7 +56,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:inputType="textMultiLine"
-                      android:lines="8" 
+                      android:lines="5" 
                       android:gravity="top|left" />
                       
         </LinearLayout>
