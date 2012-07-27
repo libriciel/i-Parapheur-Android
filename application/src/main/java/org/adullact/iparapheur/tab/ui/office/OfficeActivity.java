@@ -340,7 +340,7 @@ public class OfficeActivity
         }.execute( new OfficeLoadingTask.Params( accountIdentity,
                                                  officeIdentity,
                                                  facetsFragment.getFacetSelection(),
-                                                 0, 20 ) );
+                                                 0, 40 ) );
     }
 
     private void resetViews()
@@ -433,11 +433,12 @@ public class OfficeActivity
             details.append( folder.getBusinessType() ).append( " / " ).append( folder.getBusinessSubType() );
             dataViews.details.setText( details );
             if ( folder.getDueDate() == null ) {
-                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getCreationDate() ) );
-                dataViews.date.setTextColor( R.color.black );
+                dataViews.date.setVisibility( TextView.INVISIBLE );
             } else {
+                dataViews.date.setVisibility( TextView.VISIBLE );
+                dataViews.date.setBackgroundResource( R.color.red );
+                dataViews.date.setTextColor( activity.getResources().getColor( R.color.white ) );
                 dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getDueDate() ) );
-                dataViews.date.setTextColor( R.color.red );
             }
 
             return convertView;

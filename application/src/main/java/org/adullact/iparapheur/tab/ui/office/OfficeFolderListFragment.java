@@ -1,11 +1,5 @@
 package org.adullact.iparapheur.tab.ui.office;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +11,14 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import roboguice.fragment.RoboListFragment;
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
+import roboguice.fragment.RoboListFragment;
 
 public class OfficeFolderListFragment
         extends RoboListFragment
@@ -150,7 +147,7 @@ public class OfficeFolderListFragment
                 dataViews.icon = ( ImageView ) convertView.findViewById( R.id.office_folderlist_item_icon );
                 dataViews.title = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_title );
                 dataViews.details = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_details );
-                dataViews.date = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_date );
+                dataViews.dueDate = ( TextView ) convertView.findViewById( R.id.office_folderlist_item_due_date );
                 convertView.setTag( dataViews );
             } else {
                 dataViews = ( ItemDataViewsHolder ) convertView.getTag();
@@ -197,11 +194,12 @@ public class OfficeFolderListFragment
             details.append( folder.getBusinessType() ).append( " / " ).append( folder.getBusinessSubType() );
             dataViews.details.setText( details );
             if ( folder.getDueDate() == null ) {
-                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getCreationDate() ) );
-                dataViews.date.setTextColor( R.color.black );
+                dataViews.dueDate.setVisibility( TextView.INVISIBLE );
             } else {
-                dataViews.date.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getDueDate() ) );
-                dataViews.date.setTextColor( R.color.red );
+                dataViews.dueDate.setVisibility( TextView.VISIBLE );
+                dataViews.dueDate.setBackgroundResource( R.color.red );
+                dataViews.dueDate.setTextColor( listFragment.getResources().getColor( R.color.white ) );
+                dataViews.dueDate.setText( new SimpleDateFormat( "dd MMM" ).format( folder.getDueDate() ) );
             }
 
             return convertView;
@@ -218,7 +216,7 @@ public class OfficeFolderListFragment
 
             private TextView details;
 
-            private TextView date;
+            private TextView dueDate;
 
         }
 

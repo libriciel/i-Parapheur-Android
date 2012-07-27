@@ -45,7 +45,7 @@
         android:text="Détails" />
     
     <TextView
-        android:id="@+id/office_folderlist_item_date"
+        android:id="@+id/office_folderlist_item_due_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
