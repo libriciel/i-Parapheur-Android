@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab.services;
 
+import com.google.inject.Inject;
+import de.akquinet.android.androlog.Log;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,13 +12,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import roboguice.inject.ContextSingleton;
-
-import com.google.inject.Inject;
-
-import de.akquinet.android.androlog.Log;
-
+import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
+import org.adullact.iparapheur.tab.model.Account;
+import org.adullact.iparapheur.tab.model.Folder;
+import org.adullact.iparapheur.tab.model.FolderDocument;
+import org.adullact.iparapheur.tab.model.FolderRequestedAction;
+import org.adullact.iparapheur.tab.model.Office;
+import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
+import org.adullact.iparapheur.tab.model.Progression;
+import org.adullact.iparapheur.tab.model.Progression.Step;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -26,15 +31,7 @@ import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import org.adullact.iparapheur.tab.IParapheurTabException;
-import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
-import org.adullact.iparapheur.tab.model.Account;
-import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.model.FolderDocument;
-import org.adullact.iparapheur.tab.model.FolderRequestedAction;
-import org.adullact.iparapheur.tab.model.Office;
-import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
+import roboguice.inject.ContextSingleton;
 
 /**
  * Service used to access iParapheur HTTP API.
@@ -54,6 +51,8 @@ public class IParapheurHttpClient
     private static final String FOLDERS_PATH = "/parapheur/api/getDossiersHeaders";
 
     private static final String FOLDER_PATH = "/parapheur/api/getDossier";
+
+    private static final String PROGRESSION_PATH = "/parapheur/api/getCircuit";
 
     private static final String SIGN_PATH = "/parapheur/api/sign";
 
@@ -228,6 +227,63 @@ public class IParapheurHttpClient
             // Process response
             JSONObject dossier = json.getJSONObject( "data" );
             return folderFromJSON( account, dossier );
+
+        } catch ( JSONException ex ) {
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        } catch ( IOException ex ) {
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        }
+    }
+
+    public Progression fetchFolderProgression( Account account, String folderIdentity )
+    {
+        NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
+        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
+        staticHttpClient.ensureLoggedIn( account );
+        try {
+
+            // Prepare request body
+            String requestBody = "{'dossierRef': '" + folderIdentity + "'}";
+            Log.d( IParapheurHttpClient.class, "REQUEST on " + PROGRESSION_PATH + ": " + requestBody );
+
+            // Execute HTTP request
+            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, PROGRESSION_PATH ) );
+            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
+            post.setEntity( data );
+            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+
+            // Process response
+            JSONObject jsonData = json.getJSONObject( "data" );
+            String privAnnotation = jsonData.optString( "annotPriv" );
+            Progression progression = new Progression( folderIdentity, privAnnotation );
+            JSONArray circuit = jsonData.optJSONArray( "circuit" );
+            if ( circuit != null ) {
+                for ( int idx = 0; idx < circuit.length(); idx++ ) {
+                    JSONObject step = circuit.getJSONObject( idx );
+
+                    // Json data
+                    String dateValidation = step.getString( "dateValidation" );
+                    String parapheurName = step.getString( "parapheurName" );
+                    boolean approved = step.getBoolean( "approved" );
+                    String annotPub = step.optString( "annotPub" );
+                    String actionDemandee = step.getString( "actionDemandee" );
+
+                    // Model data
+                    Date validationDate = parseISO8601Date( dateValidation );
+                    FolderRequestedAction requestedAction = null;
+                    if ( "VISA".equals( actionDemandee ) ) {
+                        requestedAction = FolderRequestedAction.VISA;
+                    } else if ( "SIGNATURE".equals( actionDemandee ) ) {
+                        requestedAction = FolderRequestedAction.SIGNATURE;
+                    } else {
+                        // WARN Unsupported FolderRequestedAction
+                        requestedAction = FolderRequestedAction.UNSUPPORTED;
+                    }
+
+                    progression.add( new Step( validationDate, approved, parapheurName, requestedAction, annotPub ) );
+                }
+            }
+            return progression;
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );

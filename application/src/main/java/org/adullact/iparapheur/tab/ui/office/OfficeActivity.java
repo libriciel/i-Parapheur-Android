@@ -37,6 +37,7 @@ import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
+import org.adullact.iparapheur.tab.model.Progression;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
@@ -203,9 +204,33 @@ public class OfficeActivity
             folderDetails.setVisibility( View.VISIBLE );
             flipToFolderDetail();
             currentFolder = folder;
+            loadCurrentFolderProgression();
         }
 
     };
+
+    private void loadCurrentFolderProgression()
+    {
+        String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
+        new FolderProgressionLoadingTask( this, accountsRepository, iParapheurClient )
+        {
+
+            @Override
+            protected void onPostExecute( AsyncTaskResult<Progression, IParapheurTabException> result )
+            {
+                if ( result.hasError() ) {
+                    // TODO
+                    return;
+                }
+                Progression progression = result.getResult();
+                // TODO Populate views
+                System.out.println( "##################################################" );
+                System.out.println( "GOT PROGRESSION: " + progression );
+                System.out.println( "##################################################" );
+            }
+
+        }.execute( new FolderProgressionLoadingTask.Params( accountIdentity, currentFolder.getIdentity() ) );
+    }
 
     private OnFolderSelectionChange onFolderSelectionChange = new OnFolderSelectionChange()
     {
