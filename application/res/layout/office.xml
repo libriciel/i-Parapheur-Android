@@ -65,6 +65,24 @@
                           android:layout_marginLeft="64dp"
                           android:text="Détails" />
 
+                <TextView android:id="@+id/office_folder_progression"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentRight="true"
+                          android:layout_alignParentTop="true"
+                          android:layout_marginTop="140dp"
+                          android:layout_marginRight="64dp"
+                          android:text="Circuit" />
+
+                <TextView android:id="@+id/office_folder_private_annotation"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_centerHorizontal="true"
+                          android:layout_alignParentBottom="true"
+                          android:layout_marginBottom="64dp"
+                          android:background="@drawable/office_folder_private_annotation_background"
+                          android:text="Annotation Privée" />
+
                 <Button android:id="@+id/office_folder_open_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

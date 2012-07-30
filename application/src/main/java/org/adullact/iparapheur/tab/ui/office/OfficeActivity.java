@@ -49,6 +49,7 @@ import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionCha
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderDisplayRequestListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderSelectionChange;
+import roboguice.util.Strings;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -96,6 +97,12 @@ public class OfficeActivity
 
     @InjectView( R.id.office_folder_details )
     private TextView folderDetails;
+
+    @InjectView( R.id.office_folder_progression )
+    private TextView folderProgression;
+
+    @InjectView( R.id.office_folder_private_annotation )
+    private TextView folderPrivateAnnotation;
 
     @InjectView( R.id.office_folder_positive_button )
     private Button folderPositiveButton;
@@ -219,14 +226,22 @@ public class OfficeActivity
             protected void onPostExecute( AsyncTaskResult<Progression, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
-                    // TODO
+                    UserErrorDialogFactory.show( OfficeActivity.this,
+                                                 "Le chargement de ce bureau a échoué", result.getErrors(),
+                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
                     return;
                 }
                 Progression progression = result.getResult();
-                // TODO Populate views
-                System.out.println( "##################################################" );
-                System.out.println( "GOT PROGRESSION: " + progression );
-                System.out.println( "##################################################" );
+                if ( progression.getFolderIdentity().equals( currentFolder.getIdentity() ) ) {
+                    if ( !progression.isEmpty() ) {
+                        folderProgression.setText( Html.fromHtml( progression.toHtml() ) );
+                        folderProgression.setVisibility( TextView.VISIBLE );
+                    }
+                    if ( !Strings.isEmpty( progression.getPrivateAnnotation() ) ) {
+                        folderPrivateAnnotation.setText( Html.fromHtml( "<p><b>Annotation privée</b></p>" + progression.getPrivateAnnotation() ) );
+                        folderPrivateAnnotation.setVisibility( TextView.VISIBLE );
+                    }
+                }
             }
 
         }.execute( new FolderProgressionLoadingTask.Params( accountIdentity, currentFolder.getIdentity() ) );
@@ -308,6 +323,26 @@ public class OfficeActivity
         refresh();
     }
 
+    private DialogInterface.OnClickListener refresh = new DialogInterface.OnClickListener()
+    {
+
+        public void onClick( DialogInterface dialog, int id )
+        {
+            refresh();
+        }
+
+    };
+
+    private DialogInterface.OnClickListener dashboard = new DialogInterface.OnClickListener()
+    {
+
+        public void onClick( DialogInterface dialog, int id )
+        {
+            startActivity( new Intent( OfficeActivity.this, DashboardActivity.class ) );
+        }
+
+    };
+
     public void refresh()
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
@@ -332,26 +367,6 @@ public class OfficeActivity
                 facetsFragment.setOfficeTypology( result.getResult().getTypology() );
                 listFragment.setListAdapter( new OfficeFolderListAdapter( listFragment, folders ) );
             }
-
-            private DialogInterface.OnClickListener refresh = new DialogInterface.OnClickListener()
-            {
-
-                public void onClick( DialogInterface dialog, int id )
-                {
-                    refresh();
-                }
-
-            };
-
-            private DialogInterface.OnClickListener dashboard = new DialogInterface.OnClickListener()
-            {
-
-                public void onClick( DialogInterface dialog, int id )
-                {
-                    startActivity( new Intent( context, DashboardActivity.class ) );
-                }
-
-            };
 
             @Override
             protected void afterDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
