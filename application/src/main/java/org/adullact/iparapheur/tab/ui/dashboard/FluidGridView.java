@@ -8,7 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-
 import org.adullact.iparapheur.tab.R;
 
 /**

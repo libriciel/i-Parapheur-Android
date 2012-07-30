@@ -12,19 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-
-import roboguice.activity.RoboPreferenceActivity;
-
 import com.google.inject.Inject;
-
-import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
-
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
-import static org.adullact.iparapheur.tab.services.AccountsRepository.*;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
+import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.java.toolbox.Strings;
+import roboguice.activity.RoboPreferenceActivity;
+
+import static org.adullact.iparapheur.tab.services.AccountsRepository.*;
 
 public class AccountsActivity
         extends RoboPreferenceActivity
@@ -72,10 +70,11 @@ public class AccountsActivity
     public void refresh()
     {
         PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen( this );
-        rootScreen.setTitle( "Comptes iParapheur" );
+        String title = getResources().getString( R.string.accounts ) + Strings.SPACE + getResources().getString( R.string.app_name );
+        rootScreen.setTitle( title );
 
         accountsCategory = new PreferenceCategory( this );
-        accountsCategory.setTitle( "Comptes iParapheur" );
+        accountsCategory.setTitle( title );
         rootScreen.addPreference( accountsCategory );
 
         for ( final Account account : accountsRepository.all() ) {
@@ -100,11 +99,11 @@ public class AccountsActivity
         // Account Title
         String titlePrefKey = PREFS_PREFIX + account.getIdentity() + PREFS_TITLE_SUFFIX;
         final EditTextPreference titlePref = new EditTextPreference( this );
-        titlePref.setDialogTitle( "Nom du compte" );
+        titlePref.setDialogTitle( getResources().getString( R.string.account_name ) );
         titlePref.setTitle( account.getTitle() );
         titlePref.setIcon( android.R.drawable.ic_menu_info_details );
         titlePref.setText( account.getTitle() );
-        titlePref.setSummary( "Nom du compte" );
+        titlePref.setSummary( getResources().getString( R.string.account_name ) );
         titlePref.setKey( titlePrefKey );
         titlePref.setOnPreferenceChangeListener( new Preference.OnPreferenceChangeListener()
         {
@@ -124,11 +123,11 @@ public class AccountsActivity
         // IParapheur URL
         String urlPrefKey = PREFS_PREFIX + account.getIdentity() + PREFS_URL_SUFFIX;
         final EditTextPreference urlPref = new EditTextPreference( this );
-        urlPref.setDialogTitle( "Adresse du serveur iParapheur" );
+        urlPref.setDialogTitle( getResources().getString( R.string.account_url ) + Strings.SPACE + getResources().getString( R.string.app_name ) );
         urlPref.setTitle( account.getUrl() );
         urlPref.setIcon( android.R.drawable.ic_menu_compass );
         urlPref.setText( account.getUrl() );
-        urlPref.setSummary( "Adresse du serveur iParapheur" );
+        urlPref.setSummary( getResources().getString( R.string.account_url ) + Strings.SPACE + getResources().getString( R.string.app_name ) );
         urlPref.setKey( urlPrefKey );
         urlPref.setOnPreferenceChangeListener( new Preference.OnPreferenceChangeListener()
         {
@@ -145,11 +144,11 @@ public class AccountsActivity
         // Login
         String loginPrefKey = PREFS_PREFIX + account.getIdentity() + PREFS_LOGIN_SUFFIX;
         final EditTextPreference loginPref = new EditTextPreference( this );
-        loginPref.setDialogTitle( "Identifiant" );
+        loginPref.setDialogTitle( getResources().getString( R.string.account_login ) );
         loginPref.setTitle( account.getLogin() );
         loginPref.setIcon( android.R.drawable.ic_menu_myplaces );
         loginPref.setText( account.getLogin() );
-        loginPref.setSummary( "Identifiant" );
+        loginPref.setSummary( getResources().getString( R.string.account_login ) );
         loginPref.setKey( loginPrefKey );
         loginPref.setOnPreferenceChangeListener( new Preference.OnPreferenceChangeListener()
         {
@@ -167,11 +166,11 @@ public class AccountsActivity
         String passwordPrefKey = PREFS_PREFIX + account.getIdentity() + PREFS_PASSWORD_SUFFIX;
         final EditTextPreference passwordPref = new EditTextPreference( this );
         passwordPref.getEditText().setTransformationMethod( PasswordTransformationMethod.getInstance() );
-        passwordPref.setDialogTitle( "Mot de passe" );
+        passwordPref.setDialogTitle( getResources().getString( R.string.account_password ) );
         passwordPref.setTitle( "************" );
         passwordPref.setIcon( android.R.drawable.ic_menu_preferences );
         passwordPref.setText( account.getPassword() );
-        passwordPref.setSummary( "Mot de passe" );
+        passwordPref.setSummary( getResources().getString( R.string.account_password ) );
         passwordPref.setKey( passwordPrefKey );
         accountCategory.addPreference( passwordPref );
 
@@ -191,7 +190,7 @@ public class AccountsActivity
             super( context );
             this.accountsRepository = accountsRepository;
             this.account = account;
-            setTitle( "Supprimer ce compte" );
+            setTitle( context.getResources().getString( R.string.account_delete ) );
         }
 
         @Override
@@ -219,12 +218,12 @@ public class AccountsActivity
 
     }
 
-    private static String buildAccountSummary( Account account )
+    private String buildAccountSummary( Account account )
     {
         if ( account.validates() ) {
             return account.getLogin() + " @ " + account.getUrl();
         } else {
-            return "Vous devriez compléter ce compte.";
+            return getResources().getString( R.string.account_incomplete );
         }
     }
 

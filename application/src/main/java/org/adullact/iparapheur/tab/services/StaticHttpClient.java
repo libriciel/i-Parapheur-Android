@@ -1,13 +1,12 @@
 package org.adullact.iparapheur.tab.services;
 
+import android.net.http.AndroidHttpClient;
+import de.akquinet.android.androlog.Log;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import android.net.http.AndroidHttpClient;
-
-import de.akquinet.android.androlog.Log;
-
+import org.adullact.iparapheur.tab.model.Account;
+import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -23,9 +22,6 @@ import org.codeartisans.java.toolbox.Strings;
 import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import org.adullact.iparapheur.tab.model.Account;
-import org.adullact.iparapheur.tab.util.TrustAllSSLSocketFactory;
 
 /**
  * Singleton allowing to keep one HttpClient instance only.

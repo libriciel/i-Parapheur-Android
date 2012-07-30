@@ -1,29 +1,23 @@
 package org.adullact.iparapheur.tab.services;
 
+import android.content.Context;
+import android.text.format.DateUtils;
+import com.google.inject.Inject;
+import de.akquinet.android.androlog.Log;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import android.content.Context;
-import android.text.format.DateUtils;
-
-import roboguice.inject.ContextSingleton;
-
-import com.google.inject.Inject;
-
-import de.akquinet.android.androlog.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.model.OfficeFacets;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import roboguice.inject.ContextSingleton;
 
 @ContextSingleton
 public class FolderFilterMapper

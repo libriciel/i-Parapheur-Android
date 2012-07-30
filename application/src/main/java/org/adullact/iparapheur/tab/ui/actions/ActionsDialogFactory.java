@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.tab.ui.actions;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,13 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import roboguice.inject.ContextSingleton;
-
 import com.google.inject.Inject;
-
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-
+import java.util.List;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
@@ -27,6 +20,8 @@ import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import roboguice.inject.ContextSingleton;
 
 @ContextSingleton
 public class ActionsDialogFactory
@@ -76,7 +71,9 @@ public class ActionsDialogFactory
         View layout = inflater.inflate( R.layout.folder_action_dialog, ( ViewGroup ) activity.findViewById( R.id.folder_action_dialog_layout_root ) );
 
         TextView folderTitle = ( TextView ) layout.findViewById( R.id.folder_action_dialog_title );
-        folderTitle.setText( single ? lambda.getTitle() : "Lot de " + folders.size() + " dossiers" );
+        folderTitle.setText( single
+                             ? lambda.getTitle()
+                             : activity.getResources().getString( R.string.folder_batch, folders.size() ) );
 
         final EditText pubAnnotation = ( EditText ) layout.findViewById( R.id.folder_annotation_public );
         final EditText privAnnotation = ( EditText ) layout.findViewById( R.id.folder_annotation_private );
@@ -84,13 +81,16 @@ public class ActionsDialogFactory
         AlertDialog.Builder builder = new AlertDialog.Builder( activity );
         builder.setView( layout );
         builder.setCancelable( true );
-        builder.setNeutralButton( "Annuler", null );
+        builder.setNeutralButton( activity.getResources().getString( R.string.words_cancel ), null );
         switch ( lambda.getRequestedAction() ) {
             case SIGNATURE:
                 if ( accept ) {
                     builder.setIcon( R.drawable.ic_action_sign );
-                    builder.setTitle( "Signature" );
-                    builder.setPositiveButton( single ? "Signer" : "Signer le lot", new DialogInterface.OnClickListener()
+                    builder.setTitle( activity.getResources().getString( R.string.actions_sign_noun ) );
+                    builder.setPositiveButton( single
+                                               ? activity.getResources().getString( R.string.actions_sign )
+                                               : activity.getResources().getString( R.string.actions_sign_batch ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
@@ -101,8 +101,11 @@ public class ActionsDialogFactory
                     } );
                 } else {
                     builder.setIcon( R.drawable.ic_action_reject );
-                    builder.setTitle( "Rejet de signature" );
-                    builder.setPositiveButton( single ? "Rejeter" : "Rejeter le lot", new DialogInterface.OnClickListener()
+                    builder.setTitle( activity.getResources().getString( R.string.actions_reject_sign_noun ) );
+                    builder.setPositiveButton( single
+                                               ? activity.getResources().getString( R.string.actions_reject )
+                                               : activity.getResources().getString( R.string.actions_reject_batch ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
@@ -116,8 +119,11 @@ public class ActionsDialogFactory
             case VISA:
                 if ( accept ) {
                     builder.setIcon( R.drawable.ic_action_sign );
-                    builder.setTitle( "Visa" );
-                    builder.setPositiveButton( single ? "Viser" : "Viser le lot", new DialogInterface.OnClickListener()
+                    builder.setTitle( activity.getResources().getString( R.string.actions_visa_noun ) );
+                    builder.setPositiveButton( single
+                                               ? activity.getResources().getString( R.string.actions_visa )
+                                               : activity.getResources().getString( R.string.actions_visa_batch ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
@@ -128,8 +134,11 @@ public class ActionsDialogFactory
                     } );
                 } else {
                     builder.setIcon( R.drawable.ic_action_reject );
-                    builder.setTitle( "Rejet de visa" );
-                    builder.setPositiveButton( single ? "Rejeter" : "Rejeter le lot", new DialogInterface.OnClickListener()
+                    builder.setTitle( activity.getResources().getString( R.string.actions_reject_visa_noun ) );
+                    builder.setPositiveButton( single
+                                               ? activity.getResources().getString( R.string.actions_reject )
+                                               : activity.getResources().getString( R.string.actions_reject_batch ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( final DialogInterface dialog, int id )
@@ -182,10 +191,13 @@ public class ActionsDialogFactory
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( single ? "La signature de ce dossier a échoué" : "La signature de ce lot a échoué" ).
+                    builder.setTitle( single
+                                      ? activity.getResources().getString( R.string.actions_sign_error )
+                                      : activity.getResources().getString( R.string.actions_sign_error_batch ) ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
-                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( activity.getResources().getString( R.string.words_retry ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -195,7 +207,8 @@ public class ActionsDialogFactory
                         }
 
                     } );
-                    builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+                    builder.setNegativeButton( activity.getResources().getString( R.string.words_cancel ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -240,10 +253,13 @@ public class ActionsDialogFactory
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( single ? "Le visa de ce dossier a échoué" : "Le visa de ce lot a échoué" ).
+                    builder.setTitle( single
+                                      ? activity.getResources().getString( R.string.actions_visa_error )
+                                      : activity.getResources().getString( R.string.actions_visa_error_batch ) ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
-                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( activity.getResources().getString( R.string.words_retry ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -253,7 +269,8 @@ public class ActionsDialogFactory
                         }
 
                     } );
-                    builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+                    builder.setNegativeButton( activity.getResources().getString( R.string.words_cancel ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -298,10 +315,13 @@ public class ActionsDialogFactory
                 if ( result.hasError() ) {
                     boolean single = folderIdentities.length == 1;
                     AlertDialog.Builder builder = new AlertDialog.Builder( context );
-                    builder.setTitle( single ? "Le rejet de ce dossier a échoué" : "Le rejet de ce lot a échoué" ).
+                    builder.setTitle( single
+                                      ? activity.getResources().getString( R.string.actions_reject_error )
+                                      : activity.getResources().getString( R.string.actions_reject_error_batch ) ).
                             setMessage( result.buildErrorMessages() ).
                             setCancelable( false );
-                    builder.setPositiveButton( "Réessayer", new DialogInterface.OnClickListener()
+                    builder.setPositiveButton( activity.getResources().getString( R.string.words_retry ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )
@@ -311,7 +331,8 @@ public class ActionsDialogFactory
                         }
 
                     } );
-                    builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+                    builder.setNegativeButton( activity.getResources().getString( R.string.words_cancel ),
+                                               new DialogInterface.OnClickListener()
                     {
 
                         public void onClick( DialogInterface dialog, int id )

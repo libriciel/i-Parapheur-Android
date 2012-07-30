@@ -1,10 +1,5 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,19 +12,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import roboguice.inject.InjectView;
-import roboguice.util.Strings;
-
 import com.google.inject.Inject;
-
 import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.activity.RoboActivity;
-import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
-import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Community;
@@ -41,6 +29,12 @@ import org.adullact.iparapheur.tab.ui.actionbar.ActionBarActivityObserver;
 import org.adullact.iparapheur.tab.ui.dashboard.FluidGridView.OnItemClickListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
+import org.codeartisans.android.toolbox.activity.RoboActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
+import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.java.toolbox.Strings;
+import roboguice.inject.InjectView;
 
 public class DashboardActivity
         extends RoboActivity
@@ -78,7 +72,7 @@ public class DashboardActivity
 
             // No account
             TextView textView = new TextView( this );
-            textView.setText( "Aucun compte iParapheur configuré." );
+            textView.setText( getResources().getString( R.string.account_none ) );
             dashboardLayout.addView( textView );
 
         } else {
@@ -97,7 +91,7 @@ public class DashboardActivity
 
                         // No offices
                         TextView textView = new TextView( context );
-                        textView.setText( "Aucun bureau." );
+                        textView.setText( getResources().getString( R.string.office_none ) );
                         dashboardLayout.addView( textView );
 
                     } else {
@@ -155,8 +149,10 @@ public class DashboardActivity
                 {
                     // Error handling to user
                     if ( result.hasError() ) {
-                        UserErrorDialogFactory.show( context, "Le chargement de certains bureaux à échoué", result.getErrors(),
-                                                     "Continuer", cancel, "Comptes", accounts );
+                        UserErrorDialogFactory.show( context, getResources().getString( R.string.dashboard_loading_error ),
+                                                     result.getErrors(),
+                                                     getResources().getString( R.string.words_continue ), cancel,
+                                                     getResources().getString( R.string.accounts ), accounts );
                     }
                 }
 
@@ -237,17 +233,17 @@ public class DashboardActivity
             }
             dataViews.title.setText( office.getTitle() );
             if ( office.getTodoFolderCount() > 0 ) {
-                dataViews.todo.setText( "" + office.getTodoFolderCount() );
+                dataViews.todo.setText( Strings.EMPTY + office.getTodoFolderCount() );
                 dataViews.todo.setVisibility( View.VISIBLE );
             } else {
-                dataViews.todo.setText( "" );
+                dataViews.todo.setText( Strings.EMPTY );
                 dataViews.todo.setVisibility( View.INVISIBLE );
             }
             if ( office.getLateFolderCount() > 0 ) {
-                dataViews.late.setText( "" + office.getLateFolderCount() );
+                dataViews.late.setText( Strings.EMPTY + office.getLateFolderCount() );
                 dataViews.late.setVisibility( View.VISIBLE );
             } else {
-                dataViews.late.setText( "" );
+                dataViews.late.setText( Strings.EMPTY );
                 dataViews.late.setVisibility( View.INVISIBLE );
             }
 

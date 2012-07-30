@@ -1,21 +1,19 @@
 package org.adullact.iparapheur.tab.ui.office;
 
+import de.akquinet.android.androlog.Log;
 import java.io.Serializable;
 import java.util.List;
 import java.util.SortedMap;
-
-import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
-
 import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
 public class OfficeLoadingTask
         extends AsyncTaskWithMessageDialog<OfficeLoadingTask.Params, String, AsyncTaskResult<OfficeData, IParapheurTabException>>
@@ -60,7 +58,7 @@ public class OfficeLoadingTask
 
     public OfficeLoadingTask( OfficeActivity context, AccountsRepository accountsRepository, IParapheurHttpClient iParapheurClient )
     {
-        super( context, "Veuillez patienter" );
+        super( context, context.getResources().getString( R.string.words_wait ) );
         this.accountsRepository = accountsRepository;
         this.iParapheurClient = iParapheurClient;
     }
@@ -68,7 +66,7 @@ public class OfficeLoadingTask
     @Override
     protected AsyncTaskResult<OfficeData, IParapheurTabException> doInBackground( Params... parameters )
     {
-        publishProgress( "Chargement des dossiers" );
+        publishProgress( context.getResources().getString( R.string.office_loading ) );
         try {
 
             Params params = parameters[0];

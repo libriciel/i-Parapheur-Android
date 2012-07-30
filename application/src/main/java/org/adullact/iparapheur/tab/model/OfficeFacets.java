@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.tab.model;
 
+import android.content.Context;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -8,16 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
-
-import android.content.Context;
-
-import roboguice.inject.ContextSingleton;
-
-import com.google.inject.Inject;
-
-import org.codeartisans.java.toolbox.Couple;
-
 import org.adullact.iparapheur.tab.R;
+import org.codeartisans.java.toolbox.Couple;
+import org.codeartisans.java.toolbox.Strings;
+import roboguice.inject.ContextSingleton;
 
 /**
  * OfficeFacet helper for views.
@@ -157,12 +153,15 @@ public class OfficeFacets
                     break;
                 case TYPE:
                     if ( !entry.getValue().isEmpty() ) {
-                        summary.append( "Dossiers du type métier " );
+                        summary.append( context.getResources().getString( R.string.facet_type_summary ) ).
+                                append( Strings.SPACE );
                         Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
                         while ( it.hasNext() ) {
                             summary.append( it.next().displayName );
                             if ( it.hasNext() ) {
-                                summary.append( " ou " );
+                                summary.append( Strings.SPACE ).
+                                        append( context.getResources().getString( R.string.words_or ) ).
+                                        append( Strings.SPACE );
                             }
                         }
                         summary.append( ".\n" );
@@ -170,12 +169,15 @@ public class OfficeFacets
                     break;
                 case SUBTYPE:
                     if ( !entry.getValue().isEmpty() ) {
-                        summary.append( "Dossiers du sous-type métier " );
+                        summary.append( context.getResources().getString( R.string.facet_subtype_summary ) ).
+                                append( Strings.SPACE );
                         Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
                         while ( it.hasNext() ) {
                             summary.append( it.next().displayName );
                             if ( it.hasNext() ) {
-                                summary.append( " ou " );
+                                summary.append( Strings.SPACE ).
+                                        append( context.getResources().getString( R.string.words_or ) ).
+                                        append( Strings.SPACE );
                             }
                         }
                         summary.append( ".\n" );
@@ -183,12 +185,15 @@ public class OfficeFacets
                     break;
                 case SCHEDULE:
                     if ( !entry.getValue().isEmpty() ) {
-                        summary.append( "Dossiers à traiter " );
+                        summary.append( context.getResources().getString( R.string.facet_schedule_summary ) ).
+                                append( Strings.SPACE );
                         Iterator<OfficeFacetChoice> it = entry.getValue().iterator();
                         while ( it.hasNext() ) {
                             summary.append( it.next().displayName.toLowerCase() );
                             if ( it.hasNext() ) {
-                                summary.append( " ou " );
+                                summary.append( Strings.SPACE ).
+                                        append( context.getResources().getString( R.string.words_or ) ).
+                                        append( Strings.SPACE );
                             }
                         }
                         summary.append( ".\n" );

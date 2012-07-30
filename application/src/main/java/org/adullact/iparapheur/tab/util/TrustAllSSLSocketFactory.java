@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.tab.util;
 
+import de.akquinet.android.androlog.Log;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -10,21 +11,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-import de.akquinet.android.androlog.Log;
-
+import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.scheme.LayeredSocketFactory;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-
-import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 
 @Deprecated
 public class TrustAllSSLSocketFactory

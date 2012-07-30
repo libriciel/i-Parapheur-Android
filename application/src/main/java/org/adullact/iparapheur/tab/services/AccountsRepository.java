@@ -1,25 +1,22 @@
 package org.adullact.iparapheur.tab.services;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
+import org.adullact.iparapheur.tab.R;
+import org.adullact.iparapheur.tab.model.Account;
+import org.codeartisans.java.toolbox.Strings;
+import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import roboguice.activity.event.OnPauseEvent;
 import roboguice.activity.event.OnResumeEvent;
 import roboguice.event.Observes;
 import roboguice.inject.ContextSingleton;
-
-import com.google.inject.Inject;
-
-import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
-
-import org.adullact.iparapheur.tab.model.Account;
 
 /**
  * Accounts Repository.
@@ -76,10 +73,14 @@ public class AccountsRepository
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX, "Nouveau Compte" );
-        editor.putString( PREFS_PREFIX + identity + PREFS_URL_SUFFIX, "" );
-        editor.putString( PREFS_PREFIX + identity + PREFS_LOGIN_SUFFIX, "" );
-        editor.putString( PREFS_PREFIX + identity + PREFS_PASSWORD_SUFFIX, "" );
+        editor.putString( PREFS_PREFIX + identity + PREFS_TITLE_SUFFIX,
+                          context.getResources().getString( R.string.account_new ) );
+        editor.putString( PREFS_PREFIX + identity + PREFS_URL_SUFFIX,
+                          Strings.EMPTY );
+        editor.putString( PREFS_PREFIX + identity + PREFS_LOGIN_SUFFIX,
+                          Strings.EMPTY );
+        editor.putString( PREFS_PREFIX + identity + PREFS_PASSWORD_SUFFIX,
+                          Strings.EMPTY );
         editor.apply();
         editor.commit();
 

@@ -1,10 +1,5 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,13 +9,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import roboguice.fragment.RoboListFragment;
-
-import de.akquinet.android.androlog.Log;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.FolderDocument;
+import roboguice.fragment.RoboListFragment;
 
 public class FolderFileListFragment
         extends RoboListFragment

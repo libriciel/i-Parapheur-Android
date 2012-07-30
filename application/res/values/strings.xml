@@ -1,4 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Default localized strings, see http://developer.android.com/guide/topics/resources/localization.html -->
 <resources>
+    
     <string name="app_name">i-Parapheur</string>
+    
+    <!-- Words -->
+    <string name="words_or">ou</string>
+    <string name="words_and">et</string>
+    <string name="words_retry">Réessayer</string>
+    <string name="words_cancel">Annuler</string>
+    <string name="words_apply">Appliquer</string>
+    <string name="words_reset">Réinitialiser</string>
+    <string name="words_continue">Continuer</string>
+    <string name="words_close">Fermer</string>
+    <string name="words_about">À propos</string>
+    <string name="words_refresh">Rafraîchir</string>
+    <string name="words_wait">Veuillez patienter</string>
+    
+    <!-- Facets Summary -->
+    <string name="facet_type_summary">Dossiers du type métier</string>
+    <string name="facet_subtype_summary">Dossiers du sous-type métier</string>
+    <string name="facet_schedule_summary">Dossiers à traiter</string>
+    
+    <!-- Actions -->
+    <string name="actions_sign_noun">Signature</string>
+    <string name="actions_sign">Signer</string>
+    <string name="actions_sign_in_progress">Signature en cours</string>
+    <string name="actions_sign_batch">Signer le lot</string>
+    <string name="actions_sign_error">La signature de ce dossier a échoué</string>
+    <string name="actions_sign_error_batch">La signature de ce lot a échoué</string>
+    
+    <string name="actions_visa_noun">Visa</string>
+    <string name="actions_visa">Viser</string>
+    <string name="actions_visa_in_progress">Visa en cours</string>
+    <string name="actions_visa_batch">Viser le lot</string>
+    <string name="actions_visa_error">Le visa de ce dossier a échoué</string>
+    <string name="actions_visa_error_batch">Le visa de ce lot a échoué</string>
+    
+    <string name="actions_reject_sign_noun">Rejet de signature</string>
+    <string name="actions_reject_visa_noun">Rejet de visa</string>
+    <string name="actions_reject">Rejeter</string>
+    <string name="actions_reject_in_progress">Rejet en cours</string>
+    <string name="actions_reject_batch">Rejeter le lot</string>
+    <string name="actions_reject_error">Le rejet de ce dossier a échoué</string>
+    <string name="actions_reject_error_batch">Le rejet de ce lot a échoué</string>
+    
+    <!-- Accounts -->
+    <string name="account_new">Nouveau Compte</string>
+    <string name="account_none">Aucun compte iParapheur configuré.</string>
+    <string name="accounts">Comptes</string>
+    <string name="account_name">Nom du compte</string>
+    <string name="account_url">Adresse du serveur</string>
+    <string name="account_login">Identifiant</string>
+    <string name="account_password">Mot de passe</string>
+    <string name="account_delete">Supprimer ce compte</string>
+    <string name="account_incomplete">Vous devriez compléter ce compte.</string>
+    
+    <!-- Dashboard -->
+    <string name="dashboard">Tableau de bord</string>
+    <string name="dashboard_loading">Chargement des bureaux</string>
+    <string name="dashboard_loading_done">Chargement des bureaux terminé</string>
+    <string name="dashboard_loading_error">Le chargement de certains bureaux à échoué</string>
+    
+    <!-- Office -->
+    <string name="office_none">Aucun bureau.</string>
+    <string name="office_loading">Chargement des dossiers</string>
+    <string name="office_loading_error">Le chargement de ce bureau à échoué</string>
+    <string name="office_batch_different_actions">Vous ne pouvez pas séléctionner des dossiers dont les actions demandées ne sont pas supportées.</string>
+    <string name="office_batch_unsupported_actions">Vous ne pouvez pas séléctionner des dossiers dont les actions demandées sont différentes.</string>
+    
+    <!-- Folder -->
+    <string name="folder_batch">Lot de %1$d dossiers</string>
+    <string name="folder_loading">Chargement du dossier</string>
+    <string name="folder_loading_error">Le chargement de ce dossier à échoué</string>
+    <string name="folder_created_at">Créé le</string>
+    <string name="folder_todo_before">A traiter avant le</string>
+    <string name="folder_type">Type</string>
+    <string name="folder_subtype">Sous-type</string>
+    <string name="folder_creation_date">Date de création</string>
+    <string name="folder_due_date">Date limite</string>
+    <string name="folder_progression">Circuit</string>
+    <string name="folder_progression_approved_at">Approuvé le</string>
+    <string name="folder_progression_private_annotation">Annotation privée</string>
+    
 </resources>

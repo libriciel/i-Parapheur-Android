@@ -1,15 +1,13 @@
 package org.adullact.iparapheur.tab.ui.actions;
 
 import android.app.Activity;
-
 import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 
 public class RejectTask
         extends ActionTask
@@ -23,7 +21,7 @@ public class RejectTask
     @Override
     protected AsyncTaskResult<Void, IParapheurHttpException> doInBackground( ActionTaskParam... parameters )
     {
-        publishProgress( "Rejet en cours" );
+        publishProgress( context.getResources().getString( R.string.actions_reject_in_progress ) );
         try {
 
             ActionTaskParam params = parameters[0];

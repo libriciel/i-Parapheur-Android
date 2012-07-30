@@ -1,11 +1,5 @@
 package org.adullact.iparapheur.tab.ui.office;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -15,20 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
-import roboguice.fragment.RoboFragment;
-import roboguice.inject.InjectView;
-
 import com.google.inject.Inject;
-
-import org.codeartisans.java.toolbox.Couple;
-import org.codeartisans.java.toolbox.ObjectHolder;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.OfficeFacet;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoice;
 import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
 import org.adullact.iparapheur.tab.model.OfficeFacets;
+import org.codeartisans.java.toolbox.Couple;
+import org.codeartisans.java.toolbox.ObjectHolder;
+import roboguice.fragment.RoboFragment;
+import roboguice.inject.InjectView;
 
 public class OfficeFacetsFragment
         extends RoboFragment
@@ -167,7 +162,8 @@ public class OfficeFacetsFragment
         } );
 
         // Apply
-        builder.setPositiveButton( "Appliquer", new DialogInterface.OnClickListener()
+        builder.setPositiveButton( getResources().getString( R.string.words_apply ),
+                                   new DialogInterface.OnClickListener()
         {
 
             public void onClick( DialogInterface dialog, int id )
@@ -180,7 +176,8 @@ public class OfficeFacetsFragment
         } );
 
         // Réinit
-        builder.setNeutralButton( "Réinitialiser", new DialogInterface.OnClickListener()
+        builder.setNeutralButton( getResources().getString( R.string.words_reset ),
+                                  new DialogInterface.OnClickListener()
         {
 
             public void onClick( DialogInterface dialog, int id )
@@ -192,7 +189,8 @@ public class OfficeFacetsFragment
         } );
 
         // Cancel
-        builder.setNegativeButton( "Annuler", new DialogInterface.OnClickListener()
+        builder.setNegativeButton( getResources().getString( R.string.words_cancel ),
+                                   new DialogInterface.OnClickListener()
         {
 
             public void onClick( DialogInterface dialog, int id )

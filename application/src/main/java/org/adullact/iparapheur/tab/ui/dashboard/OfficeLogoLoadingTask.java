@@ -1,19 +1,16 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import de.akquinet.android.androlog.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-
 import roboguice.util.Strings;
-
-import de.akquinet.android.androlog.Log;
 
 /* package */ class OfficeLogoLoadingTask
         extends AsyncTask<String, Void, Bitmap>
@@ -31,7 +28,7 @@ import de.akquinet.android.androlog.Log;
             return null;
         }
         try {
-            synchronized ( CACHE ) {
+            synchronized( CACHE ) {
                 if ( CACHE.hasBitmap( url ) ) {
                     return CACHE.get( url );
                 }

@@ -1,10 +1,5 @@
 package org.adullact.iparapheur.tab.ui.office;
 
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,19 +14,13 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
-
-import roboguice.inject.InjectFragment;
-import roboguice.inject.InjectView;
-
 import com.google.inject.Inject;
-
 import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
-import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
-import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
@@ -49,7 +38,13 @@ import org.adullact.iparapheur.tab.ui.office.OfficeFacetsFragment.OnSelectionCha
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OfficeFolderListAdapter;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderDisplayRequestListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeFolderListFragment.OnFolderSelectionChange;
-import roboguice.util.Strings;
+import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
+import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.java.toolbox.Strings;
+import roboguice.inject.InjectFragment;
+import roboguice.inject.InjectView;
 
 public class OfficeActivity
         extends RoboFragmentActivity
@@ -162,10 +157,10 @@ public class OfficeActivity
             if ( folder.requestedActionSupported() ) {
                 switch ( folder.getRequestedAction() ) {
                     case SIGNATURE:
-                        folderPositiveButton.setText( "Signer" );
+                        folderPositiveButton.setText( getResources().getString( R.string.actions_sign ) );
                         break;
                     case VISA:
-                        folderPositiveButton.setText( "Viser" );
+                        folderPositiveButton.setText( getResources().getString( R.string.actions_visa ) );
                         break;
                 }
                 folderPositiveButton.setOnClickListener( new View.OnClickListener()
@@ -178,7 +173,7 @@ public class OfficeActivity
 
                 } );
                 folderPositiveButton.setVisibility( View.VISIBLE );
-                folderNegativeButton.setText( "Rejeter" );
+                folderNegativeButton.setText( getResources().getString( R.string.actions_reject ) );
                 folderNegativeButton.setOnClickListener( new View.OnClickListener()
                 {
 
@@ -201,11 +196,27 @@ public class OfficeActivity
 
             } );
             StringBuilder details = new StringBuilder();
-            details.append( "<p><b>Type</b> " ).append( folder.getBusinessType() ).append( "</p>" );
-            details.append( "<p><b>Sous-type</b> " ).append( folder.getBusinessSubType() ).append( "</p>" );
-            details.append( "<p><b>Date de création</b> " ).append( folder.getDisplayCreationDate() ).append( "</p>" );
+            details.append( "<p><b>" ).
+                    append( getResources().getString( R.string.folder_type ) ).
+                    append( "</b> " ).
+                    append( folder.getBusinessType() ).
+                    append( "</p>" );
+            details.append( "<p><b>" ).
+                    append( getResources().getString( R.string.folder_subtype ) ).
+                    append( "</b> " ).
+                    append( folder.getBusinessSubType() ).
+                    append( "</p>" );
+            details.append( "<p><b>" ).
+                    append( getResources().getString( R.string.folder_creation_date ) ).
+                    append( "</b> " ).
+                    append( folder.getDisplayCreationDate() ).
+                    append( "</p>" );
             if ( folder.getDueDate() != null ) {
-                details.append( "<p><b>Date limite</b> " ).append( folder.getDisplayDueDate() ).append( "</p>" );
+                details.append( "<p><b>" ).
+                        append( getResources().getString( R.string.folder_due_date ) ).
+                        append( "</b> " ).
+                        append( folder.getDisplayDueDate() ).
+                        append( "</p>" );
             }
             folderDetails.setText( Html.fromHtml( details.toString() ) );
             folderDetails.setVisibility( View.VISIBLE );
@@ -227,18 +238,54 @@ public class OfficeActivity
             {
                 if ( result.hasError() ) {
                     UserErrorDialogFactory.show( OfficeActivity.this,
-                                                 "Le chargement de ce bureau a échoué", result.getErrors(),
-                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
+                                                 getResources().getString( R.string.office_loading_error ),
+                                                 result.getErrors(),
+                                                 getResources().getString( R.string.words_retry ), refresh,
+                                                 getResources().getString( R.string.dashboard ), dashboard );
                     return;
                 }
                 Progression progression = result.getResult();
                 if ( progression.getFolderIdentity().equals( currentFolder.getIdentity() ) ) {
                     if ( !progression.isEmpty() ) {
-                        folderProgression.setText( Html.fromHtml( progression.toHtml() ) );
+                        StringBuilder progressionSummary = new StringBuilder();
+                        DateFormat dateFormat = new SimpleDateFormat( "dd MMM" );
+                        progressionSummary.append( "<p><b>" ).
+                                append( getResources().getString( R.string.folder_progression ) ).
+                                append( "</b></p>" );
+                        for ( Progression.Step step : progression ) {
+                            progressionSummary.append( "<p>" );
+                            switch ( step.getAction() ) {
+                                case VISA:
+                                    progressionSummary.append( "<b>" ).
+                                            append( getResources().getString( R.string.actions_visa_noun ) ).
+                                            append( "</b> " );
+                                    break;
+                                case SIGNATURE:
+                                    progressionSummary.append( "<b>" ).
+                                            append( getResources().getString( R.string.actions_sign_noun ) ).
+                                            append( "</b> " );
+                                    break;
+                                default:
+                            }
+                            progressionSummary.append( step.getOfficeName() );
+                            if ( step.isApproved() ) {
+                                progressionSummary.append( " (" ).
+                                        append( getResources().getString( R.string.folder_progression_approved_at ) ).
+                                        append( Strings.SPACE ).
+                                        append( dateFormat.format( step.getValidationDate() ) ).
+                                        append( ")" );
+                            }
+                            progressionSummary.append( "</p>" );
+                        }
+                        folderProgression.setText( Html.fromHtml( progressionSummary.toString() ) );
                         folderProgression.setVisibility( TextView.VISIBLE );
                     }
                     if ( !Strings.isEmpty( progression.getPrivateAnnotation() ) ) {
-                        folderPrivateAnnotation.setText( Html.fromHtml( "<p><b>Annotation privée</b></p>" + progression.getPrivateAnnotation() ) );
+                        folderPrivateAnnotation.setText( Html.fromHtml(
+                                "<p><b>"
+                                + getResources().getString( R.string.folder_progression_private_annotation )
+                                + "</b></p>"
+                                + progression.getPrivateAnnotation() ) );
                         folderPrivateAnnotation.setVisibility( TextView.VISIBLE );
                     }
                 }
@@ -261,13 +308,13 @@ public class OfficeActivity
                 if ( lambda.requestedActionSupported() ) {
                     switch ( lambda.getRequestedAction() ) {
                         case SIGNATURE:
-                            batchPositiveButton.setText( "Signer le lot" );
+                            batchPositiveButton.setText( getResources().getString( R.string.actions_sign_batch ) );
                             break;
                         case VISA:
-                            batchPositiveButton.setText( "Viser le lot" );
+                            batchPositiveButton.setText( getResources().getString( R.string.actions_visa_batch ) );
                             break;
                     }
-                    batchNegativeButton.setText( "Rejeter le lot" );
+                    batchNegativeButton.setText( getResources().getString( R.string.actions_reject_batch ) );
                     batchPositiveButton.setOnClickListener( new View.OnClickListener()
                     {
 
@@ -372,8 +419,11 @@ public class OfficeActivity
             protected void afterDialogDismiss( AsyncTaskResult<OfficeData, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
-                    UserErrorDialogFactory.show( context, "Le chargement de ce bureau a échoué", result.getErrors(),
-                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
+                    UserErrorDialogFactory.show( context,
+                                                 getResources().getString( R.string.office_loading_error ),
+                                                 result.getErrors(),
+                                                 getResources().getString( R.string.words_retry ), refresh,
+                                                 getResources().getString( R.string.dashboard ), dashboard );
                 }
             }
 

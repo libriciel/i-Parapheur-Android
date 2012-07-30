@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.adullact.iparapheur.tab.model.Folder;
 
 /* package */ class OfficeData

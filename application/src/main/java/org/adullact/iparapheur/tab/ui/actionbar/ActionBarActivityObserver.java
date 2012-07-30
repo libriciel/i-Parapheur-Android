@@ -1,8 +1,5 @@
 package org.adullact.iparapheur.tab.ui.actionbar;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,17 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-
-import roboguice.event.Observes;
-import roboguice.inject.ContextSingleton;
-
 import com.google.inject.Inject;
-
 import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.activity.event.OnCreateOptionsMenuEvent;
-import org.codeartisans.android.toolbox.activity.event.OnOptionsItemSelectedEvent;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.adullact.iparapheur.tab.IParapheurTabBuildInfo;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.ui.Refreshable;
@@ -30,6 +20,10 @@ import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderActivity;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
 import org.adullact.iparapheur.tab.ui.settings.AccountsActivity;
+import org.codeartisans.android.toolbox.activity.event.OnCreateOptionsMenuEvent;
+import org.codeartisans.android.toolbox.activity.event.OnOptionsItemSelectedEvent;
+import roboguice.event.Observes;
+import roboguice.inject.ContextSingleton;
 
 @ContextSingleton
 public class ActionBarActivityObserver
@@ -85,7 +79,7 @@ public class ActionBarActivityObserver
 
     private void addRefreshAction( Menu menu )
     {
-        MenuItem refresh = menu.add( "Rafraichir" );
+        MenuItem refresh = menu.add( activity.getResources().getString( R.string.words_refresh ) );
         refresh.setShowAsAction( MenuItem.SHOW_AS_ACTION_ALWAYS );
         refresh.setIcon( R.drawable.ic_refresh );
         refresh.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener()
@@ -102,7 +96,7 @@ public class ActionBarActivityObserver
 
     private void addAccountsAction( Menu menu )
     {
-        MenuItem accounts = menu.add( "Comptes" );
+        MenuItem accounts = menu.add( activity.getResources().getString( R.string.accounts ) );
         accounts.setShowAsAction( MenuItem.SHOW_AS_ACTION_NEVER );
         accounts.setIcon( R.drawable.ic_accounts ); // Won't be shown as Android don't want icons in the overflow menu
         accounts.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener()
@@ -119,7 +113,7 @@ public class ActionBarActivityObserver
 
     private void addAboutAction( Menu menu )
     {
-        MenuItem about = menu.add( "À propos" );
+        MenuItem about = menu.add( activity.getResources().getString( R.string.words_about ) );
         about.setShowAsAction( MenuItem.SHOW_AS_ACTION_NEVER );
         about.setIcon( R.drawable.icon );
         about.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener()
@@ -142,7 +136,8 @@ public class ActionBarActivityObserver
                 builder.setTitle( title.toString() );
                 builder.setIcon( R.drawable.icon );
                 builder.setView( aboutLayout );
-                builder.setPositiveButton( "Fermer", new DialogInterface.OnClickListener()
+                builder.setPositiveButton( activity.getResources().getString( R.string.words_close ),
+                                           new DialogInterface.OnClickListener()
                 {
 
                     public void onClick( DialogInterface dialog, int id )

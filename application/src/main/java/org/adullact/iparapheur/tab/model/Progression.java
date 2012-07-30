@@ -1,8 +1,6 @@
 package org.adullact.iparapheur.tab.model;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,33 +39,6 @@ public class Progression
     public String toString()
     {
         return "Progression{" + "folderIdentity=" + folderIdentity + ", privAnnotation=" + privAnnotation + ", steps=" + Arrays.toString( toArray() ) + '}';
-    }
-
-    public String toHtml()
-    {
-        StringBuilder sb = new StringBuilder();
-        if ( size() > 0 ) {
-            DateFormat dateFormat = new SimpleDateFormat( "dd MMM" );
-            sb.append( "<p><b>Circuit</b></p>" );
-            for ( Step step : this ) {
-                sb.append( "<p>" );
-                switch ( step.action ) {
-                    case VISA:
-                        sb.append( "<b>Visa</b> " );
-                        break;
-                    case SIGNATURE:
-                        sb.append( "<b>Signature</b> " );
-                        break;
-                    default:
-                }
-                sb.append( step.officeName );
-                if ( step.approved ) {
-                    sb.append( " (Approuvé le " ).append( dateFormat.format( step.validationDate ) ).append( ")" );
-                }
-                sb.append( "</p>" );
-            }
-        }
-        return sb.toString();
     }
 
     public static class Step

@@ -1,12 +1,13 @@
 package org.adullact.iparapheur.tab.logging;
 
-import java.util.Properties;
-
 import android.content.Context;
-
 import de.akquinet.android.androlog.reporter.Report;
 import de.akquinet.android.androlog.reporter.Reporter;
+import java.util.Properties;
 
+/**
+ * This is a base Reporter provided as an example.
+ */
 public class IParapheurReporter
         implements Reporter
 {

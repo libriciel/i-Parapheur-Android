@@ -3,7 +3,6 @@ package org.adullact.iparapheur.tab.model;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.codeartisans.java.toolbox.Strings;
 
 public class Account

@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import java.util.Collections;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,22 +9,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
-
-import roboguice.inject.InjectFragment;
-import roboguice.inject.InjectView;
-
 import com.google.inject.Inject;
-
-import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
-import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
-import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.AutoQuotaGrowWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ChainedWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ConsoleAndrologWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebViewSupport.JSInjectWebViewClient;
-import org.json.JSONObject;
-
+import java.util.Collections;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
@@ -41,6 +25,18 @@ import org.adullact.iparapheur.tab.ui.dashboard.DashboardActivity;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.FolderListAdapter;
 import org.adullact.iparapheur.tab.ui.folder.FolderFileListFragment.OnFileDisplayRequestListener;
 import org.adullact.iparapheur.tab.ui.office.OfficeActivity;
+import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
+import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
+import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.AutoQuotaGrowWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ChainedWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ConsoleAndrologWebChromeClient;
+import org.codeartisans.android.toolbox.webkit.WebViewSupport.JSInjectWebViewClient;
+import org.codeartisans.java.toolbox.Strings;
+import org.json.JSONObject;
+import roboguice.inject.InjectFragment;
+import roboguice.inject.InjectView;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -166,8 +162,8 @@ public class FolderActivity
     public void refresh()
     {
         // Clear View
-        topSummaryLeft.setText( "" );
-        topSummaryRight.setText( "" );
+        topSummaryLeft.setText( Strings.EMPTY );
+        topSummaryRight.setText( Strings.EMPTY );
         positiveButton.setVisibility( View.INVISIBLE );
         negativeButton.setVisibility( View.INVISIBLE );
         fileWebView.clearView();
@@ -190,17 +186,19 @@ public class FolderActivity
                     }
                     switch ( folder.getRequestedAction() ) {
                         case SIGNATURE:
-                            positiveButton.setText( "Signer" );
+                            positiveButton.setText( getResources().getString( R.string.actions_sign ) );
                             break;
                         case VISA:
-                            positiveButton.setText( "Viser" );
+                            positiveButton.setText( getResources().getString( R.string.actions_visa ) );
                             break;
                     }
                     topSummaryLeft.setText( Html.fromHtml( "<b>" + folder.getBusinessType() + "</b><br/>" + folder.getBusinessSubType() ) );
                     StringBuilder summaryRight = new StringBuilder();
-                    summaryRight.append( "<b>Créé le</b> " ).append( folder.getDisplayCreationDate() );
+                    summaryRight.append( "<b>" ).append( getResources().getString( R.string.folder_created_at ) ).
+                            append( "</b> " ).append( folder.getDisplayCreationDate() );
                     if ( folder.getDueDate() != null ) {
-                        summaryRight.append( "<br/><b>A traiter avant le</b> " ).append( folder.getDisplayDueDate() );
+                        summaryRight.append( "<br/><b>" ).append( getResources().getString( R.string.folder_todo_before ) ).
+                                append( "</b> " ).append( folder.getDisplayDueDate() );
                     }
                     topSummaryRight.setText( Html.fromHtml( summaryRight.toString() ) );
                     folderFileListFragment.setListAdapter( new FolderListAdapter( context, folder.getAllFiles() ) );
@@ -248,8 +246,10 @@ public class FolderActivity
             protected void afterDialogDismiss( AsyncTaskResult<Folder, IParapheurTabException> result )
             {
                 if ( result.hasError() ) {
-                    UserErrorDialogFactory.show( context, "Le chargement de ce dossier a échoué", result.getErrors(),
-                                                 "Réessayer", refresh, "Tableau de bord", dashboard );
+                    UserErrorDialogFactory.show( context, getResources().getString( R.string.folder_loading_error ),
+                                                 result.getErrors(),
+                                                 getResources().getString( R.string.words_retry ), refresh,
+                                                 getResources().getString( R.string.dashboard ), dashboard );
                 }
             }
 

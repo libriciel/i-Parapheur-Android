@@ -167,13 +167,17 @@ public class OfficeFolderListFragment
                             if ( !folder.requestedActionSupported() ) {
                                 // Ensure suported action
                                 checkbox.setChecked( false );
-                                Toast.makeText( listFragment.getActivity(), "Vous ne pouvez pas séléctionner des dossiers dont les actions demandées ne sont pas supportées.", Toast.LENGTH_SHORT ).show();
+                                Toast.makeText( listFragment.getActivity(),
+                                                listFragment.getResources().getString( R.string.office_batch_different_actions ),
+                                                Toast.LENGTH_SHORT ).show();
                                 return;
                             } else if ( !selectedFolders.isEmpty() ) {
                                 // Ensure same bulk action
                                 if ( selectedFolders.get( 0 ).getRequestedAction() != folder.getRequestedAction() ) {
                                     checkbox.setChecked( false );
-                                    Toast.makeText( listFragment.getActivity(), "Vous ne pouvez pas séléctionner des dossiers dont les actions demandées sont différentes.", Toast.LENGTH_SHORT ).show();
+                                    Toast.makeText( listFragment.getActivity(),
+                                                    listFragment.getResources().getString( R.string.office_batch_unsupported_actions ),
+                                                    Toast.LENGTH_SHORT ).show();
                                     return;
                                 }
                             }

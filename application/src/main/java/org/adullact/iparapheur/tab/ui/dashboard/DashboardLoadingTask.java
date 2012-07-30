@@ -1,22 +1,20 @@
 package org.adullact.iparapheur.tab.ui.dashboard;
 
+import de.akquinet.android.androlog.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
-
 import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Community;
 import org.adullact.iparapheur.tab.model.Office;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
 public class DashboardLoadingTask
         extends AsyncTaskWithMessageDialog<Void, String, AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException>>
@@ -28,7 +26,7 @@ public class DashboardLoadingTask
 
     public DashboardLoadingTask( DashboardActivity context, AccountsRepository accountsRepository, IParapheurHttpClient iParapheurClient )
     {
-        super( context, "Veuillez patienter" );
+        super( context, context.getResources().getString( R.string.words_wait ) );
         this.accountsRepository = accountsRepository;
         this.iParapheurClient = iParapheurClient;
     }
@@ -36,7 +34,8 @@ public class DashboardLoadingTask
     @Override
     protected AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException> doInBackground( Void... paramss )
     {
-        publishProgress( "Chargement des bureaux" );
+        String loadingMessage = context.getResources().getString( R.string.dashboard_loading );
+        publishProgress( loadingMessage );
 
         final Map<Community, List<Office>> result = new HashMap<Community, List<Office>>();
         List<Account> accounts = accountsRepository.all();
@@ -52,7 +51,7 @@ public class DashboardLoadingTask
 
             try {
 
-                publishProgress( "Chargement des bureaux (" + eachAccount.getTitle() + ")" );
+                publishProgress( loadingMessage + " (" + eachAccount.getTitle() + ")" );
 
                 List<Office> offices = iParapheurClient.fetchOffices( eachAccount );
 
@@ -74,7 +73,7 @@ public class DashboardLoadingTask
             }
 
         }
-        publishProgress( "Chargement des bureaux terminé" );
+        publishProgress( context.getResources().getString( R.string.dashboard_loading_done ) );
         return new AsyncTaskResult<Map<Community, List<Office>>, IParapheurTabException>( result, errors );
     }
 

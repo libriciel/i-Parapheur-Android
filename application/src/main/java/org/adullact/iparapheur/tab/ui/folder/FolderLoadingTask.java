@@ -1,18 +1,16 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import java.io.Serializable;
-
 import de.akquinet.android.androlog.Log;
-
-import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
-
+import java.io.Serializable;
 import org.adullact.iparapheur.tab.IParapheurTabException;
+import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Account;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.services.IParapheurHttpException;
+import org.codeartisans.android.toolbox.os.AsyncTaskResult;
+import org.codeartisans.android.toolbox.os.AsyncTaskWithMessageDialog;
 
 public class FolderLoadingTask
         extends AsyncTaskWithMessageDialog<FolderLoadingTask.Params, String, AsyncTaskResult<Folder, IParapheurTabException>>
@@ -48,7 +46,7 @@ public class FolderLoadingTask
 
     public FolderLoadingTask( FolderActivity context, AccountsRepository accountsRepository, IParapheurHttpClient iParapheurClient )
     {
-        super( context, "Veuillez patienter" );
+        super( context, context.getResources().getString( R.string.words_wait ) );
         this.accountsRepository = accountsRepository;
         this.iParapheurClient = iParapheurClient;
     }
@@ -56,7 +54,7 @@ public class FolderLoadingTask
     @Override
     protected AsyncTaskResult<Folder, IParapheurTabException> doInBackground( Params... parameters )
     {
-        publishProgress( "Chargement du dossier" );
+        publishProgress( context.getResources().getString( R.string.folder_loading ) );
         try {
 
             Params params = parameters[0];
