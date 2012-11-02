@@ -36,6 +36,10 @@
     <string name="actions_visa_batch">Viser le lot</string>
     <string name="actions_visa_error">Le visa de ce dossier a échoué</string>
     <string name="actions_visa_error_batch">Le visa de ce lot a échoué</string>
+
+    <string name="actions_tdt_noun">Télétransmission</string>
+    <string name="actions_archive_noun">Archivage</string>
+    <string name="actions_mailsec_noun">Envoi par mail-sécurisé</string>
     
     <string name="actions_reject_sign_noun">Rejet de signature</string>
     <string name="actions_reject_visa_noun">Rejet de visa</string>
@@ -47,7 +51,9 @@
     
     <!-- Accounts -->
     <string name="account_new">Nouveau Compte</string>
-    <string name="account_none">Aucun compte iParapheur configuré.</string>
+    <string name="account_none"><![CDATA[ <p><h2>Bienvenue sur l\'application i-Parapheur ADULLACT.</h2></p>
+        <p>Aucun compte i-Parapheur n\'est configuré.<br>
+           Veuillez ajouter un compte, depuis le menu déroulant.</p>]]></string>
     <string name="accounts">Comptes</string>
     <string name="account_name">Nom du compte</string>
     <string name="account_url">Adresse du serveur</string>
@@ -78,9 +84,11 @@
     <string name="folder_type">Type</string>
     <string name="folder_subtype">Sous-type</string>
     <string name="folder_creation_date">Date de création</string>
-    <string name="folder_due_date">Date limite</string>
-    <string name="folder_progression">Circuit</string>
+    <string name="folder_due_date">Date limite d\'instruction</string>
+    <string name="folder_progression">Circuit de validation</string>
     <string name="folder_progression_approved_at">Approuvé le</string>
+    <string name="folder_progression_by">par</string>
+    <string name="folder_progression_public_annotation">Annotation</string>
     <string name="folder_progression_private_annotation">Annotation privée</string>
     
 </resources>

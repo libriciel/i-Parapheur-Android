@@ -5,22 +5,10 @@ import de.akquinet.android.androlog.Log;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
-import org.adullact.iparapheur.tab.model.Account;
-import org.adullact.iparapheur.tab.model.Folder;
-import org.adullact.iparapheur.tab.model.FolderDocument;
-import org.adullact.iparapheur.tab.model.FolderRequestedAction;
-import org.adullact.iparapheur.tab.model.Office;
-import org.adullact.iparapheur.tab.model.OfficeFacetChoices;
-import org.adullact.iparapheur.tab.model.Progression;
+import org.adullact.iparapheur.tab.model.*;
 import org.adullact.iparapheur.tab.model.Progression.Step;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -87,8 +75,10 @@ public class IParapheurHttpClient
 
             // Process response
             List<Office> result = new ArrayList<Office>();
-            if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "bureaux" ) ) {
-                JSONArray bureaux = json.getJSONObject( "data" ).getJSONArray( "bureaux" );
+            // stv: API change from oct.2012
+            //if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "bureaux" ) ) {
+            if ( json.has( "bureaux" ) ) {
+                JSONArray bureaux = json.getJSONArray( "bureaux" );
                 for ( int idx = 0; idx < bureaux.length(); idx++ ) {
                     JSONObject eachBureau = bureaux.getJSONObject( idx );
                     String identity = eachBureau.getString( "nodeRef" );
@@ -101,6 +91,9 @@ public class IParapheurHttpClient
                     String image = eachBureau.optString( "image" );
                     Integer todoFolderCount = eachBureau.getInt( "a_traiter" );
                     Integer lateFolderCount = eachBureau.getInt( "en_retard" );
+                    // // new: a_archiver et retournes
+                    //Integer doneFolderCount = eachBureau.getInt( "a_archiver" );
+                    //Integer failFolderCount = eachBureau.getInt( "retournes" );
 
                     Office office = new Office( identity, title, community, account.getIdentity() );
                     office.setDescription( description );
@@ -264,23 +257,30 @@ public class IParapheurHttpClient
                     // Json data
                     String dateValidation = step.getString( "dateValidation" );
                     String parapheurName = step.getString( "parapheurName" );
+                    String signataire = step.optString( "signataire" );
                     boolean approved = step.getBoolean( "approved" );
                     String annotPub = step.optString( "annotPub" );
                     String actionDemandee = step.getString( "actionDemandee" );
 
                     // Model data
                     Date validationDate = parseISO8601Date( dateValidation );
-                    FolderRequestedAction requestedAction = null;
+                    FolderRequestedAction requestedAction;
                     if ( "VISA".equals( actionDemandee ) ) {
                         requestedAction = FolderRequestedAction.VISA;
                     } else if ( "SIGNATURE".equals( actionDemandee ) ) {
                         requestedAction = FolderRequestedAction.SIGNATURE;
+                    } else if ( "TDT".equals( actionDemandee ) ) {
+                        requestedAction = FolderRequestedAction.TDT;
+                    } else if ( "ARCHIVAGE".equals( actionDemandee ) ) {
+                        requestedAction = FolderRequestedAction.ARCHIVAGE;
+                    } else if ( "MAILSEC".equals( actionDemandee ) ) {
+                        requestedAction = FolderRequestedAction.MAILSEC;
                     } else {
                         // WARN Unsupported FolderRequestedAction
                         requestedAction = FolderRequestedAction.UNSUPPORTED;
                     }
 
-                    progression.add( new Step( validationDate, approved, parapheurName, requestedAction, annotPub ) );
+                    progression.add( new Step( validationDate, approved, parapheurName, signataire, requestedAction, annotPub ) );
                 }
             }
             return progression;
@@ -408,13 +408,14 @@ public class IParapheurHttpClient
         if ( Strings.isEmpty( dueDate ) || "null".equals( dueDate ) ) {
             dueDate = null;
         }
-        FolderRequestedAction requestedAction = null;
+        FolderRequestedAction requestedAction;
         if ( "VISA".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.VISA;
         } else if ( "SIGNATURE".equals( actionDemandee ) ) {
             requestedAction = FolderRequestedAction.SIGNATURE;
         } else {
             // WARN Unsupported FolderRequestedAction
+            
             requestedAction = FolderRequestedAction.UNSUPPORTED;
         }
         Folder folder = new Folder( identity, title, requestedAction, type, subtype, parseISO8601Date( creationDate ), parseISO8601Date( dueDate ) );
@@ -424,18 +425,38 @@ public class IParapheurHttpClient
                 JSONObject doc = documents.getJSONObject( index );
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
-                FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/html/file_viewer.html" );
-                if ( doc.has( "images" ) ) {
-                    List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
-                    JSONArray images = doc.getJSONArray( "images" );
-                    for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
-                        JSONObject image = images.getJSONObject( indexImages );
-                        FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
-                        pageImages.add( folderFilePageImage );
+                /**
+                 * FIXME plus tard: pour le moment, il n'y a QU'UN SEUL DOCUMENT, les autres pieces sont necessairement des ANNEXES !
+                 */
+                if (index==0) {
+                    FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/html/file_viewer.html" );
+                    if ( doc.has( "images" ) ) {
+                        List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
+                        JSONArray images = doc.getJSONArray( "images" );
+                        for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
+                            JSONObject image = images.getJSONObject( indexImages );
+                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
+                            pageImages.add( folderFilePageImage );
+                        }
+                        folderDocument.setPageImages( pageImages );
                     }
-                    folderDocument.setPageImages( pageImages );
+                    folder.addDocument( folderDocument );
                 }
-                folder.addDocument( folderDocument );
+                else {
+                    // EN ATTENDANT LE SUPPORT DE MULTIPLES PIECES PRINCIPALES: LES AUTRES DOCS SONT DES ANNEXES
+                    FolderAnnex folderDocument = new FolderAnnex( docName, docSize, "file:///android_asset/html/file_viewer.html" );
+                    if ( doc.has( "images" ) ) {
+                        List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
+                        JSONArray images = doc.getJSONArray( "images" );
+                        for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
+                            JSONObject image = images.getJSONObject( indexImages );
+                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
+                            pageImages.add( folderFilePageImage );
+                        }
+                        folderDocument.setPageImages( pageImages );
+                    }
+                    folder.addAnnex( folderDocument );
+                }
             }
         }
         return folder;
