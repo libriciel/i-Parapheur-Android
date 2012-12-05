@@ -516,13 +516,15 @@ public class OfficeActivity
     private void positiveAction( List<Folder> folders )
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
-        actionsDialogFactory.buildActionDialog( accountIdentity, folders ).show();
+        String officeIdentity = getIntent().getExtras().getString(EXTRA_OFFICE_IDENTITY);
+        actionsDialogFactory.buildActionDialog( accountIdentity, officeIdentity, folders ).show();
     }
 
     private void negativeAction( List<Folder> folders )
     {
         String accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
-        actionsDialogFactory.buildRejectDialog( accountIdentity, folders ).show();
+        String officeIdentity = getIntent().getExtras().getString(EXTRA_OFFICE_IDENTITY);
+        actionsDialogFactory.buildRejectDialog( accountIdentity, officeIdentity, folders ).show();
     }
 
     private void openAction( Folder folder )

@@ -94,6 +94,8 @@ public class FolderActivity
     private String accountIdentity;
 
     private String folderIdentity;
+    
+    private String officeIdentity;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -103,7 +105,7 @@ public class FolderActivity
         // Gather Intent Extras
         accountIdentity = getIntent().getExtras().getString( EXTRA_ACCOUNT_IDENTITY );
         String officeTitle = getIntent().getExtras().getString( EXTRA_OFFICE_TITLE );
-        String officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
+        officeIdentity = getIntent().getExtras().getString( EXTRA_OFFICE_IDENTITY );
         String folderTitle = getIntent().getExtras().getString( EXTRA_FOLDER_TITLE );
         folderIdentity = getIntent().getExtras().getString( EXTRA_FOLDER_IDENTITY );
 
@@ -142,7 +144,7 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                actionsDialogFactory.buildActionDialog( accountIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
+                actionsDialogFactory.buildActionDialog( accountIdentity, officeIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
             }
 
         } );
@@ -151,7 +153,7 @@ public class FolderActivity
 
             public void onClick( View view )
             {
-                actionsDialogFactory.buildRejectDialog( accountIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
+                actionsDialogFactory.buildRejectDialog( accountIdentity, officeIdentity, Collections.singletonList( currentFolder ), successIntent ).show();
             }
 
         } );
@@ -253,7 +255,7 @@ public class FolderActivity
                 }
             }
 
-        }.execute( new FolderLoadingTask.Params( accountIdentity, folderIdentity ) );
+        }.execute( new FolderLoadingTask.Params( accountIdentity, folderIdentity, officeIdentity ) );
     }
 
     private void displayFile( AbstractFolderFile file )

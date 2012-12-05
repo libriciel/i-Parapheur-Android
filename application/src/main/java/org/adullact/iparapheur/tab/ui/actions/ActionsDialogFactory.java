@@ -36,27 +36,27 @@ public class ActionsDialogFactory
     @Inject
     private IParapheurHttpClient iParapheurClient;
 
-    public Dialog buildActionDialog( String accountIdentity, List<Folder> folders )
+    public Dialog buildActionDialog( String accountIdentity, final String officeIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folders, true, null );
+        return buildDialog( accountIdentity, officeIdentity, folders, true, null );
     }
 
-    public Dialog buildRejectDialog( String accountIdentity, List<Folder> folders )
+    public Dialog buildRejectDialog( String accountIdentity, final String officeIdentity, List<Folder> folders )
     {
-        return buildDialog( accountIdentity, folders, false, null );
+        return buildDialog( accountIdentity, officeIdentity, folders, false, null );
     }
 
-    public Dialog buildActionDialog( String accountIdentity, List<Folder> folders, Intent successIntent )
+    public Dialog buildActionDialog( String accountIdentity, final String officeIdentity, List<Folder> folders, Intent successIntent )
     {
-        return buildDialog( accountIdentity, folders, true, successIntent );
+        return buildDialog( accountIdentity, officeIdentity, folders, true, successIntent );
     }
 
-    public Dialog buildRejectDialog( String accountIdentity, List<Folder> folders, Intent successIntent )
+    public Dialog buildRejectDialog( String accountIdentity, final String officeIdentity, List<Folder> folders, Intent successIntent )
     {
-        return buildDialog( accountIdentity, folders, false, successIntent );
+        return buildDialog( accountIdentity, officeIdentity, folders, false, successIntent );
     }
 
-    private Dialog buildDialog( final String accountIdentity, final List<Folder> folders, boolean accept, final Intent successIntent )
+    private Dialog buildDialog( final String accountIdentity, final String officeIdentity, final List<Folder> folders, boolean accept, final Intent successIntent )
     {
         if ( folders == null || folders.isEmpty() ) {
             throw new IllegalArgumentException( "Cannot build an Action Dialog without any Folder." );
@@ -95,7 +95,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
+                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
                         }
 
                     } );
@@ -110,7 +110,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
                         }
 
                     } );
@@ -128,7 +128,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
+                            doVisa( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
                         }
 
                     } );
@@ -143,7 +143,7 @@ public class ActionsDialogFactory
 
                         public void onClick( final DialogInterface dialog, int id )
                         {
-                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), successIntent, identities( folders ) );
+                            doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
                         }
 
                     } );
@@ -167,7 +167,7 @@ public class ActionsDialogFactory
         return identities;
     }
 
-    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
+    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String officeIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
     {
         new SignTask( activity, accountsRepository, iParapheurClient )
         {
@@ -203,7 +203,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
+                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, officeIdentity, successIntent, folderIdentities );
                         }
 
                     } );
@@ -226,10 +226,10 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, officeIdentity, folderIdentities ) );
     }
 
-    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
+    private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String officeIdentity, final Intent successIntent, final String... folderIdentities )
     {
         new VisaTask( activity, accountsRepository, iParapheurClient )
         {
@@ -265,7 +265,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
+                            doVisa( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, officeIdentity, successIntent, folderIdentities );
                         }
 
                     } );
@@ -288,10 +288,10 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, officeIdentity, folderIdentities ) );
     }
 
-    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
+    private void doReject( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String officeIdentity, final Intent successIntent, final String... folderIdentities )
     {
         new RejectTask( activity, accountsRepository, iParapheurClient )
         {
@@ -327,7 +327,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, successIntent, folderIdentities );
+                            doReject( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, officeIdentity, successIntent, folderIdentities );
                         }
 
                     } );
@@ -350,7 +350,7 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, folderIdentities ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, officeIdentity, folderIdentities ) );
     }
 
 }

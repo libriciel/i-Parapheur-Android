@@ -166,7 +166,7 @@ public class IParapheurHttpClient
         try {
 
             // Prepare request body
-            String requestBody = "{'bureauRef': '" + officeIdentity
+            String requestBody = "{'bureauCourant': '" + officeIdentity
                                  + "', 'filters': " + folderFilterMapper.buildFilters( facetSelection )
                                  + ", 'page': " + page
                                  + ", 'pageSize': " + pageSize + "}";
@@ -180,8 +180,8 @@ public class IParapheurHttpClient
 
             // Process response
             List<Folder> result = new ArrayList<Folder>();
-            if ( json.has( "data" ) && json.getJSONObject( "data" ).has( "dossiers" ) ) {
-                JSONArray dossiers = json.getJSONObject( "data" ).getJSONArray( "dossiers" );
+            if ( json.has( "dossiers" ) ) {
+                JSONArray dossiers = json.getJSONArray( "dossiers" );
                 for ( int idx = 0; idx < dossiers.length(); idx++ ) {
                     JSONObject eachDossier = dossiers.getJSONObject( idx );
                     Folder folder = folderFromJSON( account, eachDossier );
@@ -199,26 +199,27 @@ public class IParapheurHttpClient
         }
     }
 
-    public Folder fetchFolder( Account account, String folderIdentity )
+    public Folder fetchFolder( Account account, String folderIdentity, String officeIdentity )
             throws IParapheurHttpException
     {
+        NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
         NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
         StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
         staticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
-            String requestBody = "{'dossierRef': '" + folderIdentity + "'}";
+            String requestBody = "{'dossier': '" + folderIdentity
+                                 + ", 'bureauCourant' : '" + officeIdentity + "'}";
             Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDER_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, FOLDER_PATH ) );
             HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
-            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject dossier = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
 
             // Process response
-            JSONObject dossier = json.getJSONObject( "data" );
             return folderFromJSON( account, dossier );
 
         } catch ( JSONException ex ) {
@@ -236,17 +237,16 @@ public class IParapheurHttpClient
         try {
 
             // Prepare request body
-            String requestBody = "{'dossierRef': '" + folderIdentity + "'}";
+            String requestBody = "{'dossier': '" + folderIdentity + "'}";
             Log.d( IParapheurHttpClient.class, "REQUEST on " + PROGRESSION_PATH + ": " + requestBody );
 
             // Execute HTTP request
             HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, PROGRESSION_PATH ) );
             HttpEntity data = new StringEntity( requestBody, "UTF-8" );
             post.setEntity( data );
-            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject jsonData = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
 
             // Process response
-            JSONObject jsonData = json.getJSONObject( "data" );
             String privAnnotation = jsonData.optString( "annotPriv" );
             Progression progression = new Progression( folderIdentity, privAnnotation );
             JSONArray circuit = jsonData.optJSONArray( "circuit" );
@@ -292,14 +292,14 @@ public class IParapheurHttpClient
         }
     }
 
-    public void sign( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    public void sign( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
         StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
         staticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + SIGN_PATH + ": " + requestBody );
 
             // Execute HTTP request
@@ -320,14 +320,14 @@ public class IParapheurHttpClient
         }
     }
 
-    public void visa( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    public void visa( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
         StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
         staticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + VISA_PATH + ": " + requestBody );
 
             // Execute HTTP request
@@ -348,14 +348,14 @@ public class IParapheurHttpClient
         }
     }
 
-    public void reject( Account account, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    public void reject( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
         StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
         staticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, folderIdentities );
+            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + REJECT_PATH + ": " + requestBody );
 
             // Execute HTTP request
@@ -375,7 +375,7 @@ public class IParapheurHttpClient
         }
     }
 
-    private String prepareSignVisaRejectRequestBody( String pubAnnotation, String privAnnotation, String... folderIdentities )
+    private String prepareSignVisaRejectRequestBody( String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
         NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
         try {
@@ -386,6 +386,7 @@ public class IParapheurHttpClient
                 dossiers.put( folderId );
             }
             json.put( "dossiers", dossiers );
+            json.put( "bureauCourant", bureauCourant);
             json.put( "annotPub", pubAnnotation == null ? Strings.EMPTY : pubAnnotation );
             json.put( "annotPriv", privAnnotation == null ? Strings.EMPTY : privAnnotation );
             return json.toString();

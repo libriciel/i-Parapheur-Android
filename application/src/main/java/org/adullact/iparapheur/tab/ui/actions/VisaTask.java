@@ -27,7 +27,7 @@ public class VisaTask
             ActionTaskParam params = parameters[0];
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will visa folder with params: " + params + " using account: " + account );
-            iParapheurClient.visa( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities );
+            iParapheurClient.visa( account, params.pubAnnotation, params.privAnnotation, params.officeIdentity, params.folderIdentities );
             sleep( 1 );
             return new AsyncTaskResult<Void, IParapheurHttpException>( ( Void ) null );
 
