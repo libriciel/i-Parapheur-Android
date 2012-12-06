@@ -209,8 +209,10 @@ public class IParapheurHttpClient
         try {
 
             // Prepare request body
-            String requestBody = "{'dossier': '" + folderIdentity
-                                 + ", 'bureauCourant' : '" + officeIdentity + "'}";
+            // Apparement les -> " sont obligatoires sinon l'objet est interprété comme littéral
+            String requestBody = "{\"dossier\": \"" + folderIdentity
+                                 + "\", \"bureauCourant\" : \"" + officeIdentity + "\"}";
+            
             Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDER_PATH + ": " + requestBody );
 
             // Execute HTTP request
