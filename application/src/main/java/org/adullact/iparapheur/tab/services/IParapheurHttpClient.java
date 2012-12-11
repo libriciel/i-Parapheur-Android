@@ -1,11 +1,17 @@
 package org.adullact.iparapheur.tab.services;
 
+import android.content.Context;
 import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.cert.Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
 import org.adullact.iparapheur.tab.model.*;
@@ -49,6 +55,9 @@ public class IParapheurHttpClient
     private static final String REJECT_PATH = "/parapheur/api/reject";
 
     private final FolderFilterMapper folderFilterMapper;
+    
+    private HttpsURLConnection urlConnection;
+    
 
     @Inject
     public IParapheurHttpClient( FolderFilterMapper folderFilterMapper )
@@ -59,19 +68,15 @@ public class IParapheurHttpClient
     public List<Office> fetchOffices( Account account )
             throws IParapheurHttpException
     {
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
             String requestBody = "{'username': '" + account.getLogin() + "'}";
             Log.d( IParapheurHttpClient.class, "REQUEST on " + OFFICES_PATH + ": " + requestBody );
 
-            // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, OFFICES_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            //EXECUTE !
+            JSONObject json = StaticHttpClient.postToJson(account, OFFICES_PATH, requestBody);
 
             // Process response
             List<Office> result = new ArrayList<Office>();
@@ -107,8 +112,6 @@ public class IParapheurHttpClient
             }
             return result;
 
-        } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Offices " + account.getTitle() + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
@@ -117,8 +120,7 @@ public class IParapheurHttpClient
     public SortedMap<String, List<String>> fetchOfficeTypology( Account account, String officeIdentity )
     {
         NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -126,10 +128,7 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + TYPOLOGY_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, TYPOLOGY_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject json = StaticHttpClient.postToJson(account, TYPOLOGY_PATH, requestBody );
 
             // Process response
             SortedMap<String, List<String>> result = new TreeMap<String, List<String>>();
@@ -152,8 +151,6 @@ public class IParapheurHttpClient
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Office Typology " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
-        } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Office Typology" + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -161,8 +158,7 @@ public class IParapheurHttpClient
             throws IParapheurHttpException
     {
         NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -173,10 +169,7 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, FOLDERS_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            JSONObject json = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject json = StaticHttpClient.postToJson(account, FOLDERS_PATH, requestBody );
 
             // Process response
             List<Folder> result = new ArrayList<Folder>();
@@ -194,8 +187,6 @@ public class IParapheurHttpClient
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
-        } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Office " + officeIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
@@ -204,8 +195,7 @@ public class IParapheurHttpClient
     {
         NullArgumentException.ensureNotEmpty( "Office Identity", officeIdentity );
         NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -216,17 +206,12 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDER_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, FOLDER_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            JSONObject dossier = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject json = StaticHttpClient.postToJson( account, FOLDER_PATH, requestBody );
 
             // Process response
-            return folderFromJSON( account, dossier );
+            return folderFromJSON( account, json );
 
         } catch ( JSONException ex ) {
-            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
-        } catch ( IOException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
@@ -234,8 +219,7 @@ public class IParapheurHttpClient
     public Progression fetchFolderProgression( Account account, String folderIdentity )
     {
         NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -243,10 +227,7 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + PROGRESSION_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, PROGRESSION_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            JSONObject jsonData = staticHttpClient.httpClient.execute( post, StaticHttpClient.JSON_RESPONSE_HANDLER );
+            JSONObject jsonData = StaticHttpClient.postToJson(account, PROGRESSION_PATH, requestBody );
 
             // Process response
             String privAnnotation = jsonData.optString( "annotPriv" );
@@ -289,15 +270,12 @@ public class IParapheurHttpClient
 
         } catch ( JSONException ex ) {
             throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
-        } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
     public void sign( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -305,27 +283,23 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + SIGN_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, SIGN_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            HttpResponse response = staticHttpClient.httpClient.execute( post );
+            JSONObject jsonData = StaticHttpClient.postToJson(account, SIGN_PATH, requestBody );
 
             // Process response
-            if ( response.getStatusLine().getStatusCode() != 200 ) {
+            /*if ( response.getStatusLine().getStatusCode() != 200 ) {
                 throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities )
                                                    + " HTTP/" + response.getStatusLine().getStatusCode()
                                                    + " " + response.getStatusLine().getReasonPhrase() );
-            }
+            }*/
 
-        } catch ( IOException ex ) {
-            throw new IParapheurHttpException( "Sign " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        } catch (Exception e) {
+            
         }
     }
 
     public void visa( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -333,27 +307,23 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + VISA_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, VISA_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            HttpResponse response = staticHttpClient.httpClient.execute( post );
+            JSONObject jsonData = StaticHttpClient.postToJson(account, VISA_PATH, requestBody );
 
-            // Process response
+            /*// Process response
             if ( response.getStatusLine().getStatusCode() != 200 ) {
                 throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities )
                                                    + " HTTP/" + response.getStatusLine().getStatusCode()
                                                    + " " + response.getStatusLine().getReasonPhrase() );
-            }
+            }*/
 
-        } catch ( IOException ex ) {
+        } catch ( Exception ex ) {
             throw new IParapheurHttpException( "Visa " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
 
     public void reject( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
-        StaticHttpClient staticHttpClient = StaticHttpClient.getInstance();
-        staticHttpClient.ensureLoggedIn( account );
+        StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
@@ -361,18 +331,15 @@ public class IParapheurHttpClient
             Log.d( IParapheurHttpClient.class, "REQUEST on " + REJECT_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            HttpPost post = new HttpPost( staticHttpClient.buildUrl( account, REJECT_PATH ) );
-            HttpEntity data = new StringEntity( requestBody, "UTF-8" );
-            post.setEntity( data );
-            HttpResponse response = staticHttpClient.httpClient.execute( post );
+            JSONObject jsonData = StaticHttpClient.postToJson(account, REJECT_PATH, requestBody );
 
             // Process response
-            if ( response.getStatusLine().getStatusCode() != 200 ) {
+            /*if ( response.getStatusLine().getStatusCode() != 200 ) {
                 throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities )
                                                    + " HTTP/" + response.getStatusLine().getStatusCode()
                                                    + " " + response.getStatusLine().getReasonPhrase() );
-            }
-        } catch ( IOException ex ) {
+            }*/
+        } catch ( Exception ex ) {
             throw new IParapheurHttpException( "Reject " + Arrays.toString( folderIdentities ) + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
     }
@@ -438,7 +405,8 @@ public class IParapheurHttpClient
                         JSONArray images = doc.getJSONArray( "images" );
                         for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
                             JSONObject image = images.getJSONObject( indexImages );
-                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
+                            Log.d("url image : " + image.getString( "image" ));
+                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.buildUrl( account, image.getString( "image" ) ) );
                             pageImages.add( folderFilePageImage );
                         }
                         folderDocument.setPageImages( pageImages );
@@ -453,7 +421,7 @@ public class IParapheurHttpClient
                         JSONArray images = doc.getJSONArray( "images" );
                         for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
                             JSONObject image = images.getJSONObject( indexImages );
-                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.getInstance().buildUrl( account, image.getString( "image" ) ) );
+                            FolderFilePageImage folderFilePageImage = new FolderFilePageImage( StaticHttpClient.buildUrl( account, image.getString( "image" ) ) );
                             pageImages.add( folderFilePageImage );
                         }
                         folderDocument.setPageImages( pageImages );
@@ -477,5 +445,4 @@ public class IParapheurHttpClient
             return null;
         }
     }
-
 }

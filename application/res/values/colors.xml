@@ -29,6 +29,10 @@
 
     <color name="red_light">#ece1e1</color>
     <color name="red">#FF4444</color>
-    <color name="red_strong">#CC0000</color>    
+    <color name="red_strong">#CC0000</color>   
+    
+    <!-- MuPDF -->
+    <color name="canvas">#FF404040</color>
+    <color name="bar">#C0202020</color> 
     
 </resources>

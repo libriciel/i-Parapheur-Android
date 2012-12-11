@@ -44,7 +44,6 @@ public class TrustAllSSLSocketFactory
         TrustManager[] tm = new TrustManager[]{ new X509TrustManager()
     {
 
-        @Override
         public void checkClientTrusted( X509Certificate[] chain,
                                         String authType )
                 throws CertificateException
@@ -52,7 +51,6 @@ public class TrustAllSSLSocketFactory
             // do nothing
         }
 
-        @Override
         public void checkServerTrusted( X509Certificate[] chain,
                                         String authType )
                 throws CertificateException
@@ -60,7 +58,6 @@ public class TrustAllSSLSocketFactory
             // do nothing
         }
 
-        @Override
         public X509Certificate[] getAcceptedIssuers()
         {
             return new X509Certificate[ 0 ];
@@ -78,7 +75,6 @@ public class TrustAllSSLSocketFactory
         }
     }
 
-    @Override
     public Socket createSocket( Socket socket, String host, int port,
                                 boolean autoClose )
             throws IOException, UnknownHostException
@@ -88,7 +84,6 @@ public class TrustAllSSLSocketFactory
         return sslSocket;
     }
 
-    @Override
     public Socket connectSocket( Socket sock, String host, int port,
                                  InetAddress localAddress, int localPort, HttpParams params )
             throws IOException, UnknownHostException, ConnectTimeoutException
@@ -130,7 +125,6 @@ public class TrustAllSSLSocketFactory
         return sslsock;
     }
 
-    @Override
     public Socket createSocket()
             throws IOException
     {
@@ -138,7 +132,6 @@ public class TrustAllSSLSocketFactory
         return ( SSLSocket ) this.socketfactory.createSocket();
     }
 
-    @Override
     public boolean isSecure( Socket sock )
             throws IllegalArgumentException
     {

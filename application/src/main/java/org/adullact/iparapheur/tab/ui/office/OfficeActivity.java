@@ -552,19 +552,16 @@ public class OfficeActivity
             this.folders = folders;
         }
 
-        @Override
         public int getCount()
         {
             return folders.size();
         }
 
-        @Override
         public Object getItem( int position )
         {
             return folders.get( position );
         }
 
-        @Override
         public long getItemId( int position )
         {
             return position;

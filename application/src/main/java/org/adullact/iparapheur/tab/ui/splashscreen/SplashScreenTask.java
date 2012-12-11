@@ -24,14 +24,14 @@ public class SplashScreenTask
             Thread.sleep( 500 );
         } catch ( InterruptedException ignored ) {
         }
-        if ( false ) {
+        if ( true ) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
             if ( !sharedPreferences.contains( PREFS_PREFIX + "AccountTest0" + PREFS_TITLE_SUFFIX ) ) {
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
 
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_TITLE_SUFFIX, "iParapheur de DEV" );
-                editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "http://parapheur.test.adullact.org" );
+                editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "parapheur.test.adullact.org" );
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_LOGIN_SUFFIX, "eperalta" );
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_PASSWORD_SUFFIX, "secret" );
 
