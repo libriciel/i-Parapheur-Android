@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.tab.services;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
 import java.io.IOException;
@@ -395,12 +396,13 @@ public class IParapheurHttpClient
                 JSONObject doc = documents.getJSONObject( index );
                 String docName = doc.getString( "name" );
                 Integer docSize = doc.getInt( "size" );
+                String contentUrl = doc.getString( "downloadUrl" );
                 /**
                  * FIXME plus tard: pour le moment, il n'y a QU'UN SEUL DOCUMENT, les autres pieces sont necessairement des ANNEXES !
                  */
                 if (index==0) {
-                    FolderDocument folderDocument = new FolderDocument( docName, docSize, "file:///android_asset/html/file_viewer.html" );
-                    if ( doc.has( "images" ) ) {
+                    FolderDocument folderDocument = new FolderDocument( docName, docSize, contentUrl );
+                    /*if ( doc.has( "images" ) ) {
                         List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
                         JSONArray images = doc.getJSONArray( "images" );
                         for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
@@ -410,13 +412,13 @@ public class IParapheurHttpClient
                             pageImages.add( folderFilePageImage );
                         }
                         folderDocument.setPageImages( pageImages );
-                    }
+                    }*/
                     folder.addDocument( folderDocument );
                 }
                 else {
                     // EN ATTENDANT LE SUPPORT DE MULTIPLES PIECES PRINCIPALES: LES AUTRES DOCS SONT DES ANNEXES
-                    FolderAnnex folderDocument = new FolderAnnex( docName, docSize, "file:///android_asset/html/file_viewer.html" );
-                    if ( doc.has( "images" ) ) {
+                    FolderAnnex folderDocument = new FolderAnnex( docName, docSize, contentUrl );
+                    /*if ( doc.has( "images" ) ) {
                         List<FolderFilePageImage> pageImages = new ArrayList<FolderFilePageImage>();
                         JSONArray images = doc.getJSONArray( "images" );
                         for ( int indexImages = 0; indexImages < images.length(); indexImages++ ) {
@@ -425,7 +427,7 @@ public class IParapheurHttpClient
                             pageImages.add( folderFilePageImage );
                         }
                         folderDocument.setPageImages( pageImages );
-                    }
+                    }*/
                     folder.addAnnex( folderDocument );
                 }
             }
@@ -444,5 +446,10 @@ public class IParapheurHttpClient
             Log.w( IParapheurHttpClient.class, "Unable to parse iParapheur date (" + iso8601Date + ")", ex );
             return null;
         }
+    }
+    
+    public String downloadFile(Context context, Account account, String url, String fileName) {
+        StaticHttpClient.ensureLoggedIn( account );
+        return StaticHttpClient.downloadFile(context, account, url, fileName);
     }
 }

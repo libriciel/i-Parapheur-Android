@@ -1,7 +1,11 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.MotionEvent;
@@ -47,6 +51,10 @@ import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
 
 import de.akquinet.android.androlog.Log;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import org.adullact.iparapheur.tab.services.StaticHttpClient;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -80,12 +88,13 @@ public class FolderActivity
     @InjectView( R.id.folder_button_negative)
     private Button negativeButton;
     
-    private ReaderView fileWebView;
+    private ReaderView readerView;
     private Folder currentFolder;
     private String accountIdentity;
     private String folderIdentity;
     private String officeIdentity;
     private MuPDFCore core;
+    private Map<String, String> downloadedFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,10 +130,20 @@ public class FolderActivity
                 actionsDialogFactory.buildRejectDialog(accountIdentity, officeIdentity, Collections.singletonList(currentFolder), successIntent).show();
             }
         });
-
+        downloadedFiles = new HashMap<String,String>();
         refresh();
     }
 
+    @Override
+    protected void onDestroy() {
+        for (String path : downloadedFiles.values()) {
+            Log.i("FolderActivity", "deleting " + path);
+            File file = new File(path);
+            file.delete();
+        }
+        super.onDestroy();
+    }
+    
     public void refresh() {
         // Clear View
         topSummaryLeft.setText(Strings.EMPTY);
@@ -161,15 +180,12 @@ public class FolderActivity
                                 append("</b> ").append(folder.getDisplayDueDate());
                     }
                     topSummaryRight.setText(Html.fromHtml(summaryRight.toString()));
-                    folderFileListFragment.setListAdapter(new FolderListAdapter(context, folder.getAllFiles()));
                     folderFileListFragment.setOnFileDisplayRequestListener(new OnFileDisplayRequestListener() {
                         public void onFileDisplayRequest(AbstractFolderFile file) {
                             displayFile(file);
                         }
                     });
-                    if (!folder.getAllFiles().isEmpty()) {
-                        displayFile(folder.getAllFiles().get(0));
-                    }
+                    folderFileListFragment.setListAdapter(new FolderListAdapter(context, folder.getAllFiles()));
                     currentFolder = folder;
 
                 } else {
@@ -201,21 +217,51 @@ public class FolderActivity
     }
 
     private void displayFile(AbstractFolderFile file) {
-        fileWebView = new ReaderView(this);
-        Log.d("File URL : " + file.getUrl());
-        folderFileListFragment.shadeFiles(file);
-        JSONObject json = file.getPageImagesJSON();
+        if (downloadedFiles.containsKey(file.getTitle())) {
+            displayFile(downloadedFiles.get(file.getTitle()));
+        }
+        else {
+            new DownloadFileTask().execute(file.getUrl(), file.getTitle());
+        }
+    }
+    
+    private void displayFile(String filePath) {
+        if (filePath != null) {
+            readerView = new ReaderView(this);
+            try {
+                if (core != null) {
+			core.onDestroy();
+                }
+                core = new MuPDFCore(filePath);
+                LinearLayout layout = (LinearLayout) this.findViewById(R.id.folder_details_webview);
+                layout.removeAllViews();
+                readerView.setAdapter(new MuPDFPageAdapter(this, core));
+                readerView.setDisplayedViewIndex(0);
+                layout.addView(readerView);
+                layout.invalidate();
+            } catch (Exception e) {
+                Log.e("FolderActivity", "Exception catched : " + e);
+            }
+        }
+    }
+    
+    private class DownloadFileTask extends AsyncTask<String, Integer, String> {
 
-        try {
-            core = new MuPDFCore("/mnt/sdcard/Download/2test.pdf");
-        } catch (Exception e) {
-            Log.d("Exception catched : " + e.getMessage());
+        @Override
+        protected void onPostExecute(String result) {
+            displayFile(result);
         }
 
-        fileWebView.setAdapter(new MuPDFPageAdapter(this, core));
-        LinearLayout layout = (LinearLayout) this.findViewById(R.id.folder_details_webview);
-        layout.addView(fileWebView);
-        layout.invalidate();
-        //setContentView(fileWebView);
-    }
+        @Override
+        protected String doInBackground(String... params) {
+            String path = iParapheurClient.downloadFile(getApplicationContext(),
+                    accountsRepository.byIdentity(accountIdentity),
+                    params[0],
+                    params[1]);
+            if (path != null) {
+                downloadedFiles.put(params[1], path);
+            }
+            return path;
+        }
+ }
 }

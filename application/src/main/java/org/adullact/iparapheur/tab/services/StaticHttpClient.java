@@ -1,5 +1,8 @@
 package org.adullact.iparapheur.tab.services;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Environment;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,6 +27,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.akquinet.android.androlog.Log;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Singleton allowing to keep one HttpClient instance only.
@@ -111,7 +120,7 @@ public class StaticHttpClient {
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
             tmf.init(trustStore);
             
-            Log.d(StaticHttpClient.class, "------------- TrustStore initialized -------------\n url : " + url);
+            Log.i("StaticHttpClient", "TrustStore initialized --- url : " + url);
 
             SSLContext context = SSLContext.getInstance("SSL");
             context.init(null, tmf.getTrustManagers(), null);
@@ -127,10 +136,10 @@ public class StaticHttpClient {
             InputStream response = connection.getInputStream();
 
             String r = StaticHttpClient.inputStreamToString(response);
-            Log.d(StaticHttpClient.class, "response size : " + r.length());
+            Log.i("StaticHttpClient", "response size : " + r.length());
             ret = new JSONObject(r);
         } catch (Exception e) {
-            Log.d(StaticHttpClient.class, "exception : " + e);
+            Log.e("StaticHttpClient", "exception : " + e);
         } finally {
             if (output != null) {
                 try {
@@ -179,5 +188,77 @@ public class StaticHttpClient {
         NullArgumentException.ensureNotEmpty("Path", path);
         String ticket = (accountSessionTickets.get(account.getIdentity()) == null)? "" : "?alf_ticket=" + accountSessionTickets.get(account.getIdentity());
         return BASE_PATH + account.getUrl() + path + ticket;
+    }
+    
+    public static String downloadFile(Context context, Account account, String url, String fileName) {
+        
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            throw new RuntimeException("The external storage is not accessible");
+        }
+        File file = new File(context.getExternalCacheDir(), fileName);
+        
+        OutputStream fileOutput = null;
+        HttpsURLConnection connection = null;
+        String fileUrl = buildUrl(account, url);
+        Log.i("StaticHttpClient", "Downloading : " + fileUrl);
+        try {
+            InputStream in = new ByteArrayInputStream(cert.getBytes());
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            Certificate certif = factory.generateCertificate(in);
+            final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+            trustStore.setCertificateEntry("trust", certif);
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+            tmf.init(trustStore);
+
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, tmf.getTrustManagers(), null);
+            
+            connection = (HttpsURLConnection) new URL(fileUrl).openConnection();
+            connection.setSSLSocketFactory(sslContext.getSocketFactory());
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(false);
+            connection.setChunkedStreamingMode(0);
+            
+            InputStream response = connection.getInputStream();
+            
+            fileOutput = new FileOutputStream(file);
+            
+            byte[] buffer = new byte[1024];
+            int bufferLength = 0;
+            /*int totalSize = connection.getContentLength();
+            int downloadedSize = 0;
+            int previousPercent = 0;
+            int percent = 0;*/
+            
+            Log.i("StaticHttpClient", "writing file...");
+            while ((bufferLength = response.read(buffer)) > 0 ) {
+                    fileOutput.write(buffer, 0, bufferLength);
+                    /*downloadedSize += bufferLength;
+                    percent = (int) Math.floor(downloadedSize * 100 / totalSize);
+                    if (percent > previousPercent) {
+                        Log.i("StaticHttpClient", "progress : " + percent + "%");
+                        previousPercent = percent;
+                    }*/
+                    //updateProgress(downloadedSize, totalSize);
+            }
+            Log.i("StaticHttpClient", "writing file...done");
+            //close the output stream when done
+            fileOutput.close();
+            
+            
+        } catch (Exception e) {
+            Log.e("StaticHttpClient", "Erreur lors du téléchargement du pdf : " + e);
+            e.printStackTrace();
+        } finally {
+            if (fileOutput != null) {
+                try {
+                    fileOutput.close();
+                } catch (IOException logOrIgnore) {
+                }
+            }
+        }
+        return (file != null)? file.getAbsolutePath() : null;
     }
 }

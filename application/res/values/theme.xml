@@ -4,4 +4,9 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+    
+    <style name="Theme.Holo.Light.IParapheur" parent="android:Theme.Holo.Light">
+        <item name="listItemActivatedBackgroundIndicator">@drawable/list_item_activated_background</item>
+    </style>
+    
 </resources>

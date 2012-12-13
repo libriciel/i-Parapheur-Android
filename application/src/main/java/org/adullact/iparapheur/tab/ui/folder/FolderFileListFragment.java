@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import de.akquinet.android.androlog.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +33,7 @@ public class FolderFileListFragment
     }
 
     private OnFileDisplayRequestListener onFileDisplayRequestListener;
+    protected int currentPosition;
 
     public void setOnFileDisplayRequestListener( OnFileDisplayRequestListener onFileDisplayRequestListener )
     {
@@ -41,36 +45,29 @@ public class FolderFileListFragment
     {
         return inflater.inflate( R.layout.folder_filelist, container, false );
     }
-
+    
     @Override
     public void onListItemClick( ListView l, View v, int position, long id )
     {
         super.onListItemClick( l, v, position, id );
-        if ( onFileDisplayRequestListener != null ) {
+        if ((onFileDisplayRequestListener != null) && (position != currentPosition)) {
+            currentPosition = position;
             onFileDisplayRequestListener.onFileDisplayRequest( ( AbstractFolderFile ) getListAdapter().getItem( position ) );
         }
     }
-
-    public void shadeFiles( AbstractFolderFile... files )
-    {
-        List<AbstractFolderFile> fileList = Arrays.asList( files );
-        for ( int index = 0; index < getListView().getChildCount(); index++ ) {
-            View listChild = getListView().getChildAt( index );
-            View titleView = listChild.findViewById( R.id.folder_filelist_item_title );
-            if ( fileList.contains( ( AbstractFolderFile ) titleView.getTag() ) ) {
-                listChild.setBackgroundResource( R.color.grey );
-            } else {
-                listChild.setBackgroundResource( R.color.white );
-            }
-        }
+    
+    @Override
+    public void setListAdapter(ListAdapter adapter) {
+        super.setListAdapter(adapter);
+        getListView().setItemChecked(currentPosition, true);
+        onFileDisplayRequestListener.onFileDisplayRequest((AbstractFolderFile) adapter.getItem(currentPosition));
     }
-
+    
     /* package */ static final class FolderListAdapter
             extends BaseAdapter
     {
 
         private final List<AbstractFolderFile> folderFiles;
-
         private LayoutInflater inflater;
 
         /* package */ FolderListAdapter( Context context, Collection<AbstractFolderFile> folderFiles )
@@ -127,7 +124,6 @@ public class FolderFileListFragment
             } else {
                 dataViews.icon.setImageResource( R.drawable.ic_list_annex );
             }
-
             return convertView;
         }
 
