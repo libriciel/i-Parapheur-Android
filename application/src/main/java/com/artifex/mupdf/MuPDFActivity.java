@@ -299,7 +299,7 @@ public class MuPDFActivity extends Activity
 				((PageView)v).releaseResources();
 			}
 		};
-		mDocView.setAdapter(new MuPDFPageAdapter(this, core));
+		mDocView.setAdapter(new MuPDFPageAdapter(this, core, null));
 
 		// Make the buttons overlay, and store all its
 		// controls in variables

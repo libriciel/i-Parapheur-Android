@@ -34,4 +34,7 @@ public class MuPDFPageView extends PageView {
 	protected LinkInfo[] getLinkInfo() {
 		return mCore.getPageLinks(mPageNumber);
 	}
+
+    @Override
+    protected void documentAvailable() {}
 }

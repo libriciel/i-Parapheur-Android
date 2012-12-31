@@ -81,6 +81,7 @@ public abstract class PageView extends ViewGroup {
 
 	protected abstract void drawPage(Bitmap bm, int sizeX, int sizeY, int patchX, int patchY, int patchWidth, int patchHeight);
 	protected abstract LinkInfo[] getLinkInfo();
+        protected abstract void documentAvailable();
 
 	public void releaseResources() {
 		// Cancel pending render task
@@ -151,8 +152,6 @@ public abstract class PageView extends ViewGroup {
 			mDrawEntire = null;
 		}
 
-		mIsBlank = false;
-
 		mPageNumber = page;
 		if (mEntire == null) {
 			mEntire = new OpaqueImageView(mContext);
@@ -209,6 +208,8 @@ public abstract class PageView extends ViewGroup {
 				mBusyIndicator = null;
 				mEntire.setImageBitmap(mEntireBm);
 				mLinks = v;
+                                mIsBlank = false;
+                                documentAvailable();
 				invalidate();
 			}
 		};
@@ -401,4 +402,8 @@ public abstract class PageView extends ViewGroup {
 	public boolean isOpaque() {
 		return true;
 	}
+        
+        public boolean isBlanck() {
+            return mIsBlank;
+        }
 }

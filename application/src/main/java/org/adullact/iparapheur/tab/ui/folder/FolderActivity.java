@@ -1,33 +1,32 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.MotionEvent;
+import android.util.Pair;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.artifex.mupdf.MuPDFCore;
+import com.artifex.mupdf.MuPDFPageAdapter;
+import com.artifex.mupdf.ReaderView;
 import com.google.inject.Inject;
+import de.akquinet.android.androlog.Log;
+import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
+import org.adullact.iparapheur.tab.model.Account;
+import org.adullact.iparapheur.tab.model.Annotation;
 import org.adullact.iparapheur.tab.model.Folder;
 import org.adullact.iparapheur.tab.model.FolderRequestedAction;
-import com.artifex.mupdf.MuPDFActivity;
-import com.artifex.mupdf.MuPDFCore;
-import com.artifex.mupdf.MuPDFPageAdapter;
-import com.artifex.mupdf.MuPDFPageView;
-import com.artifex.mupdf.PageView;
-import com.artifex.mupdf.ReaderView;
 import org.adullact.iparapheur.tab.services.AccountsRepository;
 import org.adullact.iparapheur.tab.services.IParapheurHttpClient;
 import org.adullact.iparapheur.tab.ui.Refreshable;
@@ -41,20 +40,9 @@ import org.codeartisans.android.toolbox.activity.RoboFragmentActivity;
 import org.codeartisans.android.toolbox.app.UserErrorDialogFactory;
 import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.AutoQuotaGrowWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ChainedWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebChromeSupport.ConsoleAndrologWebChromeClient;
-import org.codeartisans.android.toolbox.webkit.WebViewSupport.JSInjectWebViewClient;
 import org.codeartisans.java.toolbox.Strings;
-import org.json.JSONObject;
 import roboguice.inject.InjectFragment;
 import roboguice.inject.InjectView;
-
-import de.akquinet.android.androlog.Log;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import org.adullact.iparapheur.tab.services.StaticHttpClient;
 
 public class FolderActivity
         extends RoboFragmentActivity
@@ -94,7 +82,7 @@ public class FolderActivity
     private String folderIdentity;
     private String officeIdentity;
     private MuPDFCore core;
-    private Map<String, String> downloadedFiles;
+    private Map<String, Map<Integer, List<Annotation>>> downloadedFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,13 +118,13 @@ public class FolderActivity
                 actionsDialogFactory.buildRejectDialog(accountIdentity, officeIdentity, Collections.singletonList(currentFolder), successIntent).show();
             }
         });
-        downloadedFiles = new HashMap<String,String>();
+        downloadedFiles = new HashMap<String, Map<Integer, List<Annotation>>>();
         refresh();
     }
 
     @Override
     protected void onDestroy() {
-        for (String path : downloadedFiles.values()) {
+        for (String path : downloadedFiles.keySet()) {
             Log.i("FolderActivity", "deleting " + path);
             File file = new File(path);
             file.delete();
@@ -217,8 +205,15 @@ public class FolderActivity
     }
 
     private void displayFile(AbstractFolderFile file) {
-        if (downloadedFiles.containsKey(file.getTitle())) {
-            displayFile(downloadedFiles.get(file.getTitle()));
+        String path = null;
+        for (String key : downloadedFiles.keySet()) {
+            if (key.contains(file.getTitle())) {
+                path = key;
+                break;
+            }
+        }
+        if (path != null) {
+            displayFile(path);
         }
         else {
             new DownloadFileTask().execute(file.getUrl(), file.getTitle());
@@ -226,6 +221,7 @@ public class FolderActivity
     }
     
     private void displayFile(String filePath) {
+        
         if (filePath != null) {
             readerView = new ReaderView(this);
             try {
@@ -235,7 +231,7 @@ public class FolderActivity
                 core = new MuPDFCore(filePath);
                 LinearLayout layout = (LinearLayout) this.findViewById(R.id.folder_details_webview);
                 layout.removeAllViews();
-                readerView.setAdapter(new MuPDFPageAdapter(this, core));
+                readerView.setAdapter(new MuPDFPageAdapter(this, core, downloadedFiles.get(filePath)));
                 readerView.setDisplayedViewIndex(0);
                 layout.addView(readerView);
                 layout.invalidate();
@@ -248,18 +244,21 @@ public class FolderActivity
     private class DownloadFileTask extends AsyncTask<String, Integer, String> {
 
         @Override
-        protected void onPostExecute(String result) {
-            displayFile(result);
+        protected void onPostExecute(String path) {
+            displayFile(path);
         }
 
         @Override
         protected String doInBackground(String... params) {
+            Account account = accountsRepository.byIdentity(accountIdentity);
+            
+            Map<Integer, List<Annotation>> annotations = iParapheurClient.fetchAnnotations(account, folderIdentity);
             String path = iParapheurClient.downloadFile(getApplicationContext(),
-                    accountsRepository.byIdentity(accountIdentity),
+                    account,
                     params[0],
                     params[1]);
             if (path != null) {
-                downloadedFiles.put(params[1], path);
+                downloadedFiles.put(path, annotations);
             }
             return path;
         }

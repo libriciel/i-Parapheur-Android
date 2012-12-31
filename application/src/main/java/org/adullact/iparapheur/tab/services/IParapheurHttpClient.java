@@ -1,6 +1,8 @@
 package org.adullact.iparapheur.tab.services;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.AsyncTask;
 import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
@@ -11,6 +13,8 @@ import java.security.cert.Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import org.adullact.iparapheur.tab.IParapheurTabException;
@@ -54,6 +58,8 @@ public class IParapheurHttpClient
     private static final String VISA_PATH = "/parapheur/api/visa";
 
     private static final String REJECT_PATH = "/parapheur/api/reject";
+    
+    private static final String ANNOTATIONS_PATH = "/parapheur/api/getAnnotations";
 
     private final FolderFilterMapper folderFilterMapper;
     
@@ -451,5 +457,65 @@ public class IParapheurHttpClient
     public String downloadFile(Context context, Account account, String url, String fileName) {
         StaticHttpClient.ensureLoggedIn( account );
         return StaticHttpClient.downloadFile(context, account, url, fileName);
+    }
+    
+    public Map<Integer, List<Annotation>> fetchAnnotations( Account account, String folderIdentity )
+            throws IParapheurHttpException
+    {
+        NullArgumentException.ensureNotEmpty( "Folder Identity", folderIdentity );
+        StaticHttpClient.ensureLoggedIn( account );
+        String requestBody = "{\"dossier\": \"" + folderIdentity + "\"}";
+
+        Log.i("IParapheurHttpClient", "REQUEST on " + ANNOTATIONS_PATH + ": " + requestBody);
+        JSONObject json = StaticHttpClient.postToJson( account, ANNOTATIONS_PATH, requestBody );
+        try {
+            return annotationsFromJson(json);
+        } catch (JSONException ex) {
+            throw new IParapheurHttpException( "Folder " + folderIdentity + " : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        }
+    }
+    
+    private Map<Integer, List<Annotation>> annotationsFromJson(JSONObject json) throws JSONException {
+        Map<Integer, List<Annotation>> result = new HashMap<Integer, List<Annotation>>();
+        if ( json.has( "annotations" ) ) {
+            JSONArray jsonArray = json.getJSONArray( "annotations" );
+            for ( int i = 0; i < jsonArray.length(); i++ ) { // On parcourt les étapes
+                JSONObject step = jsonArray.getJSONObject(i);
+                Iterator it = step.keys();
+                while (it.hasNext()) { // On parcourt les pages
+                    String key = (String) it.next();
+                    int pageNumber = Integer.parseInt(key);
+                    List<Annotation> annotations = new ArrayList<Annotation>();
+                    JSONArray annotationsJsonArray = step.getJSONArray(key);
+                    for ( int j = 0; j < annotationsJsonArray.length(); j++ ) {
+                        JSONObject annotationJson = annotationsJsonArray.getJSONObject(j);
+                        
+                        JSONObject rectJson = annotationJson.getJSONObject("rect");
+                        JSONObject topLeft = rectJson.getJSONObject("topLeft");
+                        JSONObject bottomRight = rectJson.getJSONObject("bottomRight");
+                        RectF rect = new RectF((float) (topLeft.getDouble("x") * 0.4),
+                                (float) (topLeft.getDouble("y") * 0.4),
+                                (float) (bottomRight.getDouble("x") * 0.4),
+                                (float) (bottomRight.getDouble("y") * 0.4));
+                        
+                        annotations.add(new Annotation(
+                                annotationJson.getString("uuid"),
+                                annotationJson.getString("author"),
+                                pageNumber,
+                                annotationJson.getBoolean("secretaire"),
+                                annotationJson.getString("date"),
+                                rect,
+                                annotationJson.getString("text"),
+                                annotationJson.getString("type"),
+                                0)); // FIXME
+                        
+                    }
+                    result.put(pageNumber, annotations);
+                    Log.i("IParapheurHttpClient", "nombre d'annotations trouvées pour la page " + pageNumber + " : " + annotations.size());
+                }
+            }
+        }
+        Log.i("IParapheurHttpClient", "nombre d'annotations trouvées : " + result.size());
+        return result;
     }
 }

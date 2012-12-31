@@ -8,15 +8,21 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import java.util.List;
+import java.util.Map;
+import org.adullact.iparapheur.tab.model.Annotation;
+import org.adullact.iparapheur.tab.ui.folder.IParapheurPDFPageView;
 
 public class MuPDFPageAdapter extends BaseAdapter {
 	private final Context mContext;
 	private final MuPDFCore mCore;
 	private final SparseArray<PointF> mPageSizes = new SparseArray<PointF>();
+        private final Map<Integer, List<Annotation>> mAnnoatations;
 
-	public MuPDFPageAdapter(Context c, MuPDFCore core) {
+	public MuPDFPageAdapter(Context c, MuPDFCore core, Map<Integer, List<Annotation>> annotations) {
 		mContext = c;
 		mCore = core;
+                mAnnoatations = annotations;
 	}
 
 	public int getCount() {
@@ -32,11 +38,11 @@ public class MuPDFPageAdapter extends BaseAdapter {
 	}
 
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		final MuPDFPageView pageView;
+		final IParapheurPDFPageView pageView;
 		if (convertView == null) {
-			pageView = new MuPDFPageView(mContext, mCore, new Point(parent.getWidth(), parent.getHeight()));
+			pageView = new IParapheurPDFPageView(mContext, mCore, new Point(parent.getWidth(), parent.getHeight()), mAnnoatations);
 		} else {
-			pageView = (MuPDFPageView) convertView;
+			pageView = (IParapheurPDFPageView) convertView;
 		}
 
 		PointF pageSize = mPageSizes.get(position);
@@ -61,8 +67,9 @@ public class MuPDFPageAdapter extends BaseAdapter {
 					mPageSizes.put(position, result);
 					// Check that this view hasn't been reused for
 					// another page since we started
-					if (pageView.getPage() == position)
-						pageView.setPage(position, result);
+					if (pageView.getPage() == position) {
+                                            pageView.setPage(position, result);
+                                        }
 				}
 			};
 

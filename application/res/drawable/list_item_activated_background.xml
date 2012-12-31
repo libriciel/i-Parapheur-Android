@@ -3,7 +3,5 @@
         android:exitFadeDuration="@android:integer/config_mediumAnimTime">
     <item android:state_activated="true"
             android:drawable="@color/grey" />
-    <item android:state_selected="true"
-            android:drawable="@color/red" />
     <item android:drawable="@color/transparent" />
 </selector>

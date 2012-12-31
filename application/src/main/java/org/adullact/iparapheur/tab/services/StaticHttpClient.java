@@ -136,6 +136,7 @@ public class StaticHttpClient {
             InputStream response = connection.getInputStream();
 
             String r = StaticHttpClient.inputStreamToString(response);
+            //Log.i("StaticHttpClient", "response : " + r);
             Log.i("StaticHttpClient", "response size : " + r.length());
             ret = new JSONObject(r);
         } catch (Exception e) {
