@@ -27,7 +27,7 @@ public class SignTask
             ActionTaskParam params = parameters[0];
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will sign folder with params: " + params + " using account: " + account );
-            iParapheurClient.sign( account, params.pubAnnotation, params.privAnnotation, params.folderIdentities );
+            iParapheurClient.sign( account, params.pubAnnotation, params.privAnnotation, params.officeIdentity, params.folderIdentities );
             sleep( 1 );
             return new AsyncTaskResult<Void, IParapheurHttpException>( ( Void ) null );
 

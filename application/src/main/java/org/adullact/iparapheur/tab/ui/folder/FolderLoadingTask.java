@@ -25,11 +25,14 @@ public class FolderLoadingTask
         public final String accountIdentity;
 
         public final String folderIdentity;
+        
+        public final String officeIdentity;
 
-        public Params( String accountIdentity, String folderIdentity )
+        public Params( String accountIdentity, String folderIdentity, String officeIdentity )
         {
             this.accountIdentity = accountIdentity;
             this.folderIdentity = folderIdentity;
+            this.officeIdentity = officeIdentity;
         }
 
         @Override
@@ -60,7 +63,7 @@ public class FolderLoadingTask
             Params params = parameters[0];
             Account account = accountsRepository.byIdentity( params.accountIdentity );
             Log.d( context, "Will load folder with params: " + params + " using account: " + account );
-            Folder folder = iParapheurClient.fetchFolder( account, params.folderIdentity );
+            Folder folder = iParapheurClient.fetchFolder( account, params.folderIdentity, params.officeIdentity );
             return new AsyncTaskResult<Folder, IParapheurTabException>( folder );
 
         } catch ( IParapheurHttpException ex ) {

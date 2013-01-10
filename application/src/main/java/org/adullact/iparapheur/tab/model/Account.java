@@ -3,6 +3,7 @@ package org.adullact.iparapheur.tab.model;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.adullact.iparapheur.tab.services.StaticHttpClient;
 import org.codeartisans.java.toolbox.Strings;
 
 public class Account
@@ -73,7 +74,7 @@ public class Account
     private static boolean validUrl( String url )
     {
         try {
-            new URL( url );
+            new URL(StaticHttpClient.BASE_PATH + url );
             return true;
         } catch ( MalformedURLException ignored ) {
             return false;

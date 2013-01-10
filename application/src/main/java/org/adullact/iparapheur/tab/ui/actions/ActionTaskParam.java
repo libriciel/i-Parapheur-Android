@@ -13,15 +13,18 @@ public class ActionTaskParam
     public final String pubAnnotation;
 
     public final String privAnnotation;
+    
+    public final String officeIdentity;
 
     public final String[] folderIdentities;
 
-    public ActionTaskParam( String accountIdentity, String pubAnnotation, String privAnnotation, String... folderIdentities )
+    public ActionTaskParam( String accountIdentity, String pubAnnotation, String privAnnotation, String officeIdentity, String... folderIdentities )
     {
         this.accountIdentity = accountIdentity;
         this.pubAnnotation = pubAnnotation;
         this.privAnnotation = privAnnotation;
         this.folderIdentities = folderIdentities;
+        this.officeIdentity = officeIdentity;
     }
 
 }
