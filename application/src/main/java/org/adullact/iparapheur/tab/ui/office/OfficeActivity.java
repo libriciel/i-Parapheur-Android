@@ -3,8 +3,11 @@ package org.adullact.iparapheur.tab.ui.office;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Html.ImageGetter;
+import android.text.SpannedString;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -198,23 +201,23 @@ public class OfficeActivity
             StringBuilder details = new StringBuilder();
             details.append( "<p><b>" ).
                     append( getResources().getString( R.string.folder_type ) ).
-                    append( "</b> " ).
+                    append( "</b> : " ).
                     append( folder.getBusinessType() ).
                     append( "</p>" );
             details.append( "<p><b>" ).
                     append( getResources().getString( R.string.folder_subtype ) ).
-                    append( "</b> " ).
+                    append( "</b> : " ).
                     append( folder.getBusinessSubType() ).
                     append( "</p>" );
             details.append( "<p><b>" ).
                     append( getResources().getString( R.string.folder_creation_date ) ).
-                    append( "</b> " ).
+                    append( "</b> : " ).
                     append( folder.getDisplayCreationDate() ).
                     append( "</p>" );
             if ( folder.getDueDate() != null ) {
                 details.append( "<p><b>" ).
                         append( getResources().getString( R.string.folder_due_date ) ).
-                        append( "</b> " ).
+                        append( "</b> : " ).
                         append( folder.getDisplayDueDate() ).
                         append( "</p>" );
             }
@@ -256,36 +259,77 @@ public class OfficeActivity
                             progressionSummary.append( "<p>" );
                             switch ( step.getAction() ) {
                                 case VISA:
-                                    progressionSummary.append( "<b>" ).
-                                            append( getResources().getString( R.string.actions_visa_noun ) ).
-                                            append( "</b> " );
+                                    if (step.isApproved()) {
+                                        /*progressionSummary.append( "<b>" ).
+                                                append( getResources().getString( R.string.actions_visa_noun ) ).
+                                                append( "</b> " );*/
+                                        progressionSummary.append( "<img src=\"ip_visa.jpg\" /> " );
+                                    } else {
+                                        //progressionSummary.append( "<img src=\"file:///android_asset/html/images/iw-visa.jpg\" />" );
+                                        progressionSummary.append( "<img src=\"iw_visa.jpg\" /> " );
+                                    }
                                     break;
                                 case SIGNATURE:
-                                    progressionSummary.append( "<b>" ).
+                                    /*progressionSummary.append( "<b>" ).
                                             append( getResources().getString( R.string.actions_sign_noun ) ).
+                                            append( "</b> " );*/
+                                    if (step.isApproved()) {
+                                        progressionSummary.append( "<img src=\"ip_signature.jpg\" /> " );
+                                    } else {
+                                        progressionSummary.append( "<img src=\"iw_signature.jpg\" /> " );
+                                    }
+                                    break;
+                                case TDT:
+                                    progressionSummary.append( "<b>" ).
+                                            append( getResources().getString( R.string.actions_tdt_noun ) ).
+                                            append( "</b> " );
+                                    break;
+                                case ARCHIVAGE:
+                                    /*progressionSummary.append( "<b>" ).
+                                            append( getResources().getString( R.string.actions_archive_noun ) ).
+                                            append( "</b> " );*/
+                                    progressionSummary.append( "<img src=\"iw_archivage.jpg\" /> " );
+                                    break;
+                                case MAILSEC:
+                                    progressionSummary.append( "<b>" ).
+                                            append( getResources().getString( R.string.actions_mailsec_noun ) ).
                                             append( "</b> " );
                                     break;
                                 default:
                             }
                             progressionSummary.append( step.getOfficeName() );
                             if ( step.isApproved() ) {
-                                progressionSummary.append( " (" ).
+                                progressionSummary.append( "<br> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <font color=\"grey\">(" ).
                                         append( getResources().getString( R.string.folder_progression_approved_at ) ).
                                         append( Strings.SPACE ).
                                         append( dateFormat.format( step.getValidationDate() ) ).
-                                        append( ")" );
+                                        append( Strings.SPACE ).
+                                        append( getResources().getString( R.string.folder_progression_by ) ).
+                                        append( Strings.SPACE ).
+                                        append( step.getSignataire() ).
+                                        append( ")</font>" );
+                                String publicAnnotation = step.getPublicAnnotation();
+                                if (publicAnnotation != null && !Strings.isEmpty(publicAnnotation.trim())) {
+                                    // SpannedString annotPublicSpanned = new SpannedString(publicAnnotation);
+                                    progressionSummary.append( "<br> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <font color=\"green\">" ).
+                                            append( getResources().getString( R.string.folder_progression_public_annotation ) ).
+                                            append( "</font> " ); // .append( Html.toHtml(annotPublicSpanned) );
+                                }
                             }
                             progressionSummary.append( "</p>" );
                         }
-                        folderProgression.setText( Html.fromHtml( progressionSummary.toString() ) );
+                        //folderProgression.setText( Html.fromHtml( progressionSummary.toString() ) );
+                        folderProgression.setText( Html.fromHtml( progressionSummary.toString(), imgGetter , null ) );
                         folderProgression.setVisibility( TextView.VISIBLE );
                     }
                     if ( !Strings.isEmpty( progression.getPrivateAnnotation() ) ) {
+                        SpannedString annotPriveeSpanned  = new SpannedString(progression.getPrivateAnnotation());
                         folderPrivateAnnotation.setText( Html.fromHtml(
                                 "<p><b>"
                                 + getResources().getString( R.string.folder_progression_private_annotation )
-                                + "</b></p>"
-                                + progression.getPrivateAnnotation() ) );
+                                + "</b> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p>"
+                                + Html.toHtml(annotPriveeSpanned) ) );
+
                         folderPrivateAnnotation.setVisibility( TextView.VISIBLE );
                     }
                 }
@@ -293,6 +337,31 @@ public class OfficeActivity
 
         }.execute( new FolderProgressionLoadingTask.Params( accountIdentity, currentFolder.getIdentity() ) );
     }
+
+    private ImageGetter imgGetter = new  ImageGetter () {
+
+        public Drawable getDrawable(String source) {
+            int id;
+
+            if (source.equals("iw_visa.jpg")) {
+                id = R.drawable.ic_circuit_iw_visa;
+            } else if (source.equals("ip_visa.jpg")) {
+                id = R.drawable.ic_circuit_ip_visa;
+            } else if (source.equals("iw_signature.jpg")) {
+                id = R.drawable.ic_circuit_iw_signature;
+            } else if (source.equals("iw_archivage.jpg")) {
+                id = R.drawable.ic_circuit_iw_archivage;
+            } else if (source.equals("ip_signature.jpg")) {
+                id = R.drawable.ic_circuit_ip_signature;
+            } else {
+                return null;
+            }
+
+            Drawable d = getResources().getDrawable(id);
+            d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+            return d;
+        }
+    };
 
     private OnFolderSelectionChange onFolderSelectionChange = new OnFolderSelectionChange()
     {

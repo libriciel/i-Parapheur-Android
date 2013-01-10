@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +73,7 @@ public class DashboardActivity
 
             // No account
             TextView textView = new TextView( this );
-            textView.setText( getResources().getString( R.string.account_none ) );
+            textView.setText( Html.fromHtml( getResources().getString( R.string.account_none ) ) );
             dashboardLayout.addView( textView );
 
         } else {

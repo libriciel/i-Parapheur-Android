@@ -50,48 +50,51 @@ public class Progression
 
         private final String officeName;
 
+        private final String signataire;
+
         private final FolderRequestedAction action;
 
         private final String publicAnnotation;
 
-        public Step( Date validationDate, boolean approved, String officeName, FolderRequestedAction action, String publicAnnotation )
+        public Step( Date validationDate, boolean approved, String officeName, String signataire, FolderRequestedAction action, String publicAnnotation )
         {
             this.validationDate = validationDate;
             this.approved = approved;
             this.officeName = officeName;
+            this.signataire = signataire == null ? Strings.EMPTY : signataire;
             this.action = action;
             this.publicAnnotation = publicAnnotation;
         }
 
-        public FolderRequestedAction getAction()
-        {
+        public FolderRequestedAction getAction() {
             return action;
         }
 
-        public boolean isApproved()
-        {
+        public boolean isApproved() {
             return approved;
         }
 
-        public String getOfficeName()
-        {
+        public String getOfficeName() {
             return officeName;
         }
+        public String getSignataire() {
+            return signataire;
+        }
 
-        public String getPublicAnnotation()
-        {
+        public String getPublicAnnotation() {
             return publicAnnotation;
         }
 
-        public Date getValidationDate()
-        {
+        public Date getValidationDate() {
             return validationDate;
         }
 
         @Override
         public String toString()
         {
-            return "Step{" + "validationDate=" + validationDate + ", approved=" + approved + ", officeName=" + officeName + ", action=" + action + ", publicAnnotation=" + publicAnnotation + '}';
+            return "Step{" + "validationDate=" + validationDate + ", approved=" + approved + ", officeName=" + officeName
+                    + ((signataire==null)? "":(", signataire=" + signataire))
+                    + ", action=" + action + ", publicAnnotation=" + publicAnnotation + '}';
         }
 
     }
