@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.Certificate;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -60,11 +61,16 @@ public class IParapheurHttpClient
     private static final String REJECT_PATH = "/parapheur/api/reject";
     
     private static final String ANNOTATIONS_PATH = "/parapheur/api/getAnnotations";
+    
+    private static final String ANNOTATIONS_ADD_PATH = "/parapheur/api/addAnnotation";
+    
+    private static final String ANNOTATIONS_UPDATE_PATH = "/parapheur/api/updateAnnotations";
+    
+    private static final String ANNOTATIONS_REMOVE_PATH = "/parapheur/api/removeAnnotation";
 
     private final FolderFilterMapper folderFilterMapper;
     
-    private HttpsURLConnection urlConnection;
-    
+    private HttpsURLConnection urlConnection;    
 
     @Inject
     public IParapheurHttpClient( FolderFilterMapper folderFilterMapper )
@@ -493,21 +499,28 @@ public class IParapheurHttpClient
                         JSONObject rectJson = annotationJson.getJSONObject("rect");
                         JSONObject topLeft = rectJson.getJSONObject("topLeft");
                         JSONObject bottomRight = rectJson.getJSONObject("bottomRight");
-                        RectF rect = new RectF((float) (topLeft.getDouble("x") * 0.4),
-                                (float) (topLeft.getDouble("y") * 0.4),
-                                (float) (bottomRight.getDouble("x") * 0.4),
-                                (float) (bottomRight.getDouble("y") * 0.4));
-                        
+                        RectF rect = new RectF((float) (topLeft.getDouble("x")),
+                                (float) (topLeft.getDouble("y")),
+                                (float) (bottomRight.getDouble("x")),
+                                (float) (bottomRight.getDouble("y")));
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                        String date = annotationJson.getString("date");
+                        try {
+                            date = DateFormat.getDateTimeInstance().format(format.parse(date));
+                        }
+                        catch (ParseException e) {
+                            Log.i("IParapheurHttpClient", e.toString());
+                        }
                         annotations.add(new Annotation(
                                 annotationJson.getString("uuid"),
                                 annotationJson.getString("author"),
                                 pageNumber,
                                 annotationJson.getBoolean("secretaire"),
-                                annotationJson.getString("date"),
+                                date,
                                 rect,
                                 annotationJson.getString("text"),
                                 annotationJson.getString("type"),
-                                0)); // FIXME
+                                i));
                         
                     }
                     result.put(pageNumber, annotations);
@@ -517,5 +530,101 @@ public class IParapheurHttpClient
         }
         Log.i("IParapheurHttpClient", "nombre d'annotations trouvées : " + result.size());
         return result;
+    }
+    
+    private Map<Annotation.State, String> JsonFromAnnotations(String folderIdentity, Map<Integer, List<Annotation>> annotations) throws JSONException {
+        Map<Annotation.State, String> ret = new EnumMap<Annotation.State, String>(Annotation.State.class);
+        
+        JSONArray newAnnotations = new JSONArray();
+        JSONArray updatedAnnotations = new JSONArray();
+        JSONArray deletedAnnotations = new JSONArray();
+        for (Map.Entry<Integer, List<Annotation>> annotationsPage : annotations.entrySet()) {
+            for (Annotation annotation : annotationsPage.getValue()) {
+                RectF rect = annotation.getUnscaledRect();
+                
+                JSONObject annotationObject = new JSONObject();
+                switch (annotation.getState()) {
+                    case NEW :
+                        annotationObject.
+                            put("text", annotation.getText()).
+                            put("rect", getJSONRect(rect)).
+                            put("type", "rect").
+                            put("page", annotationsPage.getKey());
+                        newAnnotations.put(annotationObject);
+                        break;
+                        
+                    case UPDATED :
+                        annotationObject.
+                            put("text", annotation.getText()).
+                            put("rect", getJSONRect(rect)).
+                            put("uuid", annotation.getUuid());
+                        updatedAnnotations.put(annotationObject);
+                        break;
+                        
+                    case DELETED :
+                        deletedAnnotations.put(annotation.getUuid());
+                        break;
+                }
+            }
+        }
+        
+        if (newAnnotations.length() > 0) {
+            ret.put(Annotation.State.NEW, new JSONObject().
+                put("dossier", folderIdentity).
+                put("annotations", newAnnotations).toString());
+        }
+        if (updatedAnnotations.length() > 0) {
+            ret.put(Annotation.State.UPDATED, new JSONObject().
+                put("dossier", folderIdentity).
+                put("annotations", updatedAnnotations).toString());
+        }
+        if (deletedAnnotations.length() > 0) {
+            ret.put(Annotation.State.DELETED, new JSONObject().
+                put("dossier", folderIdentity).
+                put("uuid", deletedAnnotations).toString());
+        }
+        
+        return ret;
+    }
+    
+    private JSONObject getJSONRect(RectF rect) throws JSONException {
+        return (new JSONObject().
+            put("topLeft", new JSONObject().
+                put("x", (double)rect.left).
+                put("y", (double)rect.top)).
+            put("bottomRight", new JSONObject().
+                put("x", (double)rect.right).
+                put("y", (double)rect.bottom)));
+    }
+    
+    public void saveAnnotations( Account account, String folderIdentity, Map<Integer, List<Annotation>> annotations )
+    {
+        StaticHttpClient.ensureLoggedIn( account );
+        try {
+            
+            Map<Annotation.State, String> JSONAnnotations = JsonFromAnnotations(folderIdentity, annotations);
+            String requestBody = JSONAnnotations.get(Annotation.State.NEW);
+            Log.i("IParapheurHttpClient", "new annotations : " + requestBody);
+            if (requestBody != null) {
+                Log.i( "IParapheurHttpClient", "REQUEST on " + ANNOTATIONS_ADD_PATH + " : " + requestBody );
+                StaticHttpClient.postToJson(account, ANNOTATIONS_ADD_PATH, requestBody );
+            }
+            requestBody = JSONAnnotations.get(Annotation.State.UPDATED);
+            Log.i("IParapheurHttpClient", "updated annotations : " + requestBody);
+            if (requestBody != null) {
+                Log.i( "IParapheurHttpClient", "REQUEST on " + ANNOTATIONS_UPDATE_PATH + " : " + requestBody );
+                StaticHttpClient.postToJson(account, ANNOTATIONS_UPDATE_PATH, requestBody );
+            }
+            requestBody = JSONAnnotations.get(Annotation.State.DELETED);
+            Log.i("IParapheurHttpClient", "deleted annotations : " + requestBody);
+            if (requestBody != null) {
+                Log.i( "IParapheurHttpClient", "REQUEST on " + ANNOTATIONS_REMOVE_PATH + " : " + requestBody );
+                StaticHttpClient.postToJson(account, ANNOTATIONS_REMOVE_PATH, requestBody );
+            }
+            
+            
+        } catch ( Exception ex ) {
+            throw new IParapheurHttpException( "Enregistrement des annotations : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        }
     }
 }

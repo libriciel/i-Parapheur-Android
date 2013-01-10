@@ -83,6 +83,7 @@ public class FolderActivity
     private String officeIdentity;
     private MuPDFCore core;
     private Map<String, Map<Integer, List<Annotation>>> downloadedFiles;
+    private String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,8 @@ public class FolderActivity
         successIntent.putExtra(OfficeActivity.EXTRA_OFFICE_IDENTITY, officeIdentity);
         positiveButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                actionsDialogFactory.buildActionDialog(accountIdentity, officeIdentity, Collections.singletonList(currentFolder), successIntent).show();
+                new SaveAnnotationsTask().execute(filePath);
+                //actionsDialogFactory.buildActionDialog(accountIdentity, officeIdentity, Collections.singletonList(currentFolder), successIntent).show();
             }
         });
         negativeButton.setOnClickListener(new View.OnClickListener() {
@@ -221,7 +223,7 @@ public class FolderActivity
     }
     
     private void displayFile(String filePath) {
-        
+        this.filePath = filePath;
         if (filePath != null) {
             readerView = new ReaderView(this);
             try {
@@ -251,7 +253,6 @@ public class FolderActivity
         @Override
         protected String doInBackground(String... params) {
             Account account = accountsRepository.byIdentity(accountIdentity);
-            
             Map<Integer, List<Annotation>> annotations = iParapheurClient.fetchAnnotations(account, folderIdentity);
             String path = iParapheurClient.downloadFile(getApplicationContext(),
                     account,
@@ -262,5 +263,20 @@ public class FolderActivity
             }
             return path;
         }
- }
+    }
+    
+    private class SaveAnnotationsTask extends AsyncTask<String, Integer, Void> {
+
+        @Override
+        protected void onPostExecute(Void ret) {
+            
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            Account account = accountsRepository.byIdentity(accountIdentity);
+            iParapheurClient.saveAnnotations(account, folderIdentity, downloadedFiles.get(params[0]));
+            return (Void)null;
+        }
+    }
 }

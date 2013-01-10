@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,8 +53,10 @@ import java.util.logging.Logger;
  */
 public class StaticHttpClient {
 
+    private static final boolean USE_HTTPS = true;
     private static final Map<String, String> accountSessionTickets = new HashMap<String, String>();
     public static final String BASE_PATH = "https://m.";
+    public static final String BASE_PATH_HTTP = "http://m.";
     
     private static final String cert = "-----BEGIN CERTIFICATE-----\n" +
                                         "MIIHyTCCBbGgAwIBAgIUbyl4BzfA+DWwMPJHFgkdXxI7UGwwDQYJKoZIhvcNAQEF\n" +
@@ -108,25 +111,31 @@ public class StaticHttpClient {
     public static JSONObject postToJson(Account account, String path, String request) {
         JSONObject ret = new JSONObject();
         OutputStream output = null;
-        HttpsURLConnection connection = null;
+        HttpURLConnection connection = null;
         String url = StaticHttpClient.buildUrl(account, path);
         try {
-            InputStream in = new ByteArrayInputStream(cert.getBytes()); 
-            CertificateFactory factory = CertificateFactory.getInstance("X.509");
-            Certificate certif = factory.generateCertificate(in);
-            final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-            trustStore.setCertificateEntry("trust", certif);
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
-            tmf.init(trustStore);
-            
-            Log.i("StaticHttpClient", "TrustStore initialized --- url : " + url);
+            InputStream in = new ByteArrayInputStream(cert.getBytes());
+            if (StaticHttpClient.USE_HTTPS) {
+                CertificateFactory factory = CertificateFactory.getInstance("X.509");
+                Certificate certif = factory.generateCertificate(in);
+                final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);
+                trustStore.setCertificateEntry("trust", certif);
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+                tmf.init(trustStore);
 
-            SSLContext context = SSLContext.getInstance("SSL");
-            context.init(null, tmf.getTrustManagers(), null);
+                //Log.i("StaticHttpClient", "TrustStore initialized --- url : " + url);
+
+                SSLContext context = SSLContext.getInstance("SSL");
+                context.init(null, tmf.getTrustManagers(), null);
+                connection = (HttpsURLConnection) new URL(url).openConnection();
+                ((HttpsURLConnection)connection).setSSLSocketFactory(context.getSocketFactory());
+            }
+            else {
+                connection = (HttpURLConnection) new URL(url).openConnection();
+            }
             
-            connection = (HttpsURLConnection) new URL(url).openConnection();
-            connection.setSSLSocketFactory(context.getSocketFactory());
+            
             connection.setDoOutput(true); // Triggers POST.
             connection.setChunkedStreamingMode(0);
             connection.setRequestProperty("Content-Type", "application/json");
@@ -137,7 +146,7 @@ public class StaticHttpClient {
 
             String r = StaticHttpClient.inputStreamToString(response);
             //Log.i("StaticHttpClient", "response : " + r);
-            Log.i("StaticHttpClient", "response size : " + r.length());
+            //Log.i("StaticHttpClient", "response size : " + r.length());
             ret = new JSONObject(r);
         } catch (Exception e) {
             Log.e("StaticHttpClient", "exception : " + e);
@@ -173,6 +182,7 @@ public class StaticHttpClient {
             try {
                 Log.d(IParapheurHttpClient.class, "REQUEST to " + BASE_PATH + IParapheurHttpClient.LOGIN_PATH);
                 String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
+                Log.i("StaticHttpClient", "request : " + request);
                 JSONObject json = StaticHttpClient.postToJson(account, IParapheurHttpClient.LOGIN_PATH, request);
                 String ticket = json.getJSONObject("data").getString("ticket");
                 accountSessionTickets.put(account.getIdentity(), ticket);
@@ -188,7 +198,7 @@ public class StaticHttpClient {
         NullArgumentException.ensureNotNull("Account", account);
         NullArgumentException.ensureNotEmpty("Path", path);
         String ticket = (accountSessionTickets.get(account.getIdentity()) == null)? "" : "?alf_ticket=" + accountSessionTickets.get(account.getIdentity());
-        return BASE_PATH + account.getUrl() + path + ticket;
+        return ((StaticHttpClient.USE_HTTPS)? BASE_PATH : BASE_PATH_HTTP) + account.getUrl() + path + ticket;
     }
     
     public static String downloadFile(Context context, Account account, String url, String fileName) {
@@ -200,24 +210,30 @@ public class StaticHttpClient {
         File file = new File(context.getExternalCacheDir(), fileName);
         
         OutputStream fileOutput = null;
-        HttpsURLConnection connection = null;
+        HttpURLConnection connection = null;
         String fileUrl = buildUrl(account, url);
         Log.i("StaticHttpClient", "Downloading : " + fileUrl);
         try {
-            InputStream in = new ByteArrayInputStream(cert.getBytes());
-            CertificateFactory factory = CertificateFactory.getInstance("X.509");
-            Certificate certif = factory.generateCertificate(in);
-            final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-            trustStore.setCertificateEntry("trust", certif);
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
-            tmf.init(trustStore);
+            if (StaticHttpClient.USE_HTTPS) {
+                InputStream in = new ByteArrayInputStream(cert.getBytes());
+                CertificateFactory factory = CertificateFactory.getInstance("X.509");
+                Certificate certif = factory.generateCertificate(in);
+                final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);
+                trustStore.setCertificateEntry("trust", certif);
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+                tmf.init(trustStore);
 
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, tmf.getTrustManagers(), null);
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+                sslContext.init(null, tmf.getTrustManagers(), null);
+
+                connection = (HttpsURLConnection) new URL(fileUrl).openConnection();
+                ((HttpsURLConnection)connection).setSSLSocketFactory(sslContext.getSocketFactory());
+            }
+            else {
+                connection = (HttpURLConnection) new URL(url).openConnection();
+            }
             
-            connection = (HttpsURLConnection) new URL(fileUrl).openConnection();
-            connection.setSSLSocketFactory(sslContext.getSocketFactory());
             connection.setRequestMethod("GET");
             connection.setDoOutput(false);
             connection.setChunkedStreamingMode(0);

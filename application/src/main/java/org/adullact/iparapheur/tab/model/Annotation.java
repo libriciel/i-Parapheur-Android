@@ -40,12 +40,20 @@
  */
 package org.adullact.iparapheur.tab.model;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.InputType;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import de.akquinet.android.androlog.Log;
 import org.adullact.iparapheur.tab.ui.folder.IParapheurPDFPageView;
 
 /**
@@ -72,21 +80,21 @@ public class Annotation {
     public static final int BUTTON_COLOR = Color.BLACK;
     public static final int BUTTON_BORDER_COLOR = Color.WHITE;
     
-    public static final int TEXT_RECT_WIDTH = 85;
-    public static final int TEXT_RECT_HEIGHT = 55;
+    public static final int TEXT_RECT_WIDTH = 120;
+    public static final int TEXT_RECT_HEIGHT = 75;
     public static final int TEXT_RECT_COLOR = Color.YELLOW;
     public static final int TEXT_RECT_ALPHA = 230; //90%
     
     public static final int TEXT_COLOR = Color.BLACK;
-    public static final int TEXT_SIZE = 8;
+    public static final int TEXT_SIZE = 11;
+    public static final int TEXT_PADDING = 5;
     
-    public static final int INFOS_RECT_WIDTH = 50;
-    public static final int INFOS_RECT_HEIGHT = 35;
+    public static final int INFOS_RECT_WIDTH = 120;
+    public static final int INFOS_RECT_HEIGHT = 45;
     public static final int INFOS_COLOR = Color.CYAN;
-    public static final int INFOS_ALPHA = 179; //70%
+    public static final int INFOS_ALPHA = 230; //90%
     public static final int INFOS_BORDER_WIDTH = 3;
     public static final int INFOS_BORDER_COLOR = Color.BLACK;
-    public static final int INFOS_BORDER_ALPHA = 179; //70%
     
     public static final int ALPHA_SELECTED = 51; //20%
     public static final int ALPHA_BORDER = 179; //70%
@@ -111,18 +119,28 @@ public class Annotation {
         INFO
     }
     
+    public enum State {
+        NEW,
+        UPDATED,
+        DELETED,
+        UNCHANGE
+    }
+    
     private String uuid;
     private int page;
     private String author;
     private boolean secretaire;
     private String date;
     private RectF rect;
+    private float scale = 1f;
     private String text;
     private String type;
     private int step;
     private Color fillColor;
     private Color penColor;
     
+    private boolean updated = false;
+    private boolean deleted = false;
     private boolean selected = false;
     private boolean minimized = false;
     private boolean textVisible = false;
@@ -131,13 +149,14 @@ public class Annotation {
     
     
     public Annotation(String author, int page, boolean secretaire, String date,
-                      float x, float y, String text, int step) {
+                      float x, float y, String text, int step, float scale) {
         
         this.author = author;
         this.page = page;
         this.secretaire = secretaire;
         this.date = date;
         this.rect = new RectF(x - Annotation.HALF_MIN_WIDTH, y - Annotation.HALF_MIN_HEIGHT, x + Annotation.HALF_MIN_WIDTH, y + Annotation.HALF_MIN_HEIGHT);
+        this.scale = scale;
         this.text = text;
         this.step = step;
     }
@@ -156,6 +175,10 @@ public class Annotation {
         this.step = step;
     }
     
+    public String getUuid() {
+        return uuid;
+    }
+    
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -164,12 +187,40 @@ public class Annotation {
         return rect;
     }
     
+    public RectF getUnscaledRect() {
+        return new RectF(rect.left / scale,
+                rect.top / scale,
+                rect.right / scale,
+                rect.bottom / scale);
+    }
+    
     public String getText() {
         return this.text;
     }
     
+    public State getState() {
+        if (this.uuid == null) {
+            return State.NEW;
+        }
+        else if (!this.updated) {
+            return State.UNCHANGE;
+        }
+        else if (this.deleted) {
+            return State.DELETED;
+        }
+        else {
+            return State.UPDATED;
+        }
+    }
+    
+    public void setText(String text) {
+        this.text = text;
+        this.updated = true;
+    }
+    
     public void moveTo(float x, float y, PointF offset) {
         this.rect.offsetTo(x - offset.x, y - offset.y);
+        this.updated = true;
     }
     
     public void resize(float x, float y) {
@@ -182,19 +233,25 @@ public class Annotation {
             bottom = y;
         }
         this.rect.set(rect.left, rect.top, right, bottom);
+        this.updated = true;
+    }
+    
+    public void delete() {
+        this.updated = true;
+        this.deleted = true;
     }
     
     public boolean isEditable(int step) {
         return true; // TODO
     }
     
-    /*public void setScale(int scale) {
-        int offset = 5;
-        if ((scale % 2) == 0) {
-            offset = - 5;
-        }
-        rect.set(rect.left - offset, rect.top - offset, rect.right + offset, rect.bottom + offset);
-    }*/
+    public void setScale(float scale) {
+        rect.set(rect.left / this.scale * scale,
+                rect.top / this.scale * scale,
+                rect.right / this.scale * scale,
+                rect.bottom / this.scale * scale);
+        this.scale = scale;
+    }
     
     public void select() {
         this.selected = true;
@@ -228,24 +285,8 @@ public class Annotation {
         this.minimized = !minimized;
     }
     
-    public void showText() {
-        this.textVisible = true;
-    }
-    
-    public void hideText() {
-        this.textVisible = false;
-    }
-    
     public void toggleText() {
         this.textVisible = !textVisible;
-    }
-    
-    public void showInfos() {
-        this.infosVisible = true;
-    }
-    
-    public void hideInfos() {
-        this.infosVisible = false;
     }
     
     public void toggleInfos() {
@@ -265,7 +306,7 @@ public class Annotation {
     }
     
     public boolean touched(float x, float y) {
-        return !getArea(x, y).equals(Annotation.Area.NONE);
+        return (!deleted && !getArea(x, y).equals(Annotation.Area.NONE));
     }
     
     // Methods and utilities for drawing
@@ -316,37 +357,38 @@ public class Annotation {
         return center;
     }
     
-    private RectF getInfosRect(RectF annot) {
-        return new RectF(annot.left, annot.bottom + 5, annot.left + INFOS_RECT_WIDTH, annot.bottom + INFOS_RECT_HEIGHT);
+    private RectF getInfosRect() {
+        return new RectF(rect.left, rect.bottom + 5, rect.left + INFOS_RECT_WIDTH, rect.bottom + INFOS_RECT_HEIGHT);
     }
     
-    private RectF getTextRect(RectF annot) {
-        return new RectF(annot.left, annot.bottom + 5, annot.left + TEXT_RECT_WIDTH, annot.bottom + TEXT_RECT_HEIGHT);
+    public Rect getTextRect() {
+        return new Rect((int)rect.left, (int)rect.bottom + 10, (int)rect.left + TEXT_RECT_WIDTH, (int)rect.bottom + TEXT_RECT_HEIGHT);
     }
     
     
     public void draw(Canvas canvas) {
-        
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        if (isMinimized()) {
-            drawButton(canvas, paint, Button.DELETE);
-            drawButton(canvas, paint, Button.MAXIMIZE);
-        }
-        else {
-            drawRect(canvas, paint);
-            if (selected) {
+        if (!deleted) {
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            if (isMinimized()) {
                 drawButton(canvas, paint, Button.DELETE);
-                drawButton(canvas, paint, Button.MINIMIZE);
-                drawButton(canvas, paint, Button.INFO);
-                drawButton(canvas, paint, Button.EDIT);
-                drawButton(canvas, paint, Button.RESIZE);
+                drawButton(canvas, paint, Button.MAXIMIZE);
             }
-            if (textVisible) {
-                drawText(canvas, paint);
-            }
-            if (infosVisible) {
-                drawInfos(canvas, paint);
+            else {
+                drawRect(canvas, paint);
+                if (selected) {
+                    drawButton(canvas, paint, Button.DELETE);
+                    drawButton(canvas, paint, Button.MINIMIZE);
+                    drawButton(canvas, paint, Button.INFO);
+                    drawButton(canvas, paint, Button.EDIT);
+                    drawButton(canvas, paint, Button.RESIZE);
+                }
+                if (textVisible) {
+                    //drawText(view, canvas, paint);
+                }
+                if (infosVisible) {
+                    drawInfos(canvas, paint);
+                }
             }
         }
     }
@@ -366,7 +408,7 @@ public class Annotation {
     }
     
     private void drawInfos(Canvas canvas, Paint paint) {
-        RectF infosRect = getInfosRect(rect);
+        RectF infosRect = getInfosRect();
         // Border
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(INFOS_BORDER_COLOR);
@@ -382,39 +424,27 @@ public class Annotation {
         
         // INFOS
         paint.setColor(TEXT_COLOR);
-        String infos = author + "  " + date;
-        canvas.drawText(infos, infosRect.left + 10, infosRect.top + 15, paint);
-        
-    }
-    
-    private void drawText(Canvas canvas, Paint paint) {
-        RectF textRect = getTextRect(rect);
-        
-        // Text Rect
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(TEXT_RECT_COLOR);
-        paint.setAlpha(TEXT_RECT_ALPHA);
-        canvas.drawRoundRect(textRect, 0f, 0f, paint);
-        
-        // Text
-        paint.setColor(TEXT_COLOR);
         paint.setTextSize(TEXT_SIZE);
-        canvas.drawText(text, textRect.left + 10, textRect.top + 15, paint);
+        canvas.drawText(author, infosRect.left + TEXT_PADDING, infosRect.top + TEXT_SIZE, paint);
+        canvas.drawText(date, infosRect.left + TEXT_PADDING, infosRect.top + (TEXT_SIZE * 3), paint);
+        
     }
     
     private void drawButton(Canvas canvas, Paint paint, Button type) {
         PointF center = getButtonCenter(rect, type);
-        // Inner black circle with shadow
-        paint.setColor(BUTTON_COLOR);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setShadowLayer(8f, 0.5f, 0.5f, BUTTON_COLOR);
-        canvas.drawCircle(center.x, center.y, Annotation.BUTTON_RADIUS, paint);
-        paint.clearShadowLayer();
-        // white border
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(Annotation.LINE_WIDTH);
-        paint.setColor(BUTTON_BORDER_COLOR);
-        canvas.drawCircle(center.x, center.y, Annotation.BUTTON_RADIUS, paint);
+        if (!type.equals(Button.RESIZE)) {
+            // Inner black circle with shadow
+            paint.setColor(BUTTON_COLOR);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setShadowLayer(8f, 0.5f, 0.5f, BUTTON_COLOR);
+            canvas.drawCircle(center.x, center.y, Annotation.BUTTON_RADIUS, paint);
+            paint.clearShadowLayer();
+            // white border
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(Annotation.LINE_WIDTH);
+            paint.setColor(BUTTON_BORDER_COLOR);
+            canvas.drawCircle(center.x, center.y, Annotation.BUTTON_RADIUS, paint);
+        }
 
         paint.setStrokeCap(Paint.Cap.ROUND);
         switch (type) {
@@ -442,11 +472,12 @@ public class Annotation {
                 break;
 
             case RESIZE :
+                paint.setColor(Color.BLACK);
                 // Two oblic straits
                 canvas.drawLine(center.x - Annotation.LINE_HALF_LENGTH, center.y + Annotation.LINE_HALF_LENGTH,
                                 center.x + Annotation.LINE_HALF_LENGTH, center.y - Annotation.LINE_HALF_LENGTH, paint);
-                canvas.drawLine(center.x, center.y + Annotation.LINE_HALF_LENGTH,
-                                center.x + Annotation.LINE_HALF_LENGTH, center.y, paint);
+                canvas.drawLine(center.x + (Annotation.LINE_HALF_LENGTH / 2), center.y + Annotation.LINE_HALF_LENGTH,
+                                center.x + Annotation.LINE_HALF_LENGTH, center.y + (Annotation.LINE_HALF_LENGTH / 2), paint);
                 // TODO : Path for arrow
                 break;
 

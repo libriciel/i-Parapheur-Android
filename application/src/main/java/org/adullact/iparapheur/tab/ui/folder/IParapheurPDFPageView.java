@@ -43,21 +43,33 @@ package org.adullact.iparapheur.tab.ui.folder;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFCore;
 import com.artifex.mupdf.PageView;
 import de.akquinet.android.androlog.Log;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.adullact.iparapheur.tab.model.Annotation;
@@ -72,12 +84,13 @@ public class IParapheurPDFPageView extends PageView
     private final MuPDFCore mCore;
     private Map<Integer, List<Annotation>> annotations;
     private View annotationsView;
+    private Map<Annotation, View> textViews;
     private GestureDetector gestureDetector;
    
     private PointF offset; // offset from the top left corner when an annotation is selected
     private Annotation selectedAnnotation;
     private Mode mode;
-
+    
     private enum Mode {
         NONE,
         MOVE,
@@ -95,6 +108,7 @@ public class IParapheurPDFPageView extends PageView
         selectedAnnotation = null;
         mode = Mode.NONE;
         gestureDetector = new GestureDetector(c, new AnnotationGestureListener());
+        textViews = new HashMap<Annotation, View>();
     }
 
     @Override
@@ -105,8 +119,12 @@ public class IParapheurPDFPageView extends PageView
         if (annotationsView != null) {
             annotationsView.layout(0, 0, w, h);
         }
+        for (Map.Entry<Annotation, View> textView : textViews.entrySet()) {
+            Rect textRect = textView.getKey().getTextRect();
+            textView.getValue().layout(textRect.left, textRect.top, textRect.right, textRect.bottom);
+        }
     }
-
+    
     @Override
     protected void documentAvailable() {
         if (annotationsView == null) {
@@ -126,13 +144,22 @@ public class IParapheurPDFPageView extends PageView
             return mCore.getPageLinks(mPageNumber);
     }
 
-    private Annotation createAnnotation(float x, float y) {
-        Annotation annotation = new Annotation("author", mPageNumber, false, new Date().toString(), x, y, "", 0); // FIXME
+    private void createAnnotation(float x, float y) {
+        String date = DateFormat.getDateTimeInstance().format(new Date());
+        Annotation annotation = new Annotation("author", mPageNumber, false, date, x, y, "", 0, mSourceScale); // FIXME
         if (!annotations.containsKey(mPageNumber)) {
             this.annotations.put(mPageNumber, new ArrayList<Annotation>());
+            ((AnnotationView)annotationsView).setAnnotations(this.annotations.get(mPageNumber));
         }
         annotations.get(mPageNumber).add(annotation);
-        return annotation;
+        selectedAnnotation = annotation;
+    }
+    
+    private void deleteAnnotation() {
+        if (selectedAnnotation != null) {
+            selectedAnnotation.delete();
+            selectedAnnotation = null;
+        }
     }
     
     private void unselectAnnotation() {
@@ -140,6 +167,47 @@ public class IParapheurPDFPageView extends PageView
             selectedAnnotation.unselect();
             selectedAnnotation = null;
         }
+    }
+    
+    private void toggleText() {
+        selectedAnnotation.toggleText();
+        if (selectedAnnotation.isTextVisible()) {
+            showText();
+        }
+        else {
+            hideText();
+        }
+    }
+    
+    private void hideText() {
+        Log.i("IParapheurPDFPageView", "hidding text");
+        textViews.get(selectedAnnotation).setVisibility(View.INVISIBLE);
+    }
+    
+    private void showText() {
+        
+        if (!textViews.containsKey(selectedAnnotation)) {
+            Log.i("IParapheurPDFPageView", "Creating editText");
+            EditText editText = new EditText(this.getContext());
+            editText.setCursorVisible(true);
+            editText.setTextSize(Annotation.TEXT_SIZE);
+            editText.setTextColor(Annotation.TEXT_COLOR);
+            editText.setBackgroundColor(Annotation.TEXT_RECT_COLOR);
+            editText.setClickable(true);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            editText.setText(selectedAnnotation.getText(), TextView.BufferType.EDITABLE);
+            editText.addTextChangedListener(new AnnotationTextWatcher());
+            textViews.put(selectedAnnotation, editText);
+            addView(editText);
+        }
+        Log.i("IParapheurPDFPageView", "Showing text");
+        textViews.get(selectedAnnotation).setVisibility(View.VISIBLE);
+        textViews.get(selectedAnnotation).bringToFront();
+    }
+    
+    private void annotationMoved() {;
+        Rect textRect = selectedAnnotation.getTextRect();
+        textViews.get(selectedAnnotation).layout(textRect.left, textRect.top, textRect.right, textRect.bottom);
     }
     
     
@@ -184,7 +252,7 @@ public class IParapheurPDFPageView extends PageView
                 Log.i("IParapheurPDFPageView", "onSingleTapConfirmed area : " + selectedAnnotation.getArea(me.getX(), me.getY()));
                 switch (selectedAnnotation.getArea(me.getX(), me.getY())) {
                     case EDIT :
-                        selectedAnnotation.toggleText();
+                        toggleText();
                         break;
                     case MAXIMIZE : // Same that MINIMIZED
                     case MINIMIZE :
@@ -195,8 +263,7 @@ public class IParapheurPDFPageView extends PageView
                         break;
                     case DELETE :
                         // TODO : possibilité d'annuler la suppression?
-                        annotations.get(mPageNumber).remove(selectedAnnotation);
-                        unselectAnnotation();
+                        deleteAnnotation();
                         break;
                     case NONE :
                         unselectAnnotation();
@@ -216,9 +283,11 @@ public class IParapheurPDFPageView extends PageView
                 switch (mode) {
                     case MOVE :
                         selectedAnnotation.moveTo(current.getX(), current.getY(), offset);
+                        annotationMoved();
                         break;
                     case RESIZE :
                         selectedAnnotation.resize(current.getX(), current.getY());
+                        annotationMoved();
                         break;
                 }
             }
@@ -250,7 +319,7 @@ public class IParapheurPDFPageView extends PageView
                     }
                 }
                 if (selectedAnnotation == null) {
-                    selectedAnnotation = createAnnotation(me.getX(), me.getY());
+                    createAnnotation(me.getX(), me.getY());
                 }
                 selectedAnnotation.select();
                 RectF rect = selectedAnnotation.getRect();
@@ -291,8 +360,18 @@ public class IParapheurPDFPageView extends PageView
         public AnnotationView(Context context, List<Annotation> annotations, View listener) {
             super(context);
             this.annotations = annotations;
+            Log.i("IParapheurPDFPageView", "setScale : " + mSourceScale);
+            if ((annotations != null)) {
+                for (Annotation annotation : this.annotations) {
+                    annotation.setScale(mSourceScale);
+                }
+            }
             this.setOnTouchListener((OnTouchListener) listener);
             this.context = context;
+        }
+        
+        public void setAnnotations(List<Annotation> annotations) {
+            this.annotations = annotations;
         }
 
         @Override
@@ -300,21 +379,18 @@ public class IParapheurPDFPageView extends PageView
             if (!isBlanck() && (annotations != null)) {
                 for (Annotation annotation : annotations) {
                     annotation.draw(canvas);
-                    if (annotation.isTextVisible()) {
-                        EditText text = new EditText(context);
-                        text.setVisibility(View.VISIBLE);
-                        text.setText(annotation.getText());
-                        text.setX(annotation.getRect().left);
-                        text.setY(annotation.getRect().bottom);
-                        text.setWidth((int)annotation.getRect().width());
-                        text.setHeight((int)annotation.getRect().height());
-                        text.setCursorVisible(true);
-                        addView(text);
-                        invalidate();
-                    }
                 }
             }
         }
-        
     }
+    
+    
+    private class AnnotationTextWatcher implements TextWatcher {
+        public void afterTextChanged(Editable s) {
+            selectedAnnotation.setText(s.toString());
+        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+    }
+    
 }
