@@ -16,6 +16,8 @@ public class ActionTaskParam
     
     public final String officeIdentity;
 
+    public final String keyAlias;
+
     public final String[] folderIdentities;
 
     public ActionTaskParam( String accountIdentity, String pubAnnotation, String privAnnotation, String officeIdentity, String... folderIdentities )
@@ -25,6 +27,17 @@ public class ActionTaskParam
         this.privAnnotation = privAnnotation;
         this.folderIdentities = folderIdentities;
         this.officeIdentity = officeIdentity;
+        this.keyAlias = null;
+    }
+
+    public ActionTaskParam( String accountIdentity, String pubAnnotation, String privAnnotation, String officeIdentity, String keyAlias, String... folderIdentities )
+    {
+        this.accountIdentity = accountIdentity;
+        this.pubAnnotation = pubAnnotation;
+        this.privAnnotation = privAnnotation;
+        this.folderIdentities = folderIdentities;
+        this.officeIdentity = officeIdentity;
+        this.keyAlias = keyAlias;
     }
 
 }

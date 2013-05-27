@@ -1,37 +1,24 @@
 package org.adullact.iparapheur.tab.services;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.cert.Certificate;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLPeerUnverifiedException;
 import org.adullact.iparapheur.tab.IParapheurTabException;
-import org.adullact.iparapheur.tab.model.AbstractFolderFile.FolderFilePageImage;
 import org.adullact.iparapheur.tab.model.*;
 import org.adullact.iparapheur.tab.model.Progression.Step;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.codeartisans.java.toolbox.Strings;
 import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import roboguice.inject.ContextSingleton;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Service used to access iParapheur HTTP API.
@@ -54,7 +41,9 @@ public class IParapheurHttpClient
 
     private static final String PROGRESSION_PATH = "/parapheur/api/getCircuit";
 
-    private static final String SIGN_PATH = "/parapheur/api/sign";
+    private static final String SIGN_PATH = "/parapheur/api/signature";
+
+    private static final String SIGNINFO_PATH = "/parapheur/api/getSignInfo";
 
     private static final String VISA_PATH = "/parapheur/api/visa";
 
@@ -286,17 +275,17 @@ public class IParapheurHttpClient
         }
     }
 
-    public void sign( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
+    public void sign( Account account, String pubAnnotation, String privAnnotation, String bureauCourant, List<String> signatures, String... folderIdentities )
     {
         StaticHttpClient.ensureLoggedIn( account );
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
+            String requestBody = prepareSignRequestBody( pubAnnotation, privAnnotation, bureauCourant, signatures, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + SIGN_PATH + ": " + requestBody );
 
             // Execute HTTP request
-            JSONObject jsonData = StaticHttpClient.postToJson(account, SIGN_PATH, requestBody );
+            //JSONObject jsonData = StaticHttpClient.postToJson(account, SIGN_PATH, requestBody );
 
             // Process response
             /*if ( response.getStatusLine().getStatusCode() != 200 ) {
@@ -316,7 +305,7 @@ public class IParapheurHttpClient
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
+            String requestBody = prepareVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + VISA_PATH + ": " + requestBody );
 
             // Execute HTTP request
@@ -340,7 +329,7 @@ public class IParapheurHttpClient
         try {
 
             // Prepare request body
-            String requestBody = prepareSignVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
+            String requestBody = prepareVisaRejectRequestBody( pubAnnotation, privAnnotation, bureauCourant, folderIdentities );
             Log.d( IParapheurHttpClient.class, "REQUEST on " + REJECT_PATH + ": " + requestBody );
 
             // Execute HTTP request
@@ -357,7 +346,7 @@ public class IParapheurHttpClient
         }
     }
 
-    private String prepareSignVisaRejectRequestBody( String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
+    private String prepareVisaRejectRequestBody( String pubAnnotation, String privAnnotation, String bureauCourant, String... folderIdentities )
     {
         NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
         try {
@@ -371,6 +360,31 @@ public class IParapheurHttpClient
             json.put( "bureauCourant", bureauCourant);
             json.put( "annotPub", pubAnnotation == null ? Strings.EMPTY : pubAnnotation );
             json.put( "annotPriv", privAnnotation == null ? Strings.EMPTY : privAnnotation );
+            return json.toString();
+        } catch ( JSONException ex ) {
+            // This should not happen but we don't want to fail silently!
+            throw new IParapheurTabException( "Unable to prepare request JSON body: " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
+        }
+    }
+
+    private String prepareSignRequestBody( String pubAnnotation, String privAnnotation, String bureauCourant, List<String> signatures, String... folderIdentities )
+    {
+        NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
+        try {
+            JSONObject json = new JSONObject();
+            JSONArray dossiers = new JSONArray();
+            for ( int index = 0; index < folderIdentities.length; index++ ) {
+                dossiers.put( folderIdentities[index] );
+            }
+            JSONArray signaturesArray = new JSONArray();
+            for ( String signature : signatures ) {
+                signaturesArray.put(signature);
+            }
+            json.put("dossiers", dossiers )
+                .put("signatures", signaturesArray)
+                .put("annotPub", pubAnnotation == null ? Strings.EMPTY : pubAnnotation)
+                .put("annotPriv", privAnnotation == null ? Strings.EMPTY : privAnnotation)
+                .put("bureauCourant", bureauCourant);
             return json.toString();
         } catch ( JSONException ex ) {
             // This should not happen but we don't want to fail silently!
@@ -626,5 +640,38 @@ public class IParapheurHttpClient
         } catch ( Exception ex ) {
             throw new IParapheurHttpException( "Enregistrement des annotations : " + ( Strings.isEmpty( ex.getMessage() ) ? ex.getClass().getSimpleName() : ex.getMessage() ), ex );
         }
+    }
+
+    public List<SignInfo> getSignaturesInfo(Account account, String... folderIdentities) {
+        NullArgumentException.ensureNotEmpty( "Folder Identities", folderIdentities );
+        StaticHttpClient.ensureLoggedIn( account );
+        JSONObject jsonRequest = new JSONObject();
+        JSONArray dossiers = new JSONArray();
+        for (int i = 0; i < folderIdentities.length; i++) {
+            dossiers.put( folderIdentities[i] );
+        }
+        try {
+            jsonRequest.put("dossiers", dossiers);
+            Log.i("IParapheurHttpClient", "REQUEST on " + SIGNINFO_PATH + ": " + jsonRequest.toString());
+            JSONObject jsonResponse = StaticHttpClient.postToJson( account, SIGNINFO_PATH, jsonRequest.toString() );
+            return SignInfoListFromJson(jsonResponse);
+        } catch (JSONException ex) {
+            throw new IParapheurHttpException( "Error while getting signature Informations", ex );
+        }
+    }
+
+    private List<SignInfo> SignInfoListFromJson(JSONObject response) {
+        List<SignInfo> infos = new ArrayList<SignInfo>();
+        try {
+            Iterator<String> keys = response.keys();
+            while (keys.hasNext()) {
+                String dossierRef = keys.next();
+                JSONObject infosJSON = response.getJSONObject(dossierRef);
+                infos.add(new SignInfo(dossierRef, infosJSON.getString("hash"), infosJSON.getString("format")));
+            }
+        } catch (Exception e) {
+            throw new IParapheurHttpException( "Error while getting signature Informations", e );
+        }
+        return infos;
     }
 }

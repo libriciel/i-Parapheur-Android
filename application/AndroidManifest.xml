@@ -4,10 +4,10 @@
            android:versionCode="1" 
            android:versionName="1.0-SNAPSHOT">
     
-    <!-- Android >= 3.x -->
+    <!-- Android >= 4.x -->
     <uses-sdk  
-        android:targetSdkVersion="11" 
-        android:minSdkVersion="11"/>
+        android:targetSdkVersion="15"
+        android:minSdkVersion="15"/>
                
     <!-- Only supports Tablets -->
     <supports-screens 
@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application 
         android:name=".IParapheurTabApplication"

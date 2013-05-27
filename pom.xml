@@ -22,7 +22,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <platform.version>3.0_r2</platform.version>
+        <platform.version>4.0.3_r3</platform.version>
         <android.toolbox.version>1.5</android.toolbox.version>
     </properties>
 

@@ -26,7 +26,7 @@
             <groupId>org.codeartisans.android-toolbox</groupId>
             <artifactId>android-toolbox</artifactId>
             <version>${android.toolbox.version}</version>
-            <type>apklib</type>
+            <!--type>apklib</type-->
         </dependency>
 
         <!-- Guava http://code.google.com/p/guava-libraries/ -->
@@ -35,14 +35,25 @@
             <artifactId>guava</artifactId>
             <version>11.0.2</version>
         </dependency>
-        
+
         <!-- Bouncy/Spongy/Castle http://rtyley.github.com/spongycastle/ -->
+        <dependency>
+            <groupId>com.madgag</groupId>
+            <artifactId>sc-light-jdk15on</artifactId>
+            <version>1.47.0.2</version>
+        </dependency>
         <dependency>
             <groupId>com.madgag</groupId>
             <artifactId>scprov-jdk15on</artifactId>
             <version>1.47.0.2</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.madgag</groupId>
+            <artifactId>scpkix-jdk15on</artifactId>
+            <version>1.47.0.2</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

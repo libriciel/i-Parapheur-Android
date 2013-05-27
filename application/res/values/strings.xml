@@ -45,6 +45,7 @@
     <string name="actions_sign_batch">Signer le lot</string>
     <string name="actions_sign_error">La signature de ce dossier a échoué</string>
     <string name="actions_sign_error_batch">La signature de ce lot a échoué</string>
+    <string name="actions_sign_choose_certificate">Choix du certificat de signature</string>
     
     <string name="actions_visa_noun">Visa</string>
     <string name="actions_visa">Viser</string>
@@ -105,6 +106,6 @@
     <string name="folder_progression_approved_at">Approuvé le</string>
     <string name="folder_progression_by">par</string>
     <string name="folder_progression_public_annotation">Annotation</string>
-    <string name="folder_progression_private_annotation">Annotation privée</string>
+    <string name="folder_progression_private_annotation">Annotation privée</string><string name="folder_action_dialog_selected_certificate">Certificat séléctionné</string>
     
 </resources>

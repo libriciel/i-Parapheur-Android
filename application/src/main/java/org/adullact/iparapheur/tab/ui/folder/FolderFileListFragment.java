@@ -5,21 +5,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import de.akquinet.android.androlog.Log;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import android.widget.*;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.AbstractFolderFile;
 import org.adullact.iparapheur.tab.model.FolderDocument;
 import roboguice.fragment.RoboListFragment;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class FolderFileListFragment
         extends RoboListFragment
@@ -76,19 +70,16 @@ public class FolderFileListFragment
             this.folderFiles = new ArrayList<AbstractFolderFile>( folderFiles );
         }
 
-        @Override
         public int getCount()
         {
             return folderFiles.size();
         }
 
-        @Override
         public Object getItem( int position )
         {
             return folderFiles.get( position );
         }
 
-        @Override
         public long getItemId( int position )
         {
             return position;
@@ -100,7 +91,6 @@ public class FolderFileListFragment
          * 
          * @return The root of the item's layout.
          */
-        @Override
         public View getView( int position, View convertView, ViewGroup parent )
         {
 

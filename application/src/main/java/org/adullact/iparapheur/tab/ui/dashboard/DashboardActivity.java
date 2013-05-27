@@ -15,10 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.inject.Inject;
 import de.akquinet.android.androlog.Log;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Community;
@@ -36,6 +32,11 @@ import org.codeartisans.android.toolbox.logging.AndrologInitOnCreateObserver;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import org.codeartisans.java.toolbox.Strings;
 import roboguice.inject.InjectView;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class DashboardActivity
         extends RoboActivity
@@ -175,19 +176,16 @@ public class DashboardActivity
             this.offices = new ArrayList<Office>( offices );
         }
 
-        @Override
         public int getCount()
         {
             return offices.size();
         }
 
-        @Override
         public Object getItem( int position )
         {
             return offices.get( position );
         }
 
-        @Override
         public long getItemId( int position )
         {
             return position;
@@ -199,7 +197,6 @@ public class DashboardActivity
          * 
          * @return The root of the item's layout.
          */
-        @Override
         public View getView( int position, View convertView, ViewGroup parent )
         {
 

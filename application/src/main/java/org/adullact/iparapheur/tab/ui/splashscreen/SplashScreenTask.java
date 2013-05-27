@@ -33,7 +33,7 @@ public class SplashScreenTask
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_TITLE_SUFFIX, "iParapheur local" );
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_URL_SUFFIX, "jmaire.test.adullact.org" );
                 editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_LOGIN_SUFFIX, "android" );
-                editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_PASSWORD_SUFFIX, "android" );
+                editor.putString( PREFS_PREFIX + "AccountTest0" + PREFS_PASSWORD_SUFFIX, "secret" );
 
                 editor.apply();
                 editor.commit();

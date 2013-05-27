@@ -1,39 +1,25 @@
 package org.adullact.iparapheur.tab.services;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Environment;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
+import de.akquinet.android.androlog.Log;
 import org.adullact.iparapheur.tab.model.Account;
 import org.codeartisans.java.toolbox.Strings;
 import org.codeartisans.java.toolbox.exceptions.NullArgumentException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.akquinet.android.androlog.Log;
-import java.io.File;
-import java.io.FileOutputStream;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Singleton allowing to keep one HttpClient instance only.
@@ -57,7 +43,38 @@ public class StaticHttpClient {
     private static final Map<String, String> accountSessionTickets = new HashMap<String, String>();
     public static final String BASE_PATH = "https://m.";
     public static final String BASE_PATH_HTTP = "http://m.";
-    
+
+    private static final String certAcAdullact = "-----BEGIN CERTIFICATE-----\n" +
+                                        "MIIFLjCCBBagAwIBAgIJAMXb2wwwEe2WMA0GCSqGSIb3DQEBBQUAMIGYMQswCQYD\n" +
+                                        "VQQGEwJGUjEQMA4GA1UECBMHSGVyYXVsdDEYMBYGA1UEChMPQURVTExBQ1QtUHJv\n" +
+                                        "amV0MRgwFgYDVQQLEw9BRFVMTEFDVC1Qcm9qZXQxHjAcBgNVBAMTFUFDIEFEVUxM\n" +
+                                        "QUNUIFByb2pldCBnMjEjMCEGCSqGSIb3DQEJARYUc3lzdGVtZUBhZHVsbGFjdC5v\n" +
+                                        "cmcwHhcNMTAxMTE1MTMzODIyWhcNMjAxMTEyMTMzODIyWjCBmDELMAkGA1UEBhMC\n" +
+                                        "RlIxEDAOBgNVBAgTB0hlcmF1bHQxGDAWBgNVBAoTD0FEVUxMQUNULVByb2pldDEY\n" +
+                                        "MBYGA1UECxMPQURVTExBQ1QtUHJvamV0MR4wHAYDVQQDExVBQyBBRFVMTEFDVCBQ\n" +
+                                        "cm9qZXQgZzIxIzAhBgkqhkiG9w0BCQEWFHN5c3RlbWVAYWR1bGxhY3Qub3JnMIIB\n" +
+                                        "IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwaVPgqgwun6lE2Yl6tsg4qiQ\n" +
+                                        "TgtwAUSu7DRjMrH9jRxmovwGRxpwR7eyHKIvV16xtLgcqk8E6oqAQhLeTKagwSzv\n" +
+                                        "Rqsod+rqi6dLAjTlupx15QTXXhEcG7EkfDNCBt5VmJZuuuIQmo1lMLUVkkm282s2\n" +
+                                        "jgZ8+2Fn8Xy7o7PCaZxHpbVs5F0oqFbvc2Tb3IPG4eTjQRpS+pl1meEdGWw9v+GP\n" +
+                                        "UhlICCVXNp/EXm6NJ/7Jp0SWXF2bWyFUSip15MM2MzSFfWpo5KOSJhBpG3WZ3L6R\n" +
+                                        "/mrhVG9LyEDMXbcEdpYTutpuq+4t0g42AcP8hRB4+QZDpgA7QdhThyi7of8z+QID\n" +
+                                        "AQABo4IBdzCCAXMwMwYDVR0fBCwwKjAooCagJIYiaHR0cDovL2NybC5hZHVsbGFj\n" +
+                                        "dC5vcmcvQ1JMX2cyLnBlbTAdBgNVHQ4EFgQUzMNE4h19Hljnc5DRwavCp4xCzxkw\n" +
+                                        "gc0GA1UdIwSBxTCBwoAUzMNE4h19Hljnc5DRwavCp4xCzxmhgZ6kgZswgZgxCzAJ\n" +
+                                        "BgNVBAYTAkZSMRAwDgYDVQQIEwdIZXJhdWx0MRgwFgYDVQQKEw9BRFVMTEFDVC1Q\n" +
+                                        "cm9qZXQxGDAWBgNVBAsTD0FEVUxMQUNULVByb2pldDEeMBwGA1UEAxMVQUMgQURV\n" +
+                                        "TExBQ1QgUHJvamV0IGcyMSMwIQYJKoZIhvcNAQkBFhRzeXN0ZW1lQGFkdWxsYWN0\n" +
+                                        "Lm9yZ4IJAMXb2wwwEe2WMAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgEGMBEGCWCG\n" +
+                                        "SAGG+EIBAQQEAwIBBjAfBgNVHREEGDAWgRRzeXN0ZW1lQGFkdWxsYWN0Lm9yZzAN\n" +
+                                        "BgkqhkiG9w0BAQUFAAOCAQEAgvALO60EHB6Ft+RloTRGGenhhViL80xeoFeGi058\n" +
+                                        "p9v3U+cLjVH/7BXli4sntD+J+tanU+P5BwbyMjO4WQF3vz7VfXlGY+4kaPPE1buP\n" +
+                                        "x+KeZ+AZEekdE0eEXuj/qfBYFUpkRCsBXHgYa4vIQ+lKkhcKU25nE8mZHO8GzDjz\n" +
+                                        "btbcmAUeNpsPF8mvF4JaQ/E2fmLeY6/x2Lzf7NcD+ft/uDauxMMblmFLbQT8tFaQ\n" +
+                                        "nV/IHaYA/olltyfw47/IxQfYy/wbKboGmKKca42T+VMj/KFKgmiy7q0limOYTIPj\n" +
+                                        "n4azomaJpl+mq3uIILJZ+/9Xcpbe/hbUGNF2tuqQv9uNPg==\n" +
+                                        "-----END CERTIFICATE-----";
+
     private static final String cert = "-----BEGIN CERTIFICATE-----\n" +
                                         "MIIHyTCCBbGgAwIBAgIUbyl4BzfA+DWwMPJHFgkdXxI7UGwwDQYJKoZIhvcNAQEF\n" +
                                         "BQAwgbUxCzAJBgNVBAYTAkZSMRAwDgYDVQQIDAdIZXJhdWx0MRQwEgYDVQQHDAtN\n" +
@@ -114,7 +131,7 @@ public class StaticHttpClient {
         HttpURLConnection connection = null;
         String url = StaticHttpClient.buildUrl(account, path);
         try {
-            InputStream in = new ByteArrayInputStream(cert.getBytes());
+            InputStream in = new ByteArrayInputStream(certAcAdullact.getBytes());
             if (StaticHttpClient.USE_HTTPS) {
                 CertificateFactory factory = CertificateFactory.getInstance("X.509");
                 Certificate certif = factory.generateCertificate(in);
@@ -180,13 +197,15 @@ public class StaticHttpClient {
         NullArgumentException.ensureNotNull("Account", account);
         if (!accountSessionTickets.containsKey(account.getIdentity())) {
             try {
-                Log.d(IParapheurHttpClient.class, "REQUEST to " + BASE_PATH + IParapheurHttpClient.LOGIN_PATH);
+                Log.d("IParapheurHttpClient", "REQUEST to " + BASE_PATH + IParapheurHttpClient.LOGIN_PATH);
                 String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
                 Log.i("StaticHttpClient", "request : " + request);
                 JSONObject json = StaticHttpClient.postToJson(account, IParapheurHttpClient.LOGIN_PATH, request);
+
                 String ticket = json.getJSONObject("data").getString("ticket");
                 accountSessionTickets.put(account.getIdentity(), ticket);
             } catch (JSONException ex) {
+                ex.printStackTrace();
                 throw new IParapheurHttpException(account.getTitle() + " : " + (Strings.isEmpty(ex.getMessage()) ? ex.getClass().getSimpleName() : ex.getMessage()), ex);
             }
         } else {
@@ -215,7 +234,7 @@ public class StaticHttpClient {
         Log.i("StaticHttpClient", "Downloading : " + fileUrl);
         try {
             if (StaticHttpClient.USE_HTTPS) {
-                InputStream in = new ByteArrayInputStream(cert.getBytes());
+                InputStream in = new ByteArrayInputStream(certAcAdullact.getBytes());
                 CertificateFactory factory = CertificateFactory.getInstance("X.509");
                 Certificate certif = factory.generateCertificate(in);
                 final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());

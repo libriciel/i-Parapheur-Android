@@ -41,38 +41,24 @@
 package org.adullact.iparapheur.tab.ui.folder;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.artifex.mupdf.LinkInfo;
 import com.artifex.mupdf.MuPDFCore;
 import com.artifex.mupdf.PageView;
 import de.akquinet.android.androlog.Log;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.adullact.iparapheur.tab.model.Annotation;
+
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  *
@@ -213,7 +199,6 @@ public class IParapheurPDFPageView extends PageView
     
     /**** Event listener callbacks ****/
 
-    @Override
     public boolean onTouch(View view, MotionEvent me) {
         boolean result = gestureDetector.onTouchEvent(me);
         if (result) {

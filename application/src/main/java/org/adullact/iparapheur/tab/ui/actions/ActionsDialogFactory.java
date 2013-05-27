@@ -6,13 +6,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.security.KeyChain;
+import android.security.KeyChainAliasCallback;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.google.inject.Inject;
-import java.util.List;
 import org.adullact.iparapheur.tab.IParapheurTabException;
 import org.adullact.iparapheur.tab.R;
 import org.adullact.iparapheur.tab.model.Folder;
@@ -22,6 +23,8 @@ import org.adullact.iparapheur.tab.services.IParapheurHttpException;
 import org.adullact.iparapheur.tab.ui.Refreshable;
 import org.codeartisans.android.toolbox.os.AsyncTaskResult;
 import roboguice.inject.ContextSingleton;
+
+import java.util.List;
 
 @ContextSingleton
 public class ActionsDialogFactory
@@ -68,7 +71,7 @@ public class ActionsDialogFactory
         }
 
         LayoutInflater inflater = ( LayoutInflater ) activity.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        View layout = inflater.inflate( R.layout.folder_action_dialog, ( ViewGroup ) activity.findViewById( R.id.folder_action_dialog_layout_root ) );
+        final View layout = inflater.inflate( R.layout.folder_action_dialog, ( ViewGroup ) activity.findViewById( R.id.folder_action_dialog_layout_root ) );
 
         TextView folderTitle = ( TextView ) layout.findViewById( R.id.folder_action_dialog_title );
         folderTitle.setText( single
@@ -85,29 +88,48 @@ public class ActionsDialogFactory
         switch ( lambda.getRequestedAction() ) {
             case SIGNATURE:
                 if ( accept ) {
+                    layout.findViewById(R.id.folder_action_dialog_layout_cert).setVisibility(View.VISIBLE);
+                    layout.findViewById(R.id.folder_action_dialog_button_reload_cert).setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            KeyChain.choosePrivateKeyAlias(activity,
+                                    new KeyChainAliasCallback() {
+                                        public void alias(final String alias) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    ((TextView) layout.findViewById(R.id.folder_action_dialog_selected_cert)).setText(alias);
+                                                }
+                                            });
+                                        }
+                                    },
+                                    // FIXME :  only RSA?
+                                    new String[]{"RSA"}, // List of acceptable key types. null for any
+                                    null,                // issuer, null for any
+                                    null,                // host name of server requesting the cert, null if unavailable
+                                    -1,                  // port of server requesting the cert, -1 if unavailable
+                                    null);               // alias to preselect, null if unavailable
+                        }
+                    });
+
                     builder.setIcon( R.drawable.ic_action_sign );
                     builder.setTitle( activity.getResources().getString( R.string.actions_sign_noun ) );
                     builder.setPositiveButton( single
                                                ? activity.getResources().getString( R.string.actions_sign )
                                                : activity.getResources().getString( R.string.actions_sign_batch ),
-                                               new DialogInterface.OnClickListener()
-                    {
-
-                        public void onClick( final DialogInterface dialog, int id )
-                        {
-                            doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
-                        }
-
-                    } );
+                                               new DialogInterface.OnClickListener() {
+                        public void onClick( final DialogInterface dialog, int id ) {
+                            String keyAlias = ((TextView) layout.findViewById(R.id.folder_action_dialog_selected_cert)).getText().toString();
+                            if (keyAlias != null) {
+                                doSign( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, keyAlias, identities( folders ) );
+                            }
+                        }});
                 } else {
-                    builder.setIcon( R.drawable.ic_action_reject );
+                    builder.setIcon(R.drawable.ic_action_reject);
                     builder.setTitle( activity.getResources().getString( R.string.actions_reject_sign_noun ) );
                     builder.setPositiveButton( single
                                                ? activity.getResources().getString( R.string.actions_reject )
                                                : activity.getResources().getString( R.string.actions_reject_batch ),
                                                new DialogInterface.OnClickListener()
                     {
-
                         public void onClick( final DialogInterface dialog, int id )
                         {
                             doReject( dialog, accountIdentity, pubAnnotation.getText().toString(), privAnnotation.getText().toString(), officeIdentity, successIntent, identities( folders ) );
@@ -167,7 +189,7 @@ public class ActionsDialogFactory
         return identities;
     }
 
-    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String officeIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String... folderIdentities )
+    private void doSign( final DialogInterface rejectDialog, final String accountIdentity, final String officeIdentity, final String pubAnnotation, final String privAnnotation, final Intent successIntent, final String keyAlias, final String... folderIdentities )
     {
         new SignTask( activity, accountsRepository, iParapheurClient )
         {
@@ -203,7 +225,7 @@ public class ActionsDialogFactory
                         public void onClick( DialogInterface dialog, int id )
                         {
                             dialog.dismiss();
-                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, officeIdentity, successIntent, folderIdentities );
+                            doSign( rejectDialog, accountIdentity, pubAnnotation, privAnnotation, officeIdentity, successIntent, keyAlias, folderIdentities );
                         }
 
                     } );
@@ -226,7 +248,7 @@ public class ActionsDialogFactory
                 }
             }
 
-        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, officeIdentity, folderIdentities ) );
+        }.execute( new ActionTaskParam( accountIdentity, pubAnnotation, privAnnotation, officeIdentity, keyAlias, folderIdentities ) );
     }
 
     private void doVisa( final DialogInterface rejectDialog, final String accountIdentity, final String pubAnnotation, final String privAnnotation, final String officeIdentity, final Intent successIntent, final String... folderIdentities )
