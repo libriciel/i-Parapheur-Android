@@ -24,6 +24,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
     public static final String PREFS_PASSWORD_SUFFIX = "_password";
 
     private ArrayList<Account> accounts = null;
+    private Account selectedAccount;
 
     public List<Account> getAccounts() {
         if (accounts == null) {
@@ -81,12 +82,16 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
             editor.apply();
             editor.commit();
         }
+        if ((selectedAccount != null) && (selectedAccount.getId().equals(id))) {
+            selectedAccount = null;
+        }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
             accounts = null;
+            selectedAccount = null;
             getAccounts();
         }
     }
@@ -98,5 +103,17 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 
     public String getAccountIdFromPreferenceKey(String key) {
         return key.substring(key.indexOf('_') + 1, key.lastIndexOf('_'));
+    }
+
+    public Account getSelectedAccount() {
+        // TODO : temporary : to delete
+        if (selectedAccount == null) {
+            selectAccount(getAccounts().get(0).getId());
+        }
+        return selectedAccount;
+    }
+
+    public void selectAccount(String id) {
+        selectedAccount = getAccount(id);
     }
 }

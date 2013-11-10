@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.model;
 
+import org.adullact.iparapheur.controller.connectivity.RESTClient;
+
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +19,7 @@ public class Account implements Serializable
     private String url;
     private String login;
     private String password;
+    private String ticket;
 
     public Account( String id)
     {
@@ -120,4 +123,11 @@ public class Account implements Serializable
         this.password = password;
     }
 
+    public String getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(String ticket) {
+        this.ticket = ticket;
+    }
 }
