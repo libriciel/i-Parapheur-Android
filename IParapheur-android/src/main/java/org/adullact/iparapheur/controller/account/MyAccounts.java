@@ -91,8 +91,12 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
             accounts = null;
-            selectedAccount = null;
             getAccounts();
+            // if an Account was previously selected, update it with the new one
+            if (selectedAccount != null)
+            {
+                selectedAccount = getAccount(selectedAccount.getId());
+            }
         }
     }
 
@@ -106,10 +110,6 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
     }
 
     public Account getSelectedAccount() {
-        // TODO : temporary : to delete
-        if (selectedAccount == null) {
-            selectAccount(getAccounts().get(0).getId());
-        }
         return selectedAccount;
     }
 

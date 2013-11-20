@@ -86,35 +86,43 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         listView = (ListView) view.findViewById(R.id.bureaux_list);
         listView.setAdapter(new BureauListAdapter(getActivity()));
         listView.setOnItemClickListener(this);
-        RadioGroup accountContainer = (RadioGroup) view.findViewById(R.id.bureaux_account_container);
+        updateAccounts();
+        updateBureaux(false);
+    }
+
+    private void updateAccounts() {
+        RadioGroup accountContainer = (RadioGroup) getView().findViewById(R.id.bureaux_account_container);
+        accountContainer.removeAllViews();
+        Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
         for (Account account : MyAccounts.INSTANCE.getAccounts()) {
             RadioButton radio = new RadioButton(getActivity());
             radio.setText(account.getTitle());
             radio.setTag(account.getId());
             radio.setOnClickListener(this);
+            if ((selectedAccount != null) && account.equals(selectedAccount)) {
+                radio.setSelected(true);
+            }
             accountContainer.addView(radio);
         }
-        updateBureaux(false);
     }
 
     private void updateBureaux(boolean forceReload) {
         if (forceReload) {
             this.bureaux = null;
         }
-        if (bureaux == null) {
+        if ((bureaux == null) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
             new BureauxLoadingTask(getActivity(), this).execute();
         }
-        else {
-            onDataChanged();
-        }
+        onDataChanged();
     }
 
     // OnClickListener implementation (used on radio buttons for accounts)
     @Override
     public void onClick(View v) {
-        String previouslySelectedAccount = MyAccounts.INSTANCE.getSelectedAccount().getId();
         String newlylySelectedAccount = (String) v.getTag();
-        if (!previouslySelectedAccount.equals(newlylySelectedAccount)) {
+        if ((MyAccounts.INSTANCE.getSelectedAccount() == null) ||
+                !newlylySelectedAccount.equals(MyAccounts.INSTANCE.getSelectedAccount().getId()))
+        {
             MyAccounts.INSTANCE.selectAccount(newlylySelectedAccount);
             updateBureaux(true);
         }
@@ -136,6 +144,12 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
          * activity that the data has changed, so the activity remove the previously selected
          * dossiers list and details
          */
+        listener.onBureauSelected(null);
+    }
+
+    public void accountsChanged() {
+        updateAccounts();
+        updateBureaux(true);
         listener.onBureauSelected(null);
     }
 

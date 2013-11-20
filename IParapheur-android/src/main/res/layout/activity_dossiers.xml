@@ -31,13 +31,11 @@
 
     <fragment
         android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
-        android:orientation="vertical"
         android:id="@+id/activity_dossiers_left_drawer"
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        tools:layout="@layout/bureaux"
+        android:tag="Bureaux_list" />
 
 </android.support.v4.widget.DrawerLayout>

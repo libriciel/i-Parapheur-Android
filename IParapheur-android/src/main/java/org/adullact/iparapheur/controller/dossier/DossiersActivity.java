@@ -45,6 +45,8 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     private static final String FRAGMENT_TAG_DETAILS = "Dossier_details";
     private static final String FRAGMENT_TAG_LIST = "Dossiers_list";
     private static final String FRAGMENT_TAG_BATCH = "Dossiers_batch";
+    private static final String FRAGMENT_TAG_BUREAUX = "Bureaux_list";
+    private static final int EDIT_PREFERENCE_REQUEST = 0;
 
     private HashSet<String> selectedDossiers;
 
@@ -163,7 +165,9 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
         // show or hide specific menu actions depending on Drawer state
-        menu.findItem(R.id.action_filtrer).setVisible(!drawerLayout.isDrawerVisible(drawerMenu));
+        // FIXME : actions appearance on dossiers list size?
+        boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
+        menu.findItem(R.id.action_filtrer).setVisible(actionsVisibility);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -183,10 +187,24 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
                 // TODO
                 return true;
             case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // Return of the settings Activity.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_PREFERENCE_REQUEST) {
+            /* Don't check if result is ok as the user can press back after modifying an Account
+               only notify BureauxFragments to update accounts list (the bureau will update back this
+               Activity if needed).*/
+            BureauxFragment bureauxFragment = (BureauxFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_BUREAUX);
+            if (bureauxFragment != null) {
+                bureauxFragment.accountsChanged();
+            }
         }
     }
 
@@ -201,7 +219,9 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
 
         @Override
         public void onDrawerClosed(View view) {
-            getActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+            if (MyAccounts.INSTANCE.getSelectedAccount() != null) {
+                getActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+            }
             // calls onPrepareOptionMenu to show context specific actions
             invalidateOptionsMenu();
         }

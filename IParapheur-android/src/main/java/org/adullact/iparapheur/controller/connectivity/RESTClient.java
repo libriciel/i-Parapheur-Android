@@ -51,20 +51,20 @@ public enum  RESTClient {
     }
 
     public static Dossier getDossier(String bureauId, String dossierId) {
-        String url = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), ACTION_GET_DOSSIER);
+        String url = buildUrl(ACTION_GET_DOSSIER);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
                        "\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"}";
         return ModelMapper.getDossier(RESTUtils.post(url, body));
     }
 
     public static ArrayList<EtapeCircuit> getCircuit(String dossierId) {
-        String url = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), ACTION_GET_CIRCUIT);
+        String url = buildUrl(ACTION_GET_CIRCUIT);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"}";
         return ModelMapper.getCircuit(RESTUtils.post(url, body));
     }
 
     public static ArrayList<Dossier> getDossiers(String bureauId) {
-        String url = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), ACTION_GET_DOSSIERS);
+        String url = buildUrl(ACTION_GET_DOSSIERS);
         String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
                 "\"filters\": \"\"," +
                 "\"page\": 0," +
@@ -74,15 +74,15 @@ public enum  RESTClient {
     }
 
     public ArrayList<Bureau> getBureaux() {
-        String url = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), ACTION_GET_BUREAUX);
+        String url = buildUrl(ACTION_GET_BUREAUX);
         String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
         return ModelMapper.getBureaux(RESTUtils.post(url, body));
     }
 
-    public static String buildUrl(Account account, String action) {
-        String ticket = getTicket(account);
-        return BASE_PATH + account.getUrl() + action + ((ticket == null)? "" : "?alf_ticket=" + ticket);
+    public static String buildUrl(String action) {
+        String ticket = getTicket(MyAccounts.INSTANCE.getSelectedAccount());
+        return BASE_PATH + MyAccounts.INSTANCE.getSelectedAccount().getUrl() + action + ((ticket == null)? "" : "?alf_ticket=" + ticket);
     }
 
     public static String downloadFile(String url, String path) {
@@ -92,7 +92,7 @@ public enum  RESTClient {
             throw new RuntimeException("The external storage is not accessible");
         }
         File file = new File(path);
-        String fullUrl = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), url);
+        String fullUrl = buildUrl(url);
         InputStream response = RESTUtils.downloadFile(fullUrl);
 
         FileOutputStream fileOutput = null;
