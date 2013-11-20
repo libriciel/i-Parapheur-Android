@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.adullact.iparapheur.controller.DataChangeListener;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Dossier;
@@ -32,7 +31,7 @@ import java.util.UUID;
  * details of a dossier are retained in this fragment. Also the pdf is saved on external storage
  * and its url is stored in the dossier information.
  */
-public class DossierListFragment extends ListFragment implements DataChangeListener {
+public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -49,7 +48,7 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
     /**
      * Bureau id where the dossiers belongs
      */
-    private String bureauId = "433149e9-a552-4472-90a6-2f08eb046eca";
+    private String bureauId;
     /**
      * List of dossiers displayed in this fragment
      */
@@ -70,6 +69,7 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
          * Callback for when a dossier has been selected.
          */
         void onDossierSelected(String id);
+        void onDossierChecked(String id);
     }
 
     /**
@@ -95,7 +95,6 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
-        getDossiers(false);
     }
 
     @Override
@@ -117,11 +116,6 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
         // Notify the parent activity that a dossier has been selected, only if not already selected.
@@ -139,9 +133,17 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
         }
     }
 
+    public void setBureauId(String bureauId) {
+        this.bureauId = bureauId;
+        getDossiers(true);
+    }
+
     private void getDossiers(boolean forceReload) {
-        if ((dossiers == null) || forceReload) {
-            new DossiersLoadingTask(getActivity(), this).execute("bureauId");
+        if (bureauId == null) {
+            onDataChanged();
+        }
+        else if ((dossiers == null) || forceReload) {
+            new DossiersLoadingTask(getActivity(), this).execute(bureauId);
         }
     }
 
@@ -237,7 +239,7 @@ public class DossierListFragment extends ListFragment implements DataChangeListe
         protected Void doInBackground(String... params) {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return null;}
-            dossiers = RESTClient.INSTANCE.getDossiers(bureauId);
+            dossiers = RESTClient.INSTANCE.getDossiers(params[0]);
             return null;
         }
     }

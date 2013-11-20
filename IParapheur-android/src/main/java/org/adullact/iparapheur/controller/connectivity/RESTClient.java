@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
@@ -29,6 +30,7 @@ public enum  RESTClient {
     private static final String ACTION_GET_DOSSIER = "/parapheur/api/getDossier";
     private static final String ACTION_GET_DOSSIERS = "/parapheur/api/getDossiersHeaders";
     private static final String ACTION_GET_CIRCUIT = "/parapheur/api/getCircuit";
+    private static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
 
     private static String getTicket(Account account)
     {
@@ -71,7 +73,12 @@ public enum  RESTClient {
         return ModelMapper.getDossiers(RESTUtils.post(url, body));
     }
 
-
+    public ArrayList<Bureau> getBureaux() {
+        String url = buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), ACTION_GET_BUREAUX);
+        String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
+        //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
+        return ModelMapper.getBureaux(RESTUtils.post(url, body));
+    }
 
     public static String buildUrl(Account account, String action) {
         String ticket = getTicket(account);

@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.connectivity;
 import android.util.Log;
 
 import org.adullact.iparapheur.controller.utils.TransformUtils;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
@@ -104,5 +105,26 @@ public class ModelMapper
             }
         }
         return circuit;
+    }
+
+    public static ArrayList<Bureau> getBureaux(RequestResponse response) {
+        ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
+        if (response.getResponse() != null) {
+            JSONArray array = response.getResponse().optJSONArray("bureaux");
+            if (array != null) {
+                for (int i = 0; i < array.length(); i++)
+                {
+                    try {
+                            bureaux.add(new Bureau(
+                                    array.getJSONObject(i).getString("nodeRef").substring("workspace://SpacesStore/".length()),
+                                    array.getJSONObject(i).getString("name")));
+                        }
+                    catch (JSONException e) {
+                        Log.e("ModelMapper", "Erreur lors de la transformation en liste de bureaux.", e);
+                    }
+                }
+            }
+        }
+        return bureaux;
     }
 }

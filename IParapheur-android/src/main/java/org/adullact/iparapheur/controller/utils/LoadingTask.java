@@ -8,11 +8,10 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.DataChangeListener;
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
- * If a {@link org.adullact.iparapheur.controller.DataChangeListener} is defined, this
+ * If a {@link org.adullact.iparapheur.controller.utils.LoadingTask.DataChangeListener} is defined, this
  * listener is notified when the task finishes.
  * Created by jmaire on 04/11/2013.
  */
@@ -48,5 +47,19 @@ public abstract class LoadingTask extends AsyncTask<String, Void, Void> {
 
     protected void onCancelled() {
         context.setProgressBarIndeterminateVisibility(false);
+    }
+
+    /**
+     * This interface is used by {@link LoadingTask},
+     * when the task has finished loading its data, the component which holds the data is notified
+     * with the call of the function onDataChanged().
+     * Created by jmaire on 04/11/2013.
+     */
+    public static interface DataChangeListener {
+        /**
+         * Used to notify a class that its data has changed. The class should reload the UI in case
+         * of a Fragment or an Activity.
+         */
+        void onDataChanged();
     }
 }

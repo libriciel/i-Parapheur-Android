@@ -13,5 +13,12 @@
     <string name="icon_action">icône d\'action</string>
     <string name="par">par</string>
     <string name="network_unreachable">Aucune connexion disponible</string>
+    <string name="at">à</string>
+    <string name="the">le</string>
+    <string name="action_details">details</string>
+    <string name="action_dossiers">dossiers</string>
+    <string name="action_filtrer">Filtrer</string>
+    <string name="drawer_open">Ouvrir le menu contextuel</string>
+    <string name="drawer_close">Fermer le menu contextuel</string>
 
 </resources>

@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,7 +24,6 @@ import com.artifex.mupdf.MuPDFPageAdapter;
 import com.artifex.mupdf.ReaderView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.DataChangeListener;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
 import org.adullact.iparapheur.controller.utils.FileUtils;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
@@ -30,12 +32,13 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 
 /**
  * A fragment representing a single Dossier detail screen.
- * This fragment is contained in a {@link DossierListActivity}.
+ * This fragment is contained in a {@link DossiersActivity}.
  */
-public class DossierDetailFragment extends Fragment implements DataChangeListener {
+public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener {
 
     public interface DossierDetailListener {
         Dossier getDossier(String id);
@@ -75,9 +78,14 @@ public class DossierDetailFragment extends Fragment implements DataChangeListene
     public DossierDetailFragment() {}
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_dossier_detail, container, false);
-        return rootView;
+        return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
     }
 
     @Override
@@ -160,10 +168,37 @@ public class DossierDetailFragment extends Fragment implements DataChangeListene
     private void updateDetails() {
         if (getView() != null) {
             ((TextView) getView().findViewById(R.id.fragment_dossier_detail_title)).setText(dossier.getName());
-            ((TextView) getView().findViewById(R.id.fragment_dossier_detail_type)).setText(dossier.getType());
-            ((TextView) getView().findViewById(R.id.fragment_dossier_detail_sous_type)).setText(dossier.getSousType());
+            ((TextView) getView().findViewById(R.id.fragment_dossier_detail_typologie)).setText(dossier.getType() + " / " + dossier.getSousType());
             ListView circuitView = (ListView) getView().findViewById(R.id.fragment_dossier_detail_circuit);
             circuitView.setAdapter(new CircuitAdapter(getActivity()));
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.dossier_details_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_details:
+                toggleDetails();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void toggleDetails() {
+        View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+        if (details.getVisibility() == View.VISIBLE) {
+            details.setVisibility(View.INVISIBLE);
+        }
+        else {
+            details.setVisibility(View.VISIBLE);
         }
     }
 
@@ -214,9 +249,10 @@ public class DossierDetailFragment extends Fragment implements DataChangeListene
             EtapeCircuit etape = getItem(position);
             ((ImageView) view.findViewById(R.id.etape_circuit_icon)).setImageResource(etape.getAction().getIcon(etape.isApproved()));
             if (etape.isApproved()) {
-                String validation = "le " + etape.getDateValidation() +
-                        " " + getResources().getString(R.string.par) + " " +
-                        etape.getSignataire();
+                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy "+ getResources().getString(R.string.at) + " hh:mm");
+                String validation = getResources().getString(R.string.par) + " " +
+                        etape.getSignataire() +
+                        getResources().getString(R.string.the) + df.format(etape.getDateValidation());
                 ((TextView) view.findViewById(R.id.etape_circuit_validation)).setText(validation);
             }
             return view;
