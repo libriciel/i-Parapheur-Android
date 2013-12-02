@@ -17,9 +17,9 @@
             android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             tools:layout="@android:layout/list_content"
-            android:tag="Dossiers_list" />
+            android:tag="Dossiers_list"
+            android:layout_weight="1" />
 
         <FrameLayout
             android:layout_width="0dp"
@@ -27,6 +27,7 @@
             android:layout_gravity="right"
             android:id="@+id/dossier_detail_container"
             android:layout_weight="3" />
+
     </LinearLayout>
 
     <fragment

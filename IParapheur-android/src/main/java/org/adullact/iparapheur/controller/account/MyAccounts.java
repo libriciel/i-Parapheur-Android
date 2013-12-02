@@ -22,6 +22,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
     public static final String PREFS_URL_SUFFIX = "_url";
     public static final String PREFS_LOGIN_SUFFIX = "_login";
     public static final String PREFS_PASSWORD_SUFFIX = "_password";
+    public static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
     private ArrayList<Account> accounts = null;
     private Account selectedAccount;
@@ -44,6 +45,12 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
                         account.setPassword(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX, ""));
                         accounts.add(account);
                     }
+                }
+            }
+            if (selectedAccount == null) {
+                String selectedDossierId = (sharedPreferences.getString(PREFS_SELECTED_ACCOUNT, null));
+                if (selectedDossierId != null) {
+                    selectedAccount = getAccount(selectedDossierId);
                 }
             }
         }
@@ -115,5 +122,15 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 
     public void selectAccount(String id) {
         selectedAccount = getAccount(id);
+    }
+
+    public void saveState() {
+        if (selectedAccount != null) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString( PREFS_SELECTED_ACCOUNT, selectedAccount.getId());
+            editor.apply();
+            editor.commit();
+        }
     }
 }

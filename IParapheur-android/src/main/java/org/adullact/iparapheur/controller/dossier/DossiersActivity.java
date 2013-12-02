@@ -1,12 +1,14 @@
 package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,9 +21,8 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxFragment;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
+import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Dossier;
-
-import java.util.HashSet;
 
 
 /**
@@ -39,16 +40,14 @@ import java.util.HashSet;
  */
 public class DossiersActivity extends Activity implements DossierListFragment.DossierSelectedListener,
                                                           DossierDetailFragment.DossierDetailListener,
-                                                          BureauxFragment.BureauSelectedListener {
+                                                          BureauxFragment.BureauSelectedListener,
+                                                          LoadingTask.DataChangeListener {
 
 
     private static final String FRAGMENT_TAG_DETAILS = "Dossier_details";
     private static final String FRAGMENT_TAG_LIST = "Dossiers_list";
-    private static final String FRAGMENT_TAG_BATCH = "Dossiers_batch";
     private static final String FRAGMENT_TAG_BUREAUX = "Bureaux_list";
     private static final int EDIT_PREFERENCE_REQUEST = 0;
-
-    private HashSet<String> selectedDossiers;
 
     /** Main Layout off the screen */
     private DrawerLayout drawerLayout;
@@ -58,6 +57,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
 
     /** Used to control the drawer state. */
     private ActionBarDrawerToggle drawerToggle;
+    private boolean openDrawerwhenFinishedLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +75,6 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-
-        selectedDossiers = new HashSet<String>();
     }
 
     @Override
@@ -84,6 +82,27 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         drawerToggle.syncState();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (openDrawerwhenFinishedLoading) {
+            if (drawerLayout != null) {
+                drawerLayout.openDrawer(drawerMenu);
+            }
+            openDrawerwhenFinishedLoading = false;
+        }
+    }
+
+    /**
+     * Save accounts state for later use. In our case, the latest selected account
+     * will be automatically selected if the application is killed and relaunched.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MyAccounts.INSTANCE.saveState();
     }
 
     @Override
@@ -102,7 +121,6 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
                 // hide is used so that we can do a relace when a dossier is selected after
                 getFragmentManager().beginTransaction().hide(fragment);
             }
-            selectedDossiers.clear();
         }
         else {
             Bundle arguments = new Bundle();
@@ -116,24 +134,12 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     }
 
     /**
-     * if the dossier is newly selected, create or update the batchFragment
+     * Update actionBar actions on dossier
      * @param id
      */
     @Override
     public void onDossierChecked(String id) {
-        DossierBatchFragment batchFragment = (DossierBatchFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_BATCH);
-        DossierListFragment fragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
-        Dossier dossier = (fragment == null)? null : fragment.getDossier(id);
-        if (dossier != null) {
-            if (batchFragment == null) {
-                batchFragment = new DossierBatchFragment();
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.dossier_detail_container, batchFragment, FRAGMENT_TAG_BATCH)
-                        .setTransition(android.R.anim.slide_in_left)
-                        .commit();
-            }
-            batchFragment.addDossier(dossier);
-        }
+        invalidateOptionsMenu();
     }
 
     // DossierDetailListener implementation
@@ -146,10 +152,37 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     // BureauSelectedListener implementation
     @Override
     public void onBureauSelected(String id) {
+        // Can happen when there is no network! no bureau can be loaded and we are notified.
+        if (drawerLayout == null) {
+            // TODO : use it!
+            openDrawerwhenFinishedLoading = true;
+        }
+        else {
+            if (id == null) {
+                drawerLayout.openDrawer(drawerMenu);
+            }
+            else {
+                drawerLayout.closeDrawer(drawerMenu);
+            }
+        }
         DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
         if (listFragment != null) {
             // this method will reload dossiers fragments
             listFragment.setBureauId(id);
+        }
+    }
+
+    //LoadingTask implementation
+    /**
+     * Called when an action is done on a dossier. We have to force reload dossier list and
+     * dismiss details.
+     */
+    @Override
+    public void onDataChanged() {
+        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
+        if (listFragment != null) {
+            // this method will reload dossiers fragments
+            listFragment.reload();
         }
     }
 
@@ -162,12 +195,16 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         return super.onCreateOptionsMenu(menu);
     }
 
+    /* Will also call onPrepareOptionsMenu on each Fragments.
+     * DossierListFragment will update possible actions on checked dossiers.
+     */
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
         // show or hide specific menu actions depending on Drawer state
         // FIXME : actions appearance on dossiers list size?
+        Log.d("debug", "onPrepareOptionsMenu in Activity");
         boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
-        menu.findItem(R.id.action_filtrer).setVisible(actionsVisibility);
+        menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -178,7 +215,9 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+        // TODO : handle dossier(s) actions
         // Handle presses on the action bar items
+        DialogFragment actionDialog;
         switch (item.getItemId()) {
             case R.id.action_filtrer :
                 Toast.makeText(this, "Filtrer", Toast.LENGTH_LONG).show();

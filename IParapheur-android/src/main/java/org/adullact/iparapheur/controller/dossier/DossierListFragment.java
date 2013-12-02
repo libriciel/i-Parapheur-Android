@@ -1,20 +1,31 @@
 package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -59,6 +70,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
      */
     private int selectedDossier = ListView.INVALID_POSITION;
 
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -78,12 +90,24 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
      */
     public DossierListFragment() {}
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof DossierSelectedListener))
+        {
+            throw new IllegalStateException("Activity must implement DossierSelectedListener.");
+        }
+        listener = (DossierSelectedListener) activity;
+    }
+
     // Called only once as retainInstance is set to true.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new DossierListAdapter(getActivity()));
+        setListAdapter(new DossierListAdapter(getActivity(), listener));
         setRetainInstance(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -98,30 +122,10 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Activities containing this fragment must implement its callbacks.
-        if (!(activity instanceof DossierSelectedListener))
-        {
-            throw new IllegalStateException("Activity must implement DossierSelectedListener.");
-        }
-        listener = (DossierSelectedListener) activity;
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         // Reset the active callbacks interface .
         listener = null;
-    }
-
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
-        // Notify the parent activity that a dossier has been selected, only if not already selected.
-        if (position != selectedDossier) {
-            listener.onDossierSelected(dossiers.get(position).getId());
-        }
     }
 
     @Override
@@ -133,8 +137,72 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.dossiers_list_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu (Menu menu) {
+        menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
+        menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+
+        HashSet<Action> actions = new HashSet<Action>();
+        if (((DossierListAdapter) getListAdapter()).getCheckedDossiers().size() > 0) {
+            actions.addAll(Arrays.asList(Action.values()));
+        }
+        for (Dossier dossier : ((DossierListAdapter) getListAdapter()).getCheckedDossiers()) {
+            actions.retainAll(dossier.getActions());
+        }
+
+        for (Action action : actions) {
+            MenuItem item = menu.findItem(action.getMenuItemId());
+            item.setTitle(action.getTitle());
+            item.setVisible(true);
+        }
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        DialogFragment actionDialog;
+        HashSet<Dossier> checkedDossiers = ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
+        switch (item.getItemId()) {
+            case R.id.action_visa:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.VISA, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            case R.id.action_signature:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.SIGNATURE, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            case R.id.action_mailsec:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.MAILSEC, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            case R.id.action_tdt:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.TDT, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            case R.id.action_archivage:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.ARCHIVAGE, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            case R.id.action_rejet:
+                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.REJETER, bureauId);
+                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public void setBureauId(String bureauId) {
         this.bureauId = bureauId;
+        if (bureauId == null) {
+            this.dossiers = null;
+        }
         getDossiers(true);
     }
 
@@ -169,6 +237,24 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         selectedDossier = position;
     }
 
+    /**
+     * called by the parent Activity when
+     */
+    public void reload() {
+        /* if a dossier was previously selected, we have to notify the parent
+         * activity that the data has changed, so the activity remove the previously selected
+         * dossier details
+         */
+        if (selectedDossier != ListView.INVALID_POSITION) {
+            selectedDossier = ListView.INVALID_POSITION;
+            setActivatedPosition(ListView.INVALID_POSITION);
+            listener.onDossierSelected(null);
+        }
+        ((DossierListAdapter) getListAdapter()).clearSelection();
+
+        getDossiers(true);
+    }
+
     @Override
     public void onDataChanged() {
         ((DossierListAdapter) getListAdapter()).notifyDataSetChanged();
@@ -182,11 +268,15 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
     }
 
-    private class DossierListAdapter extends ArrayAdapter<Dossier>
-    {
+    private class DossierListAdapter extends ArrayAdapter<Dossier> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
-        public DossierListAdapter(Context context) {
-            super(context, android.R.layout.simple_list_item_activated_2, android.R.id.text1);
+        private final DossierSelectedListener listener;
+        private HashSet<Dossier> checkedDossiers;
+
+        public DossierListAdapter(Context context, DossierSelectedListener listener) {
+            super(context, R.layout.list_item_multiple_choice_2, R.id.text1);
+            this.listener = listener;
+            this.checkedDossiers = new HashSet<Dossier>();
         }
 
         @Override
@@ -204,7 +294,14 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = super.getView(position, convertView, parent);
             Dossier dossier = dossiers.get(position);
-            ((TextView) v.findViewById(android.R.id.text2)).setText(dossier.getType() + " / " + dossier.getSousType());
+            ((TextView) v.findViewById(R.id.text2)).setText(dossier.getType() + " / " + dossier.getSousType());
+            CheckBox c = (CheckBox) v.findViewById(R.id.checkBox);
+            c.setTag(position);
+            c.setOnCheckedChangeListener(this);
+            c.setChecked(checkedDossiers.contains(dossier));
+            LinearLayout l = (LinearLayout) v.findViewById(R.id.list_item_selectable_layout);
+            l.setTag(position);
+            l.setOnClickListener(this);
             return v;
         }
 
@@ -226,6 +323,37 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         @Override
         public boolean isEmpty() {
             return (dossiers == null) || dossiers.isEmpty();
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            Dossier dossier = dossiers.get((Integer) buttonView.getTag());
+            boolean updated = (isChecked)?
+                    checkedDossiers.add(dossier) :
+                    checkedDossiers.remove(dossier);
+
+            if (updated) {
+                // will call invalidateOptionMenu, so the actions will be updated
+                listener.onDossierChecked(dossier.getId());
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            Integer position = (Integer) v.getTag();
+            if (position != selectedDossier) {
+                listener.onDossierSelected(dossiers.get(position).getId());
+                setActivatedPosition(position);
+            }
+        }
+
+        public HashSet<Dossier> getCheckedDossiers() {
+            return checkedDossiers;
+        }
+
+        public void clearSelection() {
+            checkedDossiers.clear();
+            notifyDataSetChanged();
         }
     }
 

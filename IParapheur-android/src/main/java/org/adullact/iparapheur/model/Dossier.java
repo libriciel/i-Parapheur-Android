@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.model;
 
-import org.adullact.iparapheur.R;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,33 +12,11 @@ import java.util.UUID;
  */
 public class Dossier {
 
-    public enum Action
-    {
-        // TODO : mailsec and TdT icons
-        VISA(R.drawable.ic_circuit_iw_visa, R.drawable.ic_circuit_ip_visa),
-        SIGNATURE(R.drawable.ic_circuit_iw_signature, R.drawable.ic_circuit_ip_signature),
-        TDT(R.drawable.ic_circuit_iw_visa, R.drawable.ic_circuit_ip_visa),
-        ARCHIVAGE(R.drawable.ic_circuit_iw_archivage, R.drawable.ic_circuit_iw_archivage),
-        MAILSEC(R.drawable.ic_circuit_iw_visa, R.drawable.ic_circuit_ip_visa);
-
-        private final int icon;
-        private final int approvedIcon;
-
-        Action(int icon, int rejectedIcon) {
-            this.icon = icon;
-            this.approvedIcon = rejectedIcon;
-        }
-
-        public int getIcon(boolean approved) {
-            return approved? approvedIcon : icon;
-        }
-    }
-
     private final String id;
 
     private final String name;
 
-    private final Action action;
+    private final ArrayList<Action> actions;
 
     private final String type;
 
@@ -60,11 +36,12 @@ public class Dossier {
     public Dossier(int i) {
         this(UUID.randomUUID().toString(),
                 "Dossier " + i,
-                Action.VISA,
+                new ArrayList<Action>(),
                 "Type",
                 "SousType",
                 Calendar.getInstance().getTime(),
                 Calendar.getInstance().getTime());
+        getActions().add(Action.VISA);
     }
 
     /**
@@ -75,13 +52,13 @@ public class Dossier {
         this.id = id;
         this.name = this.type = this.sousType = null;
         this.dateCreation = this.dateLimite = null;
-        this.action = null;
+        this.actions = null;
     }
 
-    public Dossier(String id, String name, Action action, String type, String sousType, Date dateCreation, Date dateLimite) {
+    public Dossier(String id, String name, ArrayList<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
         this.id = id;
         this.name = name;
-        this.action = action;
+        this.actions = actions;
         this.type = type;
         this.sousType = sousType;
         this.dateCreation = dateCreation;
@@ -103,6 +80,9 @@ public class Dossier {
         if(o instanceof Dossier){
             Dossier toCompare = (Dossier) o;
             return this.id.equals(toCompare.id);
+        }
+        else if (o instanceof String) {
+            return this.id.equals(o);
         }
         return false;
     }
@@ -140,8 +120,8 @@ public class Dossier {
         return name;
     }
 
-    public Action getAction() {
-        return action;
+    public ArrayList<Action> getActions() {
+        return actions;
     }
 
     public String getType() {

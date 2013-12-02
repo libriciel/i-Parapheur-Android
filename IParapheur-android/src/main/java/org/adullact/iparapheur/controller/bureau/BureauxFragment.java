@@ -93,14 +93,14 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
     private void updateAccounts() {
         RadioGroup accountContainer = (RadioGroup) getView().findViewById(R.id.bureaux_account_container);
         accountContainer.removeAllViews();
-        Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
         for (Account account : MyAccounts.INSTANCE.getAccounts()) {
             RadioButton radio = new RadioButton(getActivity());
+            radio.setId(View.generateViewId()); // Mandatory to check buttons
             radio.setText(account.getTitle());
             radio.setTag(account.getId());
             radio.setOnClickListener(this);
-            if ((selectedAccount != null) && account.equals(selectedAccount)) {
-                radio.setSelected(true);
+            if ((MyAccounts.INSTANCE.getSelectedAccount() != null) && account.equals(MyAccounts.INSTANCE.getSelectedAccount())) {
+                radio.setChecked(true);
             }
             accountContainer.addView(radio);
         }
@@ -140,11 +140,19 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
     @Override
     public void onDataChanged() {
         ((BureauListAdapter) listView.getAdapter()).notifyDataSetChanged();
-        /* if a bureau was previously selected, we have to notify the parent
-         * activity that the data has changed, so the activity remove the previously selected
-         * dossiers list and details
+        /* if there's only 1 bureau, select it automatically
+         *
          */
-        listener.onBureauSelected(null);
+        if ((bureaux != null) && (bureaux.size() == 1)) {
+            listener.onBureauSelected(bureaux.get(0).getId());
+        }
+        else {
+            /* if a bureau was previously selected, we have to notify the parent
+             * activity that the data has changed, so the activity remove the previously selected
+             * dossiers list and details
+             */
+            listener.onBureauSelected(null);
+        }
     }
 
     public void accountsChanged() {

@@ -34,11 +34,6 @@ public class IParapheur extends Application {
         }
     }
 
-    @Override
-    public void onTerminate() {
-
-    }
-
     public static Context getContext(){
         return context;
     }

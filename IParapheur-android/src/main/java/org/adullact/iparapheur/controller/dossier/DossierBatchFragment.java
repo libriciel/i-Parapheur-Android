@@ -1,30 +1,56 @@
 package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Fragment;
-import android.widget.Toast;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.R;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 /**
  * Created by jmaire on 16/11/2013.
  */
 public class DossierBatchFragment extends Fragment {
-    public static final String DOSSIER_ID = "dossier_id";
-    private HashSet<Dossier> dossiers;
 
-    public void addDossier(Dossier dossier) {
-        if (dossiers.contains(dossier)) {
-            dossiers.remove(dossier);
+    public static final String DOSSIER = "dossier";
+    private ArrayList<String> dossiers;
+    private ListView listView;
+
+    public DossierBatchFragment() {
+        this.dossiers = new ArrayList<String>();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.dossiers_batch_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (getArguments().containsKey(DOSSIER)) {
+            this.dossiers.add(getArguments().getString(DOSSIER));
         }
-        else {
-            dossiers.add(dossier);
-        }
+        listView = (ListView) view.findViewById(R.id.dossiers_list);
+        listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
+        listView.setItemsCanFocus(false);
+    }
+
+    public void addDossier(String dossier) {
+        dossiers.add(dossier);
+        updateView();
+    }
+
+    public void removeDossier(String dossier) {
+        dossiers.remove(dossier);
         updateView();
     }
 
     private void updateView() {
-        Toast.makeText(getActivity(), "Nombre de dossiers : " + dossiers.size(), Toast.LENGTH_LONG);
+        ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
 }

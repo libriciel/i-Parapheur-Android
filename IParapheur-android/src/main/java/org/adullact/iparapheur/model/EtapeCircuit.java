@@ -16,11 +16,11 @@ public class EtapeCircuit
 
     private final String signataire;
 
-    private final Dossier.Action action;
+    private final Action action;
 
     private final String publicAnnotation;
 
-    public EtapeCircuit(Date dateValidation, boolean isApproved, String bureauName, String signataire, Dossier.Action action, String publicAnnotation)
+    public EtapeCircuit(Date dateValidation, boolean isApproved, String bureauName, String signataire, Action action, String publicAnnotation)
     {
         this.dateValidation = dateValidation;
         this.isApproved = isApproved;
@@ -46,7 +46,7 @@ public class EtapeCircuit
         return signataire;
     }
 
-    public Dossier.Action getAction() {
+    public Action getAction() {
         return action;
     }
 

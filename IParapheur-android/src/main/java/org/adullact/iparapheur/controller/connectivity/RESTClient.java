@@ -5,11 +5,15 @@ import android.util.Log;
 
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.apache.http.HttpStatus;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +36,10 @@ public enum  RESTClient {
     private static final String ACTION_GET_CIRCUIT = "/parapheur/api/getCircuit";
     private static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
 
+    private static final String ACTION_VALIDATE = "/parapheur/api/";
+
+
+
     private static String getTicket(Account account)
     {
         String ticket = account.getTicket();
@@ -40,9 +48,16 @@ public enum  RESTClient {
             try {
                 String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
                 RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
-
-                ticket = response.getResponse().getJSONObject("data").getString("ticket");
-                account.setTicket(ticket);
+                if (response != null) {
+                    JSONObject json = response.getResponse();
+                    if (json != null) {
+                        json = json.getJSONObject("data");
+                        if (json != null) {
+                            ticket = json.getString("ticket");
+                            account.setTicket(ticket);
+                        }
+                    }
+                }
             } catch (JSONException ex) {
                 Log.e("RESTClient", "Error while trying to log in.", ex);
             }
@@ -68,7 +83,10 @@ public enum  RESTClient {
         String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
                 "\"filters\": \"\"," +
                 "\"page\": 0," +
-                "\"pageSize\": 10}";
+                "\"pageSize\": 10," +
+                "parent: \"no-corbeille\","+
+                "asc: \"false\","+
+                "propSort: \"cm:created\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
         return ModelMapper.getDossiers(RESTUtils.post(url, body));
     }
@@ -118,5 +136,30 @@ public enum  RESTClient {
             }
         }
         return (file != null)? file.getAbsolutePath() : null;
+    }
+
+    public boolean viser(ArrayList<Dossier> dossiers, String action, String annotPub, String annotPriv, String bureauId) {
+        String path = ACTION_VALIDATE + action.toLowerCase();
+        // FIXME with new API
+        if (action == Action.REJETER.name()) {
+            path = ACTION_VALIDATE + "reject";
+        }
+        try {
+            JSONObject json = new JSONObject();
+            JSONArray dossiersId = new JSONArray();
+            for (Dossier dossier : dossiers) {
+                dossiersId.put("workspace://SpacesStore/" + dossier.getId());
+            }
+            json.put("dossiers", dossiersId);
+            json.put("bureauCourant", "workspace://SpacesStore/" + bureauId);
+            json.put("annotPub", annotPub);
+            json.put("annotPriv", annotPriv);
+            RequestResponse response = RESTUtils.post(buildUrl(path), json.toString());
+            return (response != null && response.getCode() == HttpStatus.SC_OK);
+
+        } catch (JSONException e) {
+            Log.e("RESTClient", "Erreur lors de la construction de la requête pour faire l'action " + action + " sur un dossier", e);
+        }
+        return false;
     }
 }

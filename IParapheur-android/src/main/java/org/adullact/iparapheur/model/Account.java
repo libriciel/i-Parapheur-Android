@@ -47,7 +47,7 @@ public class Account implements Serializable
     @Override
     public String toString()
     {
-        return "Account[ title: " + title + ", url: " + url + ", login: " + login + " ]";
+        return title;
     }
 
     public boolean isValid()

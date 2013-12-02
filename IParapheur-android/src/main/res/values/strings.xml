@@ -18,7 +18,29 @@
     <string name="action_details">details</string>
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
+
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
+
+    <!-- Actions sur un dossier -->
+    <string name="action_valider">Valider</string>
+    <string name="action_rejeter">Rejeter</string>
+
+    <!-- actions de validation -->
+    <string name="action_viser">Viser</string>
+    <string name="action_signer">Signer</string>
+    <string name="action_tdt">Envoyer au TdT</string>
+    <string name="action_mailsec">Envoyer par mail sécurisé</string>
+
+    <!-- actions secondaires -->
+    <string name="action_mail">Envoyer par mail</string>
+    <string name="action_avis">Demander un avis complémentaire</string>
+    <string name="action_transfertsign">Transférer le dossier à signer</string>
+    <string name="action_ajoutsign">Ajouter une signature au dossier</string>
+    <string name="action_enregistrer">Enregistrer le dossier</string>
+    <string name="action_archiver">Archiver</string>
+    <string name="annotation_publique">Annotation publique</string>
+    <string name="annotation_privee">Annotation privée</string>
+    <string name="cancel">Annuler</string>
 
 </resources>

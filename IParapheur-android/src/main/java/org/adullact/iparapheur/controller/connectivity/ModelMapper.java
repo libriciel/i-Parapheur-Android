@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.connectivity;
 import android.util.Log;
 
 import org.adullact.iparapheur.controller.utils.TransformUtils;
+import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -33,9 +34,11 @@ public class ModelMapper
         Dossier dossier = null;
         try
         {
+            ArrayList<Action> actions = new ArrayList<Action>(1);
+            actions.add(Action.valueOf(jsonObject.getString("actionDemandee")));
             dossier = new Dossier(jsonObject.getString("dossierRef").substring("workspace://SpacesStore/".length()),
                     jsonObject.getString("titre"),
-                    Dossier.Action.valueOf(jsonObject.getString("actionDemandee")),
+                    actions,
                     jsonObject.getString("type"),
                     jsonObject.getString("sousType"),
                     TransformUtils.parseISO8601Date(jsonObject.getString("dateCreation")),
@@ -95,7 +98,7 @@ public class ModelMapper
                                 etapeObject.optBoolean("approved", false),
                                 etapeObject.optString("parapheurName", ""),
                                 etapeObject.optString("signataire", ""),
-                                Dossier.Action.valueOf(etapeObject.optString("actionDemandee", "")),
+                                Action.valueOf(etapeObject.optString("actionDemandee", "")),
                                 etapeObject.optString("annotPub", "")));
 
                     } catch (JSONException e) {
