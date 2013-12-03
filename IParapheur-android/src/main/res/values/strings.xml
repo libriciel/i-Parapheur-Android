@@ -43,4 +43,9 @@
     <string name="annotation_privee">Annotation privée</string>
     <string name="cancel">Annuler</string>
 
+    <string name="selected_certificate">Certificat sélectionné</string>
+    <string name="select_certificate">Choisir un certificat</string>
+    <string name="please_select_certificate">Veuillez selectionner un certificat</string>
+    <string name="justify_reject">Merci de saisir votre motif de rejet</string>
+
 </resources>

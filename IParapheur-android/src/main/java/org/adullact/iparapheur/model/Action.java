@@ -33,7 +33,7 @@ public enum Action
             R.drawable.ic_circuit_iw_visa,
             R.drawable.ic_circuit_ip_visa),
 
-    REJETER(R.string.action_rejeter,
+    REJET(R.string.action_rejeter,
             R.id.action_rejet,
             R.drawable.ic_action_reject,
             R.drawable.ic_action_reject),

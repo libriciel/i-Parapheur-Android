@@ -15,7 +15,7 @@ import org.adullact.iparapheur.R;
  * listener is notified when the task finishes.
  * Created by jmaire on 04/11/2013.
  */
-public abstract class LoadingTask extends AsyncTask<String, Void, Void> {
+public abstract class LoadingTask extends AsyncTask<String, Integer, Void> {
 
     private Activity context;
     private DataChangeListener dataListener;

@@ -5,7 +5,6 @@ import android.util.Log;
 
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Account;
-import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
@@ -20,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jmaire on 23/10/13.
@@ -36,7 +36,12 @@ public enum  RESTClient {
     private static final String ACTION_GET_CIRCUIT = "/parapheur/api/getCircuit";
     private static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
 
-    private static final String ACTION_VALIDATE = "/parapheur/api/";
+    private static final String ACTION_VISA = "/parapheur/api/visa";
+    private static final String ACTION_SIGNATURE = "/parapheur/api/signature";
+    private static final String ACTION_TDT = "/parapheur/api/tdt";
+    private static final String ACTION_MAILSEC = "/parapheur/api/mailsec";
+    private static final String ACTION_ARCHIVAGE = "/parapheur/api/archivage";
+    private static final String ACTION_REJET = "/parapheur/api/rejet";
 
 
 
@@ -138,28 +143,47 @@ public enum  RESTClient {
         return (file != null)? file.getAbsolutePath() : null;
     }
 
-    public boolean viser(ArrayList<Dossier> dossiers, String action, String annotPub, String annotPriv, String bureauId) {
-        String path = ACTION_VALIDATE + action.toLowerCase();
-        // FIXME with new API
-        if (action == Action.REJETER.name()) {
-            path = ACTION_VALIDATE + "reject";
-        }
+    public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) {
+
         try {
             JSONObject json = new JSONObject();
             JSONArray dossiersId = new JSONArray();
-            for (Dossier dossier : dossiers) {
-                dossiersId.put("workspace://SpacesStore/" + dossier.getId());
-            }
+            dossiersId.put("workspace://SpacesStore/" + dossier.getId());
             json.put("dossiers", dossiersId);
             json.put("bureauCourant", "workspace://SpacesStore/" + bureauId);
             json.put("annotPub", annotPub);
             json.put("annotPriv", annotPriv);
-            RequestResponse response = RESTUtils.post(buildUrl(path), json.toString());
+            RequestResponse response = RESTUtils.post(buildUrl(ACTION_VISA), json.toString());
             return (response != null && response.getCode() == HttpStatus.SC_OK);
 
         } catch (JSONException e) {
-            Log.e("RESTClient", "Erreur lors de la construction de la requête pour faire l'action " + action + " sur un dossier", e);
+            Log.e("RESTClient", "Erreur lors de la construction de la requête pour viser un dossier", e);
         }
+        return false;
+    }
+
+    public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) {
+        return false;
+    }
+
+    public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) {
+        return false;
+    }
+
+    public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) {
+        return false;
+    }
+
+    public boolean envoiTdtActes(String dossierId, String classification, String annotPub, String annotPriv, String bureauId) {
+        return false;
+    }
+
+    public boolean envoiMailSec(String dossierId, List<String> destinataires, String sujet, String message, boolean showPassword, String annotPub, String annotPriv, String bureauId) {
+        // TODO : manage annexes
+        return false;
+    }
+
+    public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) {
         return false;
     }
 }

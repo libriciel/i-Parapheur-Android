@@ -19,6 +19,12 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.TdtDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -26,7 +32,6 @@ import org.adullact.iparapheur.model.Dossier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.UUID;
 
 /**
  * A list fragment representing a list of Dossiers. This fragment
@@ -170,28 +175,28 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         HashSet<Dossier> checkedDossiers = ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
         switch (item.getItemId()) {
             case R.id.action_visa:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.VISA, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new VisaDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "VisaDialogFragment");
                 return true;
             case R.id.action_signature:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.SIGNATURE, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new SignatureDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "SignatureDialogFragment");
                 return true;
             case R.id.action_mailsec:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.MAILSEC, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new MailSecDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
                 return true;
             case R.id.action_tdt:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.TDT, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new TdtDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "TdtDialogFragment");
                 return true;
             case R.id.action_archivage:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.ARCHIVAGE, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new ArchivageDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
                 return true;
             case R.id.action_rejet:
-                actionDialog = new ActionDialogFragment(new ArrayList<Dossier>(checkedDossiers), Action.REJETER, bureauId);
-                actionDialog.show(getFragmentManager(), "ActionDialogFragment");
+                actionDialog = new RejetDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "RejetDialogFragment");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -238,7 +243,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     }
 
     /**
-     * called by the parent Activity when
+     * called by the parent Activity to reload the list
      */
     public void reload() {
         /* if a dossier was previously selected, we have to notify the parent
@@ -257,13 +262,14 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
 
     @Override
     public void onDataChanged() {
-        ((DossierListAdapter) getListAdapter()).notifyDataSetChanged();
-        /* if a dossier was previously selected, we have to notify the parent
-         * activity that the data has changed, so the activity remove the previously selected
-         * dossier details
-         */
+        ((DossierListAdapter) getListAdapter()).clearSelection();
         if (selectedDossier != ListView.INVALID_POSITION) {
             selectedDossier = ListView.INVALID_POSITION;
+            setActivatedPosition(ListView.INVALID_POSITION);
+            /* if a dossier was previously selected, we have to notify the parent
+             * activity that the data has changed, so the activity remove the previously selected
+             * dossier details
+             */
             listener.onDossierSelected(null);
         }
     }
@@ -277,17 +283,6 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
             super(context, R.layout.list_item_multiple_choice_2, R.id.text1);
             this.listener = listener;
             this.checkedDossiers = new HashSet<Dossier>();
-        }
-
-        @Override
-        public long getItemId(int position) {
-            // FIXME : is it ok?
-            return UUID.fromString(dossiers.get(position).getId()).getMostSignificantBits();
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
         }
 
         @Override
