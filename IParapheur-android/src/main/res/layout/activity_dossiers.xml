@@ -6,29 +6,44 @@
     android:orientation="vertical"
     android:divider="@android:drawable/divider_horizontal_bright">
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <FrameLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:baselineAligned="false">
 
-        <fragment
-            android:id="@+id/dossier_list"
-            android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:layout="@android:layout/list_content"
-            android:tag="Dossiers_list"
-            android:layout_weight="1" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:baselineAligned="false">
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:id="@+id/dossier_detail_container"
-            android:layout_weight="3" />
+            <fragment
+                android:id="@+id/dossier_list"
+                android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                tools:layout="@android:layout/list_content"
+                android:tag="Dossiers_list"
+                android:layout_weight="1" />
 
-    </LinearLayout>
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:id="@+id/dossier_detail_container"
+                android:layout_weight="3" />
+        </LinearLayout>
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:max="100"
+            android:visibility="invisible" />
+
+    </FrameLayout>
 
     <fragment
         android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"

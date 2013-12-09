@@ -214,7 +214,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return null;}
             Log.d("debug", "getting dossier details");
-            dossier.saveDetails(RESTClient.INSTANCE.getDossier(bureauId, dossier.getId()));
+            Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
+            if (dossier != null) {
+                dossier.saveDetails(d);
+            }
             if (isCancelled()) {return null;}
             dossier.setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
             if (isCancelled()) {return null;}

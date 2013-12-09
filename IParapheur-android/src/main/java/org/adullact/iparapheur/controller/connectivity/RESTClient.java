@@ -101,6 +101,7 @@ public enum  RESTClient {
         String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
         return ModelMapper.getBureaux(RESTUtils.post(url, body));
+        //return ModelMapper.getBureaux(RESTUtils.get(url, null));
     }
 
     public static String buildUrl(String action) {

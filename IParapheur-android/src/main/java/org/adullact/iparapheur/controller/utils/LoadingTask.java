@@ -17,36 +17,55 @@ import org.adullact.iparapheur.R;
  */
 public abstract class LoadingTask extends AsyncTask<String, Integer, Void> {
 
-    private Activity context;
+    protected Activity activity;
     private DataChangeListener dataListener;
 
-    public LoadingTask(Activity context, DataChangeListener listener) {
-        this.context = context;
+    public LoadingTask(Activity activity, DataChangeListener listener) {
+        this.activity = activity;
         this.dataListener = listener;
     }
 
+    @Override
     protected void onPreExecute() {
         ConnectivityManager connMgr = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo == null || !networkInfo.isConnected()) {
             this.cancel(true);
-            Toast.makeText(context, R.string.network_unreachable, Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, R.string.network_unreachable, Toast.LENGTH_LONG).show();
         }
         else {
-            context.setProgressBarIndeterminateVisibility(true);
+            showProgress();
         }
     }
 
+    @Override
     protected void onPostExecute(Void result) {
-        context.setProgressBarIndeterminateVisibility(false);
         if (dataListener != null) {
             dataListener.onDataChanged();
         }
+        hideProgress();
     }
 
+    @Override
     protected void onCancelled() {
-        context.setProgressBarIndeterminateVisibility(false);
+        hideProgress();
+    }
+
+    /**
+     * Show the indeterminate progress wheel
+     * Protected so subclasses can override it (ex. for determinate progressBar)
+     */
+    protected void showProgress() {
+        activity.setProgressBarIndeterminateVisibility(true);
+    }
+
+    /**
+     * Hide the indeterminate progress wheel
+     * Protected so subclasses can override it (ex. for determinate progressBar)
+     */
+    protected void hideProgress() {
+        activity.setProgressBarIndeterminateVisibility(false);
     }
 
     /**

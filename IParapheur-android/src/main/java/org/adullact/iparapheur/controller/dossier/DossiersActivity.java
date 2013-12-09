@@ -64,6 +64,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         super.onCreate(savedInstanceState);
         // Loading indicator
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_dossiers);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);

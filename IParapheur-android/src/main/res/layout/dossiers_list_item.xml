@@ -7,21 +7,30 @@
     android:baselineAligned="false"
     android:background="?android:activatedBackgroundIndicator" >
 
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/dossiers_list_item_image"
+        android:contentDescription="@string/etape_courante"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="6dp"
+        android:layout_marginLeft="6dp" />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:id="@+id/list_item_selectable_layout">
+        android:id="@+id/dossiers_list_item_selectable_layout">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeightSmall"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:gravity="center_vertical"
-            android:id="@+id/text1" />
+            android:id="@+id/dossiers_list_item_title" />
 
-        <TextView android:id="@+id/text2"
+        <TextView android:id="@+id/dossiers_list_item_extras"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignStart="@android:id/text1"
@@ -31,7 +40,7 @@
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/checkBox"
+        android:id="@+id/dossiers_list_item_checkBox"
         android:layout_gravity="center"
         android:layout_margin="12dp" />
 

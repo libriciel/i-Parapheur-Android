@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -52,10 +52,11 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
     }
 
 
-    private class VisaTask extends LoadingTask {
+    private class VisaTask extends LoadingWithProgressTask {
 
         public VisaTask(Activity context) {
             super(context, listener);
+
         }
 
         @Override
@@ -66,6 +67,7 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
             int i = 0;
             int total = dossiers.size();
             publishProgress(i);
+
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return null;}
                 Log.d("debug", "VISA on " + dossier);

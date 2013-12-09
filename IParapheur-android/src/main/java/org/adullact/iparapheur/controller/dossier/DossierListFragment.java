@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -280,7 +281,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         private HashSet<Dossier> checkedDossiers;
 
         public DossierListAdapter(Context context, DossierSelectedListener listener) {
-            super(context, R.layout.list_item_multiple_choice_2, R.id.text1);
+            super(context, R.layout.dossiers_list_item, R.id.dossiers_list_item_title);
             this.listener = listener;
             this.checkedDossiers = new HashSet<Dossier>();
         }
@@ -289,12 +290,17 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = super.getView(position, convertView, parent);
             Dossier dossier = dossiers.get(position);
-            ((TextView) v.findViewById(R.id.text2)).setText(dossier.getType() + " / " + dossier.getSousType());
-            CheckBox c = (CheckBox) v.findViewById(R.id.checkBox);
+            ((TextView) v.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
+            // FIXME : changement d'api avec toutes les actions..
+            Action actionDemandee = dossier.getActions().get(0);
+            if (actionDemandee != null) {
+                ((ImageView) v.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
+            }
+            CheckBox c = (CheckBox) v.findViewById(R.id.dossiers_list_item_checkBox);
             c.setTag(position);
             c.setOnCheckedChangeListener(this);
             c.setChecked(checkedDossiers.contains(dossier));
-            LinearLayout l = (LinearLayout) v.findViewById(R.id.list_item_selectable_layout);
+            LinearLayout l = (LinearLayout) v.findViewById(R.id.dossiers_list_item_selectable_layout);
             l.setTag(position);
             l.setOnClickListener(this);
             return v;
