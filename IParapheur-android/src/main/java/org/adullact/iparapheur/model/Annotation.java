@@ -51,7 +51,6 @@ public class Annotation {
     private enum Button {
         DELETE,
         MINIMIZE,
-        MAXIMIZE,
         RESIZE,
         INFO,
         EDIT
@@ -64,7 +63,6 @@ public class Annotation {
         DELETE,
         EDIT,
         MINIMIZE,
-        MAXIMIZE,
         INFO
     }
 
@@ -255,7 +253,7 @@ public class Annotation {
     }
 
     public boolean touched(float x, float y) {
-        return (!deleted && !getArea(x, y).equals(Annotation.Area.NONE));
+        return (!getArea(x, y).equals(Annotation.Area.NONE));
     }
 
     // Methods and utilities for drawing
@@ -268,13 +266,15 @@ public class Annotation {
 
     public Area getArea(float x, float y) {
         Area area = Area.NONE;
-        if (rect.contains(x, y)) {
-            area = Area.CENTER;
-        }
-        for (Button button : Button.values()) {
-            if (distance(x, y, getButtonCenter(rect, button)) < Annotation.BUTTON_RADIUS) {
-                area = Area.valueOf(button.name());
-                break;
+        if (!deleted) {
+            if (rect.contains(x, y)) {
+                area = Area.CENTER;
+            }
+            for (Button button : Button.values()) {
+                if (distance(x, y, getButtonCenter(rect, button)) < Annotation.BUTTON_RADIUS) {
+                    area = Area.valueOf(button.name());
+                    break;
+                }
             }
         }
         return area;
@@ -292,7 +292,6 @@ public class Annotation {
             case INFO :
                 center.set(rect.left, rect.bottom);
                 break;
-            case MAXIMIZE : // MAXIMIZE and MINIMIZE are on the same location
             case MINIMIZE :
                 center.set(rect.left + Annotation.BUTTONS_SPACE, rect.top);
                 break;
@@ -321,7 +320,7 @@ public class Annotation {
             paint.setAntiAlias(true);
             if (isMinimized()) {
                 drawButton(canvas, paint, Button.DELETE);
-                drawButton(canvas, paint, Button.MAXIMIZE);
+                drawButton(canvas, paint, Button.MINIMIZE);
             }
             else {
                 drawRect(canvas, paint);
@@ -409,15 +408,11 @@ public class Annotation {
             case MINIMIZE :
                 // Minus
                 canvas.drawLine(center.x - Annotation.LINE_HALF_LENGTH, center.y,
-                        center.x + Annotation.LINE_HALF_LENGTH, center.y, paint);
-                break;
-
-            case MAXIMIZE :
-                // Plus
-                canvas.drawLine(center.x - Annotation.LINE_HALF_LENGTH, center.y,
-                        center.x + Annotation.LINE_HALF_LENGTH, center.y, paint);
-                canvas.drawLine(center.x, center.y - Annotation.LINE_HALF_LENGTH,
+                    center.x + Annotation.LINE_HALF_LENGTH, center.y, paint);
+                if (minimized) { // Plus
+                    canvas.drawLine(center.x, center.y - Annotation.LINE_HALF_LENGTH,
                         center.x, center.y + Annotation.LINE_HALF_LENGTH, paint);
+                }
                 break;
 
             case RESIZE :

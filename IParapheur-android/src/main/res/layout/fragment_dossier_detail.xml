@@ -15,9 +15,9 @@
         android:layout_height="fill_parent"
         android:layout_gravity="right"
         android:id="@+id/fragment_dossier_detail_details"
-        android:background="@drawable/texture_paper_eggshell"
         android:gravity="center_horizontal"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        android:background="@android:color/background_light">
 
         <TextView
             android:layout_width="wrap_content"

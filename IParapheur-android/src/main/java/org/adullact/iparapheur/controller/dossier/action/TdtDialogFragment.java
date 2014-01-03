@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -50,22 +50,22 @@ public class TdtDialogFragment extends ActionDialogFragment {
         new TdtTask(getActivity()).execute();
     }
 
-    private class TdtTask extends LoadingTask {
+    private class TdtTask extends LoadingWithProgressTask {
 
         public TdtTask(Activity activity) {
             super(activity, listener);
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (isCancelled()) {return null;}
+        protected void load(String... params) {
+            if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();
             int i = 0;
             int total = dossiers.size();
             publishProgress(i);
             for (Dossier dossier : dossiers) {
-                if (isCancelled()) {return null;}
+                if (isCancelled()) {return;}
                 // TODO : distinguer Actes et Helios
                 Log.d("debug", "Mailsec sur " + dossier.getName());
                 RESTClient.INSTANCE.envoiTdtActes(dossier.getId(),
@@ -76,8 +76,6 @@ public class TdtDialogFragment extends ActionDialogFragment {
                 i++;
                 publishProgress(i * 100 / total);
             }
-
-            return null;
         }
     }
 }

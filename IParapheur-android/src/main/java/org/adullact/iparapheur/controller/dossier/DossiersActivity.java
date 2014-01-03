@@ -58,13 +58,13 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     /** Used to control the drawer state. */
     private ActionBarDrawerToggle drawerToggle;
     private boolean openDrawerwhenFinishedLoading = false;
+    private boolean manageDrawerwhenFinishedLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Loading indicator
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_dossiers);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
@@ -88,11 +88,16 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     @Override
     public void onResume() {
         super.onResume();
-        if (openDrawerwhenFinishedLoading) {
+        if (manageDrawerwhenFinishedLoading) {
             if (drawerLayout != null) {
-                drawerLayout.openDrawer(drawerMenu);
+                if (openDrawerwhenFinishedLoading) {
+                    drawerLayout.openDrawer(drawerMenu);
+                }
+                else {
+                    drawerLayout.closeDrawer(drawerMenu);
+                }
             }
-            openDrawerwhenFinishedLoading = false;
+            manageDrawerwhenFinishedLoading = false;
         }
     }
 
@@ -114,18 +119,19 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
 
     // DossierSelectedListener implementations
     @Override
-    public void onDossierSelected(String id)
+    public void onDossierSelected(String dossierId, String bureauId)
     {
-        if (id == null) {
+        if (dossierId == null) {
             Fragment fragment = getFragmentManager().findFragmentByTag(FRAGMENT_TAG_DETAILS);
             if (fragment != null) {
                 // hide is used so that we can do a relace when a dossier is selected after
-                getFragmentManager().beginTransaction().hide(fragment);
+                getFragmentManager().beginTransaction().hide(fragment).commit();
             }
         }
         else {
             Bundle arguments = new Bundle();
-            arguments.putString(DossierDetailFragment.DOSSIER_ID, id);
+            arguments.putString(DossierDetailFragment.DOSSIER_ID, dossierId);
+            arguments.putString(DossierDetailFragment.BUREAU_ID, bureauId);
             DossierDetailFragment fragment = new DossierDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
@@ -153,10 +159,9 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     // BureauSelectedListener implementation
     @Override
     public void onBureauSelected(String id) {
-        // Can happen when there is no network! no bureau can be loaded and we are notified.
         if (drawerLayout == null) {
-            // TODO : use it!
-            openDrawerwhenFinishedLoading = true;
+            manageDrawerwhenFinishedLoading = true;
+            openDrawerwhenFinishedLoading = (id == null);
         }
         else {
             if (id == null) {
@@ -202,7 +207,6 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
         // show or hide specific menu actions depending on Drawer state
-        // FIXME : actions appearance on dossiers list size?
         Log.d("debug", "onPrepareOptionsMenu in Activity");
         boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
         menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);

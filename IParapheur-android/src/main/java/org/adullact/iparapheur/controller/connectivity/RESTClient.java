@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.connectivity;
 import android.os.Environment;
 import android.util.Log;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
@@ -70,20 +71,48 @@ public enum  RESTClient {
         return ticket;
     }
 
-    public static Dossier getDossier(String bureauId, String dossierId) {
+    public static int test(Account account) {
+        int messageRes = R.string.test_unreachable;
+        String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
+        RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
+        if (response != null) {
+            if (response.getCode() == HttpStatus.SC_OK) {
+                messageRes = R.string.test_ok;
+            }
+            else {
+                switch (response.getCode()) {
+                    case HttpStatus.SC_FORBIDDEN :
+                        messageRes = R.string.test_forbidden;
+                        break;
+                    case HttpStatus.SC_NOT_FOUND :
+                        messageRes = R.string.test_not_found;
+                        break;
+                    case HttpStatus.SC_INTERNAL_SERVER_ERROR :
+                        if (response.getError().contains("Tenant does not exist")) {
+                            messageRes = R.string.test_tenant_not_exist;
+                        }
+                        break;
+                }
+            }
+        }
+        return messageRes;
+    }
+
+    public static Dossier getDossier(String bureauId, String dossierId) throws RuntimeException {
         String url = buildUrl(ACTION_GET_DOSSIER);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
                        "\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"}";
+        Log.d("debug", "body : " + body);
         return ModelMapper.getDossier(RESTUtils.post(url, body));
     }
 
-    public static ArrayList<EtapeCircuit> getCircuit(String dossierId) {
+    public static ArrayList<EtapeCircuit> getCircuit(String dossierId) throws RuntimeException {
         String url = buildUrl(ACTION_GET_CIRCUIT);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"}";
         return ModelMapper.getCircuit(RESTUtils.post(url, body));
     }
 
-    public static ArrayList<Dossier> getDossiers(String bureauId) {
+    public static ArrayList<Dossier> getDossiers(String bureauId) throws RuntimeException {
         String url = buildUrl(ACTION_GET_DOSSIERS);
         String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
                 "\"filters\": \"\"," +
@@ -96,20 +125,24 @@ public enum  RESTClient {
         return ModelMapper.getDossiers(RESTUtils.post(url, body));
     }
 
-    public ArrayList<Bureau> getBureaux() {
+    public ArrayList<Bureau> getBureaux() throws RuntimeException {
         String url = buildUrl(ACTION_GET_BUREAUX);
-        String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
+        //String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
-        return ModelMapper.getBureaux(RESTUtils.post(url, body));
-        //return ModelMapper.getBureaux(RESTUtils.get(url, null));
+        //return ModelMapper.getBureaux(RESTUtils.post(url, body));
+        return ModelMapper.getBureaux(RESTUtils.get(url, null));
     }
 
-    public static String buildUrl(String action) {
+    public static String buildUrl(String action) throws RuntimeException {
         String ticket = getTicket(MyAccounts.INSTANCE.getSelectedAccount());
-        return BASE_PATH + MyAccounts.INSTANCE.getSelectedAccount().getUrl() + action + ((ticket == null)? "" : "?alf_ticket=" + ticket);
+
+        if (ticket == null) {
+            throw new RuntimeException("Impossible de se connecter, veuillez vérifier vos comptes");
+        }
+        return BASE_PATH + MyAccounts.INSTANCE.getSelectedAccount().getUrl() + action + "?alf_ticket=" + ticket;
     }
 
-    public static String downloadFile(String url, String path) {
+    public static boolean downloadFile(String url, String path) throws RuntimeException {
 
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state)) {
@@ -131,8 +164,7 @@ public enum  RESTClient {
             fileOutput.close();
 
         } catch (Exception e) {
-            Log.e("RESTClient", "Erreur lors du téléchargement du pdf : " + e);
-            e.printStackTrace();
+            throw new RuntimeException("Erreur lors du téléchargement du pdf : " + e.getMessage());
         } finally {
             if (fileOutput != null) {
                 try {
@@ -141,10 +173,10 @@ public enum  RESTClient {
                 }
             }
         }
-        return (file != null)? file.getAbsolutePath() : null;
+        return ((file != null) && file.exists());
     }
 
-    public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) {
+    public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
 
         try {
             JSONObject json = new JSONObject();
@@ -158,33 +190,32 @@ public enum  RESTClient {
             return (response != null && response.getCode() == HttpStatus.SC_OK);
 
         } catch (JSONException e) {
-            Log.e("RESTClient", "Erreur lors de la construction de la requête pour viser un dossier", e);
+            throw new RuntimeException("Une erreur est survenue lors du visa");
         }
+    }
+
+    public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
         return false;
     }
 
-    public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) {
+    public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws RuntimeException {
         return false;
     }
 
-    public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) {
+    public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
         return false;
     }
 
-    public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) {
+    public boolean envoiTdtActes(String dossierId, String classification, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
         return false;
     }
 
-    public boolean envoiTdtActes(String dossierId, String classification, String annotPub, String annotPriv, String bureauId) {
-        return false;
-    }
-
-    public boolean envoiMailSec(String dossierId, List<String> destinataires, String sujet, String message, boolean showPassword, String annotPub, String annotPriv, String bureauId) {
+    public boolean envoiMailSec(String dossierId, List<String> destinataires, String sujet, String message, boolean showPassword, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
         // TODO : manage annexes
         return false;
     }
 
-    public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) {
+    public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws RuntimeException {
         return false;
     }
 }

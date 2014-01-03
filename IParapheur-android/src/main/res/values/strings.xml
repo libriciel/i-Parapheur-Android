@@ -49,4 +49,15 @@
     <string name="justify_reject">Merci de saisir votre motif de rejet</string>
     <string name="etape_courante">Étape courante</string>
 
+
+    <!-- MuPDF strings -->
+    <string name="cannot_open_file_Path">Impossible d\'ouvrir le fichier : %1$s</string>
+    <string name="cannot_open_buffer">Impossible d\'ouvrir le buffer</string>
+    <string name="not_supported">Non compatible</string>
+    <string name="test_ok">Connexion réussie</string>
+    <string name="test_forbidden">Nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="test_not_found">URL non trouvée</string>
+    <string name="test_unreachable">Impossible d\'accéder au serveur</string>
+    <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string><string name="pref_account_test">Tester la connexion</string>
+
 </resources>

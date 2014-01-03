@@ -6,7 +6,7 @@ import android.view.View;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -44,20 +44,20 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
         new ArchivageTask(getActivity()).execute();
     }
 
-    private class ArchivageTask extends LoadingTask {
+    private class ArchivageTask extends LoadingWithProgressTask {
 
         public ArchivageTask(Activity activity) {
             super(activity, listener);
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (isCancelled()) {return null;}
+        protected void load(String... params) {
+            if (isCancelled()) {return;}
             int i = 0;
             int total = dossiers.size();
             publishProgress(i);
             for (Dossier dossier : dossiers) {
-                if (isCancelled()) {return null;}
+                if (isCancelled()) {return;}
                 Log.d("debug", "Archivage du dossier " + dossier.getName());
                 RESTClient.INSTANCE.archiver(dossier.getId(),
                         dossier.getName() + "pdf",
@@ -66,8 +66,6 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
                 i++;
                 publishProgress(i * 100 / total);
             }
-
-            return null;
         }
     }
 }

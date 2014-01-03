@@ -86,7 +86,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         /**
          * Callback for when a dossier has been selected.
          */
-        void onDossierSelected(String id);
+        void onDossierSelected(String dossierId, String bureauId);
         void onDossierChecked(String id);
     }
 
@@ -236,7 +236,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
 
     private void setActivatedPosition(int position) {
         if (position == ListView.INVALID_POSITION) {
-            getListView().setItemChecked(selectedDossier, false);
+            getListView().clearChoices();
         } else {
             getListView().setItemChecked(position, true);
         }
@@ -254,7 +254,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         if (selectedDossier != ListView.INVALID_POSITION) {
             selectedDossier = ListView.INVALID_POSITION;
             setActivatedPosition(ListView.INVALID_POSITION);
-            listener.onDossierSelected(null);
+            listener.onDossierSelected(null, null);
         }
         ((DossierListAdapter) getListAdapter()).clearSelection();
 
@@ -271,7 +271,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
              * activity that the data has changed, so the activity remove the previously selected
              * dossier details
              */
-            listener.onDossierSelected(null);
+            listener.onDossierSelected(null, null);
         }
     }
 
@@ -343,7 +343,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         public void onClick(View v) {
             Integer position = (Integer) v.getTag();
             if (position != selectedDossier) {
-                listener.onDossierSelected(dossiers.get(position).getId());
+                listener.onDossierSelected(dossiers.get(position).getId(), bureauId);
                 setActivatedPosition(position);
             }
         }
@@ -365,11 +365,14 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected void load(String... params) {
             // Check if this task is cancelled as often as possible.
-            if (isCancelled()) {return null;}
+            if (isCancelled()) {return;}
             dossiers = RESTClient.INSTANCE.getDossiers(params[0]);
-            return null;
+            // OFFLINE
+            //dossiers = new ArrayList<Dossier>();
+            //Dossier dossier = new Dossier(1);
+            //dossiers.add(dossier);
         }
     }
 

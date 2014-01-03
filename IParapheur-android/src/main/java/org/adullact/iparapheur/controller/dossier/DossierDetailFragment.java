@@ -19,12 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.artifex.mupdf.MuPDFCore;
-import com.artifex.mupdf.MuPDFPageAdapter;
-import com.artifex.mupdf.ReaderView;
-
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.document.DocumentReader;
 import org.adullact.iparapheur.controller.utils.FileUtils;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
@@ -49,26 +46,25 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
      * represents.
      */
     public static final String DOSSIER_ID = "dossier_id";
+    /**
+     * The id of the selected bureau.
+     */
+    public static final String BUREAU_ID = "bureau_id";
 
     /**
      * the bureau where the dossier belongs.
      */
-    private String bureauId = "433149e9-a552-4472-90a6-2f08eb046eca";
+    private String bureauId;
     /**
      * The Dossier this fragment is presenting.
      */
     private Dossier dossier;
-    /**
-     * The Document this fragment is displaying in the reader view.
-     */
-    private Document document;
 
     private DossierDetailListener listener;
 
     private boolean isReaderEnabled;
 
-    // MuPDF variables
-    private MuPDFCore core;
+    private DocumentReader reader;
 
 
     /**
@@ -90,17 +86,20 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (getArguments().containsKey(DOSSIER_ID)) {
-            dossier = listener.getDossier(getArguments().getString(DOSSIER_ID));
-            if (dossier != null) {
-                this.isReaderEnabled = true;
-                String state = Environment.getExternalStorageState();
-                if (!Environment.MEDIA_MOUNTED.equals(state)) {
-                    Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG);
-                    this.isReaderEnabled = false;
+        if (getArguments().containsKey(BUREAU_ID)) {
+            bureauId = getArguments().getString(BUREAU_ID);
+            if (getArguments().containsKey(DOSSIER_ID)) {
+                dossier = listener.getDossier(getArguments().getString(DOSSIER_ID));
+                if (dossier != null) {
+                    this.isReaderEnabled = true;
+                    String state = Environment.getExternalStorageState();
+                    if (!Environment.MEDIA_MOUNTED.equals(state)) {
+                        Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
+                        this.isReaderEnabled = false;
+                    }
+                    // todo : reload if data is too old
+                    getDossierDetails(false);
                 }
-                // todo : reload if data is too old
-                getDossierDetails(false);
             }
         }
     }
@@ -135,33 +134,24 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
     @Override
     public void onDataChanged() {
         updateDetails();
+        // OFFLINE : commenter updateDetails
         updateReader();
     }
 
     // TODO : aucun apercu disponible
     private void updateReader() {
-        // TODO : remove false
-        if (/*isReaderEnabled*/false && (document.getPath() != null)) {
+        Document document = dossier.getMainDocuments().get(0);
+        if (isReaderEnabled && (document.getPath() != null)) {
             FrameLayout layout = (FrameLayout) getView().findViewById(R.id.fragment_dossier_detail_reader_view);
-            ReaderView readerView;
-            if ((layout.getChildCount() > 0) && (layout.getChildAt(0) instanceof ReaderView)) {
-                readerView = (ReaderView) layout.getChildAt(0);
+            if ((layout.getChildCount() > 0) && (layout.getChildAt(0) instanceof DocumentReader)) {
+                reader = (DocumentReader) layout.getChildAt(0);
             }
             else {
-                readerView = new ReaderView(getActivity());
+                reader = new DocumentReader(getActivity());
+                layout.addView(reader);
             }
-            try {
-                if (core != null) {
-                    core.onDestroy();
-                }
-                core = new MuPDFCore(document.getPath());
-                readerView.setAdapter(new MuPDFPageAdapter(getActivity(), core, null));
-                readerView.setDisplayedViewIndex(0);
-                layout.invalidate();
-                Log.d("debug", "Detail Fragment Data changed loading document done!");
-            } catch (Exception e) {
-                Log.e("FolderActivity", "Exception catched : " + e);
-            }
+            reader.setDocument(document);
+            layout.invalidate();
         }
     }
 
@@ -209,34 +199,46 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         }
 
         @Override
-        protected Void doInBackground(String... params)
+        protected void load(String... params)
         {
             // Check if this task is cancelled as often as possible.
-            if (isCancelled()) {return null;}
+            if (isCancelled()) {return;}
             Log.d("debug", "getting dossier details");
             Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
             if (dossier != null) {
                 dossier.saveDetails(d);
             }
-            if (isCancelled()) {return null;}
+            // OFFLINE
+            //dossier.addDocument(new Document(
+            /*        UUID.randomUUID().toString(),
+                    "ducument par defaut",
+                    ""));*/
+            if (isCancelled()) {return;}
             dossier.setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
-            if (isCancelled()) {return null;}
+            // OFFLINE : commenter la ligne au dessus
+            if (isCancelled()) {return;}
 
             if (isReaderEnabled && (dossier.getMainDocuments().size() > 0)) {
-                document = dossier.getMainDocuments().get(0);
+                Document document = dossier.getMainDocuments().get(0);
 
                 if ((document.getPath() == null) || !(new File(document.getPath()).exists()))
                 {
                     File file = FileUtils.getFileForDocument(dossier.getId(), document.getId());
                     String path = file.getAbsolutePath();
                     Log.d("debug", "saving document on disk");
-                    String res = RESTClient.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path);
-                    if (res != null) {
-                        document.setPath(res);
+                    if (RESTClient.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
+                        document.setPath(path);
                     }
+                    // OFFLINE
+                    /*document.setPath(path);
+                    if (file.exists()) {
+                        Log.d("debug", "Document par defaut trouvé");
+                    }
+                    else {
+                        Log.d("debug", "Document par defaut non trouvé");
+                    }*/
                 }
             }
-            return null;
         }
     }
 
@@ -252,7 +254,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
             EtapeCircuit etape = getItem(position);
             ((ImageView) view.findViewById(R.id.etape_circuit_icon)).setImageResource(etape.getAction().getIcon(etape.isApproved()));
             if (etape.isApproved()) {
-                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy "+ getResources().getString(R.string.at) + " hh:mm");
+                SimpleDateFormat df = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
                 String validation = getResources().getString(R.string.par) + " " +
                         etape.getSignataire() +
                         getResources().getString(R.string.the) + df.format(etape.getDateValidation());

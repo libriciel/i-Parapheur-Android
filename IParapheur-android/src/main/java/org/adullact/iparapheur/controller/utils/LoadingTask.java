@@ -13,9 +13,11 @@ import org.adullact.iparapheur.R;
  * Simple AsyncTask that automatically show a loader in the action bar.
  * If a {@link org.adullact.iparapheur.controller.utils.LoadingTask.DataChangeListener} is defined, this
  * listener is notified when the task finishes.
+ * It automatically manage exceptions and feed back the user with a Toast.
+ * Subclasses must Override
  * Created by jmaire on 04/11/2013.
  */
-public abstract class LoadingTask extends AsyncTask<String, Integer, Void> {
+public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
     protected Activity activity;
     private DataChangeListener dataListener;
@@ -24,6 +26,8 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, Void> {
         this.activity = activity;
         this.dataListener = listener;
     }
+
+    protected abstract void load(String... params);
 
     @Override
     protected void onPreExecute() {
@@ -40,8 +44,22 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void result) {
-        if (dataListener != null) {
+    protected String doInBackground(String... params) {
+        String error = null;
+        try {
+            load(params);
+        } catch (RuntimeException e) {
+            error = e.getMessage();
+        }
+        return error;
+    }
+
+    @Override
+    protected void onPostExecute(String error) {
+        if (error != null) {
+            Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
+        }
+        else if (dataListener != null) {
             dataListener.onDataChanged();
         }
         hideProgress();

@@ -1,5 +1,9 @@
 package org.adullact.iparapheur.model;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by jmaire on 03/11/2013.
  */
@@ -7,6 +11,7 @@ public class Document {
 
     private final String id;
     private final String name;
+    private final Map<Integer, List<Annotation>> annotations;
     /**
      * URL of the document (its content)
      */
@@ -20,6 +25,7 @@ public class Document {
         this.id = id;
         this.name = name;
         this.url = url;
+        this.annotations = new HashMap<Integer, List<Annotation>>();
     }
 
     public String getId() {
@@ -40,5 +46,9 @@ public class Document {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Map<Integer, List<Annotation>> getAnnotations() {
+        return annotations;
     }
 }

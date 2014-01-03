@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -80,22 +80,22 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
     }
 
 
-    private class SignTask extends LoadingTask {
+    private class SignTask extends LoadingWithProgressTask {
 
         public SignTask(Activity activity) {
             super(activity, listener);
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (isCancelled()) {return null;}
+        protected void load(String... params) {
+            if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();
             int i = 0;
             int total = dossiers.size();
             publishProgress(i);
             for (Dossier dossier : dossiers) {
-                if (isCancelled()) {return null;}
+                if (isCancelled()) {return;}
                 String signValue = "";
                 // TODO sign and update signValue
                 Log.d("debug", "Signature sur " + dossier.getName() + "avec le certificat " + selectedCertAlias);
@@ -107,8 +107,6 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
                 i++;
                 publishProgress(i * 100 / total);
             }
-
-            return null;
         }
     }
 }

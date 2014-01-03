@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.controller.connectivity;
 
-import android.util.Log;
-
 import org.adullact.iparapheur.controller.utils.TransformUtils;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
@@ -21,7 +19,7 @@ import java.util.ArrayList;
 public class ModelMapper
 {
 
-    public static Dossier getDossier(RequestResponse requestResponse) {
+    public static Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
         Dossier dossier = null;
         if (requestResponse.getResponse() != null)
         {
@@ -30,7 +28,7 @@ public class ModelMapper
         return dossier;
     }
 
-    private static Dossier getDossier(JSONObject jsonObject) {
+    private static Dossier getDossier(JSONObject jsonObject) throws RuntimeException {
         Dossier dossier = null;
         try
         {
@@ -57,12 +55,12 @@ public class ModelMapper
                 }
             }
         } catch (JSONException e) {
-            Log.e("ModelMapper", "Erreur lors de la transformation en dossier.", e);
+            throw new RuntimeException("Erreur lors de la récupération du dossier");
         }
         return dossier;
     }
 
-    public static ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
+    public static ArrayList<Dossier> getDossiers(RequestResponse requestResponse) throws RuntimeException {
         ArrayList<Dossier> dossiers = new ArrayList<Dossier>();
         if (requestResponse.getResponse() != null) {
             JSONArray array = requestResponse.getResponse().optJSONArray("dossiers");
@@ -74,8 +72,8 @@ public class ModelMapper
                         if (dossier != null) {
                             dossiers.add(dossier);
                         }
-                    } catch (JSONException e) {
-                        Log.e("ModelMapper", "Erreur lors de la transformation en liste de dossiers.", e);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Erreur lors de la récupération des dossiers");
                     }
                 }
             }
@@ -83,7 +81,7 @@ public class ModelMapper
         return dossiers;
     }
 
-    public static ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
+    public static ArrayList<EtapeCircuit> getCircuit(RequestResponse response) throws RuntimeException {
         ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
         if (response.getResponse() != null)
         {
@@ -102,7 +100,7 @@ public class ModelMapper
                                 etapeObject.optString("annotPub", "")));
 
                     } catch (JSONException e) {
-                        Log.e("ModelMapper", "Erreur lors de la transformation en circuit", e);
+                        throw new RuntimeException("Erreur lors de la récupération du circuit de validation");
                     }
                 }
             }
@@ -110,7 +108,7 @@ public class ModelMapper
         return circuit;
     }
 
-    public static ArrayList<Bureau> getBureaux(RequestResponse response) {
+    public static ArrayList<Bureau> getBureaux(RequestResponse response) throws RuntimeException {
         ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
         if (response.getResponse() != null) {
             JSONArray array = response.getResponse().optJSONArray("bureaux");
@@ -123,7 +121,7 @@ public class ModelMapper
                                     array.getJSONObject(i).getString("name")));
                         }
                     catch (JSONException e) {
-                        Log.e("ModelMapper", "Erreur lors de la transformation en liste de bureaux.", e);
+                        throw new RuntimeException("Erreur lors de la récupération des bureaux.");
                     }
                 }
             }

@@ -21,6 +21,8 @@ public class FileUtils {
 
     public static File getFileForDocument(String dossierId, String documentId) {
         return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
+        // OFFLINE
+        //return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "defautDoc.pdf");
     }
 
     public static boolean isStorageAvailable() {

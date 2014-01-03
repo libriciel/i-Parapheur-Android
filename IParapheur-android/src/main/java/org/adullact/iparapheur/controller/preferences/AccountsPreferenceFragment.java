@@ -18,7 +18,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Account;
 
 
-public class AccountsPreferenceFragment extends PreferenceFragment implements DeleteAccountPreference.OnAccountDeletedListener, Preference.OnPreferenceChangeListener {
+public class AccountsPreferenceFragment extends PreferenceFragment implements ActionsAccountPreference.ActionsAccountPreferenceListener, Preference.OnPreferenceChangeListener {
 
     private PreferenceScreen accountsScreen;
 
@@ -111,7 +111,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements De
         passwordPref.setOnPreferenceChangeListener(this);
         accountPref.addPreference(passwordPref);
 
-        accountPref.addPreference(new DeleteAccountPreference(getActivity(), this, account));
+        accountPref.addPreference(new ActionsAccountPreference(getActivity(), this, account));
     }
 
     /**

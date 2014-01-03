@@ -49,7 +49,7 @@ public class RequestResponse {
                 data = TransformUtils.inputStreamToString(httpURLConnection.getErrorStream());
                 Log.d("debug", "data : " + data);
                 Object json = new JSONTokener(data).nextValue();
-                //this.error = ((JSONObject) json).isNull("message")? null : ((JSONObject) json).getString("error");
+                this.error = ((JSONObject) json).optString("message", "");
             }
 
         } catch (Exception e) {

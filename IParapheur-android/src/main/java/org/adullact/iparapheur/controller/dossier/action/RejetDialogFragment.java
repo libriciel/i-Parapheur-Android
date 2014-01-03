@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -57,22 +57,22 @@ public class RejetDialogFragment extends ActionDialogFragment {
         }
     }
 
-    private class RejetTask extends LoadingTask {
+    private class RejetTask extends LoadingWithProgressTask {
 
         public RejetTask(Activity activity) {
             super(activity, listener);
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (isCancelled()) {return null;}
+        protected void load(String... params) {
+            if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();
             int i = 0;
             int total = dossiers.size();
             publishProgress(i);
             for (Dossier dossier : dossiers) {
-                if (isCancelled()) {return null;}
+                if (isCancelled()) {return;}
                 Log.d("debug", "Rejet sur " + dossier.getName() + "avec le motif " + annotPub);
                 RESTClient.INSTANCE.rejeter(dossier.getId(),
                         annotPub,
@@ -81,8 +81,6 @@ public class RejetDialogFragment extends ActionDialogFragment {
                 i++;
                 publishProgress(i * 100 / total);
             }
-
-            return null;
         }
     }
 }

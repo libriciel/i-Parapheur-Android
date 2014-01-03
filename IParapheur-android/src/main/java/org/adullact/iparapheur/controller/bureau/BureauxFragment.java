@@ -93,9 +93,13 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
     private void updateAccounts() {
         RadioGroup accountContainer = (RadioGroup) getView().findViewById(R.id.bureaux_account_container);
         accountContainer.removeAllViews();
+        int i = 0;
         for (Account account : MyAccounts.INSTANCE.getAccounts()) {
             RadioButton radio = new RadioButton(getActivity());
-            radio.setId(View.generateViewId()); // Mandatory to check buttons
+            //radio.setId(View.generateViewId()); // Mandatory to check buttons
+            // FIXME
+            radio.setId(i);
+            i++;
             radio.setText(account.getTitle());
             radio.setTag(account.getId());
             radio.setOnClickListener(this);
@@ -167,11 +171,13 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected void load(String... params) {
             // Check if this task is cancelled as often as possible.
-            if (isCancelled()) {return null;}
+            if (isCancelled()) {return;}
             bureaux = RESTClient.INSTANCE.getBureaux();
-            return null;
+            // OFFLINE
+            //bureaux = new ArrayList<Bureau>();
+            //bureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
         }
     }
 

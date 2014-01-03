@@ -60,8 +60,8 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (isCancelled()) {return null;}
+        protected void load(String... params) {
+            if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();
             int i = 0;
@@ -69,7 +69,7 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
             publishProgress(i);
 
             for (Dossier dossier : dossiers) {
-                if (isCancelled()) {return null;}
+                if (isCancelled()) {return;}
                 Log.d("debug", "VISA on " + dossier);
                 RESTClient.INSTANCE.viser(dossier,
                         annotPub,
@@ -78,7 +78,6 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
                 i++;
                 publishProgress(i * 100 / total);
             }
-            return null;
         }
     }
 }
