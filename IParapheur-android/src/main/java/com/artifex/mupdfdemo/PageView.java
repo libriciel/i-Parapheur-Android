@@ -155,7 +155,7 @@ public abstract class PageView extends ViewGroup {
      * method used to notify subclasses that the document is loaded.
      */
     protected abstract void documentAvailable();
-    protected boolean isBlank() {
+    public boolean isBlank() {
         return mIsBlank;
     }
     ///// END ADDED METHODS /////

@@ -10,28 +10,28 @@ public enum Action
     // TODO : all possible actions (secretariat, supprimer, ...)
     VISA(R.string.action_viser,
             R.id.action_visa,
-            R.drawable.ic_circuit_iw_visa,
-            R.drawable.ic_circuit_ip_visa),
+            R.drawable.iw_visa,
+            R.drawable.ip_visa),
 
     SIGNATURE(R.string.action_signer,
             R.id.action_signature,
-            R.drawable.ic_circuit_iw_signature,
-            R.drawable.ic_circuit_ip_signature),
+            R.drawable.iw_signature,
+            R.drawable.ip_signature),
 
     TDT(R.string.action_tdt,
             R.id.action_tdt,
-            R.drawable.ic_circuit_iw_visa,
-            R.drawable.ic_circuit_ip_visa),
+            R.drawable.iw_visa,
+            R.drawable.ip_visa),
 
     ARCHIVAGE(R.string.action_archiver,
             R.id.action_archivage,
-            R.drawable.ic_circuit_iw_archivage,
-            R.drawable.ic_circuit_iw_archivage),
+            R.drawable.iw_archivage,
+            R.drawable.iw_archivage),
 
     MAILSEC(R.string.action_mailsec,
             R.id.action_mailsec,
-            R.drawable.ic_circuit_iw_visa,
-            R.drawable.ic_circuit_ip_visa),
+            R.drawable.iw_visa,
+            R.drawable.ip_visa),
 
     REJET(R.string.action_rejeter,
             R.id.action_rejet,

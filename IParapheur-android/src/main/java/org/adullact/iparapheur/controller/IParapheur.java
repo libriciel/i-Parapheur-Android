@@ -13,6 +13,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 public class IParapheur extends Application {
 
     private static Context context;
+    public static final boolean OFFLINE = false;
 
     @Override
     public void onCreate() {

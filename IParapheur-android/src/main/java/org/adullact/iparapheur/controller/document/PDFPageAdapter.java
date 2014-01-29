@@ -22,16 +22,18 @@ import java.util.Map;
  * Nearly the same as MuPDFPageAdapter.
  */
 public class PDFPageAdapter extends BaseAdapter {
+
     private final Context mContext;
     private final Map<Integer,List<Annotation>> mAnnotations;
     private final MuPDFCore mCore;
     private final SparseArray<PointF> mPageSizes = new SparseArray<PointF>();
+    private PDFPageView pageView;
     private Bitmap mSharedHqBm;
 
-    public PDFPageAdapter(Context c, Map<Integer,List<Annotation>> annotations, MuPDFCore core) {
+    public PDFPageAdapter(Context c, Map<Integer,List<Annotation>> annotations, String path) throws Exception {
         mContext = c;
         mAnnotations = annotations;
-        mCore = core;
+        mCore = new MuPDFCore(c, path);
     }
 
     public int getCount() {
@@ -46,8 +48,14 @@ public class PDFPageAdapter extends BaseAdapter {
         return 0;
     }
 
+    public void clean() {
+        if (pageView != null) {
+            pageView.clean();
+        }
+        //mCore.onDestroy();
+    }
+
     public View getView(final int position, View convertView, ViewGroup parent) {
-        final PDFPageView pageView;
         if (convertView == null) {
             if (mSharedHqBm == null || mSharedHqBm.getWidth() != parent.getWidth() || mSharedHqBm.getHeight() != parent.getHeight())
                 mSharedHqBm = Bitmap.createBitmap(parent.getWidth(), parent.getHeight(), Bitmap.Config.ARGB_8888);

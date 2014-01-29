@@ -8,7 +8,6 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -28,52 +27,58 @@ public class ModelMapper
         return dossier;
     }
 
-    private static Dossier getDossier(JSONObject jsonObject) throws RuntimeException {
-        Dossier dossier = null;
-        try
-        {
-            ArrayList<Action> actions = new ArrayList<Action>(1);
-            actions.add(Action.valueOf(jsonObject.getString("actionDemandee")));
-            dossier = new Dossier(jsonObject.getString("dossierRef").substring("workspace://SpacesStore/".length()),
-                    jsonObject.getString("titre"),
-                    actions,
-                    jsonObject.getString("type"),
-                    jsonObject.getString("sousType"),
-                    TransformUtils.parseISO8601Date(jsonObject.getString("dateCreation")),
-                    TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite")));
+    private static Dossier getDossier(JSONObject jsonObject)
+    {
+        ArrayList<Action> actions = new ArrayList<Action>(1);
+        actions.add(Action.valueOf(jsonObject.optString("actionDemandee", "VISA")));
+        String ref = jsonObject.optString("dossierRef");
+        if (ref.contains("workspace://SpacesStore/")) {
+            ref = ref.substring("workspace://SpacesStore/".length());
+        }
+        Dossier dossier = new Dossier(ref,
+                jsonObject.optString("titre"),
+                actions,
+                jsonObject.optString("type"),
+                jsonObject.optString("sousType"),
+                TransformUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
+                TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite")));
 
-            if (jsonObject.has("documents"))
+        JSONArray documents = jsonObject.optJSONArray("documents");
+        if (documents != null)
+        {
+
+            for (int index = 0; index < documents.length(); index++)
             {
-                JSONArray documents = jsonObject.getJSONArray("documents");
-                for (int index = 0; index < documents.length(); index++)
-                {
-                    JSONObject doc = documents.getJSONObject(index);
+                JSONObject doc = documents.optJSONObject(index);
+                if (doc != null) {
+                    String docRef = jsonObject.optString("dossierRef");
+                    if (docRef.contains("workspace://SpacesStore/")) {
+                        docRef = ref.substring("workspace://SpacesStore/".length());
+                    }
                     dossier.addDocument(new Document(
-                            doc.getString("nodeRef").substring("workspace://SpacesStore/".length()),
-                            doc.getString("name"),
-                            doc.getString("downloadUrl")));
+                            docRef,
+                            doc.optString("name"),
+                            doc.optString("downloadUrl")));
                 }
             }
-        } catch (JSONException e) {
-            throw new RuntimeException("Erreur lors de la récupération du dossier");
         }
         return dossier;
     }
 
-    public static ArrayList<Dossier> getDossiers(RequestResponse requestResponse) throws RuntimeException {
+    public static ArrayList<Dossier> getDossiers(RequestResponse requestResponse)
+    {
         ArrayList<Dossier> dossiers = new ArrayList<Dossier>();
         if (requestResponse.getResponse() != null) {
             JSONArray array = requestResponse.getResponse().optJSONArray("dossiers");
             if (array != null) {
                 for (int i = 0; i < array.length(); i++)
                 {
-                    try {
-                        Dossier dossier = getDossier(array.getJSONObject(i));
+                    JSONObject dossierJSON = array.optJSONObject(i);
+                    if (dossierJSON != null) {
+                        Dossier dossier = getDossier(dossierJSON);
                         if (dossier != null) {
                             dossiers.add(dossier);
                         }
-                    } catch (Exception e) {
-                        throw new RuntimeException("Erreur lors de la récupération des dossiers");
                     }
                 }
             }
@@ -81,7 +86,7 @@ public class ModelMapper
         return dossiers;
     }
 
-    public static ArrayList<EtapeCircuit> getCircuit(RequestResponse response) throws RuntimeException {
+    public static ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
         ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
         if (response.getResponse() != null)
         {
@@ -89,39 +94,35 @@ public class ModelMapper
             if (circuit != null) {
                 for (int i = 0; i < circuitArray.length(); i++)
                 {
-                    try {
-                        JSONObject etapeObject = circuitArray.getJSONObject(i);
-                        circuit.add(new EtapeCircuit(
-                                TransformUtils.parseISO8601Date(etapeObject.getString("dateValidation")),
-                                etapeObject.optBoolean("approved", false),
-                                etapeObject.optString("parapheurName", ""),
-                                etapeObject.optString("signataire", ""),
-                                Action.valueOf(etapeObject.optString("actionDemandee", "")),
-                                etapeObject.optString("annotPub", "")));
+                    JSONObject etapeObject = circuitArray.optJSONObject(i);
+                    circuit.add(new EtapeCircuit(
+                            TransformUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
+                            etapeObject.optBoolean("approved"),
+                            etapeObject.optString("parapheurName"),
+                            etapeObject.optString("signataire"),
+                            Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
+                            etapeObject.optString("annotPub")));
 
-                    } catch (JSONException e) {
-                        throw new RuntimeException("Erreur lors de la récupération du circuit de validation");
-                    }
                 }
             }
         }
         return circuit;
     }
 
-    public static ArrayList<Bureau> getBureaux(RequestResponse response) throws RuntimeException {
+    public static ArrayList<Bureau> getBureaux(RequestResponse response) {
         ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
         if (response.getResponse() != null) {
             JSONArray array = response.getResponse().optJSONArray("bureaux");
             if (array != null) {
                 for (int i = 0; i < array.length(); i++)
                 {
-                    try {
-                            bureaux.add(new Bureau(
-                                    array.getJSONObject(i).getString("nodeRef").substring("workspace://SpacesStore/".length()),
-                                    array.getJSONObject(i).getString("name")));
+                    JSONObject bureau = array.optJSONObject(i);
+                    if (bureau != null) {
+                        String bureauRef = bureau.optString("nodeRef");
+                        if (bureauRef.contains("workspace://SpacesStore/")) {
+                            bureauRef = bureauRef.substring("workspace://SpacesStore/".length());
                         }
-                    catch (JSONException e) {
-                        throw new RuntimeException("Erreur lors de la récupération des bureaux.");
+                        bureaux.add(new Bureau(bureauRef, bureau.optString("name")));
                     }
                 }
             }

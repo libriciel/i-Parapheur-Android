@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -43,10 +42,8 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
                                                           BureauxFragment.BureauSelectedListener,
                                                           LoadingTask.DataChangeListener {
 
-
-    private static final String FRAGMENT_TAG_DETAILS = "Dossier_details";
-    private static final String FRAGMENT_TAG_LIST = "Dossiers_list";
-    private static final String FRAGMENT_TAG_BUREAUX = "Bureaux_list";
+    public static final String DOSSIER_ID = "dossier_id";
+    public static final String BUREAU_ID = "bureau_id";
     private static final int EDIT_PREFERENCE_REQUEST = 0;
 
     /** Main Layout off the screen */
@@ -111,33 +108,30 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         MyAccounts.INSTANCE.saveState();
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
     // DossierSelectedListener implementations
     @Override
     public void onDossierSelected(String dossierId, String bureauId)
     {
-        if (dossierId == null) {
-            Fragment fragment = getFragmentManager().findFragmentByTag(FRAGMENT_TAG_DETAILS);
+        Fragment fragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+        if (fragment != null) {
+            ((DossierDetailFragment) fragment).update(bureauId, dossierId);
+        }
+        /*if (dossierId == null) {
             if (fragment != null) {
-                // hide is used so that we can do a relace when a dossier is selected after
-                getFragmentManager().beginTransaction().hide(fragment).commit();
+                getFragmentManager().beginTransaction().remove(fragment).commit();
             }
         }
         else {
             Bundle arguments = new Bundle();
-            arguments.putString(DossierDetailFragment.DOSSIER_ID, dossierId);
-            arguments.putString(DossierDetailFragment.BUREAU_ID, bureauId);
-            DossierDetailFragment fragment = new DossierDetailFragment();
+            arguments.putString(DOSSIER_ID, dossierId);
+            arguments.putString(BUREAU_ID, bureauId);
+            fragment = new DossierDetailFragment();
             fragment.setArguments(arguments);
+
             getFragmentManager().beginTransaction()
-                    .replace(R.id.dossier_detail_container, fragment, FRAGMENT_TAG_DETAILS)
+                    .replace(R.id.dossier_detail_container, fragment, DossierDetailFragment.TAG)
                     .commit();
-        }
+        }*/
     }
 
     /**
@@ -146,13 +140,15 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
      */
     @Override
     public void onDossierChecked(String id) {
+        Dossier dossier = getDossier(id);
+        getActionBar().setSubtitle((dossier != null)? getDossier(id).getName() : "");
         invalidateOptionsMenu();
     }
 
     // DossierDetailListener implementation
     @Override
     public Dossier getDossier(String id) {
-        DossierListFragment fragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
+        DossierListFragment fragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         return (fragment == null)? null : fragment.getDossier(id);
     }
 
@@ -171,7 +167,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
                 drawerLayout.closeDrawer(drawerMenu);
             }
         }
-        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
+        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         if (listFragment != null) {
             // this method will reload dossiers fragments
             listFragment.setBureauId(id);
@@ -185,7 +181,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
      */
     @Override
     public void onDataChanged() {
-        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_LIST);
+        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         if (listFragment != null) {
             // this method will reload dossiers fragments
             listFragment.reload();
@@ -245,7 +241,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
             /* Don't check if result is ok as the user can press back after modifying an Account
                only notify BureauxFragments to update accounts list (the bureau will update back this
                Activity if needed).*/
-            BureauxFragment bureauxFragment = (BureauxFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG_BUREAUX);
+            BureauxFragment bureauxFragment = (BureauxFragment) getFragmentManager().findFragmentByTag(BureauxFragment.TAG);
             if (bureauxFragment != null) {
                 bureauxFragment.accountsChanged();
             }

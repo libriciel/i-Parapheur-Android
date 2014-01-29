@@ -6,7 +6,7 @@
     <string name="account_new">Nouveau compte</string>
     <string name="search">Rechercher</string>
     <string name="settings">Préférences</string>
-    <string name="media_not_mounted">Aucun stockage disponible, les dossiers ne seront pas visualisés.</string>
+    <string name="media_not_mounted">Aucun stockage disponible, les documents ne seront pas visualisables.</string>
     <string name="type">Type</string>
     <string name="sous_type">Sous-Type</string>
     <string name="circuit">Circuit de validation</string>
@@ -59,5 +59,7 @@
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
     <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string><string name="pref_account_test">Tester la connexion</string>
+    <string name="no_details">Aucun détail disponible</string>
+    <string name="error_reading_document">Impossible de lire le document</string>
 
 </resources>

@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
@@ -50,11 +51,13 @@ import java.util.HashSet;
  */
 public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener {
 
+    public static String TAG = "Dossiers_list";
+
     /**
      * The serialization (saved instance state) Bundle key representing the
      * activated item position. Only used on tablets.
      */
-    private static final String STATE_ACTIVATED_POSITION = "activated_position";
+    //private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -121,10 +124,6 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         super.onViewCreated(view, savedInstanceState);
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         getView().setBackgroundColor(getResources().getColor(android.R.color.background_light));
-        // Restore the previously serialized activated item position.
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-        }
     }
 
     @Override
@@ -132,15 +131,6 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         super.onDetach();
         // Reset the active callbacks interface .
         listener = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (selectedDossier != ListView.INVALID_POSITION) {
-            // Serialize and persist the activated item position.
-            outState.putInt(STATE_ACTIVATED_POSITION, selectedDossier);
-        }
     }
 
     @Override
@@ -205,11 +195,13 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     }
 
     public void setBureauId(String bureauId) {
-        this.bureauId = bureauId;
-        if (bureauId == null) {
-            this.dossiers = null;
+        if (this.bureauId != bureauId) {
+            this.bureauId = bureauId;
+            if (bureauId == null) {
+                this.dossiers = null;
+            }
+            getDossiers(true);
         }
-        getDossiers(true);
     }
 
     private void getDossiers(boolean forceReload) {
@@ -368,11 +360,16 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         protected void load(String... params) {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
-            dossiers = RESTClient.INSTANCE.getDossiers(params[0]);
-            // OFFLINE
-            //dossiers = new ArrayList<Dossier>();
-            //Dossier dossier = new Dossier(1);
-            //dossiers.add(dossier);
+            if (!IParapheur.OFFLINE) {
+                dossiers = RESTClient.INSTANCE.getDossiers(params[0]);
+            }
+            else {
+                dossiers = new ArrayList<Dossier>();
+                Dossier dossier1 = new Dossier(1);
+                Dossier dossier2 = new Dossier(2);
+                dossiers.add(dossier1);
+                dossiers.add(dossier2);
+            }
         }
     }
 

@@ -20,9 +20,12 @@ public class FileUtils {
     }
 
     public static File getFileForDocument(String dossierId, String documentId) {
-        return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
-        // OFFLINE
-        //return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "defautDoc.pdf");
+        if (!IParapheur.OFFLINE) {
+            return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
+        }
+        else {
+            return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "long.pdf");
+        }
     }
 
     public static boolean isStorageAvailable() {

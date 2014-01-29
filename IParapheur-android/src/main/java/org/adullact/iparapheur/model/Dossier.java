@@ -30,7 +30,7 @@ public class Dossier {
 
     private final List<Document> annexes = new ArrayList<Document>();
 
-    private ArrayList<EtapeCircuit> circuit;
+    private ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
 
     // TODO : remove
     public Dossier(int i) {
@@ -66,7 +66,7 @@ public class Dossier {
     }
 
     public boolean isDetailsAvailable() {
-        return (circuit != null) && !mainDocuments.isEmpty();
+        return (!circuit.isEmpty() && !mainDocuments.isEmpty());
     }
 
     @Override
@@ -108,6 +108,12 @@ public class Dossier {
     public void saveDetails(Dossier dossier) {
         this.mainDocuments.addAll(dossier.getMainDocuments());
         this.annexes.addAll(dossier.getAnnexes());
+    }
+
+    public void clearDetails() {
+        this.mainDocuments.clear();
+        this.annexes.clear();
+        this.circuit.clear();
     }
 
     // Getters

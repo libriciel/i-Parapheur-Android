@@ -14,6 +14,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.connectivity.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
@@ -21,12 +22,15 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by jmaire on 19/11/2013.
  */
 public class BureauxFragment extends Fragment implements View.OnClickListener, LoadingTask.DataChangeListener, AdapterView.OnItemClickListener {
 
+
+    public static final String TAG = "Bureaux_list";
 
     /**
      * The parent activity must implement this interface.
@@ -174,10 +178,13 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         protected void load(String... params) {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
-            bureaux = RESTClient.INSTANCE.getBureaux();
-            // OFFLINE
-            //bureaux = new ArrayList<Bureau>();
-            //bureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
+            if (!IParapheur.OFFLINE) {
+                bureaux = RESTClient.INSTANCE.getBureaux();
+            }
+            else {
+                bureaux = new ArrayList<Bureau>();
+                bureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
+            }
         }
     }
 

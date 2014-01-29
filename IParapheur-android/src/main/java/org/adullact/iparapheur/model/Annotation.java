@@ -13,33 +13,34 @@ import android.graphics.RectF;
 public class Annotation {
     public static final int BORDER_WIDTH = 4;
     public static final int CORNER_RADIUS = 10;
-    public static final int HALF_MIN_WIDTH = 35;
-    public static final int HALF_MIN_HEIGHT = 20;
+    public static final int HALF_MIN_WIDTH = 80;
+    public static final int HALF_MIN_HEIGHT = 40;
 
     public static final int LINE_WIDTH = 3;
-    public static final int LINE_HALF_LENGTH = 4;
+    // Button's drawings line size
+    public static final int LINE_HALF_LENGTH = 6;
 
     // Space between two buttons from center to center
-    public static final int BUTTONS_SPACE = 28;
+    public static final int BUTTONS_SPACE = 42;
 
     public static final int COLOR_SELECTED = Color.RED;
     public static final int COLOR_BORDER = Color.BLACK;
 
-    public static final int BUTTON_RADIUS = 10;
+    public static final int BUTTON_RADIUS = 14;
     public static final int BUTTON_COLOR = Color.BLACK;
     public static final int BUTTON_BORDER_COLOR = Color.WHITE;
 
-    public static final int TEXT_RECT_WIDTH = 120;
-    public static final int TEXT_RECT_HEIGHT = 75;
+    public static final int TEXT_RECT_WIDTH = 200;
+    public static final int TEXT_RECT_HEIGHT = 100;
     public static final int TEXT_RECT_COLOR = Color.YELLOW;
     public static final int TEXT_RECT_ALPHA = 230; //90%
 
     public static final int TEXT_COLOR = Color.BLACK;
-    public static final int TEXT_SIZE = 11;
+    public static final int TEXT_SIZE = 12;
     public static final int TEXT_PADDING = 5;
 
-    public static final int INFOS_RECT_WIDTH = 120;
-    public static final int INFOS_RECT_HEIGHT = 45;
+    public static final int INFOS_RECT_WIDTH = 150;
+    public static final int INFOS_RECT_HEIGHT = 60;
     public static final int INFOS_COLOR = Color.CYAN;
     public static final int INFOS_ALPHA = 230; //90%
     public static final int INFOS_BORDER_WIDTH = 3;
@@ -192,6 +193,10 @@ public class Annotation {
         return true; // TODO
     }
 
+    public float getScale() {
+        return scale;
+    }
+
     public void setScale(float scale) {
         rect.set(rect.left / this.scale * scale,
                 rect.top / this.scale * scale,
@@ -342,17 +347,18 @@ public class Annotation {
     }
 
     protected void drawRect(Canvas canvas, Paint paint) {
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(COLOR_BORDER);
-        paint.setAlpha(ALPHA_SELECTED);
         paint.setStrokeWidth(Annotation.BORDER_WIDTH);
-        canvas.drawRoundRect(rect, Annotation.CORNER_RADIUS, Annotation.CORNER_RADIUS, paint);
         if (selected) {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(COLOR_SELECTED);
             paint.setAlpha(ALPHA_SELECTED);
-            canvas.drawRoundRect(rect, Annotation.CORNER_RADIUS, Annotation.CORNER_RADIUS, paint);
         }
+        else {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(COLOR_BORDER);
+            paint.setAlpha(ALPHA_BORDER);
+        }
+        canvas.drawRoundRect(rect, Annotation.CORNER_RADIUS, Annotation.CORNER_RADIUS, paint);
     }
 
     private void drawInfos(Canvas canvas, Paint paint) {

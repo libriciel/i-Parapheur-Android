@@ -98,7 +98,7 @@ public enum  RESTClient {
         return messageRes;
     }
 
-    public static Dossier getDossier(String bureauId, String dossierId) throws RuntimeException {
+    public static Dossier getDossier(String bureauId, String dossierId) {
         String url = buildUrl(ACTION_GET_DOSSIER);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
                        "\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"}";
@@ -106,13 +106,13 @@ public enum  RESTClient {
         return ModelMapper.getDossier(RESTUtils.post(url, body));
     }
 
-    public static ArrayList<EtapeCircuit> getCircuit(String dossierId) throws RuntimeException {
+    public static ArrayList<EtapeCircuit> getCircuit(String dossierId) {
         String url = buildUrl(ACTION_GET_CIRCUIT);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"}";
         return ModelMapper.getCircuit(RESTUtils.post(url, body));
     }
 
-    public static ArrayList<Dossier> getDossiers(String bureauId) throws RuntimeException {
+    public static ArrayList<Dossier> getDossiers(String bureauId) {
         String url = buildUrl(ACTION_GET_DOSSIERS);
         String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
                 "\"filters\": \"\"," +
@@ -125,7 +125,7 @@ public enum  RESTClient {
         return ModelMapper.getDossiers(RESTUtils.post(url, body));
     }
 
-    public ArrayList<Bureau> getBureaux() throws RuntimeException {
+    public ArrayList<Bureau> getBureaux() {
         String url = buildUrl(ACTION_GET_BUREAUX);
         //String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );

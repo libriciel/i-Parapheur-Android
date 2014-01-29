@@ -42,7 +42,6 @@ package org.adullact.iparapheur.controller.document;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -63,7 +62,9 @@ import com.artifex.mupdfdemo.MuPDFCore;
 import com.artifex.mupdfdemo.PageView;
 import com.artifex.mupdfdemo.TextWord;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.document.annotation.AnnotationView;
 import org.adullact.iparapheur.model.Annotation;
 
 import java.text.DateFormat;
@@ -116,17 +117,35 @@ public class PDFPageView extends PageView implements OnTouchListener {
         if (annotationsView != null) {
             annotationsView.layout(0, 0, w, h);
         }
-        for (Map.Entry<Annotation, View> textView : textViews.entrySet()) {
-            Rect textRect = textView.getKey().getTextRect();
-            textView.getValue().layout(textRect.left, textRect.top, textRect.right, textRect.bottom);
+        for (Map.Entry<Annotation, View> entry : textViews.entrySet()) {
+            if (entry.getKey().isTextVisible()) {
+                Rect textRect = entry.getKey().getTextRect();
+                entry.getValue().layout(textRect.left, textRect.top, textRect.right, textRect.bottom);
+            }
         }
     }
     
     @Override
     protected void documentAvailable() {
         if (annotationsView == null) {
-            annotationsView = new AnnotationView(this.getContext(), annotations.get(mPageNumber), this);
+            annotationsView = new AnnotationView(this, this.getContext(), annotations.get(mPageNumber), this);
             addView(annotationsView);
+        }
+    }
+
+    @Override
+    public void blank(int page) {
+        super.blank(page);
+        setBackgroundColor(getResources().getColor(R.color.canvas));
+    }
+
+    public void clean() {
+        if (selectedAnnotation != null) {
+            unselectAnnotation();
+        }
+        mode = Mode.NONE;
+        if (annotationsView != null) {
+            annotationsView.invalidate();
         }
     }
 
@@ -149,6 +168,10 @@ public class PDFPageView extends PageView implements OnTouchListener {
     @Override
     protected TextWord[][] getText() {
         return mCore.textLines(mPageNumber);
+    }
+
+    public float getScale() {
+        return mSourceScale*(float)getWidth()/(float)mSize.x;
     }
 
     private void createAnnotation(float x, float y) {
@@ -219,7 +242,7 @@ public class PDFPageView extends PageView implements OnTouchListener {
         }
     }
 
-    private void annotationMoved() {;
+    private void annotationMoved() {
         Rect textRect = selectedAnnotation.getTextRect();
         if (selectedAnnotation.isTextVisible()) {
             textViews.get(selectedAnnotation).layout(textRect.left, textRect.top, textRect.right, textRect.bottom);
@@ -384,42 +407,8 @@ public class PDFPageView extends PageView implements OnTouchListener {
             return true;
         }
     }
-    
-    
-    
-    private class AnnotationView extends View {
 
-        private List<Annotation> annotations;
-        private Context context;
 
-        public AnnotationView(Context context, List<Annotation> annotations, View listener) {
-            super(context);
-            this.annotations = annotations;
-            Log.i("IParapheurPDFPageView", "setScale : " + mSourceScale);
-            if ((annotations != null)) {
-                for (Annotation annotation : this.annotations) {
-                    annotation.setScale(mSourceScale);
-                }
-            }
-            this.setOnTouchListener((OnTouchListener) listener);
-            this.context = context;
-        }
-        
-        public void setAnnotations(List<Annotation> annotations) {
-            this.annotations = annotations;
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            if (!isBlank() && (annotations != null)) {
-                for (Annotation annotation : annotations) {
-                    annotation.draw(canvas);
-                }
-            }
-        }
-    }
-    
-    
     private class AnnotationTextWatcher implements TextWatcher {
         public void afterTextChanged(Editable s) {
             selectedAnnotation.setText(s.toString());
