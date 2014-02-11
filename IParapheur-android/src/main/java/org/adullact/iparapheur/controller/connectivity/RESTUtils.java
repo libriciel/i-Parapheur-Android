@@ -72,6 +72,7 @@ public class RESTUtils {
 
     public static RequestResponse post(String url, String body) {
         Log.d("debug", "POST request on : " + url);
+        Log.d("debug", "with body : " + body);
         RequestResponse res = null;
         OutputStream output = null;
         try {

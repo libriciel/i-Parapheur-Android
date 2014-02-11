@@ -40,45 +40,11 @@
  */
 package org.adullact.iparapheur.controller.document;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.artifex.mupdfdemo.LinkInfo;
-import com.artifex.mupdfdemo.MuPDFCore;
-import com.artifex.mupdfdemo.PageView;
-import com.artifex.mupdfdemo.TextWord;
-
-import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.document.annotation.AnnotationView;
-import org.adullact.iparapheur.model.Annotation;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  *
  * @author jmaire
  */
-public class PDFPageView extends PageView implements OnTouchListener {
+public class PDFPageView {}/*extends PageView implements OnTouchListener {
 
     private final MuPDFCore mCore;
     private Map<Integer, List<Annotation>> annotations;
@@ -127,10 +93,10 @@ public class PDFPageView extends PageView implements OnTouchListener {
     
     @Override
     protected void documentAvailable() {
-        if (annotationsView == null) {
-            annotationsView = new AnnotationView(this, this.getContext(), annotations.get(mPageNumber), this);
+        *//*if (annotationsView == null) {
+            annotationsView = new AnnotationsLayout(this, this.getContext(), annotations.get(mPageNumber), this);
             addView(annotationsView);
-        }
+        }*//*
     }
 
     @Override
@@ -179,7 +145,7 @@ public class PDFPageView extends PageView implements OnTouchListener {
         Annotation annotation = new Annotation(MyAccounts.INSTANCE.getSelectedAccount().getLogin(), mPageNumber, false, date, x, y, "", 0, mSourceScale); // FIXME
         if (!annotations.containsKey(mPageNumber)) {
             this.annotations.put(mPageNumber, new ArrayList<Annotation>());
-            ((AnnotationView)annotationsView).setAnnotations(this.annotations.get(mPageNumber));
+            ((AnnotationsLayout)annotationsView).setAnnotations(this.annotations.get(mPageNumber));
         }
         annotations.get(mPageNumber).add(annotation);
         selectAnnotation(annotation);
@@ -232,7 +198,7 @@ public class PDFPageView extends PageView implements OnTouchListener {
             editText.setCursorVisible(true);
             editText.setTextSize(Annotation.TEXT_SIZE);
             editText.setTextColor(Annotation.TEXT_COLOR);
-            editText.setBackgroundColor(Annotation.TEXT_RECT_COLOR);
+            editText.setBackgroundColor(Annotation.POSTIT_COLOR);
             editText.setClickable(true);
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
             editText.setText(selectedAnnotation.getText(), TextView.BufferType.EDITABLE);
@@ -249,9 +215,9 @@ public class PDFPageView extends PageView implements OnTouchListener {
         }
     }
     
-    
+    /*
     /**** Event listener callbacks ****/
-
+/*
     public boolean onTouch(View view, MotionEvent me) {
         if (gestureDetector.onTouchEvent(me)) {
             annotationsView.invalidate();
@@ -417,4 +383,4 @@ public class PDFPageView extends PageView implements OnTouchListener {
         public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
     
-}
+*///}

@@ -38,11 +38,14 @@ public enum Action
             R.drawable.ic_action_reject,
             R.drawable.ic_action_reject),
 
+    SECRETARIAT(R.string.action_secretariat,R.id.action_secretariat,-1, -1),
+    REMORD(R.string.action_remord,R.id.action_remord,-1, -1),
     AVIS_COMPLEMENTAIRE(R.string.action_avis,R.id.action_avis,-1, -1),
     TRANSFERT_SIGNATURE(R.string.action_transfertsign,R.id.action_transfert_signature,-1, -1),
     AJOUT_SIGNATURE(R.string.action_ajoutsign,R.id.action_ajout_signature,-1, -1),
     MAIL(R.string.action_mail,R.id.action_mail,-1, -1),
-    ENREGISTRER(R.string.action_enregistrer,R.id.action_enregistrer,-1, -1);
+    ENREGISTRER(R.string.action_enregistrer,R.id.action_enregistrer,-1, -1),
+    SUPPRIMER(R.string.action_supprimer,R.id.action_supprimer,-1, -1);
 
 
 

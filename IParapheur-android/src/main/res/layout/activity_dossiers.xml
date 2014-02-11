@@ -34,7 +34,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
-                android:layout_weight="3" />
+                android:layout_weight="3"
+                tools:layout="@layout/fragment_dossier_detail" />
         </LinearLayout>
 
         <ProgressBar
@@ -47,13 +48,20 @@
 
     </FrameLayout>
 
-    <fragment
-        android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
+    <FrameLayout
+        android:orientation="horizontal"
         android:id="@+id/activity_dossiers_left_drawer"
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        tools:layout="@layout/bureaux"
-        android:tag="Bureaux_list" />
+        android:baselineAligned="false">
+        <fragment
+            android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
+            android:id="@+id/activity_dossiers_bureaux_fragment"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            tools:layout="@layout/bureaux"
+            android:tag="Bureaux_list" />
+    </FrameLayout>
 
 </android.support.v4.widget.DrawerLayout>

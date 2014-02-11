@@ -2,19 +2,18 @@ package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.FrameLayout;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
@@ -37,7 +36,7 @@ import org.adullact.iparapheur.model.Dossier;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierSelectedListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends Activity implements DossierListFragment.DossierSelectedListener,
+public class DossiersActivity extends FragmentActivity implements DossierListFragment.DossierSelectedListener,
                                                           DossierDetailFragment.DossierDetailListener,
                                                           BureauxFragment.BureauSelectedListener,
                                                           LoadingTask.DataChangeListener {
@@ -50,7 +49,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     private DrawerLayout drawerLayout;
 
     /** Left panel acting as a menu */
-    private LinearLayout drawerMenu;
+    private FrameLayout drawerMenu;
 
     /** Used to control the drawer state. */
     private ActionBarDrawerToggle drawerToggle;
@@ -65,14 +64,13 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         setContentView(R.layout.activity_dossiers);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
-        drawerMenu = (LinearLayout) findViewById(R.id.activity_dossiers_left_drawer);
+        drawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
 
         // Used to listen open and close events on the Drawer Layout
         drawerToggle = new DossiersActionBarDrawerToggle(this, drawerLayout);
         drawerLayout.setDrawerListener(drawerToggle);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -112,26 +110,10 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     @Override
     public void onDossierSelected(String dossierId, String bureauId)
     {
-        Fragment fragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
         if (fragment != null) {
             ((DossierDetailFragment) fragment).update(bureauId, dossierId);
         }
-        /*if (dossierId == null) {
-            if (fragment != null) {
-                getFragmentManager().beginTransaction().remove(fragment).commit();
-            }
-        }
-        else {
-            Bundle arguments = new Bundle();
-            arguments.putString(DOSSIER_ID, dossierId);
-            arguments.putString(BUREAU_ID, bureauId);
-            fragment = new DossierDetailFragment();
-            fragment.setArguments(arguments);
-
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.dossier_detail_container, fragment, DossierDetailFragment.TAG)
-                    .commit();
-        }*/
     }
 
     /**
@@ -148,7 +130,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     // DossierDetailListener implementation
     @Override
     public Dossier getDossier(String id) {
-        DossierListFragment fragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         return (fragment == null)? null : fragment.getDossier(id);
     }
 
@@ -167,7 +149,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
                 drawerLayout.closeDrawer(drawerMenu);
             }
         }
-        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         if (listFragment != null) {
             // this method will reload dossiers fragments
             listFragment.setBureauId(id);
@@ -181,11 +163,13 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
      */
     @Override
     public void onDataChanged() {
-        DossierListFragment listFragment = (DossierListFragment) getFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
         if (listFragment != null) {
             // this method will reload dossiers fragments
             listFragment.reload();
         }
+        onDossierSelected(null, null);
+        invalidateOptionsMenu();
     }
 
     // ACTIONBAR METHODS
@@ -203,10 +187,12 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
         // show or hide specific menu actions depending on Drawer state
-        Log.d("debug", "onPrepareOptionsMenu in Activity");
-        boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
-        menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
-        return super.onPrepareOptionsMenu(menu);
+        if ((drawerLayout != null) && (drawerMenu != null)) {
+            boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
+            menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
+            return super.onPrepareOptionsMenu(menu);
+        }
+        return false;
     }
 
     @Override
@@ -220,12 +206,6 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
         // Handle presses on the action bar items
         DialogFragment actionDialog;
         switch (item.getItemId()) {
-            case R.id.action_filtrer :
-                Toast.makeText(this, "Filtrer", Toast.LENGTH_LONG).show();
-                return true;
-            case R.id.action_search:
-                // TODO
-                return true;
             case R.id.action_settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
                 return true;
@@ -241,7 +221,7 @@ public class DossiersActivity extends Activity implements DossierListFragment.Do
             /* Don't check if result is ok as the user can press back after modifying an Account
                only notify BureauxFragments to update accounts list (the bureau will update back this
                Activity if needed).*/
-            BureauxFragment bureauxFragment = (BureauxFragment) getFragmentManager().findFragmentByTag(BureauxFragment.TAG);
+            BureauxFragment bureauxFragment = (BureauxFragment) getSupportFragmentManager().findFragmentByTag(BureauxFragment.TAG);
             if (bureauxFragment != null) {
                 bureauxFragment.accountsChanged();
             }

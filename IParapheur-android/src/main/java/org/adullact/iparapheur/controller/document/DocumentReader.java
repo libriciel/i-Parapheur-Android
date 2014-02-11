@@ -1,18 +1,9 @@
 package org.adullact.iparapheur.controller.document;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.DisplayMetrics;
-import android.view.MotionEvent;
-
-import com.artifex.mupdfdemo.ReaderView;
-
-import org.adullact.iparapheur.model.Document;
-
 /**
  * Created by jmaire on 05/11/2013.
  */
-public class DocumentReader extends ReaderView {
+public class DocumentReader {}/*extends ReaderView {
 
     public interface OnReaderStateChangeListener {
         void onPageChange(int numPage);
@@ -27,12 +18,12 @@ public class DocumentReader extends ReaderView {
         calculateTapPageMargin();
         this.listener = listener;
     }
-
+*/
     /**
      * Calcule la marge servant à tourner les pages (singleTapUp).
      * La marge est comprise entre 50 pixels et 1/7 de l'écran.
      */
-    private void calculateTapPageMargin() {
+  /*  private void calculateTapPageMargin() {
         DisplayMetrics dm = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(dm);
         tapPageMargin = (int)dm.xdpi;
@@ -92,4 +83,4 @@ public class DocumentReader extends ReaderView {
                 getAdapter().getCount() :
                 0;
     }
-}
+*///}

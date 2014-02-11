@@ -1,6 +1,6 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +36,13 @@ public class DossierBatchFragment extends Fragment {
             this.dossiers.add(getArguments().getString(DOSSIER));
         }
         listView = (ListView) view.findViewById(R.id.dossiers_list);
-        listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
         listView.setItemsCanFocus(false);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
     }
 
     public void addDossier(String dossier) {

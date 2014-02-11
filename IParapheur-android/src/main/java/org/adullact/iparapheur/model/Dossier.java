@@ -16,6 +16,8 @@ public class Dossier {
 
     private final String name;
 
+    private final Action actionDemandee;
+
     private final ArrayList<Action> actions;
 
     private final String type;
@@ -36,6 +38,7 @@ public class Dossier {
     public Dossier(int i) {
         this(UUID.randomUUID().toString(),
                 "Dossier " + i,
+                Action.VISA,
                 new ArrayList<Action>(),
                 "Type",
                 "SousType",
@@ -53,11 +56,13 @@ public class Dossier {
         this.name = this.type = this.sousType = null;
         this.dateCreation = this.dateLimite = null;
         this.actions = null;
+        this.actionDemandee = null;
     }
 
-    public Dossier(String id, String name, ArrayList<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
+    public Dossier(String id, String name, Action actionDemandee, ArrayList<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
         this.id = id;
         this.name = name;
+        this.actionDemandee = actionDemandee;
         this.actions = actions;
         this.type = type;
         this.sousType = sousType;
@@ -172,4 +177,7 @@ public class Dossier {
         return circuit;
     }
 
+    public Action getActionDemandee() {
+        return actionDemandee;
+    }
 }

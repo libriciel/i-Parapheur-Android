@@ -1,7 +1,7 @@
 package org.adullact.iparapheur.controller.bureau;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -87,9 +87,15 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         listView = (ListView) view.findViewById(R.id.bureaux_list);
-        listView.setAdapter(new BureauListAdapter(getActivity()));
         listView.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        listView.setAdapter(new BureauListAdapter(getActivity()));
         updateAccounts();
         updateBureaux(false);
     }

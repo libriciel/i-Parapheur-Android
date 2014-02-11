@@ -5,10 +5,12 @@ import android.util.Log;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
+import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
@@ -20,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -36,6 +39,7 @@ public enum  RESTClient {
     private static final String ACTION_GET_DOSSIERS = "/parapheur/api/getDossiersHeaders";
     private static final String ACTION_GET_CIRCUIT = "/parapheur/api/getCircuit";
     private static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
+    private static final String ACTION_GET_TYPOLOGIE = "/parapheur/api/getTypologie";
 
     private static final String ACTION_VISA = "/parapheur/api/visa";
     private static final String ACTION_SIGNATURE = "/parapheur/api/signature";
@@ -43,7 +47,6 @@ public enum  RESTClient {
     private static final String ACTION_MAILSEC = "/parapheur/api/mailsec";
     private static final String ACTION_ARCHIVAGE = "/parapheur/api/archivage";
     private static final String ACTION_REJET = "/parapheur/api/rejet";
-
 
 
     private static String getTicket(Account account)
@@ -114,11 +117,15 @@ public enum  RESTClient {
 
     public static ArrayList<Dossier> getDossiers(String bureauId) {
         String url = buildUrl(ACTION_GET_DOSSIERS);
+        Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+        if (filter == null) {
+            filter = new Filter();
+        }
         String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
-                "\"filters\": \"\"," +
+                "\"filters\": " + filter.getJSONFilter() + "," +
                 "\"page\": 0," +
-                "\"pageSize\": 10," +
-                "parent: \"no-corbeille\","+
+                "\"pageSize\": 15," +
+                "parent: \"" + filter.getEtat() + "\"," +
                 "asc: \"false\","+
                 "propSort: \"cm:created\"}";
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
@@ -131,6 +138,12 @@ public enum  RESTClient {
         //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
         //return ModelMapper.getBureaux(RESTUtils.post(url, body));
         return ModelMapper.getBureaux(RESTUtils.get(url, null));
+    }
+
+    public LinkedHashMap<String, ArrayList<String>> getTypologie() {
+        String url = buildUrl(ACTION_GET_TYPOLOGIE);
+        String body = "{\"getAll\": \"true\"}";
+        return ModelMapper.getTypologie(RESTUtils.post(url, body));
     }
 
     public static String buildUrl(String action) throws RuntimeException {

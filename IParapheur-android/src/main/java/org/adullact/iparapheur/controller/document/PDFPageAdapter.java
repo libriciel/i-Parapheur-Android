@@ -1,27 +1,10 @@
 package org.adullact.iparapheur.controller.document;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.os.AsyncTask;
-import android.util.SparseArray;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-
-import com.artifex.mupdfdemo.MuPDFCore;
-
-import org.adullact.iparapheur.model.Annotation;
-
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by jmaire on 02/01/2014.
  * Nearly the same as MuPDFPageAdapter.
  */
-public class PDFPageAdapter extends BaseAdapter {
+public class PDFPageAdapter {}/*extends BaseAdapter {
 
     private final Context mContext;
     private final Map<Integer,List<Annotation>> mAnnotations;
@@ -95,5 +78,5 @@ public class PDFPageAdapter extends BaseAdapter {
             sizingTask.execute((Void) null);
         }
         return pageView;
-    }
-}
+    }*/
+//}

@@ -1,13 +1,17 @@
 package org.adullact.iparapheur.controller.dossier;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.ListFragment;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,9 +31,13 @@ import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.TdtDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
+import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
+import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
+import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +57,7 @@ import java.util.HashSet;
  * details of a dossier are retained in this fragment. Also the pdf is saved on external storage
  * and its url is stored in the dossier information.
  */
-public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener {
+public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionBar.OnNavigationListener{
 
     public static String TAG = "Dossiers_list";
 
@@ -79,6 +87,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
      */
     private int selectedDossier = ListView.INVALID_POSITION;
 
+    private FilterAdapter filterAdapter;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -114,16 +123,21 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new DossierListAdapter(getActivity(), listener));
         setRetainInstance(true);
-        setHasOptionsMenu(true);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         getView().setBackgroundColor(getResources().getColor(android.R.color.background_light));
+        setListAdapter(new DossierListAdapter(getActivity(), listener));
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -249,12 +263,25 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
             listener.onDossierSelected(null, null);
         }
         ((DossierListAdapter) getListAdapter()).clearSelection();
-
+        getActivity().invalidateOptionsMenu();
         getDossiers(true);
     }
 
     @Override
     public void onDataChanged() {
+        if (getActivity() != null) {
+            ActionBar actionBar = getActivity().getActionBar();
+            if (bureauId == null) {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            }
+            else if (actionBar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+                if (filterAdapter == null) {
+                    filterAdapter = new FilterAdapter(getActivity());
+                }
+                actionBar.setListNavigationCallbacks(filterAdapter, this);
+            }
+        }
         ((DossierListAdapter) getListAdapter()).clearSelection();
         if (selectedDossier != ListView.INVALID_POSITION) {
             selectedDossier = ListView.INVALID_POSITION;
@@ -267,10 +294,56 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
     }
 
-    private class DossierListAdapter extends ArrayAdapter<Dossier> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+    // OnNavigationListener implementation
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (itemPosition < filterAdapter.getCount() - 1) {
+            Filter filter = filterAdapter.getItem(itemPosition);
+            if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
+                MyFilters.INSTANCE.selectFilter(filter);
+                reload();
+            }
+        }
+        else {
+            Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+            if (filter == null) {
+                filter = new Filter();
+            }
+            new FilterDialog(filter, this).show(getActivity().getSupportFragmentManager(), FilterDialog.TAG);
+
+        }
+        return false;
+    }
+
+    // FilterDialogListener implementation
+
+    @Override
+    public void onFilterSave(Filter filter) {
+        MyFilters.INSTANCE.selectFilter(filter);
+        MyFilters.INSTANCE.save(filter);
+        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+        filterAdapter.notifyDataSetChanged();
+        reload();
+    }
+
+    @Override
+    public void onFilterChange(Filter filter) {
+        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+        MyFilters.INSTANCE.selectFilter(filter);
+        reload();
+    }
+
+    @Override
+    public void onFilterCancel() {
+        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+    }
+
+    private class DossierListAdapter extends ArrayAdapter<Dossier> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, View.OnTouchListener {
 
         private final DossierSelectedListener listener;
         private HashSet<Dossier> checkedDossiers;
+        private final GestureDetector gestureDetector = new GestureDetector(getContext(), new OnSwipeGestureListener());
 
         public DossierListAdapter(Context context, DossierSelectedListener listener) {
             super(context, R.layout.dossiers_list_item, R.id.dossiers_list_item_title);
@@ -284,7 +357,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
             Dossier dossier = dossiers.get(position);
             ((TextView) v.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
             // FIXME : changement d'api avec toutes les actions..
-            Action actionDemandee = dossier.getActions().get(0);
+            Action actionDemandee = dossier.getActionDemandee();
             if (actionDemandee != null) {
                 ((ImageView) v.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
             }
@@ -348,6 +421,52 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
             checkedDossiers.clear();
             notifyDataSetChanged();
         }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+        }
+
+        private final class OnSwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+            private static final int SWIPE_THRESHOLD = 100;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                boolean result = false;
+                try {
+                    float diffY = e2.getY() - e1.getY();
+                    float diffX = e2.getX() - e1.getX();
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (diffX > 0) {
+                                onSwipeRight();
+                            } else {
+                                onSwipeLeft();
+                            }
+                        }
+                    }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                return result;
+            }
+        }
+
+        public void onSwipeRight() {
+            Log.d("swipe", "SWIPE RIGHT");
+        }
+
+        public void onSwipeLeft() {
+            Log.d("swipe", "SWIPE LEFT");
+        }
+
     }
 
     private class DossiersLoadingTask extends LoadingTask {
@@ -372,5 +491,4 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
             }
         }
     }
-
 }

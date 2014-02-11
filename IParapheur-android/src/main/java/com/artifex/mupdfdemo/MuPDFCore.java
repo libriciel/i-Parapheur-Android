@@ -7,8 +7,6 @@ import android.graphics.RectF;
 
 import org.adullact.iparapheur.R;
 
-import java.util.ArrayList;
-
 public class MuPDFCore
 {
     /* load our native library */
@@ -42,7 +40,7 @@ public class MuPDFCore
                                            int patchX, int patchY,
                                            int patchW, int patchH);
     private native RectF[] searchPage(String text);
-    private native TextChar[][][][] text();
+    //private native TextChar[][][][] text();
     private native byte[] textAsHtml();
     private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
     private native void addInkAnnotationInternal(PointF[][] arcs);
@@ -57,15 +55,15 @@ public class MuPDFCore
     private native int setFocusedWidgetTextInternal(String text);
     private native String getFocusedWidgetTextInternal();
     private native int getFocusedWidgetTypeInternal();
-    private native LinkInfo [] getPageLinksInternal(int page);
+    //private native LinkInfo [] getPageLinksInternal(int page);
     private native RectF[] getWidgetAreasInternal(int page);
     //private native Annotation[] getAnnotationsInternal(int page);
-    private native OutlineItem [] getOutlineInternal();
+    //private native OutlineItem [] getOutlineInternal();
     private native boolean hasOutlineInternal();
     private native boolean needsPasswordInternal();
     private native boolean authenticatePasswordInternal(String password);
-    private native MuPDFAlertInternal waitForAlertInternal();
-    private native void replyToAlertInternal(MuPDFAlertInternal alert);
+    //private native MuPDFAlertInternal waitForAlertInternal();
+    //private native void replyToAlertInternal(MuPDFAlertInternal alert);
     private native void startAlertsInternal();
     private native void stopAlertsInternal();
     private native void destroying();
@@ -129,14 +127,14 @@ public class MuPDFCore
         return new PointF(pageWidth, pageHeight);
     }
 
-    public MuPDFAlert waitForAlert() {
+    /*public MuPDFAlert waitForAlert() {
         MuPDFAlertInternal alert = waitForAlertInternal();
         return alert != null ? alert.toAlert() : null;
     }
 
     public void replyToAlert(MuPDFAlert alert) {
         replyToAlertInternal(new MuPDFAlertInternal(alert));
-    }
+    }*/
 
     public void stopAlerts() {
         stopAlertsInternal();
@@ -204,15 +202,15 @@ public class MuPDFCore
         return signFocusedSignatureInternal(keyFile, password);
     }
 
-    public synchronized LinkInfo [] getPageLinks(int page) {
+    /*public synchronized LinkInfo [] getPageLinks(int page) {
         return getPageLinksInternal(page);
-    }
+    }*/
 
     public synchronized RectF [] getWidgetAreas(int page) {
         return getWidgetAreasInternal(page);
     }
 
-    /*public synchronized Annotation [] getAnnoations(int page) {
+    /*public synchronized Annotation [] getAnnotations(int page) {
         return getAnnotationsInternal(page);
     }*/
 
@@ -226,7 +224,7 @@ public class MuPDFCore
         return textAsHtml();
     }
 
-    public synchronized TextWord [][] textLines(int page) {
+    /*public synchronized TextWord [][] textLines(int page) {
         gotoPage(page);
         TextChar[][][][] chars = text();
 
@@ -262,7 +260,7 @@ public class MuPDFCore
         }
 
         return lns.toArray(new TextWord[lns.size()][]);
-    }
+    }*/
 
     /*public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
         gotoPage(page);
@@ -283,9 +281,9 @@ public class MuPDFCore
         return hasOutlineInternal();
     }
 
-    public synchronized OutlineItem [] getOutline() {
+    /*public synchronized OutlineItem [] getOutline() {
         return getOutlineInternal();
-    }
+    }*/
 
     public synchronized boolean needsPassword() {
         return needsPasswordInternal();
