@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -22,8 +23,18 @@ public class RejetDialogFragment extends ActionDialogFragment {
     protected TextView annotationPublique;
     protected TextView annotationPrivee;
 
-    public RejetDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public RejetDialogFragment() {}
+
+    public static RejetDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        RejetDialogFragment f = new RejetDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
@@ -73,7 +84,7 @@ public class RejetDialogFragment extends ActionDialogFragment {
             publishProgress(i);
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return;}
-                Log.d("debug", "Rejet sur " + dossier.getName() + "avec le motif " + annotPub);
+                //Log.d("debug", "Rejet sur " + dossier.getName() + "avec le motif " + annotPub);
                 RESTClient.INSTANCE.rejeter(dossier.getId(),
                         annotPub,
                         annotPriv,

@@ -31,7 +31,7 @@ public class CircuitAdapter extends ArrayAdapter<EtapeCircuit>
         if (etape.isApproved()) {
             SimpleDateFormat df = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
             String validation = getContext().getResources().getString(R.string.par) + " " +
-                    etape.getSignataire() +
+                    etape.getSignataire() + ", " +
                     getContext().getResources().getString(R.string.the) + df.format(etape.getDateValidation());
             ((TextView) view.findViewById(R.id.etape_circuit_validation)).setText(validation);
         }

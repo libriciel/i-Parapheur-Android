@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -21,8 +22,18 @@ public class TdtDialogFragment extends ActionDialogFragment {
     protected TextView annotationPublique;
     protected TextView annotationPrivee;
 
-    public TdtDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public TdtDialogFragment() {}
+
+    public static TdtDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        TdtDialogFragment f = new TdtDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
@@ -67,7 +78,7 @@ public class TdtDialogFragment extends ActionDialogFragment {
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return;}
                 // TODO : distinguer Actes et Helios
-                Log.d("debug", "Mailsec sur " + dossier.getName());
+                //Log.d("debug", "Mailsec sur " + dossier.getName());
                 RESTClient.INSTANCE.envoiTdtActes(dossier.getId(),
                         "",
                         annotPub,

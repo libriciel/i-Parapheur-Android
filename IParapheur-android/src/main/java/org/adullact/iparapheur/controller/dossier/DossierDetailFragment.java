@@ -6,7 +6,6 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,12 +87,9 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        if ((getArguments() != null) && getArguments().containsKey(DossiersActivity.BUREAU_ID)) {
+        if (getArguments() != null) {
             bureauId = getArguments().getString(DossiersActivity.BUREAU_ID);
-            if (getArguments().containsKey(DossiersActivity.DOSSIER_ID)) {
-                dossierId = getArguments().getString(DossiersActivity.DOSSIER_ID);
-
-            }
+            dossierId = getArguments().getString(DossiersActivity.DOSSIER_ID);
         }
         this.currentPage = 0;
     }
@@ -213,7 +209,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                             ((DocumentPagerAdapter) viewPager.getAdapter()).setDocument(document);
                             viewPager.setCurrentItem(0, false );
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                             Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -234,7 +230,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                         ((DocumentPagerAdapter) viewPager.getAdapter()).setDocument(null);
                         //viewPager.setCurrentItem(0, false);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -318,7 +314,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
-            Log.d("debug", "getting dossier details");
+            //Log.d("debug", "getting dossier details");
             if (!IParapheur.OFFLINE) {
                 Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
                 if (dossier != null) {
@@ -344,7 +340,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                 {
                     File file = FileUtils.getFileForDocument(dossier.getId(), document.getId());
                     String path = file.getAbsolutePath();
-                    Log.d("debug", "saving document on disk");
+                    //Log.d("debug", "saving document on disk");
                     if (!IParapheur.OFFLINE) {
                         if (RESTClient.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
                             document.setPath(path);
@@ -353,10 +349,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                     else {
                         document.setPath(path);
                         if (file.exists()) {
-                            Log.d("debug", "Document par defaut trouvé");
+                            //Log.d("debug", "Document par defaut trouvé");
                         }
                         else {
-                            Log.d("debug", "Document par defaut non trouvé");
+                            //Log.d("debug", "Document par defaut non trouvé");
                         }
                     }
                 }

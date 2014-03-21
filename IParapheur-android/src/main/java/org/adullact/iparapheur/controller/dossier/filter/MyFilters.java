@@ -44,8 +44,8 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
                         filter.setNom(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_NOM_SUFFIX, ""));
                         filter.setTitre(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX, ""));
                         filter.setEtat(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX, ""));
-                        filter.setTypes(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>()));
-                        filter.setSousTypes(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>()));
+                        filter.setTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
+                        filter.setSousTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>())));
                         long debut = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX, 0L);
                         if (debut != 0L) {
                             filter.setDateDebut(debut);
@@ -72,8 +72,8 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
                 .putString( PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getNom())
                 .putString( PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitre())
                 .putString( PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getEtat())
-                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, filter.getTypes())
-                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, filter.getSousTypes());
+                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, new HashSet<String>(filter.getTypes()))
+                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>(filter.getSousTypes()));
         if (filter.getDateDebut() != null) {
             editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEDEBUT_SUFFIX, filter.getDateDebut().getTime());
         }

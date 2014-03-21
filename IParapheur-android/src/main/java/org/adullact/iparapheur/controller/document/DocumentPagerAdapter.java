@@ -15,6 +15,7 @@ import com.artifex.mupdfdemo.MuPDFCore;
 
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.PageAnnotations;
 
 /**
  * Created by jmaire on 29/01/2014.
@@ -73,7 +74,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
         if (document != null) {
             muPDFCore = new MuPDFCore(context, document.getPath());
         }
-        else {
+        else if (muPDFCore != null) {
             muPDFCore.onDestroy();
             muPDFCore = null;
         }
@@ -82,7 +83,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
     private void updateFragment(int position, Bitmap bm, float scale, DocumentPageFragment fragment) {
         if ((fragment != null) && (fragment.getActivity() != null)) {
-            fragment.updatePage(bm, document.getAnnotations().get(position), scale);
+            fragment.updatePage(bm, document.getPagesAnnotations().get(position, new PageAnnotations()), scale);
         }
     }
 

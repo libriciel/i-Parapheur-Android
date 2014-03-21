@@ -406,7 +406,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.d("debug", "ONDRAW");
+        //Log.d("debug", "ONDRAW");
         if (!annotation.isDeleted()) {
             Paint paint = new Paint();
             paint.setAntiAlias(true);
@@ -526,7 +526,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
         @Override
         public boolean onDown(MotionEvent me) {
-            Log.d("debug", "onDown");
+            //Log.d("debug", "onDown");
             switch (getArea(me.getX(), me.getY())) {
                 case CENTER :
                     mode = Mode.MOVE;
@@ -544,7 +544,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent me) {
-            Log.i("IParapheurPDFPageView", "onSingleTapConfirmed");
+            //Log.i("IParapheurPDFPageView", "onSingleTapConfirmed");
             boolean invalidate = false;
             // Nouvelle selection ou déselection
             if (selected) {
@@ -580,7 +580,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
                         offset = moveTo(current.getX() - start.getX(), current.getY() - start.getY(), offset);
                         break;
                     case RESIZE :
-                        Log.d("move", "" + current.getX() + " ; " + current.getY());
+                        //Log.d("move", "" + current.getX() + " ; " + current.getY());
                         resize(current.getX(), current.getY());
                         break;
                 }

@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -22,8 +23,18 @@ public class MailSecDialogFragment extends ActionDialogFragment {
     protected TextView annotationPrivee;
 
 
-    public MailSecDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public MailSecDialogFragment() {}
+
+    public static MailSecDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        MailSecDialogFragment f = new MailSecDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
@@ -67,7 +78,7 @@ public class MailSecDialogFragment extends ActionDialogFragment {
             publishProgress(i);
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return;}
-                Log.d("debug", "Mailsec sur " + dossier.getName());
+                //Log.d("debug", "Mailsec sur " + dossier.getName());
                 RESTClient.INSTANCE.envoiMailSec(dossier.getId(),
                         null,
                         "",

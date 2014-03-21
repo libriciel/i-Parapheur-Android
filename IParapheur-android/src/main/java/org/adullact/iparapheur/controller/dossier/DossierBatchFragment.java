@@ -32,7 +32,7 @@ public class DossierBatchFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (getArguments().containsKey(DOSSIER)) {
+        if ((getArguments()!= null) && getArguments().containsKey(DOSSIER)) {
             this.dossiers.add(getArguments().getString(DOSSIER));
         }
         listView = (ListView) view.findViewById(R.id.dossiers_list);

@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -9,15 +11,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Created by jmaire on 06/02/2014.
  */
-public class Filter {
+public class Filter implements Parcelable {
 
     public static final String DEFAULT_ID = "default-filter";
     public static final String EDIT_FILTER_NOM = "Éditer le filtre courant";
@@ -84,8 +85,8 @@ public class Filter {
      * Valeurs du filtre
      */
     private String titre;
-    private Set<String> types;
-    private Set<String> sousTypes;
+    private List<String> types;
+    private List<String> sousTypes;
     private String etat;
     private Date dateDebut;
     private Date dateFin;
@@ -94,16 +95,16 @@ public class Filter {
         this.id = DEFAULT_ID;
         this.nom = DEFAULT_NOM;
         this.etat = DEFAULT_ETAT;
-        this.types = new HashSet<String>();
-        this.sousTypes = new HashSet<String>();
+        this.types = new ArrayList<String>();
+        this.sousTypes = new ArrayList<String>();
     }
 
     public Filter(String id) {
         this.id = id;
         this.nom = DEFAULT_NOM;
         this.etat = DEFAULT_ETAT;
-        this.types = new HashSet<String>();
-        this.sousTypes = new HashSet<String>();
+        this.types = new ArrayList<String>();
+        this.sousTypes = new ArrayList<String>();
     }
 
     public Filter(Filter filter) {
@@ -153,7 +154,7 @@ public class Filter {
                     .put(new JSONObject().put("or", jsonTitre))).toString();
         }
         catch (JSONException e) {
-            Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);
+            //Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);
         }
         return jsonFilter.toString();
     }
@@ -202,19 +203,19 @@ public class Filter {
         this.titre = titre;
     }
 
-    public Set<String> getTypes() {
+    public List<String> getTypes() {
         return types;
     }
 
-    public void setTypes(Set<String> types) {
+    public void setTypes(List<String> types) {
         this.types = types;
     }
 
-    public Set<String> getSousTypes() {
+    public List<String> getSousTypes() {
         return sousTypes;
     }
 
-    public void setSousTypes(Set<String> sousTypes) {
+    public void setSousTypes(List<String> sousTypes) {
         this.sousTypes = sousTypes;
     }
 
@@ -241,4 +242,46 @@ public class Filter {
     public void setDateFin(long dateFin) {
         this.dateFin = new Date(dateFin);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.nom);
+        dest.writeString(this.titre);
+        dest.writeList(this.types);
+        dest.writeList(this.sousTypes);
+        dest.writeString(this.etat);
+        dest.writeLong(dateDebut != null ? dateDebut.getTime() : -1);
+        dest.writeLong(dateFin != null ? dateFin.getTime() : -1);
+    }
+
+    private Filter(Parcel in) {
+        this.id = in.readString();
+        this.nom = in.readString();
+        this.titre = in.readString();
+        this.types = new ArrayList<String>();
+        in.readList(this.types, String.class.getClassLoader());
+        this.sousTypes = new ArrayList<String>();
+        in.readList(this.sousTypes, String.class.getClassLoader());
+        this.etat = in.readString();
+        long tmpDateDebut = in.readLong();
+        this.dateDebut = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
+        long tmpDateFin = in.readLong();
+        this.dateFin = tmpDateFin == -1 ? null : new Date(tmpDateFin);
+    }
+
+    public static Parcelable.Creator<Filter> CREATOR = new Parcelable.Creator<Filter>() {
+        public Filter createFromParcel(Parcel source) {
+            return new Filter(source);
+        }
+
+        public Filter[] newArray(int size) {
+            return new Filter[size];
+        }
+    };
 }

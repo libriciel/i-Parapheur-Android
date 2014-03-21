@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.util.Log;
@@ -25,8 +26,18 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
     private TextView certInfo;
     private String selectedCertAlias;
 
-    public SignatureDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public SignatureDialogFragment() {}
+
+    public static SignatureDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        SignatureDialogFragment f = new SignatureDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
@@ -98,7 +109,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
                 if (isCancelled()) {return;}
                 String signValue = "";
                 // TODO sign and update signValue
-                Log.d("debug", "Signature sur " + dossier.getName() + "avec le certificat " + selectedCertAlias);
+                //Log.d("debug", "Signature sur " + dossier.getName() + "avec le certificat " + selectedCertAlias);
                 RESTClient.INSTANCE.signer(dossier.getId(),
                         signValue,
                         annotPub,

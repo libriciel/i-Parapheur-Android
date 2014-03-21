@@ -1,15 +1,16 @@
 package org.adullact.iparapheur.model;
 
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import org.adullact.iparapheur.controller.document.annotation.AnnotationView;
 
 /**
  * Created by jmaire on 05/11/2013.
  */
-public class Annotation {
+public class Annotation implements Parcelable {
 
     public enum State {
         NEW,
@@ -28,12 +29,9 @@ public class Annotation {
     private String text;
     private String type;
     private int step;
-    private Color fillColor;
-    private Color penColor;
 
     private boolean updated = false;
     private boolean deleted = false;
-
 
 
     public Annotation(String author, int page, boolean secretaire, String date,
@@ -165,4 +163,52 @@ public class Annotation {
                 ", type : " + type + "}";
     }
 
+
+    // PARCELABLE IMPLEMENTATION
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.uuid);
+        dest.writeInt(this.page);
+        dest.writeString(this.author);
+        dest.writeByte(secretaire ? (byte) 1 : (byte) 0);
+        dest.writeString(this.date);
+        dest.writeParcelable(this.rect, 0);
+        dest.writeFloat(this.scale);
+        dest.writeString(this.text);
+        dest.writeString(this.type);
+        dest.writeInt(this.step);
+        dest.writeByte(updated ? (byte) 1 : (byte) 0);
+        dest.writeByte(deleted ? (byte) 1 : (byte) 0);
+    }
+
+    private Annotation(Parcel in) {
+        this.uuid = in.readString();
+        this.page = in.readInt();
+        this.author = in.readString();
+        this.secretaire = in.readByte() != 0;
+        this.date = in.readString();
+        this.rect = in.readParcelable(((Object) rect).getClass().getClassLoader());
+        this.scale = in.readFloat();
+        this.text = in.readString();
+        this.type = in.readString();
+        this.step = in.readInt();
+        this.updated = in.readByte() != 0;
+        this.deleted = in.readByte() != 0;
+    }
+
+    public static Parcelable.Creator<Annotation> CREATOR = new Parcelable.Creator<Annotation>() {
+        public Annotation createFromParcel(Parcel source) {
+            return new Annotation(source);
+        }
+
+        public Annotation[] newArray(int size) {
+            return new Annotation[size];
+        }
+    };
 }

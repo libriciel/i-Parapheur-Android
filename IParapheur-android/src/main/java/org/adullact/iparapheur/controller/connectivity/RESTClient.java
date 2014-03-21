@@ -52,7 +52,7 @@ public enum  RESTClient {
     private static String getTicket(Account account)
     {
         String ticket = account.getTicket();
-        Log.d("debug", "getTicket : " + ticket);
+        //Log.d("debug", "getTicket : " + ticket);
         if (ticket == null) {
             try {
                 String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
@@ -68,7 +68,7 @@ public enum  RESTClient {
                     }
                 }
             } catch (JSONException ex) {
-                Log.e("RESTClient", "Error while trying to log in.", ex);
+                //Log.e("RESTClient", "Error while trying to log in.", ex);
             }
         }
         return ticket;
@@ -105,7 +105,7 @@ public enum  RESTClient {
         String url = buildUrl(ACTION_GET_DOSSIER);
         String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
                        "\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"}";
-        Log.d("debug", "body : " + body);
+        //Log.d("debug", "body : " + body);
         return ModelMapper.getDossier(RESTUtils.post(url, body));
     }
 

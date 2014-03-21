@@ -11,9 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.adullact.iparapheur.controller.document.annotation.AnnotationsLayout;
-import org.adullact.iparapheur.model.Annotation;
-
-import java.util.List;
+import org.adullact.iparapheur.model.PageAnnotations;
 
 /**
  * Created by jmaire on 29/01/2014.
@@ -46,7 +44,7 @@ public class DocumentPageFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    public void updatePage(Bitmap pageImage, List<Annotation> annotations, float scale) {
+    public void updatePage(Bitmap pageImage, PageAnnotations annotations, float scale) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(pageImage.getWidth(), pageImage.getHeight());
         ViewGroup.LayoutParams groupParams = new ViewGroup.LayoutParams(layoutParams);
 

@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.dossier;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Intent;
@@ -18,9 +19,13 @@ import android.widget.FrameLayout;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxFragment;
+import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
+import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
+import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 
 
 /**
@@ -33,13 +38,15 @@ import org.adullact.iparapheur.model.Dossier;
  * is a {@link DossierDetailFragment}.
  * <p>
  * This activity also implements the required
- * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierSelectedListener} interface
+ * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends FragmentActivity implements DossierListFragment.DossierSelectedListener,
+public class DossiersActivity extends FragmentActivity implements DossierListFragment.DossierListFragmentListener,
                                                           DossierDetailFragment.DossierDetailListener,
                                                           BureauxFragment.BureauSelectedListener,
-                                                          LoadingTask.DataChangeListener {
+                                                          LoadingTask.DataChangeListener,
+                                                          FilterDialog.FilterDialogListener,
+                                                          ActionBar.OnNavigationListener {
 
     public static final String DOSSIER_ID = "dossier_id";
     public static final String BUREAU_ID = "bureau_id";
@@ -55,6 +62,9 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
     private ActionBarDrawerToggle drawerToggle;
     private boolean openDrawerwhenFinishedLoading = false;
     private boolean manageDrawerwhenFinishedLoading = false;
+
+    /** Adapter for action bar, used to display user's filters */
+    private FilterAdapter filterAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +116,7 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
         MyAccounts.INSTANCE.saveState();
     }
 
-    // DossierSelectedListener implementations
+    // DossierListFragmentListener implementations
     @Override
     public void onDossierSelected(String dossierId, String bureauId)
     {
@@ -125,6 +135,24 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
         Dossier dossier = getDossier(id);
         getActionBar().setSubtitle((dossier != null)? getDossier(id).getName() : "");
         invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onDossiersLoaded(int size) {
+        onDossierSelected(null, null);
+
+        if (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
+            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            if (filterAdapter == null) {
+                filterAdapter = new FilterAdapter(this);
+            }
+            getActionBar().setListNavigationCallbacks(filterAdapter, this);
+        }
+    }
+
+    @Override
+    public void onDossiersNotLoaded() {
+        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
     }
 
     // DossierDetailListener implementation
@@ -154,6 +182,48 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
             // this method will reload dossiers fragments
             listFragment.setBureauId(id);
         }
+    }
+
+    // FilterDialogListener methods passed by the parent Activity
+
+    public void onFilterSave(Filter filter) {
+        MyFilters.INSTANCE.selectFilter(filter);
+        MyFilters.INSTANCE.save(filter);
+        getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+        filterAdapter.notifyDataSetChanged();
+        onDataChanged();
+    }
+
+    public void onFilterChange(Filter filter) {
+        getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+        MyFilters.INSTANCE.selectFilter(filter);
+        onDataChanged();
+    }
+
+    public void onFilterCancel() {
+        getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+    }
+
+    // OnNavigationListener implementation
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        if (itemPosition < filterAdapter.getCount() - 1) {
+            Filter filter = filterAdapter.getItem(itemPosition);
+            if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
+                MyFilters.INSTANCE.selectFilter(filter);
+                onDataChanged();
+            }
+        }
+        else {
+            Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+            if (filter == null) {
+                filter = new Filter();
+            }
+            FilterDialog.newInstance(filter).show(getSupportFragmentManager(), FilterDialog.TAG);
+
+        }
+        return false;
     }
 
     //LoadingTask implementation

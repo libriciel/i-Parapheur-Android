@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">IParapheur</string>
+    <string name="app_name">i-Parapheur</string>
     <string name="title_dossier_detail">Dossier Detail</string>
     <string name="account_new">Nouveau compte</string>
     <string name="search">Rechercher</string>

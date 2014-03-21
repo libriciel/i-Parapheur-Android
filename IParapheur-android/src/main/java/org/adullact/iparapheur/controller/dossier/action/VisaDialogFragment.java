@@ -2,6 +2,7 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -22,8 +23,18 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
     protected TextView annotationPublique;
     protected TextView annotationPrivee;
 
-    public VisaDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public VisaDialogFragment() {}
+
+    public static VisaDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        VisaDialogFragment f = new VisaDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
@@ -70,7 +81,7 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
 
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return;}
-                Log.d("debug", "VISA on " + dossier);
+                //Log.d("debug", "VISA on " + dossier);
                 RESTClient.INSTANCE.viser(dossier,
                         annotPub,
                         annotPriv,

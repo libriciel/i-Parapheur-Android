@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.dossier.filter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,7 +34,7 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 
     private FilterDialogListener listener;
     private Filter filter;
-    private final Filter originalFilter;
+    private Filter originalFilter;
 
     private EditText titleText;
     private Spinner etatSpinner;
@@ -41,14 +42,35 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
     private ExpandableListView typologieList;
     private TypologieListAdapter typologieListAdapter;
 
-    public FilterDialog(Filter filter, FilterDialogListener listener) {
-        this.originalFilter = filter;
-        this.filter = new Filter(originalFilter);
-        this.listener = listener;
+    public FilterDialog() {}
+
+    public static FilterDialog newInstance(Filter filter) {
+        FilterDialog f = new FilterDialog();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelable("filter", filter);
+        f.setArguments(args);
+
+        return f;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof FilterDialogListener))
+        {
+            throw new IllegalStateException("Activity must implement FilterDialogListener.");
+        }
+        listener = (FilterDialogListener) activity;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        this.originalFilter = getArguments().getParcelable("filter");
+        this.filter = new Filter(originalFilter);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // TITLE
         builder.setTitle(filter.getNom());

@@ -19,9 +19,8 @@ import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.List;
 
 /**
 * Created by jmaire on 10/02/2014.
@@ -115,7 +114,7 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
                 TypologieListAdapter.this.notifyDataSetChanged();
             }
         });
-        Log.d("debug", "GET TYPE");
+        //Log.d("debug", "GET TYPE");
         return convertView;
     }
 
@@ -157,7 +156,7 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
                 TypologieListAdapter.this.notifyDataSetChanged();
             }
         });
-        Log.d("debug", "GET SOUTYPE");
+        //Log.d("debug", "GET SOUTYPE");
         return convertView;
     }
 
@@ -193,12 +192,12 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
         }
     }
 
-    public Set<String> getSelectedTypes() {
-        return selection.keySet();
+    public List<String> getSelectedTypes() {
+        return new ArrayList<String>(selection.keySet());
     }
 
-    public Set<String> getSelectedSousTypes() {
-        Set<String> sousTypes = new HashSet<String>();
+    public List<String> getSelectedSousTypes() {
+        List<String> sousTypes = new ArrayList<String>();
         for (String type : selection.keySet()) {
             sousTypes.addAll(selection.get(type));
         }
@@ -215,8 +214,8 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
         this.selection.clear();
         for (String type : filter.getTypes()) {
             if (typologie.containsKey(type)) {
-                ArrayList<String> selectedSousTypes = typologie.get(type);
-                ArrayList<String> currentSousTypes = typologie.get(type);
+                ArrayList<String> selectedSousTypes = new ArrayList<String>(typologie.get(type));
+                ArrayList<String> currentSousTypes = new ArrayList<String>(typologie.get(type));
                 if (currentSousTypes.removeAll(filter.getSousTypes())) {
                     if (!currentSousTypes.isEmpty()) {
                         selectedSousTypes.retainAll(filter.getSousTypes());

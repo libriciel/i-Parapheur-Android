@@ -1,5 +1,8 @@
 package org.adullact.iparapheur.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,7 +13,7 @@ import java.util.UUID;
 /**
  * Created by jmaire on 01/11/2013.
  */
-public class Dossier {
+public class Dossier implements Parcelable {
 
     private final String id;
 
@@ -18,7 +21,7 @@ public class Dossier {
 
     private final Action actionDemandee;
 
-    private final ArrayList<Action> actions;
+    private List<Action> actions;
 
     private final String type;
 
@@ -32,7 +35,7 @@ public class Dossier {
 
     private final List<Document> annexes = new ArrayList<Document>();
 
-    private ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
+    private List<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
 
     // TODO : remove
     public Dossier(int i) {
@@ -55,11 +58,11 @@ public class Dossier {
         this.id = id;
         this.name = this.type = this.sousType = null;
         this.dateCreation = this.dateLimite = null;
-        this.actions = null;
         this.actionDemandee = null;
+        this.actions = new ArrayList<Action>();
     }
 
-    public Dossier(String id, String name, Action actionDemandee, ArrayList<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
+    public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
         this.id = id;
         this.name = name;
         this.actionDemandee = actionDemandee;
@@ -131,7 +134,7 @@ public class Dossier {
         return name;
     }
 
-    public ArrayList<Action> getActions() {
+    public List<Action> getActions() {
         return actions;
     }
 
@@ -169,15 +172,63 @@ public class Dossier {
         return documents;
     }
 
-    public void setCircuit(ArrayList<EtapeCircuit> circuit) {
+    public void setCircuit(List<EtapeCircuit> circuit) {
         this.circuit = circuit;
     }
 
-    public ArrayList<EtapeCircuit> getCircuit() {
+    public List<EtapeCircuit> getCircuit() {
         return circuit;
     }
 
     public Action getActionDemandee() {
         return actionDemandee;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeInt(this.actionDemandee == null ? -1 : this.actionDemandee.ordinal());
+        dest.writeTypedList(actions);
+        dest.writeString(this.type);
+        dest.writeString(this.sousType);
+        dest.writeLong(dateCreation != null ? dateCreation.getTime() : -1);
+        dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
+        dest.writeTypedList(mainDocuments);
+        dest.writeTypedList(annexes);
+        dest.writeTypedList(circuit);
+    }
+
+    private Dossier(Parcel in) {
+        this.id = in.readString();
+        this.name = in.readString();
+        int tmpActionDemandee = in.readInt();
+        this.actionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
+        in.readTypedList(actions, Action.CREATOR);
+        this.type = in.readString();
+        this.sousType = in.readString();
+        long tmpDateCreation = in.readLong();
+        this.dateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
+        long tmpDateLimite = in.readLong();
+        this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
+        in.readTypedList(mainDocuments, Document.CREATOR);
+        in.readTypedList(annexes, Document.CREATOR);
+        in.readTypedList(circuit, EtapeCircuit.CREATOR);
+    }
+
+    public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
+        public Dossier createFromParcel(Parcel source) {
+            return new Dossier(source);
+        }
+
+        public Dossier[] newArray(int size) {
+            return new Dossier[size];
+        }
+    };
 }

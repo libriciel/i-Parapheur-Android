@@ -121,7 +121,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
      */
     private String buildAccountHeader(Account account)
     {
-        Log.d("debug", "buildAccountHeader for account : " + account.getTitle());
+        //Log.d("debug", "buildAccountHeader for account : " + account.getTitle());
         if (account.isValid()) {
             return account.getLogin() + " @ " + account.getUrl();
         } else {

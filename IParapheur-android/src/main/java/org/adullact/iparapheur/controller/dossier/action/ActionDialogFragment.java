@@ -3,9 +3,9 @@ package org.adullact.iparapheur.controller.dossier.action;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,13 +26,14 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
     protected ArrayList<Dossier> dossiers;
     protected String bureauId;
 
-    public ActionDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        this.dossiers = dossiers;
-        this.bureauId = bureauId;
-    }
+    public ActionDialogFragment() {}
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            this.dossiers = getArguments().getParcelableArrayList("dossiers");
+            this.bureauId = getArguments().getString("bureauId");
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(createView())
                 // Set action button

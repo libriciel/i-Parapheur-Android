@@ -10,11 +10,10 @@ import android.widget.RelativeLayout;
 
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Annotation;
+import org.adullact.iparapheur.model.PageAnnotations;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -23,21 +22,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AnnotationsLayout extends RelativeLayout implements View.OnTouchListener, AnnotationView.AnnotationViewListener {
 
     private int numPage;
-    private List<Annotation> annotations;
+    private PageAnnotations annotations;
     private AnnotationView selectedAnnotation;
     private static final AtomicInteger idValue = new AtomicInteger(1);
 
     private GestureDetector gestureDetector;
     private float scale;
 
-    public AnnotationsLayout(Context context, int numPage, List<Annotation> annotations, float scale) {
+    public AnnotationsLayout(Context context, int numPage, PageAnnotations annotations, float scale) {
         super(context);
         this.annotations = annotations;
-        if (annotations == null) {
-            this.annotations = new ArrayList<Annotation>();
-        }
 
-        for (Annotation annotation : this.annotations) {
+        for (Annotation annotation : this.annotations.getAnnotations()) {
             AnnotationView av = new AnnotationView(getContext(), annotation, this);
             av.setId(idValue.getAndIncrement());
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) annotation.getRect().width(), (int) annotation.getRect().height());
@@ -50,10 +46,6 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
         this.scale = scale;
         gestureDetector = new GestureDetector(context, new AnnotationGestureListener());
         setOnTouchListener(this);
-    }
-
-    public void setAnnotations(List<Annotation> annotations) {
-        this.annotations = annotations;
     }
 
     /**
@@ -164,7 +156,7 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
 
         @Override
         public boolean onDown(MotionEvent me) {
-            Log.i("IParapheurPDFPageView", "onDown");
+            //Log.i("IParapheurPDFPageView", "onDown");
 
             if (selectedAnnotation != null) {
                 unselectAnnotation(true);
@@ -175,14 +167,14 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
 
         @Override
         public boolean onDoubleTap(MotionEvent me) {
-            Log.i("IParapheurPDFPageView", "onDoubleTap");
+            //Log.i("IParapheurPDFPageView", "onDoubleTap");
             onLongPress(me);
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent me) {
-            Log.i("IParapheurPDFPageView", "onLongPress");
+            //Log.i("IParapheurPDFPageView", "onLongPress");
             createAnnotation(me.getX(), me.getY());
         }
 

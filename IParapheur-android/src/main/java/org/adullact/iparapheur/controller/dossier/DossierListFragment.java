@@ -1,12 +1,10 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,13 +29,9 @@ import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.TdtDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
-import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
-import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
-import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +43,7 @@ import java.util.HashSet;
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a {@link DossierDetailFragment}.
  * <p>
- * Activities containing this fragment MUST implement the {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierSelectedListener}
+ * Activities containing this fragment MUST implement the {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener}
  * interface.
  *
  * This fragment is also used to retain all the dossiers informations.
@@ -57,7 +51,7 @@ import java.util.HashSet;
  * details of a dossier are retained in this fragment. Also the pdf is saved on external storage
  * and its url is stored in the dossier information.
  */
-public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionBar.OnNavigationListener{
+public class DossierListFragment extends ListFragment implements LoadingTask.DataChangeListener {
 
     public static String TAG = "Dossiers_list";
 
@@ -71,7 +65,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
      * The fragment's current callback object, which is notified of list item
      * clicks.
      */
-    private DossierSelectedListener listener;
+    private DossierListFragmentListener listener;
 
     /**
      * Bureau id where the dossiers belongs
@@ -87,19 +81,27 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
      */
     private int selectedDossier = ListView.INVALID_POSITION;
 
-    private FilterAdapter filterAdapter;
-
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
-     * selections.
+     * selections and datachanges.
      */
-    public interface DossierSelectedListener {
+    public interface DossierListFragmentListener {
         /**
-         * Callback for when a dossier has been selected.
+         * Callback used when a dossier has been selected.
          */
         void onDossierSelected(String dossierId, String bureauId);
+        /**
+         * Callback used when a dossier has been checked.
+         */
         void onDossierChecked(String id);
+        /**
+         * Callback used when a dossiers has been loaded.
+         * @param size
+         */
+        void onDossiersLoaded(int size);
+
+        void onDossiersNotLoaded();
     }
 
     /**
@@ -112,11 +114,11 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         // Activities containing this fragment must implement its callbacks.
-        if (!(activity instanceof DossierSelectedListener))
+        if (!(activity instanceof DossierListFragmentListener))
         {
-            throw new IllegalStateException("Activity must implement DossierSelectedListener.");
+            throw new IllegalStateException("Activity must implement DossierListFragmentListener.");
         }
-        listener = (DossierSelectedListener) activity;
+        listener = (DossierListFragmentListener) activity;
     }
 
     // Called only once as retainInstance is set to true.
@@ -180,27 +182,27 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         HashSet<Dossier> checkedDossiers = ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
         switch (item.getItemId()) {
             case R.id.action_visa:
-                actionDialog = new VisaDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = VisaDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "VisaDialogFragment");
                 return true;
             case R.id.action_signature:
-                actionDialog = new SignatureDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = SignatureDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "SignatureDialogFragment");
                 return true;
             case R.id.action_mailsec:
-                actionDialog = new MailSecDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = MailSecDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
                 return true;
             case R.id.action_tdt:
-                actionDialog = new TdtDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = TdtDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "TdtDialogFragment");
                 return true;
             case R.id.action_archivage:
-                actionDialog = new ArchivageDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
                 return true;
             case R.id.action_rejet:
-                actionDialog = new RejetDialogFragment(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog = RejetDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "RejetDialogFragment");
                 return true;
             default:
@@ -260,29 +262,22 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         if (selectedDossier != ListView.INVALID_POSITION) {
             selectedDossier = ListView.INVALID_POSITION;
             setActivatedPosition(ListView.INVALID_POSITION);
-            listener.onDossierSelected(null, null);
         }
         ((DossierListAdapter) getListAdapter()).clearSelection();
-        getActivity().invalidateOptionsMenu();
         getDossiers(true);
     }
 
     @Override
     public void onDataChanged() {
-        if (getActivity() != null) {
-            ActionBar actionBar = getActivity().getActionBar();
-            if (bureauId == null) {
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            }
-            else if (actionBar.getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST) {
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-                if (filterAdapter == null) {
-                    filterAdapter = new FilterAdapter(getActivity());
-                }
-                actionBar.setListNavigationCallbacks(filterAdapter, this);
-            }
-        }
+
         ((DossierListAdapter) getListAdapter()).clearSelection();
+        if (bureauId != null) {
+            listener.onDossiersLoaded(this.dossiers.size());
+        }
+        else {
+            listener.onDossiersNotLoaded();
+        }
+
         if (selectedDossier != ListView.INVALID_POSITION) {
             selectedDossier = ListView.INVALID_POSITION;
             setActivatedPosition(ListView.INVALID_POSITION);
@@ -294,58 +289,14 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
     }
 
-    // OnNavigationListener implementation
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        if (itemPosition < filterAdapter.getCount() - 1) {
-            Filter filter = filterAdapter.getItem(itemPosition);
-            if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
-                MyFilters.INSTANCE.selectFilter(filter);
-                reload();
-            }
-        }
-        else {
-            Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-            if (filter == null) {
-                filter = new Filter();
-            }
-            new FilterDialog(filter, this).show(getActivity().getSupportFragmentManager(), FilterDialog.TAG);
-
-        }
-        return false;
-    }
-
-    // FilterDialogListener implementation
-
-    @Override
-    public void onFilterSave(Filter filter) {
-        MyFilters.INSTANCE.selectFilter(filter);
-        MyFilters.INSTANCE.save(filter);
-        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-        filterAdapter.notifyDataSetChanged();
-        reload();
-    }
-
-    @Override
-    public void onFilterChange(Filter filter) {
-        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-        MyFilters.INSTANCE.selectFilter(filter);
-        reload();
-    }
-
-    @Override
-    public void onFilterCancel() {
-        getActivity().getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
-    }
 
     private class DossierListAdapter extends ArrayAdapter<Dossier> implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, View.OnTouchListener {
 
-        private final DossierSelectedListener listener;
+        private final DossierListFragmentListener listener;
         private HashSet<Dossier> checkedDossiers;
         private final GestureDetector gestureDetector = new GestureDetector(getContext(), new OnSwipeGestureListener());
 
-        public DossierListAdapter(Context context, DossierSelectedListener listener) {
+        public DossierListAdapter(Context context, DossierListFragmentListener listener) {
             super(context, R.layout.dossiers_list_item, R.id.dossiers_list_item_title);
             this.listener = listener;
             this.checkedDossiers = new HashSet<Dossier>();
@@ -453,18 +404,18 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
                         }
                     }
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    //exception.printStackTrace();
                 }
                 return result;
             }
         }
 
         public void onSwipeRight() {
-            Log.d("swipe", "SWIPE RIGHT");
+            //Log.d("swipe", "SWIPE RIGHT");
         }
 
         public void onSwipeLeft() {
-            Log.d("swipe", "SWIPE LEFT");
+            //Log.d("swipe", "SWIPE LEFT");
         }
 
     }

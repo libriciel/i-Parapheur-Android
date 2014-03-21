@@ -2,9 +2,9 @@
 
     <!-- These settings headers are only used on tablets. -->
 
-    <header
+    <!--header
         android:fragment="org.adullact.iparapheur.controller.preferences.GeneralPreferenceFragment"
-        android:title="@string/pref_header_general" />
+        android:title="@string/pref_header_general" /-->
 
     <header
         android:fragment="org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment"

@@ -1,11 +1,14 @@
 package org.adullact.iparapheur.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.adullact.iparapheur.R;
 
 /**
 * Created by jmaire on 02/12/2013.
 */
-public enum Action
+public enum Action implements Parcelable
 {
     // TODO : all possible actions (secretariat, supprimer, ...)
     VISA(R.string.action_viser,
@@ -72,4 +75,28 @@ public enum Action
     public int getMenuItemId() {
         return menuItemId;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(ordinal());
+    }
+
+    public static final Creator<Action> CREATOR = new Creator<Action>() {
+        @Override
+        public Action createFromParcel(final Parcel source) {
+            return Action.values()[source.readInt()];
+        }
+
+        @Override
+        public Action[] newArray(final int size) {
+            return new Action[size];
+        }
+    };
+
 }

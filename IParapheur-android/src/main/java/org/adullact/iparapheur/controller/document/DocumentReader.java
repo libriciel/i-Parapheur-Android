@@ -67,7 +67,7 @@ public class DocumentReader {}/*extends ReaderView {
 
     public void setDocument(Document document) throws Exception {
         if (document.getPath() != null) {
-            setAdapter(new PDFPageAdapter(getContext(), document.getAnnotations(), document.getPath()));
+            setAdapter(new PDFPageAdapter(getContext(), document.getPagesAnnotations(), document.getPath()));
             //refresh(true);
         }
     }

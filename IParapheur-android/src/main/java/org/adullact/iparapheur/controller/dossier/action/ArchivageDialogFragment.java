@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
@@ -18,14 +19,23 @@ import java.util.ArrayList;
 public class ArchivageDialogFragment extends ActionDialogFragment {
 
 
-    public ArchivageDialogFragment(ArrayList<Dossier> dossiers, String bureauId) {
-        super(dossiers, bureauId);
+    public ArchivageDialogFragment() {}
+
+    public static ArchivageDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        ArchivageDialogFragment f = new ArchivageDialogFragment();
+
+        // Supply parameters as an arguments.
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("dossiers", dossiers);
+        args.putString("bureauId", bureauId);
+        f.setArguments(args);
+
+        return f;
     }
 
     @Override
     protected View createView() {
         View layout = super.createView();
-
         return layout;
     }
 
@@ -58,7 +68,7 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
             publishProgress(i);
             for (Dossier dossier : dossiers) {
                 if (isCancelled()) {return;}
-                Log.d("debug", "Archivage du dossier " + dossier.getName());
+                //Log.d("debug", "Archivage du dossier " + dossier.getName());
                 RESTClient.INSTANCE.archiver(dossier.getId(),
                         dossier.getName() + "pdf",
                         false,

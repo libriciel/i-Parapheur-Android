@@ -1,12 +1,14 @@
 package org.adullact.iparapheur.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
 /**
  * Created by jmaire on 06/11/2013.
  */
-public class EtapeCircuit
-{
+public class EtapeCircuit implements Parcelable {
 
     private final Date dateValidation;
 
@@ -60,4 +62,39 @@ public class EtapeCircuit
         return bureauName;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(dateValidation != null ? dateValidation.getTime() : -1);
+        dest.writeByte(isApproved ? (byte) 1 : (byte) 0);
+        dest.writeString(this.bureauName);
+        dest.writeString(this.signataire);
+        dest.writeInt(this.action == null ? -1 : this.action.ordinal());
+        dest.writeString(this.publicAnnotation);
+    }
+
+    private EtapeCircuit(Parcel in) {
+        long tmpDateValidation = in.readLong();
+        this.dateValidation = tmpDateValidation == -1 ? null : new Date(tmpDateValidation);
+        this.isApproved = in.readByte() != 0;
+        this.bureauName = in.readString();
+        this.signataire = in.readString();
+        int tmpAction = in.readInt();
+        this.action = tmpAction == -1 ? null : Action.values()[tmpAction];
+        this.publicAnnotation = in.readString();
+    }
+
+    public static Parcelable.Creator<EtapeCircuit> CREATOR = new Parcelable.Creator<EtapeCircuit>() {
+        public EtapeCircuit createFromParcel(Parcel source) {
+            return new EtapeCircuit(source);
+        }
+
+        public EtapeCircuit[] newArray(int size) {
+            return new EtapeCircuit[size];
+        }
+    };
 }

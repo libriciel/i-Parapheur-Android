@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.controller.connectivity;
 
-import android.util.Log;
-
 import org.adullact.iparapheur.model.RequestResponse;
 
 import java.io.ByteArrayInputStream;
@@ -71,8 +69,8 @@ public class RESTUtils {
             "-----END CERTIFICATE-----";
 
     public static RequestResponse post(String url, String body) {
-        Log.d("debug", "POST request on : " + url);
-        Log.d("debug", "with body : " + body);
+        //Log.d("debug", "POST request on : " + url);
+        //Log.d("debug", "with body : " + body);
         RequestResponse res = null;
         OutputStream output = null;
         try {
@@ -88,7 +86,7 @@ public class RESTUtils {
             output.write(body.getBytes());
             res = new RequestResponse(connection);
         } catch (Exception e) {
-            Log.e("RESTUtils", "Error while sending post request.", e);
+            //Log.e("RESTUtils", "Error while sending post request.", e);
             res = new RequestResponse();
         } finally {
             if (output != null) {
@@ -103,7 +101,7 @@ public class RESTUtils {
 
 
     public static RequestResponse get(String url, String params) {
-        Log.d("debug", "GET request on : " + url);
+        //Log.d("debug", "GET request on : " + url);
         RequestResponse res = null;
         try {
             HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -127,7 +125,7 @@ public class RESTUtils {
 
     public static InputStream downloadFile(String url)
     {
-        Log.d("debug", "GET (download file) request on : " + url);
+        //Log.d("debug", "GET (download file) request on : " + url);
         InputStream fileStream = null;
         try {
             HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -141,7 +139,7 @@ public class RESTUtils {
 
         } catch (Exception e) {
             //Log.e("StaticHttpClient", "Erreur lors du téléchargement du pdf : " + e);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return fileStream;
     }
