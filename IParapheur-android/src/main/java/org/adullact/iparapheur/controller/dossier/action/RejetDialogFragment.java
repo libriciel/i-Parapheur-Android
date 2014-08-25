@@ -2,16 +2,16 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.util.ArrayList;
 
@@ -75,7 +75,7 @@ public class RejetDialogFragment extends ActionDialogFragment {
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();

@@ -20,12 +20,13 @@ import android.widget.Toast;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.utils.FileUtils;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.io.File;
 import java.util.UUID;
@@ -310,7 +311,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         }
 
         @Override
-        protected void load(String... params)
+        protected void load(String... params) throws IParapheurException
         {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
@@ -325,11 +326,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                 dossier.addDocument(new Document(
                         UUID.randomUUID().toString(),
                         "ducument par defaut",
-                        ""));
+                        -1, ""));
             }
             if (isCancelled()) {return;}
             if (!IParapheur.OFFLINE) {
-                dossier. setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
+                dossier.setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
             }
             if (isCancelled()) {return;}
 
@@ -342,7 +343,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                     String path = file.getAbsolutePath();
                     //Log.d("debug", "saving document on disk");
                     if (!IParapheur.OFFLINE) {
-                        if (RESTClient.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
+                        if (RESTClient.INSTANCE.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
                             document.setPath(path);
                         }
                     }

@@ -30,6 +30,8 @@
     <string name="action_viser">Viser</string>
     <string name="action_signer">Signer</string>
     <string name="action_tdt">Envoyer au TdT</string>
+    <string name="action_tdt_actes">Envoyer au TdT - ACTES</string>
+    <string name="action_tdt_helios">Envoyer au TdT - HELIOS</string>
     <string name="action_mailsec">Envoyer par mail sécurisé</string>
 
     <!-- actions secondaires -->
@@ -68,5 +70,26 @@
     <string name="enregistrer_filtre">Enregistrer</string>
     <string name="filtre_nom">Nom du filtre</string>
     <string name="filtre_nom_hint">Nouveau filtre</string>
+
+    <string name="http_error_undefined">Une erreur est intervenue lors de l\'envoi de la requête</string>
+    <string name="http_error_malformed_url">URL mal formée : %s</string>
+    <string name="http_error_ssl_failed">Erreur lors de la mise en place de la connexion sécurisée</string>
+    <string name="http_error_explicit">%s</string>
+
+    <string name="http_error_400">Erreur lors de l\'envoi de la requête</string>
+    <string name="http_error_401">Authentification obligatoire</string>
+    <string name="http_error_403">Votre compte ne permet pas d\'effectuer cette action</string>
+    <string name="http_error_404">Ressource non trouvée</string>
+    <string name="http_error_405">Méthode de requête non autorisée</string>
+    <string name="http_error_503">Le service est actuellement indisponible</string>
+
+    <string name="error_mismatch_versions">Le i-Parapheur associé au compte %s est incompatible avec cette application</string>
+    <string name="error_parse">Erreur lors du traitement de la réponse</string>
+    <string name="error_no_ticket">Impossible de se connecter, veuillez vérifier vos comptes</string>
+    <string name="error_no_storage">Stockage inaccessible</string>
+    <string name="error_file_not_found">Impossible d\'enregistrer le fichier.</string>
+    <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application</string>
+    <string name="action_non_implementee">non implémenté</string>
+    <string name="action_journal">Journal d\'événements</string>
 
 </resources>

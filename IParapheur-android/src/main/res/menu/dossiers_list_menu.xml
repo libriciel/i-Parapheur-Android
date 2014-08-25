@@ -20,6 +20,15 @@
                 android:title="@string/action_tdt"
                 android:showAsAction="ifRoom" />
 
+
+            <item android:id="@+id/action_tdt_actes"
+                android:title="@string/action_tdt_actes"
+                android:showAsAction="ifRoom" />
+
+            <item android:id="@+id/action_tdt_helios"
+                android:title="@string/action_tdt_helios"
+                android:showAsAction="ifRoom" />
+
             <item android:id="@+id/action_archivage"
                 android:title="@string/action_archiver"
                 android:showAsAction="ifRoom" />
@@ -60,6 +69,10 @@
 
             <item android:id="@+id/action_supprimer"
                 android:title="@string/action_supprimer"
+                android:showAsAction="never" />
+
+            <item android:id="@+id/action_journal"
+                android:title="@string/action_journal"
                 android:showAsAction="never" />
         </group>
     </group>

@@ -274,7 +274,6 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
         }
         // TODO : handle dossier(s) actions
         // Handle presses on the action bar items
-        DialogFragment actionDialog;
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);

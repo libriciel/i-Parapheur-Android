@@ -1,12 +1,16 @@
-package org.adullact.iparapheur.controller.connectivity;
+package org.adullact.iparapheur.controller.rest;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -68,10 +72,10 @@ public class RESTUtils {
             "RhvLQliUUxVMDX2+VTGKgEGGB+knAIKObp4vr2o=\n" +
             "-----END CERTIFICATE-----";
 
-    public static RequestResponse post(String url, String body) {
+    public static RequestResponse post(String url, String body) throws IParapheurException {
         //Log.d("debug", "POST request on : " + url);
         //Log.d("debug", "with body : " + body);
-        RequestResponse res = null;
+        RequestResponse res;
         OutputStream output = null;
         try {
             HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -85,26 +89,26 @@ public class RESTUtils {
             output = connection.getOutputStream();
             output.write(body.getBytes());
             res = new RequestResponse(connection);
-        } catch (Exception e) {
-            //Log.e("RESTUtils", "Error while sending post request.", e);
-            res = new RequestResponse();
-        } finally {
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException logOrIgnore) {
-                }
-            }
+        } catch (IParapheurException e) {
+            throw e;
+        } catch (MalformedURLException e) {
+            throw new IParapheurException(R.string.http_error_malformed_url, url);
+        } catch (ProtocolException e) {
+            throw new IParapheurException(R.string.http_error_405, null);
+        } catch (GeneralSecurityException e) {
+            throw new IParapheurException(R.string.http_error_ssl_failed, null);
+        } catch (IOException e) {
+            throw new IParapheurException(R.string.http_error_400, null);
         }
         return res;
     }
 
-
-    public static RequestResponse get(String url, String params) {
+    public static RequestResponse get(String url) throws IParapheurException {
         //Log.d("debug", "GET request on : " + url);
-        RequestResponse res = null;
+        RequestResponse res;
+        String urlStr = url;
         try {
-            HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+            HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
             ((HttpsURLConnection)connection).setSSLSocketFactory(getSSLSocketFactory());
 
             connection.setRequestMethod("GET");
@@ -117,29 +121,35 @@ public class RESTUtils {
 
             res = new RequestResponse(connection);
 
-        } catch (Exception e) {
-            res = new RequestResponse();
+        } catch (IParapheurException e) {
+            throw e;
+        } catch (MalformedURLException e) {
+            throw new IParapheurException(R.string.http_error_malformed_url, url);
+        } catch (ProtocolException e) {
+            throw new IParapheurException(R.string.http_error_405, null);
+        } catch (GeneralSecurityException e) {
+            throw new IParapheurException(R.string.http_error_ssl_failed, null);
+        } catch (IOException e) {
+            throw new IParapheurException(R.string.http_error_400, null);
         }
         return res;
     }
 
-    public static InputStream downloadFile(String url)
-    {
+    public static InputStream downloadFile(String url) throws IParapheurException {
         //Log.d("debug", "GET (download file) request on : " + url);
         InputStream fileStream = null;
+        HttpURLConnection connection = null;
         try {
-            HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+            connection = (HttpsURLConnection) new URL(url).openConnection();
             ((HttpsURLConnection)connection).setSSLSocketFactory(getSSLSocketFactory());
-
             connection.setRequestMethod("GET");
             connection.setDoOutput(false);
             connection.setChunkedStreamingMode(0);
-
             fileStream = connection.getInputStream();
-
-        } catch (Exception e) {
-            //Log.e("StaticHttpClient", "Erreur lors du téléchargement du pdf : " + e);
-            //e.printStackTrace();
+        } catch (GeneralSecurityException e) {
+            throw new IParapheurException(R.string.http_error_ssl_failed, null);
+        } catch (IOException e) {
+            throw new IParapheurException(R.string.http_error_400, null);
         }
         return fileStream;
     }
@@ -157,5 +167,36 @@ public class RESTUtils {
         SSLContext context = SSLContext.getInstance("SSL");
         context.init(null, tmf.getTrustManagers(), null);
         return context.getSocketFactory();
+    }
+
+    public static IParapheurException getExceptionForError(int code, String message) {
+        if (message != null) {
+            return new IParapheurException(R.string.http_error_explicit, message);
+        }
+        IParapheurException exception;
+        switch (code) {
+            case 400 :
+                exception = new IParapheurException(R.string.http_error_400, null);
+                break;
+            case 401 :
+                exception = new IParapheurException(R.string.http_error_401, null);
+                break;
+            case 403 :
+                exception = new IParapheurException(R.string.http_error_403, null);
+                break;
+            case 404 :
+                exception = new IParapheurException(R.string.http_error_404, null);
+                break;
+            case 405 :
+                exception = new IParapheurException(R.string.http_error_405, null);
+                break;
+            case 503 :
+                exception = new IParapheurException(R.string.http_error_503, null);
+                break;
+            default :
+                exception = new IParapheurException(R.string.http_error_undefined, null);
+                break;
+        }
+        return exception;
     }
 }

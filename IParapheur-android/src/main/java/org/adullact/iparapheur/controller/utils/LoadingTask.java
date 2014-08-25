@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
@@ -27,7 +28,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
         this.dataListener = listener;
     }
 
-    protected abstract void load(String... params);
+    protected abstract void load(String... params) throws IParapheurException;
 
     @Override
     protected void onPreExecute() {
@@ -48,8 +49,8 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
         String error = null;
         try {
             load(params);
-        } catch (RuntimeException e) {
-            error = e.getMessage();
+        } catch (IParapheurException e) {
+            error = activity.getResources().getString(e.getResId(), e.getComplement());
         }
         return error;
     }

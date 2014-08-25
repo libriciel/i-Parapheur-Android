@@ -16,12 +16,14 @@ import android.widget.RadioGroup;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -50,7 +52,7 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
     /**
      * list of bureaux currently displayed in this Fragment
      */
-    private ArrayList<Bureau> bureaux;
+    private List<Bureau> bureaux;
     /**
      * the currently selected dossier
      */
@@ -181,7 +183,7 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
             if (!IParapheur.OFFLINE) {

@@ -12,7 +12,9 @@ public class Document implements Parcelable {
 
     private final String id;
     private final String name;
+    private final int size; // TODO : utiliser pour ne pas telecharger des dossiers trop lourds (images à la place)
     private final SparseArray<PageAnnotations> pagesAnnotations;
+
     /**
      * URL of the document (its content)
      */
@@ -22,10 +24,11 @@ public class Document implements Parcelable {
      */
     private String path;
 
-    public Document(String id, String name, String url) {
+    public Document(String id, String name, int size, String url) {
         this.id = id;
         this.name = name;
         this.url = url;
+        this.size = size;
         this.pagesAnnotations = new SparseArray<PageAnnotations>();
     }
 
@@ -39,6 +42,10 @@ public class Document implements Parcelable {
 
     public String getUrl() {
         return url;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public String getPath() {
@@ -69,6 +76,7 @@ public class Document implements Parcelable {
         dest.writeString(this.name);
         dest.writeBundle(bundle);
         dest.writeString(this.url);
+        dest.writeInt(this.size);
         dest.writeString(this.path);
     }
 
@@ -77,6 +85,7 @@ public class Document implements Parcelable {
         this.name = in.readString();
         this.pagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("pagesAnnotations");
         this.url = in.readString();
+        this.size = in.readInt();
         this.path = in.readString();
     }
 

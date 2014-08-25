@@ -2,14 +2,14 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.util.ArrayList;
 
@@ -61,7 +61,7 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             if (isCancelled()) {return;}
             int i = 0;
             int total = dossiers.size();

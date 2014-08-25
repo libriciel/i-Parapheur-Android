@@ -14,6 +14,8 @@ public class EtapeCircuit implements Parcelable {
 
     private final boolean isApproved;
 
+    private final boolean isRejected;
+
     private final String bureauName;
 
     private final String signataire;
@@ -22,10 +24,11 @@ public class EtapeCircuit implements Parcelable {
 
     private final String publicAnnotation;
 
-    public EtapeCircuit(Date dateValidation, boolean isApproved, String bureauName, String signataire, Action action, String publicAnnotation)
+    public EtapeCircuit(Date dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, Action action, String publicAnnotation)
     {
         this.dateValidation = dateValidation;
         this.isApproved = isApproved;
+        this.isRejected = isRejected;
         this.bureauName = bureauName;
         this.signataire = signataire == null ? "" : signataire;
         this.action = action;
@@ -38,6 +41,10 @@ public class EtapeCircuit implements Parcelable {
 
     public boolean isApproved() {
         return isApproved;
+    }
+
+    public boolean isRejected() {
+        return isRejected;
     }
 
     public String getBureauName() {
@@ -71,6 +78,7 @@ public class EtapeCircuit implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(dateValidation != null ? dateValidation.getTime() : -1);
         dest.writeByte(isApproved ? (byte) 1 : (byte) 0);
+        dest.writeByte(isRejected ? (byte) 1 : (byte) 0);
         dest.writeString(this.bureauName);
         dest.writeString(this.signataire);
         dest.writeInt(this.action == null ? -1 : this.action.ordinal());
@@ -81,6 +89,7 @@ public class EtapeCircuit implements Parcelable {
         long tmpDateValidation = in.readLong();
         this.dateValidation = tmpDateValidation == -1 ? null : new Date(tmpDateValidation);
         this.isApproved = in.readByte() != 0;
+        this.isRejected = in.readByte() != 0;
         this.bureauName = in.readString();
         this.signataire = in.readString();
         int tmpAction = in.readInt();

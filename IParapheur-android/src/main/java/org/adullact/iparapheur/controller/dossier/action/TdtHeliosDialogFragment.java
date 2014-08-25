@@ -2,30 +2,30 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.util.ArrayList;
 
 /**
  * Created by jmaire on 03/12/2013.
  */
-public class TdtDialogFragment extends ActionDialogFragment {
+public class TdtHeliosDialogFragment extends ActionDialogFragment {
 
     protected TextView annotationPublique;
     protected TextView annotationPrivee;
 
-    public TdtDialogFragment() {}
+    public TdtHeliosDialogFragment() {}
 
-    public static TdtDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
-        TdtDialogFragment f = new TdtDialogFragment();
+    public static TdtHeliosDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+        TdtHeliosDialogFragment f = new TdtHeliosDialogFragment();
 
         // Supply parameters as an arguments.
         Bundle args = new Bundle();
@@ -48,7 +48,7 @@ public class TdtDialogFragment extends ActionDialogFragment {
 
     @Override
     protected int getTitle() {
-        return Action.TDT.getTitle();
+        return Action.TDT_HELIOS.getTitle();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class TdtDialogFragment extends ActionDialogFragment {
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             if (isCancelled()) {return;}
             String annotPub = annotationPublique.getText().toString();
             String annotPriv = annotationPrivee.getText().toString();
@@ -80,7 +80,7 @@ public class TdtDialogFragment extends ActionDialogFragment {
                 // TODO : distinguer Actes et Helios
                 //Log.d("debug", "Mailsec sur " + dossier.getName());
                 RESTClient.INSTANCE.envoiTdtActes(dossier.getId(),
-                        "",
+                        "", "", "", 0l, "",
                         annotPub,
                         annotPriv,
                         bureauId);

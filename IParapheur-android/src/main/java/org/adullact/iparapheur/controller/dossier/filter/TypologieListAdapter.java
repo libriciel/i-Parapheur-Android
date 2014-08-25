@@ -2,7 +2,6 @@ package org.adullact.iparapheur.controller.dossier.filter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,8 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Filter;
 
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
 * Created by jmaire on 10/02/2014.
@@ -29,7 +30,7 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
 
     private Context context;
     private final Filter filter;
-    private HashMap<String, ArrayList<String>> typologie;
+    private Map<String, ArrayList<String>> typologie;
     private HashMap<String, ArrayList<String>> selection;
 
     public TypologieListAdapter(Context context, Filter filter) {
@@ -234,7 +235,7 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             typologie = RESTClient.INSTANCE.getTypologie();
         }
     }

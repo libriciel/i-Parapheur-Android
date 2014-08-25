@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.controller.connectivity;
+package org.adullact.iparapheur.controller.rest.mapper;
 
 import org.adullact.iparapheur.controller.utils.TransformUtils;
 import org.adullact.iparapheur.model.Action;
@@ -16,11 +16,11 @@ import java.util.LinkedHashMap;
 
 /**
  * Created by jmaire on 04/11/2013.
+ * Utilitaire de conversion des réponses json du serveur i-Parapheur pour les versions d'API 1 et 2.
  */
-public class ModelMapper
-{
+public class ModelMapper {
 
-    public static Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
+    public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
         Dossier dossier = null;
         if (requestResponse.getResponse() != null)
         {
@@ -29,7 +29,7 @@ public class ModelMapper
         return dossier;
     }
 
-    private static Dossier getDossier(JSONObject jsonObject)
+    protected Dossier getDossier(JSONObject jsonObject)
     {
 
         String ref = jsonObject.optString("dossierRef");
@@ -65,6 +65,7 @@ public class ModelMapper
                     dossier.addDocument(new Document(
                             docRef,
                             doc.optString("name"),
+                            doc.optInt("size", -1),
                             downloadUrl));
                 }
             }
@@ -72,7 +73,7 @@ public class ModelMapper
         return dossier;
     }
 
-    private static ArrayList<Action> getActionsForDossier(JSONObject dossier) {
+    protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
         ArrayList<Action> actions = new ArrayList<Action>();
         JSONObject returnedActions = dossier.optJSONObject("actions");
         String actionDemandee = dossier.optString("actionDemandee");
@@ -88,7 +89,7 @@ public class ModelMapper
                         }
                     }
                     else if (action.equals("delete")) {
-                        actions.add(Action.SUPPRIMER);
+                        actions.add(Action.SUPPRESSION);
                     }
                     else if (action.equals("reject")) {
                         actions.add(Action.REJET);
@@ -106,9 +107,6 @@ public class ModelMapper
                         else if (actionDemandee.equals("VISA")) {
                             actions.add(Action.VISA);
                         }
-                        else if (actionDemandee.equals("TDT")) {
-                            actions.add(Action.TDT);
-                        }
                         else if (actionDemandee.equals("MAILSEC")) {
                             actions.add(Action.MAILSEC);
                         }
@@ -120,7 +118,7 @@ public class ModelMapper
     }
 
 
-    public static ArrayList<Dossier> getDossiers(RequestResponse requestResponse)
+    public ArrayList<Dossier> getDossiers(RequestResponse requestResponse)
     {
         ArrayList<Dossier> dossiers = new ArrayList<Dossier>();
         if (requestResponse.getResponse() != null) {
@@ -141,7 +139,7 @@ public class ModelMapper
         return dossiers;
     }
 
-    public static ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
+    public ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
         ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
         if (response.getResponse() != null)
         {
@@ -153,6 +151,7 @@ public class ModelMapper
                     circuit.add(new EtapeCircuit(
                             TransformUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
                             etapeObject.optBoolean("approved"),
+                            etapeObject.optBoolean("rejected", false),
                             etapeObject.optString("parapheurName"),
                             etapeObject.optString("signataire"),
                             Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
@@ -164,7 +163,7 @@ public class ModelMapper
         return circuit;
     }
 
-    public static ArrayList<Bureau> getBureaux(RequestResponse response) {
+    public ArrayList<Bureau> getBureaux(RequestResponse response) {
         ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
         if (response.getResponse() != null) {
             JSONArray array = response.getResponse().optJSONArray("bureaux");
@@ -185,7 +184,7 @@ public class ModelMapper
         return bureaux;
     }
 
-    public static LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
+    public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
         LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<String, ArrayList<String>>();
         if (response.getResponse() != null) {
             JSONObject data = response.getResponse().optJSONObject("data");

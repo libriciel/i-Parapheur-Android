@@ -16,6 +16,7 @@ import com.artifex.mupdfdemo.MuPDFCore;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 /**
  * Created by jmaire on 29/01/2014.
@@ -106,7 +107,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
             if (muPDFCore != null) {

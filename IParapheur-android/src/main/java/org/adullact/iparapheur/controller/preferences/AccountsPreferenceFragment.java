@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.preferences;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -12,15 +13,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 
-public class AccountsPreferenceFragment extends PreferenceFragment implements ActionsAccountPreference.ActionsAccountPreferenceListener, Preference.OnPreferenceChangeListener {
+public class AccountsPreferenceFragment extends PreferenceFragment
+                                        implements ActionsAccountPreference.ActionsAccountPreferenceListener,
+                                                   Preference.OnPreferenceChangeListener, LoadingTask.DataChangeListener {
 
     private PreferenceScreen accountsScreen;
+    private String testResponse;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,6 +144,21 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
         MyAccounts.INSTANCE.delete(deleted);
     }
 
+    @Override
+    public void onAccountTested(Account toTest) {
+        new TestTask(this, toTest).execute();
+    }
+
+    /**
+     * Applelé quand le test du compte est terminé (LoadinkTask)
+     */
+    @Override
+    public void onDataChanged() {
+        Toast.makeText(getActivity(), this.testResponse, Toast.LENGTH_LONG).show();
+        this.testResponse = null;
+    }
+
+
     /**
      * Find the modified account and update the related category title and also the modified
      * preference title
@@ -165,5 +188,20 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
         }
         accountsScreen.findPreference(key).setTitle(buildAccountHeader(modifiedAccount));
         return true;
+    }
+
+    private class TestTask extends LoadingTask {
+
+        private Account account;
+
+        public TestTask(DataChangeListener listener, Account account) {
+            super(getActivity(), listener);
+            this.account = account;
+        }
+
+        @Override
+        protected void load(String... params) throws IParapheurException {
+            testResponse = getActivity().getResources().getString(RESTClient.INSTANCE.test(MyAccounts.INSTANCE.getAccount(this.account.getId())));
+        }
     }
 }

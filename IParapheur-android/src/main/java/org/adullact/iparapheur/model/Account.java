@@ -1,6 +1,6 @@
 package org.adullact.iparapheur.model;
 
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -18,16 +18,19 @@ public class Account implements Serializable
     private String title;
     private String url;
     private String login;
+    private String tenant;
     private String password;
     private String ticket;
+    private Integer apiVersion;
 
-    public Account( String id)
+    public Account(String id)
     {
         this.id = id;
         this.title = "";
         this.url = "";
         this.login = "";
         this.password = "";
+        this.tenant = null;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class Account implements Serializable
             return false;
         }
         try {
-            new URL(RESTClient.BASE_PATH + url );
+            new URL(IParapheurAPI.BASE_PATH + url );
             return true;
         } catch ( MalformedURLException ignored ) {
             return false;
@@ -112,6 +115,16 @@ public class Account implements Serializable
 
     public void setLogin(String login) {
         this.login = login;
+        if (login != null) {
+            int separatorIndex = login.indexOf("@");
+            if (separatorIndex != -1) {
+                this.tenant = login.substring(separatorIndex + 1);
+            }
+        }
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     public String getPassword()
@@ -129,5 +142,13 @@ public class Account implements Serializable
 
     public void setTicket(String ticket) {
         this.ticket = ticket;
+    }
+
+    public void setApiVersion(Integer apiVersion) {
+        this.apiVersion = apiVersion;
+    }
+
+    public Integer getApiVersion() {
+        return apiVersion;
     }
 }

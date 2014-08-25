@@ -22,20 +22,22 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
-import org.adullact.iparapheur.controller.connectivity.RESTClient;
+import org.adullact.iparapheur.controller.dossier.action.TdtHeliosDialogFragment;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
-import org.adullact.iparapheur.controller.dossier.action.TdtDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * A list fragment representing a list of Dossiers. This fragment
@@ -74,7 +76,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
     /**
      * List of dossiers displayed in this fragment
      */
-    private ArrayList<Dossier> dossiers;
+    private List<Dossier> dossiers;
 
     /**
      * the currently selected dossier
@@ -170,8 +172,10 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
 
         for (Action action : actions) {
             MenuItem item = menu.findItem(action.getMenuItemId());
-            item.setTitle(action.getTitle());
-            item.setVisible(true);
+            if (item != null) {
+                item.setTitle(action.getTitle());
+                item.setVisible(true);
+            }
         }
         super.onPrepareOptionsMenu(menu);
     }
@@ -193,9 +197,10 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
                 actionDialog = MailSecDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
                 actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
                 return true;
-            case R.id.action_tdt:
-                actionDialog = TdtDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
-                actionDialog.show(getFragmentManager(), "TdtDialogFragment");
+            case R.id.action_tdt_actes:
+            case R.id.action_tdt_helios :
+                actionDialog = TdtHeliosDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
+                actionDialog.show(getFragmentManager(), "TdtHeliosDialogFragment");
                 return true;
             case R.id.action_archivage:
                 actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<Dossier>(checkedDossiers), bureauId);
@@ -427,7 +432,7 @@ public class DossierListFragment extends ListFragment implements LoadingTask.Dat
         }
 
         @Override
-        protected void load(String... params) {
+        protected void load(String... params) throws IParapheurException {
             // Check if this task is cancelled as often as possible.
             if (isCancelled()) {return;}
             if (!IParapheur.OFFLINE) {
