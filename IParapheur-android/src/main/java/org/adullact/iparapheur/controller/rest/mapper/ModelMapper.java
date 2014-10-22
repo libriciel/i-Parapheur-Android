@@ -75,6 +75,12 @@ public class ModelMapper {
 
     protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
         ArrayList<Action> actions = new ArrayList<Action>();
+        boolean isActeurCourant = dossier.optBoolean("isActeurCourant", false);
+        if (isActeurCourant) {
+            actions.add(Action.EMAIL);
+            actions.add(Action.JOURNAL);
+            actions.add(Action.ENREGISTRER);
+        }
         JSONObject returnedActions = dossier.optJSONObject("actions");
         String actionDemandee = dossier.optString("actionDemandee");
         if (returnedActions != null) {

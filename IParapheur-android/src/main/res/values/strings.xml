@@ -14,7 +14,7 @@
     <string name="par">par</string>
     <string name="network_unreachable">Aucune connexion disponible</string>
     <string name="at">à</string>
-    <string name="the">le</string>
+    <string name="le">le</string>
     <string name="action_details">details</string>
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
@@ -91,5 +91,9 @@
     <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application</string>
     <string name="action_non_implementee">non implémenté</string>
     <string name="action_journal">Journal d\'événements</string>
+    <string name="no_content">Pas de contenu</string>
+    <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
+    <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
+    <string name="action_mode_nb_dossiers">%d dossier(s)</string>
 
 </resources>

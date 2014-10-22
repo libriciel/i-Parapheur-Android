@@ -21,7 +21,6 @@ import java.util.UUID;
 public class Filter implements Parcelable {
 
     public static final String DEFAULT_ID = "default-filter";
-    public static final String EDIT_FILTER_NOM = "Éditer le filtre courant";
     public static final String EDIT_FILTER_ID = "edit-filter";
 
     private static final String DEFAULT_ETAT = "a-traiter";

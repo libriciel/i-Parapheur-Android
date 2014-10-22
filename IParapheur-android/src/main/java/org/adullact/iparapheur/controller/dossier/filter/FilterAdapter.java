@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.dossier.filter;
 import android.content.Context;
 import android.widget.ArrayAdapter;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Filter;
 
 /**
@@ -27,7 +28,7 @@ public class FilterAdapter extends ArrayAdapter<Filter>  {
         }
         else {
             filter = new Filter(Filter.EDIT_FILTER_ID);
-            filter.setNom(Filter.EDIT_FILTER_NOM);
+            filter.setNom(getContext().getResources().getString(R.string.action_filtrer));
         }
         return filter;
     }

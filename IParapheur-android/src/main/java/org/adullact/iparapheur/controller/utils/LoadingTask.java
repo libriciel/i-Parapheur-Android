@@ -57,13 +57,13 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String error) {
+        hideProgress();
         if (error != null) {
             Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
         }
         else if (dataListener != null) {
             dataListener.onDataChanged();
         }
-        hideProgress();
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
@@ -29,7 +31,7 @@ import java.util.UUID;
 /**
  * Created by jmaire on 19/11/2013.
  */
-public class BureauxFragment extends Fragment implements View.OnClickListener, LoadingTask.DataChangeListener, AdapterView.OnItemClickListener {
+public class BureauxFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener {
 
 
     public static final String TAG = "Bureaux_list";
@@ -50,6 +52,10 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
 
     private BureauSelectedListener listener;
     /**
+     * list of accounts displayed in the spinner
+     */
+    private List<Account> accounts;
+    /**
      * list of bureaux currently displayed in this Fragment
      */
     private List<Bureau> bureaux;
@@ -62,12 +68,23 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
      */
     private ListView listView;
 
+    /**
+     * Spinner containing user's accounts.
+     */
+    private Spinner accountsSpinner;
+
+    /**
+     * Swipe refresh layout on top of the list view
+     */
+    private SwipeRefreshLayout swipeRefreshLayout;
+
 
     // Called only once as retainInstance is set to true.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        accounts = new ArrayList<Account>();
     }
 
     @Override
@@ -92,34 +109,39 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         super.onViewCreated(view, savedInstanceState);
         listView = (ListView) view.findViewById(R.id.bureaux_list);
         listView.setOnItemClickListener(this);
+        listView.setEmptyView(view.findViewById(android.R.id.empty));
+        accountsSpinner = (Spinner) getView().findViewById(R.id.bureaux_accounts_spinner);
+        accountsSpinner.setOnItemSelectedListener(this);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bureaux_refresh_layout);
+        swipeRefreshLayout.setColorScheme(android.R.color.holo_green_light,
+                android.R.color.holo_red_light,
+                android.R.color.holo_blue_light,
+                android.R.color.holo_orange_light);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         listView.setAdapter(new BureauListAdapter(getActivity()));
+        accountsSpinner.setAdapter(new AccountSpinnerAdapter(getActivity()));
+        swipeRefreshLayout.setOnRefreshListener(this);
         updateAccounts();
         updateBureaux(false);
     }
 
     private void updateAccounts() {
-        RadioGroup accountContainer = (RadioGroup) getView().findViewById(R.id.bureaux_account_container);
-        accountContainer.removeAllViews();
-        int i = 0;
+        accounts.clear();
+        int i = -1;
         for (Account account : MyAccounts.INSTANCE.getAccounts()) {
-            RadioButton radio = new RadioButton(getActivity());
-            //radio.setId(View.generateViewId()); // Mandatory to check buttons
-            // FIXME
-            radio.setId(i);
-            i++;
-            radio.setText(account.getTitle());
-            radio.setTag(account.getId());
-            radio.setOnClickListener(this);
-            if ((MyAccounts.INSTANCE.getSelectedAccount() != null) && account.equals(MyAccounts.INSTANCE.getSelectedAccount())) {
-                radio.setChecked(true);
+            if (account.isValid()) {
+                accounts.add(account);
+                i ++;
+                if ((MyAccounts.INSTANCE.getSelectedAccount() != null) && account.equals(MyAccounts.INSTANCE.getSelectedAccount())) {
+                    accountsSpinner.setSelection(i);
+                }
             }
-            accountContainer.addView(radio);
         }
+        ((AccountSpinnerAdapter) accountsSpinner.getAdapter()).notifyDataSetChanged();
     }
 
     private void updateBureaux(boolean forceReload) {
@@ -132,16 +154,21 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         onDataChanged();
     }
 
-    // OnClickListener implementation (used on radio buttons for accounts)
+    // onItemSelected implementation (used on accounts spinner)
     @Override
-    public void onClick(View v) {
-        String newlylySelectedAccount = (String) v.getTag();
-        if ((MyAccounts.INSTANCE.getSelectedAccount() == null) ||
-                !newlylySelectedAccount.equals(MyAccounts.INSTANCE.getSelectedAccount().getId()))
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Account newlylySelectedAccount = accounts.get(i);
+        Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+        if ((selectedAccount == null) || !newlylySelectedAccount.equals(selectedAccount))
         {
-            MyAccounts.INSTANCE.selectAccount(newlylySelectedAccount);
+            MyAccounts.INSTANCE.selectAccount(newlylySelectedAccount.getId());
             updateBureaux(true);
         }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     // OnItemClickListener implementation (used on bureaux list)
@@ -171,6 +198,12 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         }
     }
 
+    // SwipeRefreshLayout listener
+    @Override
+    public void onRefresh() {
+        new BureauxLoadingTask(getActivity(), this).execute();
+    }
+
     public void accountsChanged() {
         updateAccounts();
         updateBureaux(true);
@@ -193,6 +226,16 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
                 bureaux = new ArrayList<Bureau>();
                 bureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
             }
+        }
+
+        @Override
+        protected void showProgress() {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected void hideProgress() {
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -228,6 +271,34 @@ public class BureauxFragment extends Fragment implements View.OnClickListener, L
         @Override
         public boolean isEmpty() {
             return (bureaux == null) || bureaux.isEmpty();
+        }
+    }
+
+    private class AccountSpinnerAdapter extends ArrayAdapter<Account>
+    {
+
+        public AccountSpinnerAdapter(Context context) {
+            super(context, android.R.layout.simple_list_item_activated_1, android.R.id.text1);
+        }
+
+        @Override
+        public int getCount() {
+            return (accounts == null)? 0 : accounts.size();
+        }
+
+        @Override
+        public Account getItem(int position) {
+            return accounts.get(position);
+        }
+
+        @Override
+        public int getPosition(Account item) {
+            return accounts.indexOf(item);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return (accounts == null) || accounts.isEmpty();
         }
     }
 }

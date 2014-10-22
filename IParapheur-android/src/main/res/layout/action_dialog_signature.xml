@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,7 +8,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/annotation_publique" />
+        android:text="@string/annotation_publique"
+        android:id="@+id/textView" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -16,14 +17,20 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/action_dialog_annotation_publique"
-        android:lines="4" />
+        android:lines="4"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/annotation_privee"
-        android:layout_marginTop="20dp" />
+        android:layout_below="@+id/action_dialog_annotation_publique"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView2" />
 
     <EditText
         android:layout_width="fill_parent"
@@ -31,32 +38,19 @@
         android:inputType="textMultiLine"
         android:ems="10"
         android:id="@+id/action_dialog_annotation_privee"
-        android:lines="4" />
+        android:lines="4"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/selected_certificate" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/select_certificate"
-            android:id="@+id/action_dialog_signature_certificate_button" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/action_dialog_signature_cert_info"
-            android:text="@string/please_select_certificate" />
-    </LinearLayout>
+        android:layout_toEndOf="@+id/action_dialog_signature_certificate_button"
+        android:layout_alignBottom="@+id/action_dialog_signature_certificate_button"
+        android:layout_toRightOf="@+id/action_dialog_signature_certificate_button"
+        android:id="@+id/action_dialog_signature_cert_info" />
 
     <ListView
         android:layout_width="fill_parent"
@@ -64,4 +58,13 @@
         android:id="@+id/action_dialog_dossiers"
         android:layout_weight="1" />
 
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_certificate"
+        android:id="@+id/action_dialog_signature_certificate_button"
+        android:layout_below="@+id/action_dialog_annotation_privee"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

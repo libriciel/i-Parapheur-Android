@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * Created by jmaire on 09/06/2014.
@@ -25,6 +26,7 @@ import java.io.InputStream;
 public abstract class RESTClientAPI implements IParapheurAPI {
 
     protected static final String ACTION_LOGIN = "/parapheur/api/login";
+    private static final long SESSION_TIMEOUT = 1800000L; // 30 minutes d'inactivité
 
     @Override
     public int test(Account account) throws IParapheurException {
@@ -57,8 +59,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
     @Override
     public String getTicket(Account account) throws IParapheurException {
         String ticket = account.getTicket();
-        //Log.d("debug", "getTicket : " + ticket);
-        if (ticket == null) {
+        Long time = new Date().getTime();
+        if ((ticket == null) || ((time - account.getLastRequest()) > SESSION_TIMEOUT)){
             try {
                 String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
                 RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
@@ -91,7 +93,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
         if (ticket == null) {
             throw new IParapheurException(R.string.error_no_ticket, null);
         }
-
+        account.setLastRequest(new Date().getTime());
         return BASE_PATH +
                 ((tenant != null)? tenant + "." : "") +
                 MyAccounts.INSTANCE.getSelectedAccount().getUrl() +

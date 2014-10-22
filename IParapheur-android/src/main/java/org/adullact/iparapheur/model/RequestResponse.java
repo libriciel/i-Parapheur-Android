@@ -12,6 +12,8 @@ import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 
 /**
  * Created by jmaire on 04/11/2013.
@@ -52,6 +54,8 @@ public class RequestResponse {
 
         } catch (JSONException e) {
             throw new IParapheurException(R.string.error_parse, null);
+        } catch (UnknownHostException e) {
+            throw new IParapheurException(R.string.http_error_malformed_url, httpURLConnection.getURL().getHost());
         } catch (IOException e) {
             throw new IParapheurException(R.string.error_parse, null);
         }

@@ -27,8 +27,10 @@ import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.model.EtapeCircuit;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -165,6 +167,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         this.bureauId = bureauId;
         this.dossierId = dossierId;
         this.dossier = null;
+        closeDetails();
         if (dossierId != null) {
             getDossierDetails(false);
         }
@@ -280,8 +283,15 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         if (details.getVisibility() == View.VISIBLE) {
             details.setVisibility(View.INVISIBLE);
         }
-        else {
+        else if ((dossier != null) && dossier.isDetailsAvailable()){
             details.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void closeDetails() {
+        View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+        if ((details != null) && (details.getVisibility() == View.VISIBLE)) {
+            details.setVisibility(View.INVISIBLE);
         }
     }
 

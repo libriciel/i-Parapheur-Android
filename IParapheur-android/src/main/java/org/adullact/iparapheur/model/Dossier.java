@@ -77,6 +77,9 @@ public class Dossier implements Parcelable {
         return (!circuit.isEmpty() && !mainDocuments.isEmpty());
     }
 
+    public boolean hasActions() {
+        return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
+    }
     @Override
     public String toString() {
         return name;

@@ -93,7 +93,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
         String params = "asc=true" +
                 "&bureau=" + bureauId +
                 "&corbeilleName=" + filter.getEtat() +
-                "&filters=" + filter.getJSONFilter() +
+                "&filter=" + filter.getJSONFilter() +
                 "&metas={}" +
                 "&page=0" +
                 "&pageSize=25" +

@@ -156,25 +156,26 @@ public class ModelMapper3 extends ModelMapper
     @Override
     public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
         LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<String, ArrayList<String>>();
-        if (response.getResponse() != null) {
-            JSONObject data = response.getResponse().optJSONObject("data");
-            if (data != null) {
-                JSONObject typology = data.optJSONObject("typology");
-                if (typology != null) {
-                    Iterator types = typology.keys();
-                    while (types.hasNext()) {
-                        String type = (String) types.next();
-                        JSONArray jsonSousTypes =  typology.optJSONArray(type);
-                        if (jsonSousTypes != null) {
-                            ArrayList<String> sousTypes = new ArrayList<String>(jsonSousTypes.length());
-                            for (int i = 0; i < jsonSousTypes.length(); i++) {
-                                String sousType = jsonSousTypes.optString(i);
-                                if (!sousType.isEmpty()) {
-                                    sousTypes.add(sousType);
-                                }
+        JSONArray JSONTypes = response.getResponseArray();
+        if (JSONTypes != null) {
+
+            for (int i = 0; i < JSONTypes.length(); i++) {
+                JSONObject JSONType = JSONTypes.optJSONObject(i);
+
+                if (JSONType != null) {
+                    String type = JSONType.optString("id");
+                    JSONArray JSONSousTypes = JSONType.optJSONArray("sousTypes");
+
+                    if (JSONSousTypes != null) {
+                        ArrayList<String> sousTypes = new ArrayList<String>(JSONSousTypes.length());
+
+                        for (int j = 0; j < JSONSousTypes.length(); j++) {
+                            String sousType = JSONSousTypes.optString(j);
+                            if (sousType != null) {
+                                sousTypes.add(sousType);
                             }
-                            typologie.put(type, sousTypes);
                         }
+                        typologie.put(type, sousTypes);
                     }
                 }
             }

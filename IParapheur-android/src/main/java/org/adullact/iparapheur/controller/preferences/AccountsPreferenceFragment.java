@@ -1,9 +1,11 @@
 package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -13,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
@@ -80,6 +83,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment
         titlePref.setTitle(account.getTitle());
         titlePref.setIcon(android.R.drawable.ic_menu_info_details);
         titlePref.setText(account.getTitle());
+        titlePref.getEditText().setTextColor(Color.RED);
         titlePref.setSummary(getResources().getString(R.string.pref_account_title));
         titlePref.setKey(MyAccounts.PREFS_ACCOUNT_PREFIX + account.getId() + MyAccounts.PREFS_TITLE_SUFFIX);
         titlePref.setOnPreferenceChangeListener(this);

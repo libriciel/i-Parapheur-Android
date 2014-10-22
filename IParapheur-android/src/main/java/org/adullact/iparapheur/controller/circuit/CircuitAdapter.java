@@ -30,9 +30,11 @@ public class CircuitAdapter extends ArrayAdapter<EtapeCircuit>
         ((ImageView) view.findViewById(R.id.etape_circuit_icon)).setImageResource(etape.getAction().getIcon(etape.isApproved()));
         if (etape.isApproved()) {
             SimpleDateFormat df = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-            String validation = getContext().getResources().getString(R.string.par) + " " +
-                    etape.getSignataire() + ", " +
-                    getContext().getResources().getString(R.string.the) + " " + df.format(etape.getDateValidation());
+            String signataire = etape.getSignataire();
+            String validation = validation = getContext().getResources().getString(R.string.le) + " " + df.format(etape.getDateValidation());
+            if ((signataire != null) && !signataire.trim().isEmpty() && !signataire.equalsIgnoreCase("null")) {
+                validation += " " + getContext().getResources().getString(R.string.par) + " " + signataire;
+            }
             ((TextView) view.findViewById(R.id.etape_circuit_validation)).setText(validation);
         }
         return view;

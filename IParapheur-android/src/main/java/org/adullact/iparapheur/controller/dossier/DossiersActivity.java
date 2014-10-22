@@ -2,13 +2,14 @@ package org.adullact.iparapheur.controller.dossier;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,13 +20,24 @@ import android.widget.FrameLayout;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxFragment;
+import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.TdtHeliosDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 
 /**
@@ -46,7 +58,7 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
                                                           BureauxFragment.BureauSelectedListener,
                                                           LoadingTask.DataChangeListener,
                                                           FilterDialog.FilterDialogListener,
-                                                          ActionBar.OnNavigationListener {
+                                                          ActionBar.OnNavigationListener, ActionMode.Callback {
 
     public static final String DOSSIER_ID = "dossier_id";
     public static final String BUREAU_ID = "bureau_id";
@@ -65,6 +77,10 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
     /** Adapter for action bar, used to display user's filters */
     private FilterAdapter filterAdapter;
+    /**
+     * The actionMode used when dossiers are checked
+     */
+    private ActionMode mActionMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,14 +143,18 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
     }
 
     /**
-     * Update actionBar actions on dossier
-     * @param id
+     * Update actionMode
      */
     @Override
-    public void onDossierChecked(String id) {
-        Dossier dossier = getDossier(id);
-        getActionBar().setSubtitle((dossier != null)? getDossier(id).getName() : "");
-        invalidateOptionsMenu();
+    public void onDossierCheckedChanged() {
+
+        if (mActionMode == null) {
+            mActionMode = startActionMode(this);
+        }
+        else {
+            mActionMode.invalidate();
+        }
+
     }
 
     @Override
@@ -295,6 +315,118 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
                 bureauxFragment.accountsChanged();
             }
         }
+    }
+
+    /*
+     * ActionMode.Callback implementation
+     */
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        actionMode.setTitleOptionalHint(true);
+        MenuInflater inflater = actionMode.getMenuInflater();
+        inflater.inflate(R.menu.dossiers_list_menu_actions, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        if (fragment != null)
+        {
+            HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
+            if ((checkedDossiers != null) && (!checkedDossiers.isEmpty()))
+            {
+                actionMode.setTitle(getResources().getString(R.string.action_mode_nb_dossiers, checkedDossiers.size()));
+                // Get the intersection of all possible actions on checked dossiers and update the menu
+                menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
+                menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+
+                HashSet<Action> actions = new HashSet<Action>(Arrays.asList(Action.values()));
+
+                boolean sign = false;
+                for (Dossier dossier : checkedDossiers) {
+                    actions.retainAll(dossier.getActions());
+                    sign = sign || dossier.getActions().contains(Action.SIGNATURE);
+                }
+
+                for (Action action : actions) {
+                    MenuItem item;
+                    int menuItemId;
+                    String menuTitle;
+                    // Si c'est le visa, et qu'on a aussi de la signature dans le lot, on prend
+                    // la signature (possible en API v3).
+                    if (action.equals(Action.VISA) && (sign)) {
+                        menuItemId = Action.SIGNATURE.getMenuItemId();
+                        menuTitle = getResources().getString(Action.VISA.getTitle()) + "/" +
+                                getResources().getString(Action.SIGNATURE.getTitle());
+                    }
+                    else {
+                        menuItemId = action.getMenuItemId();
+                        menuTitle = getResources().getString(action.getTitle());
+                    }
+
+                    item = menu.findItem(menuItemId);
+                    if (item != null) {
+                        item.setTitle(menuTitle);
+                        item.setVisible(true);
+                    }
+                }
+                return true;
+            }
+            else {
+                actionMode.finish();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        String bureauId = fragment.getBureauId();
+        if (fragment != null) {
+            DialogFragment actionDialog;
+            switch (menuItem.getItemId()) {
+                case R.id.action_visa:
+                    actionDialog = VisaDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "VisaDialogFragment");
+                    return true;
+                case R.id.action_signature:
+                    actionDialog = SignatureDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "SignatureDialogFragment");
+                    return true;
+                case R.id.action_mailsec:
+                    actionDialog = MailSecDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "MailSecDialogFragment");
+                    return true;
+                case R.id.action_tdt_actes:
+                case R.id.action_tdt_helios:
+                    actionDialog = TdtHeliosDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "TdtHeliosDialogFragment");
+                    return true;
+                case R.id.action_archivage:
+                    actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
+                    return true;
+                case R.id.action_rejet:
+                    actionDialog = RejetDialogFragment.newInstance(new ArrayList<Dossier>(fragment.getCheckedDossiers()), bureauId);
+                    actionDialog.show(getSupportFragmentManager(), "RejetDialogFragment");
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+        DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+        if (fragment != null) {
+            fragment.clearSelection();
+        }
+        mActionMode = null;
     }
 
     /**

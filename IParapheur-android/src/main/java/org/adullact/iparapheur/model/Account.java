@@ -22,6 +22,7 @@ public class Account implements Serializable
     private String password;
     private String ticket;
     private Integer apiVersion;
+    private Long lastRequest;
 
     public Account(String id)
     {
@@ -31,6 +32,7 @@ public class Account implements Serializable
         this.login = "";
         this.password = "";
         this.tenant = null;
+        this.lastRequest = 0L;
     }
 
     @Override
@@ -150,5 +152,13 @@ public class Account implements Serializable
 
     public Integer getApiVersion() {
         return apiVersion;
+    }
+
+    public Long getLastRequest() {
+        return lastRequest;
+    }
+
+    public void setLastRequest(Long lastRequest) {
+        this.lastRequest = lastRequest;
     }
 }
