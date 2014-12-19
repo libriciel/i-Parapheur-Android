@@ -4,13 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import org.adullact.iparapheur.controller.document.annotation.AnnotationsLayout;
 import org.adullact.iparapheur.model.Annotation;
@@ -25,16 +26,16 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
     private ImageView imageView;
     private int initialWidth = 0;
     private int initialHeight = 0;
-    private ScaleGestureDetector scaleGestureDetector;
+    //private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
     private boolean scaling = false;
-    private float scale = 1.0f;
     private float pageMaxScale, pageScale, childScale;
+    private PageLayoutListener mPageLayoutListener;
 
     public PageLayout(Context context, int numPage) {
         super(context);
         addChildViews(numPage);
-        scaleGestureDetector = new ScaleGestureDetector(context, new AnnotationScaleGestureListener());
+        // scaleGestureDetector = new ScaleGestureDetector(context, new AnnotationScaleGestureListener());
         gestureDetector = new GestureDetector(context, new AnnotationGestureListener());
         setOnTouchListener(this);
     }
@@ -59,11 +60,12 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
         imageView.setScaleX(childScale);
         imageView.setScaleY(childScale);
 
-        //RelativeLayout.LayoutParams layoutParam = new RelativeLayout.LayoutParams((int) (initialWidth * pageScale), (int) (initialHeight * pageScale));
-        //layoutParam.addRule(RelativeLayout.CENTER_IN_PARENT);
-        //this.setLayoutParams(layoutParam);
-        //setScaleX(pageScale);
-        //setScaleY(pageScale);
+        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams((int) (initialWidth * pageScale), (int) (initialHeight * pageScale));
+        layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
+
+        this.setLayoutParams(layoutParam);
+        setScaleX(pageScale);
+        setScaleY(pageScale);
 
         //Log.i("debug", "child X : " + annotationsView.getX() + "child Y : " + annotationsView.getY());
         //Log.i("debug", "Y | SCROLL Y | TOP | BOTTOM | TRANSLATION Y | SCALE Y" + getY());
@@ -80,8 +82,8 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
         this.childScale = 1.0f;
         this.pageScale = 1.0f;
 
-        RelativeLayout.LayoutParams layoutParam = new RelativeLayout.LayoutParams(initialWidth, initialHeight);
-        layoutParam.addRule(RelativeLayout.CENTER_IN_PARENT);
+        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams(initialWidth, initialHeight);
+        layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
         this.setLayoutParams(layoutParam);
         scalePage();
 
@@ -125,13 +127,21 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
         }*/
     }
 
-
     // Scaling gestures
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         boolean ret = gestureDetector.onTouchEvent(event);
-        ret = ret || scaleGestureDetector.onTouchEvent(event);
-        return  ret || super.onTouchEvent(event);
+//        ret = ret || scaleGestureDetector.onTouchEvent(event);
+        return ret || super.onTouchEvent(event);
+    }
+
+    public int getInitialWidth() {
+        return initialWidth;
+    }
+
+    public int getInitialHeight() {
+        return initialHeight;
     }
 
     private class AnnotationGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -142,10 +152,12 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
             return true;
         }
 
-
         @Override
         public boolean onDoubleTap(MotionEvent me) {
-            onLongPress(me);
+
+            if (mPageLayoutListener != null)
+                mPageLayoutListener.onDoubleTap(me);
+
             return true;
         }
 
@@ -156,63 +168,69 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            //getParent().requestDisallowInterceptTouchEvent(true);
-            if (!scaling && scale > 1.0f) {
-                int diste1e2X = (int) (e2.getRawX() - e1.getRawX());
-                int diste1e2Y = (int) (e2.getRawY() - e1.getRawY());
-                //setTranslationY(diste1e2Y);
-                return true;
-            }
             return false;
         }
     }
 
-    private class AnnotationScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            scale *= detector.getScaleFactor();
-            // Don't let the object get too small or too large.
-            scale = Math.max(1.0f, Math.min(scale, 3.0f));
-            if (scale > pageMaxScale) {
-                childScale = 1 + scale - pageMaxScale;
-                pageScale = pageMaxScale;
+//    private class AnnotationScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+//        @Override
+//        public boolean onScale(ScaleGestureDetector detector) {
+//            scale *= detector.getScaleFactor();
+//            // Don't let the object get too small or too large.
+//            scale = Math.max(1.0f, Math.min(scale, 3.0f));
+//            if (scale > pageMaxScale) {
+//                childScale = 1 + scale - pageMaxScale;
+//                pageScale = pageMaxScale;
+//
+//            } else {
+//                pageScale = scale;
+//                childScale = 1.0f;
+//            }
+//            scalePage();
+//            return true;
+//        }
+//
+//        @Override
+//        public boolean onScaleBegin(ScaleGestureDetector detector) {
+//            scaling = true;
+//            Log.i("debug", "FOCUS : (" + detector.getFocusX() + ", " + detector.getFocusY() + ")");
+//            int[] parentLocation = new int[2];
+//            int[] childLocation = new int[2];
+//            getLocationInWindow(parentLocation);
+//            imageView.getLocationInWindow(childLocation);
+//            Log.i("debug", "PARENT LOC : (" + parentLocation[0] + ", " + parentLocation[1] + ")");
+//            Log.i("debug", "CHILD LOC : (" + childLocation[0] + ", " + childLocation[1] + ")");
+//            float childPivotX = detector.getFocusX() + parentLocation[0] - childLocation[0];
+//            float childPivotY = detector.getFocusY() + parentLocation[1] - childLocation[1];
+//            //setPivotX(detector.getFocusX());
+//            //setPivotY(detector.getFocusY());*/
+//            float previousPivotX = annotationsView.getPivotX();
+//            float previousPivotY = annotationsView.getPivotY();
+//            annotationsView.setPivotX(detector.getFocusX());
+//            annotationsView.setPivotY(detector.getFocusY());
+//            imageView.setPivotX(detector.getFocusX());
+//            imageView.setPivotY(detector.getFocusY());
+//            return super.onScaleBegin(detector);
+//        }
+//
+//        @Override
+//        public void onScaleEnd(ScaleGestureDetector detector) {
+//            scaling = false;
+//            super.onScaleEnd(detector);
+//        }
+//    }
 
-            }
-            else {
-                pageScale = scale;
-                childScale = 1.0f;
-            }
-            scalePage();
-            return true;
-        }
+    //<editor-fold desc="PageLayoutListener"
 
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector) {
-            scaling = true;
-            Log.i("debug", "FOCUS : (" + detector.getFocusX() + ", " + detector.getFocusY() + ")");
-            int[] parentLocation = new int[2];
-            int[] childLocation = new int[2];
-            getLocationInWindow(parentLocation);
-            imageView.getLocationInWindow(childLocation);
-            Log.i("debug", "PARENT LOC : (" + parentLocation[0] + ", " + parentLocation[1] + ")");
-            Log.i("debug", "CHILD LOC : (" + childLocation[0] + ", " + childLocation[1] + ")");
-            float childPivotX = detector.getFocusX() + parentLocation[0] - childLocation[0];
-            float childPivotY = detector.getFocusY() + parentLocation[1] - childLocation[1];
-            //setPivotX(detector.getFocusX());
-            //setPivotY(detector.getFocusY());*/
-            float previousPivotX = annotationsView.getPivotX();
-            float previousPivotY = annotationsView.getPivotY();
-            annotationsView.setPivotX(detector.getFocusX());
-            annotationsView.setPivotY(detector.getFocusY());
-            imageView.setPivotX(detector.getFocusX());
-            imageView.setPivotY(detector.getFocusY());
-            return super.onScaleBegin(detector);
-        }
+    public interface PageLayoutListener {
 
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
-            scaling = false;
-            super.onScaleEnd(detector);
-        }
+        public void onDoubleTap(MotionEvent me);
     }
+
+    public void setPageLayoutListener(PageLayoutListener pageLayoutListener) {
+        mPageLayoutListener = pageLayoutListener;
+    }
+
+    //</editor-fold desc="PageLayoutListener"
+
 }
