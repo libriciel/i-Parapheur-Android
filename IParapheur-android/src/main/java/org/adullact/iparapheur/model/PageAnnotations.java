@@ -58,4 +58,8 @@ public class PageAnnotations implements Parcelable {
     public void add(Annotation annotation) {
         this.annotations.add(annotation);
     }
+
+    public void remove(Annotation annotation) {
+        this.annotations.remove(annotation);
+    }
 }

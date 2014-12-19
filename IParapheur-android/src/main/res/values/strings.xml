@@ -95,5 +95,7 @@
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
     <string name="action_mode_nb_dossiers">%d dossier(s)</string>
+    <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
+    <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
 
 </resources>

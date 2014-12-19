@@ -103,6 +103,38 @@ public class RESTUtils {
         return res;
     }
 
+    public static RequestResponse put(String url, String body) throws IParapheurException {
+        //Log.d("debug", "POST request on : " + url);
+        //Log.d("debug", "with body : " + body);
+        RequestResponse res;
+        OutputStream output = null;
+        try {
+            HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+            ((HttpsURLConnection)connection).setSSLSocketFactory(getSSLSocketFactory());
+            connection.setDoOutput(true);
+            connection.setRequestMethod("PUT");
+            connection.setChunkedStreamingMode(0);
+            //connection.setReadTimeout(10000);
+            connection.setConnectTimeout(10000);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept-Charset", "UTF-8");
+            output = connection.getOutputStream();
+            output.write(body.getBytes());
+            res = new RequestResponse(connection);
+        } catch (IParapheurException e) {
+            throw e;
+        } catch (MalformedURLException e) {
+            throw new IParapheurException(R.string.http_error_malformed_url, url);
+        } catch (ProtocolException e) {
+            throw new IParapheurException(R.string.http_error_405, null);
+        } catch (GeneralSecurityException e) {
+            throw new IParapheurException(R.string.http_error_ssl_failed, null);
+        } catch (IOException e) {
+            throw new IParapheurException(R.string.http_error_400, null);
+        }
+        return res;
+    }
+
     public static RequestResponse get(String url) throws IParapheurException {
         //Log.d("debug", "GET request on : " + url);
         RequestResponse res;
@@ -113,6 +145,38 @@ public class RESTUtils {
 
             connection.setRequestMethod("GET");
             connection.setDoOutput(false); // Don't trigger POST.
+            connection.setChunkedStreamingMode(0);
+            //connection.setReadTimeout(10000);
+            connection.setConnectTimeout(10000);
+            //connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept-Charset", "UTF-8");
+
+            res = new RequestResponse(connection);
+
+        } catch (IParapheurException e) {
+            throw e;
+        } catch (MalformedURLException e) {
+            throw new IParapheurException(R.string.http_error_malformed_url, url);
+        } catch (ProtocolException e) {
+            throw new IParapheurException(R.string.http_error_405, null);
+        } catch (GeneralSecurityException e) {
+            throw new IParapheurException(R.string.http_error_ssl_failed, null);
+        } catch (IOException e) {
+            throw new IParapheurException(R.string.http_error_400, null);
+        }
+        return res;
+    }
+
+    public static RequestResponse delete(String url) throws IParapheurException {
+        //Log.d("debug", "GET request on : " + url);
+        RequestResponse res;
+        String urlStr = url;
+        try {
+            HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
+            ((HttpsURLConnection)connection).setSSLSocketFactory(getSSLSocketFactory());
+
+            connection.setRequestMethod("DELETE");
+            connection.setDoOutput(false);
             connection.setChunkedStreamingMode(0);
             //connection.setReadTimeout(10000);
             connection.setConnectTimeout(10000);

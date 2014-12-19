@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.controller.IParapheur;
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
@@ -32,15 +32,20 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPreExecute() {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo == null || !networkInfo.isConnected()) {
-            this.cancel(true);
-            Toast.makeText(activity, R.string.network_unreachable, Toast.LENGTH_LONG).show();
+        if (IParapheur.OFFLINE) {
+            Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
+            showProgress();
         }
         else {
-            showProgress();
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                this.cancel(true);
+                Toast.makeText(activity, R.string.network_unreachable, Toast.LENGTH_LONG).show();
+            } else {
+                showProgress();
+            }
         }
     }
 

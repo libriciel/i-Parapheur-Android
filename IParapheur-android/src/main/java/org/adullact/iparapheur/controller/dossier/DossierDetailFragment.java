@@ -20,17 +20,15 @@ import android.widget.Toast;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
-import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.controller.utils.FileUtils;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
-import org.adullact.iparapheur.model.EtapeCircuit;
 
 import java.io.File;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -335,6 +333,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
             else {
                 dossier.addDocument(new Document(
                         UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
                         "ducument par defaut",
                         -1, ""));
             }
@@ -355,6 +354,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
                     if (!IParapheur.OFFLINE) {
                         if (RESTClient.INSTANCE.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
                             document.setPath(path);
+                            document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId));
                         }
                     }
                     else {

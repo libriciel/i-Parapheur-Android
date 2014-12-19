@@ -1,18 +1,21 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.util.SparseArray;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
-import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.apache.http.HttpStatus;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +45,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
     private static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
     private static final String RESOURCE_DOSSIER_CIRCUIT = "/parapheur/dossiers/%s/circuit";
     private static final String RESOURCE_TYPES = "/parapheur/types";
+    private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
+    private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
     private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
 
     /* Ressources secondaires */
@@ -116,6 +121,90 @@ public class RESTClientAPI3 extends RESTClientAPI {
     public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
         String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
         return modelMapper.getCircuit(RESTUtils.get(url));
+    }
+
+    @Override
+    public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
+        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+        return modelMapper.getAnnotations(RESTUtils.get(url));
+    }
+
+    @Override
+    public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+        JSONObject annot = new JSONObject();
+        float annotHeight = annotation.getRect().height();
+        float annotwidth = annotation.getRect().width();
+        float centerX = annotation.getRect().centerX();
+        float centerY = annotation.getRect().centerY();
+
+        try {
+            JSONObject rect = new JSONObject()
+                    .putOpt("bottomRight",
+                            new JSONObject().put("x", centerX + annotwidth / 2)
+                                    .put("y", centerY - annotHeight / 2))
+                    .putOpt("topLeft",
+                            new JSONObject().put("x", centerX - annotwidth / 2)
+                                    .put("y", centerY + annotHeight / 2));
+
+        annot.put("author", annotation.getAuthor())
+                .put("date", annotation.getDate())
+                .put("page", page)
+                .put("rect", rect)
+                .put("text", annotation.getText())
+                .put("type", "rect");
+        } catch (JSONException e) {
+            throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
+        }
+
+        RequestResponse response = RESTUtils.post(url, annot.toString());
+        if (response != null && response.getCode() == HttpStatus.SC_OK) {
+            JSONObject idObj = response.getResponse();
+            if (idObj != null) {
+                return idObj.optString("id", null);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
+        JSONObject annot = new JSONObject();
+        float annotHeight = annotation.getRect().height();
+        float annotwidth = annotation.getRect().width();
+        float centerX = annotation.getRect().centerX();
+        float centerY = annotation.getRect().centerY();
+
+        try {
+            JSONObject rect = new JSONObject()
+                    .putOpt("bottomRight",
+                            new JSONObject().put("x", centerX + annotwidth / 2)
+                                    .put("y", centerY - annotHeight / 2))
+                    .putOpt("topLeft",
+                            new JSONObject().put("x", centerX - annotwidth / 2)
+                                    .put("y", centerY + annotHeight / 2));
+
+            annot.put("author", annotation.getAuthor())
+                    .put("date", annotation.getDate())
+                    .put("page", page)
+                    .put("rect", rect)
+                    .put("text", annotation.getText())
+                    .put("type", "rect");
+        } catch (JSONException e) {
+            throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
+        }
+
+        RequestResponse response = RESTUtils.put(url, annot.toString());
+        if (response == null || response.getCode() != HttpStatus.SC_OK) {
+            throw new IParapheurException(R.string.error_annotation_update, "");
+        }
+    }
+
+    @Override
+    public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
+        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
+        RESTUtils.delete(url);
     }
 
     @Override

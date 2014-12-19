@@ -35,14 +35,13 @@ public class Annotation implements Parcelable {
 
 
     public Annotation(String author, int page, boolean secretaire, String date,
-                      float x, float y, String text, int step, float scale) {
+                      float x, float y, String text, int step) {
 
         this.author = author;
         this.page = page;
         this.secretaire = secretaire;
         this.date = date;
         this.rect = new RectF(x - AnnotationView.MIN_WIDTH / 2, y - AnnotationView.MIN_HEIGHT / 2, x + AnnotationView.MIN_WIDTH / 2, y + AnnotationView.MIN_HEIGHT / 2);
-        this.scale = scale;
         this.text = text;
         this.step = step;
     }
@@ -109,6 +108,14 @@ public class Annotation implements Parcelable {
         this.updated = true;
     }
 
+    public boolean isUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(boolean updated) {
+        this.updated = updated;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -128,11 +135,6 @@ public class Annotation implements Parcelable {
     public void moveTo(float x, float y, PointF offset) {
         this.rect.offsetTo(x - offset.x, y - offset.y);
         this.updated = true;
-    }
-
-    public void delete() {
-        this.updated = true;
-        this.deleted = true;
     }
 
     public boolean isEditable(int step) {

@@ -1,15 +1,18 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.util.SparseArray;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
+import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
-import org.apache.http.HttpStatus;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -148,6 +151,27 @@ public enum RESTClient implements IParapheurAPI {
     public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
         return getRESTClient().getCircuit(dossierId);
     }
+
+    @Override
+    public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
+        return getRESTClient().getAnnotations(dossierId);
+    }
+
+    @Override
+    public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+        return getRESTClient().createAnnotation(dossierId, annotation, page);
+    }
+
+    @Override
+    public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+        getRESTClient().updateAnnotation(dossierId, annotation, page);
+    }
+
+    @Override
+    public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
+        getRESTClient().deleteAnnotation(dossierId, annotationId, page);
+    }
+
 
     @Override
     public boolean downloadFile(String url, String path) throws IParapheurException {

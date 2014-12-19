@@ -6,22 +6,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-import org.adullact.iparapheur.controller.document.annotation.AnnotationsLayout;
 import org.adullact.iparapheur.model.PageAnnotations;
 
 /**
  * Created by jmaire on 29/01/2014.
  */
-public class DocumentPageFragment extends Fragment {
+public class DocumentPageFragment extends Fragment  {
 
     private int numPage;
-    private ImageView imageView;
-    private AnnotationsLayout annotationsView;
-    private FrameLayout layout;
+    private PageLayout pageLayout;
 
     public DocumentPageFragment() {}
 
@@ -35,8 +30,17 @@ public class DocumentPageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        layout = new FrameLayout(getActivity());
-        return layout;
+
+        // Top layout : Relative layout.
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout rl = new RelativeLayout(getActivity());
+        rl.setLayoutParams(lp);
+
+        // PageLayout containing imageView for the page and the annotationsLayout
+        pageLayout = new PageLayout(getActivity(), numPage);
+
+        rl.addView(pageLayout);
+        return rl;
     }
 
     @Override
@@ -44,27 +48,7 @@ public class DocumentPageFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    public void updatePage(Bitmap pageImage, PageAnnotations annotations, float scale) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(pageImage.getWidth(), pageImage.getHeight());
-        ViewGroup.LayoutParams groupParams = new ViewGroup.LayoutParams(layoutParams);
-
-        float x = this.layout.getX() + (this.layout.getWidth() - pageImage.getWidth()) / 2;
-        float y = this.layout.getY() + (this.layout.getHeight() - pageImage.getHeight()) / 2;
-
-        this.annotationsView = new AnnotationsLayout(getActivity(), numPage, annotations, scale);
-        this.annotationsView.setLayoutParams(groupParams);
-        this.annotationsView.setX(x);
-        this.annotationsView.setY(y);
-
-        this.imageView = new ImageView(getActivity());
-        this.imageView.setLayoutParams(layoutParams);
-        this.imageView.setImageBitmap(pageImage);
-        this.imageView.setX(x);
-        this.imageView.setY(y);
-
-        this.layout.addView(this.imageView);
-        this.layout.addView(this.annotationsView);
-        this.layout.requestLayout();
-        this.layout.invalidate();
+    public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations) {
+        pageLayout.update(pageImage, annotations);
     }
 }

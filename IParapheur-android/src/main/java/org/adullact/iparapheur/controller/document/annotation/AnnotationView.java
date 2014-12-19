@@ -8,10 +8,10 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +29,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     public interface AnnotationViewListener {
         void onAnnotationSelected(AnnotationView annotationView);
+        void onAnnotationEdited(AnnotationView annotationView);
         void onAnnotationDeleted(AnnotationView annotationView);
     }
 
@@ -39,29 +40,30 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     public static final int LINE_WIDTH = 3;
     // Button's drawings line size
-    public static final int LINE_HALF_LENGTH = 6;
+    public static final int LINE_HALF_LENGTH = 7;
 
     // Space between two buttons from center to center
     public static final int BUTTONS_SPACE = 42;
 
-    public static final int COLOR_SELECTED = Color.RED;
+    public static final int COLOR_SELECTED = Color.parseColor("#ffff4444");
     public static final int COLOR_BORDER = Color.BLACK;
 
-    public static final int BUTTON_RADIUS = 14;
+    public static final int BUTTON_RADIUS = 16;
+    public static final int BUTTON_TOUCH_RADIUS = 19;
     public static final int BUTTON_COLOR = Color.BLACK;
     public static final int BUTTON_BORDER_COLOR = Color.WHITE;
 
-    public static final int POSTIT_WIDTH = 120;
-    public static final int POSTIT_HEIGHT = 80;
-    public static final int POSTIT_COLOR = Color.YELLOW;
+    public static final int POSTIT_WIDTH = 220;
+    public static final int POSTIT_HEIGHT = 180;
+    public static final int POSTIT_COLOR = Color.parseColor("#ffffbb33");
 
     public static final int TEXT_COLOR = Color.BLACK;
     public static final int TEXT_SIZE = 12;
     public static final int TEXT_PADDING = 5;
 
-    public static final int INFOS_WIDTH = 150;
-    public static final int INFOS_HEIGHT = 60;
-    public static final int INFOS_COLOR = Color.CYAN;
+    public static final int INFOS_WIDTH = 180;
+    public static final int INFOS_HEIGHT = 120;
+    public static final int INFOS_COLOR = Color.parseColor("#ff33b5e5");
     public static final int INFOS_ALPHA = 230; //90%
     public static final int INFOS_BORDER_WIDTH = 3;
     public static final int INFOS_BORDER_COLOR = Color.BLACK;
@@ -122,9 +124,14 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
         this.annotation = annotation;
     }
 
-    public void select() {
+    private void selectInternal() {
         this.selected = true;
         this.listener.onAnnotationSelected(this);
+    }
+
+    public void select() {
+        this.selected = true;
+        invalidate();
     }
 
     public void unselect() {
@@ -139,7 +146,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
     }
 
     public void delete() {
-        this.annotation.delete();
+        this.annotation.setDeleted(true);
         this.selected = false;
         if (infosTextView != null) {
             ((ViewGroup) getParent()).removeView(infosTextView);
@@ -175,6 +182,8 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
         postItEditText.setTextColor(TEXT_COLOR);
         postItEditText.setBackgroundColor(POSTIT_COLOR);
         postItEditText.setClickable(true);
+        postItEditText.setHorizontallyScrolling(false);
+        postItEditText.setTextSize(14);
         postItEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         postItEditText.setText(annotation.getText(), TextView.BufferType.EDITABLE);
         postItEditText.addTextChangedListener(this);
@@ -202,8 +211,11 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
         infosTextView.setTextColor(TEXT_COLOR);
         infosTextView.setBackgroundColor(INFOS_COLOR);
         infosTextView.setClickable(false);
-        //infosTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        infosTextView.setText(annotation.getText(), TextView.BufferType.NORMAL);
+        infosTextView.setSingleLine(false);
+        infosTextView.setInputType(InputType.TYPE_NULL | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        infosTextView.setTextSize(12);
+        infosTextView.setHorizontallyScrolling(false);
+        infosTextView.setText(Html.fromHtml(annotation.getAuthor() + "<br />" + annotation.getDate()), TextView.BufferType.NORMAL);
         placeInfosView();
         infosTextView.setVisibility(GONE);
         ((ViewGroup) getParent()).addView(infosTextView);
@@ -211,21 +223,16 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     private void placeTextView() {
         if ((postItEditText != null) && (postItEditText.getVisibility() != GONE)) {
-            int parentWidth = ((AnnotationsLayout) getParent()).getWidth();
             int parentHeight = ((AnnotationsLayout) getParent()).getHeight();
             RelativeLayout.LayoutParams annotationLP = (RelativeLayout.LayoutParams) getLayoutParams();
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(POSTIT_WIDTH, POSTIT_HEIGHT);
-            int left = (annotationLP.leftMargin + annotationLP.width);
-            int top = annotationLP.topMargin;
-            int maxLeft = (parentWidth - POSTIT_WIDTH);
-            if (left > maxLeft) {
-                left = maxLeft;
-                top = annotationLP.topMargin + annotationLP.height;
-                if (top > parentHeight - POSTIT_HEIGHT) {
-                    top = (annotationLP.topMargin - POSTIT_HEIGHT);
-                    if (top < 0) {
-                        top = annotationLP.topMargin + BUTTON_RADIUS * 2;
-                    }
+            int left = annotationLP.leftMargin + BUTTON_RADIUS;
+            int top = annotationLP.topMargin + annotationLP.height;
+            if (top > (parentHeight - POSTIT_HEIGHT)) {
+                top = annotationLP.topMargin - POSTIT_HEIGHT;
+                if (top < 0) {
+                    top = (parentHeight - POSTIT_HEIGHT);
+                    left += BUTTON_RADIUS;
                 }
             }
             lp.leftMargin = left;
@@ -236,16 +243,21 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     private void placeInfosView() {
         if ((infosTextView != null) && (infosTextView.getVisibility() != GONE)) {
+            int parentWidth = ((AnnotationsLayout) getParent()).getWidth();
             int parentHeight = ((AnnotationsLayout) getParent()).getHeight();
             RelativeLayout.LayoutParams annotationLP = (RelativeLayout.LayoutParams) getLayoutParams();
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(INFOS_WIDTH, INFOS_HEIGHT);
-            int left = annotationLP.leftMargin;
-            int top = annotationLP.topMargin + annotationLP.height;
-            if (top > (parentHeight - INFOS_HEIGHT)) {
-                top = annotationLP.topMargin - INFOS_HEIGHT;
-                if (top < 0) {
-                    top = (parentHeight - INFOS_HEIGHT);
-                    left += BUTTON_RADIUS * 2;
+            int left = (annotationLP.leftMargin + annotationLP.width);
+            int top = annotationLP.topMargin + BUTTON_RADIUS;
+            int maxLeft = (parentWidth - INFOS_WIDTH);
+            if (left > maxLeft) {
+                left = maxLeft;
+                top = annotationLP.topMargin + annotationLP.height;
+                if (top > parentHeight - INFOS_HEIGHT) {
+                    top = (annotationLP.topMargin - INFOS_HEIGHT);
+                    if (top < 0) {
+                        top = annotationLP.topMargin;
+                    }
                 }
             }
             lp.leftMargin = left;
@@ -308,7 +320,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
         if (!annotation.isDeleted()) {
             area = Area.CENTER;
             for (Button button : Button.values()) {
-                if (distance(x, y, getButtonCenter(button)) < BUTTON_RADIUS) {
+                if (distance(x, y, getButtonCenter(button)) < BUTTON_TOUCH_RADIUS ) {
                     area = Area.valueOf(button.name());
                     break;
                 }
@@ -323,10 +335,10 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
             case DELETE :
                 center.set(BUTTON_RADIUS, BUTTON_RADIUS);
                 break;
-            case EDIT :
+            case INFO :
                 center.set(getWidth() - BUTTON_RADIUS, BUTTON_RADIUS);
                 break;
-            case INFO :
+            case EDIT :
                 center.set(BUTTON_RADIUS, getHeight() - BUTTON_RADIUS);
                 break;
             case MINIMIZE :
@@ -448,6 +460,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
     private void drawButton(Canvas canvas, Paint paint, Button type) {
         PointF center = getButtonCenter(type);
+
         if (!type.equals(Button.RESIZE)) {
             // Inner black circle with shadow
             paint.setColor(BUTTON_COLOR);
@@ -517,6 +530,17 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
             invalidate();
             return true;
         }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (selected) {
+                if (annotation.isUpdated()) {
+                    listener.onAnnotationEdited(this);
+                    annotation.setUpdated(false);
+                }
+                else if (annotation.isDeleted()) {
+                    listener.onAnnotationDeleted(this);
+                }
+            };
+        }
         return false;
     }
 
@@ -529,6 +553,9 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
             //Log.d("debug", "onDown");
             switch (getArea(me.getX(), me.getY())) {
                 case CENTER :
+                    if (!selected) {
+                        selectInternal();
+                    }
                     mode = Mode.MOVE;
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) getLayoutParams();
                     offset.set(lp.leftMargin, lp.topMargin);
@@ -545,7 +572,6 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
         @Override
         public boolean onSingleTapConfirmed(MotionEvent me) {
             //Log.i("IParapheurPDFPageView", "onSingleTapConfirmed");
-            boolean invalidate = false;
             // Nouvelle selection ou déselection
             if (selected) {
                 switch (getArea(me.getX(), me.getY())) {
@@ -565,7 +591,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
                 }
             }
             else {
-                select();
+                selectInternal();
             }
             // Invalidate here because this function is not called on au touch event.
             invalidate();
@@ -593,6 +619,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
     @Override
     public void afterTextChanged(Editable s) {
         annotation.setText(s.toString());
+        listener.onAnnotationEdited(this);
     }
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

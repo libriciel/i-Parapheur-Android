@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 /**
@@ -35,9 +34,9 @@ public class ModelMapper3 extends ModelMapper
     protected Dossier getDossier(JSONObject jsonObject)
     {
 
-        String id = jsonObject.optString("id");
+        String dossierId = jsonObject.optString("id");
         ArrayList<Action> actions = getActionsForDossier(jsonObject);
-        Dossier dossier = new Dossier(id,
+        Dossier dossier = new Dossier(dossierId,
                 jsonObject.optString("title"),
                 Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
                 actions,
@@ -62,6 +61,7 @@ public class ModelMapper3 extends ModelMapper
                     }
                     dossier.addDocument(new Document(
                             docId,
+                            dossierId,
                             doc.optString("name"),
                             doc.optInt("size", -1),
                             downloadUrl));

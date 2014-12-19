@@ -1,18 +1,28 @@
 package org.adullact.iparapheur.controller.rest.mapper;
 
+import android.graphics.RectF;
+import android.util.SparseArray;
+
 import org.adullact.iparapheur.controller.utils.TransformUtils;
 import org.adullact.iparapheur.model.Action;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
+import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 
 /**
  * Created by jmaire on 04/11/2013.
@@ -32,12 +42,12 @@ public class ModelMapper {
     protected Dossier getDossier(JSONObject jsonObject)
     {
 
-        String ref = jsonObject.optString("dossierRef");
-        if (ref.contains("workspace://SpacesStore/")) {
-            ref = ref.substring("workspace://SpacesStore/".length());
+        String dossierRef = jsonObject.optString("dossierRef");
+        if (dossierRef.contains("workspace://SpacesStore/")) {
+            dossierRef = dossierRef.substring("workspace://SpacesStore/".length());
         }
         ArrayList<Action> actions = getActionsForDossier(jsonObject);
-        Dossier dossier = new Dossier(ref,
+        Dossier dossier = new Dossier(dossierRef,
                 jsonObject.optString("titre"),
                 Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
                 actions,
@@ -56,7 +66,7 @@ public class ModelMapper {
                 if (doc != null) {
                     String docRef = jsonObject.optString("dossierRef");
                     if (docRef.contains("workspace://SpacesStore/")) {
-                        docRef = ref.substring("workspace://SpacesStore/".length());
+                        docRef = dossierRef.substring("workspace://SpacesStore/".length());
                     }
                     String downloadUrl = doc.optString("downloadUrl");
                     if (doc.has("visuelPdfUrl")) {
@@ -64,6 +74,7 @@ public class ModelMapper {
                     }
                     dossier.addDocument(new Document(
                             docRef,
+                            dossierRef,
                             doc.optString("name"),
                             doc.optInt("size", -1),
                             downloadUrl));
@@ -216,5 +227,63 @@ public class ModelMapper {
             }
         }
         return typologie;
+    }
+
+    public SparseArray<PageAnnotations> getAnnotations(RequestResponse response) {
+        SparseArray<PageAnnotations> annotations = new SparseArray<PageAnnotations>();
+        if (response.getResponseArray() != null) {
+            JSONArray etapes = response.getResponseArray();
+            for (int step = 0; step < etapes.length(); step++) {
+                JSONObject etapeAnnotations = etapes.optJSONObject(step);
+                if (etapeAnnotations != null) {
+                    Iterator pages = etapeAnnotations.keys();
+                    while (pages.hasNext()) {
+                        String pageStr = (String) pages.next();
+                        JSONArray pagesAnnotations = etapeAnnotations.optJSONArray(pageStr);
+                        if (pagesAnnotations != null) {
+                            PageAnnotations pageAnnotations = new PageAnnotations();
+                            for (int page = 0; page < pagesAnnotations.length(); page++) {
+                                JSONObject jsonAnnotation = pagesAnnotations.optJSONObject(page);
+                                if (jsonAnnotation != null) {
+
+                                    try {
+                                        Date date = null;
+                                        try {
+                                            date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US).parse(jsonAnnotation.getString("date"));
+                                        } catch (ParseException e) {
+                                            date = new Date();
+                                        } catch (JSONException e) {
+                                            date = new Date();
+                                        }
+                                        String outDate = new SimpleDateFormat("dd/MM/yyyy' - 'HH:mm").format(date);
+
+                                        JSONObject jsonRect = jsonAnnotation.getJSONObject("rect");
+                                        JSONObject topLeft = jsonRect.getJSONObject("topLeft");
+                                        JSONObject bottomRight = jsonRect.getJSONObject("bottomRight");
+                                        RectF rect = new RectF(topLeft.getLong("x"), topLeft.getLong("y"), bottomRight.getLong("x"), bottomRight.getLong("y"));
+
+                                        pageAnnotations.add(
+                                                new Annotation(
+                                                        jsonAnnotation.optString("id"),
+                                                        jsonAnnotation.optString("author"),
+                                                        Integer.parseInt(pageStr),
+                                                        jsonAnnotation.optBoolean("secretaire"),
+                                                        outDate,
+                                                        rect,
+                                                        jsonAnnotation.optString("text"),
+                                                        jsonAnnotation.optString("type", "rect"),
+                                                        step));
+                                    } catch (JSONException e) {
+                                        // Tant pis, on passe l'annotation
+                                    }
+                                }
+                            }
+                            annotations.append(Integer.parseInt(pageStr), pageAnnotations);
+                        }
+                    }
+                }
+            }
+        }
+        return annotations;
     }
 }

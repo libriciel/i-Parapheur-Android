@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 
 import com.artifex.mupdfdemo.MuPDFCore;
 
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.PageAnnotations;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 /**
  * Created by jmaire on 29/01/2014.
@@ -27,8 +27,6 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
     private MuPDFCore muPDFCore;
     private final SparseArray<PointF> pageSizes = new SparseArray<PointF>();
     private Document document;
-    private DocumentPageLoadingTask task;
-
 
     public DocumentPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -84,7 +82,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
     private void updateFragment(int position, Bitmap bm, float scale, DocumentPageFragment fragment) {
         if ((fragment != null) && (fragment.getActivity() != null)) {
-            fragment.updatePage(bm, document.getPagesAnnotations().get(position, new PageAnnotations()), scale);
+            fragment.updatePage(document.getDossierId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()));
         }
     }
 

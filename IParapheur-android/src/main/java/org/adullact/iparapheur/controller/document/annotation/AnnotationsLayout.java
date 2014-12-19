@@ -1,10 +1,6 @@
 package org.adullact.iparapheur.controller.document.annotation;
 
 import android.content.Context;
-import android.graphics.PointF;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -19,33 +15,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
 * Created by jmaire on 13/01/2014.
 */
-public class AnnotationsLayout extends RelativeLayout implements View.OnTouchListener, AnnotationView.AnnotationViewListener {
+public class AnnotationsLayout extends RelativeLayout implements AnnotationView.AnnotationViewListener {
+
+    public interface AnnotationsLayoutListener {
+        void onCreateAnnotation(Annotation annotation);
+        void onUpdateAnnotation(Annotation annotation);
+        void onDeleteAnnotation(Annotation annotation);
+    }
 
     private int numPage;
     private PageAnnotations annotations;
     private AnnotationView selectedAnnotation;
     private static final AtomicInteger idValue = new AtomicInteger(1);
 
-    private GestureDetector gestureDetector;
-    private float scale;
+    private AnnotationsLayoutListener listener;
 
-    public AnnotationsLayout(Context context, int numPage, PageAnnotations annotations, float scale) {
+    public AnnotationsLayout(Context context, int numPage, AnnotationsLayoutListener listener) {
         super(context);
-        this.annotations = annotations;
-
-        for (Annotation annotation : this.annotations.getAnnotations()) {
-            AnnotationView av = new AnnotationView(getContext(), annotation, this);
-            av.setId(idValue.getAndIncrement());
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) annotation.getRect().width(), (int) annotation.getRect().height());
-            lp.setMargins((int) annotation.getRect().left, (int) annotation.getRect().top, 0, 0);
-            lp.alignWithParent = true;
-            av.setLayoutParams(lp);
-            addView(av);
-        }
+        this.listener = listener;
+        this.annotations = new PageAnnotations();
         this.numPage = numPage;
-        this.scale = scale;
-        gestureDetector = new GestureDetector(context, new AnnotationGestureListener());
-        setOnTouchListener(this);
     }
 
     /**
@@ -64,6 +53,7 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //Log.i("debug", "onMeasure");
 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
@@ -81,6 +71,7 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
      */
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        //Log.i("debug", "onLayout");
         final int count = getChildCount();
 
         for (int i = 0; i < count; i++) {
@@ -98,9 +89,13 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
         }
     }
 
-    private void createAnnotation(float x, float y) {
+    public void setAnnotations(PageAnnotations annotations) {
+        this.annotations = annotations;
+    }
+
+    public void createAnnotation(float x, float y) {
         String date = DateFormat.getDateTimeInstance().format(new Date());
-        Annotation annotation = new Annotation(MyAccounts.INSTANCE.getSelectedAccount().getLogin(), numPage, false, date, x, y, "", 0, scale); // FIXME
+        Annotation annotation = new Annotation(MyAccounts.INSTANCE.getSelectedAccount().getLogin(), numPage, false, date, x, y, "", 0); // FIXME
         this.annotations.add(annotation);
         AnnotationView annotationView = new AnnotationView(getContext(), annotation, this);
         annotationView.setId(idValue.getAndIncrement());
@@ -108,12 +103,13 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
         lp.setMargins((int) annotation.getRect().left, (int) annotation.getRect().top, 0, 0);
         lp.alignWithParent = true;
         annotationView.setLayoutParams(lp);
-        addView(annotationView);
         selectAnnotation(annotationView, true);
+        addView(annotationView);
         annotationView.requestLayout();
+        listener.onCreateAnnotation(annotation);
     }
 
-    private void unselectAnnotation(boolean informChild) {
+    public void unselectAnnotation(boolean informChild) {
         if (informChild && (selectedAnnotation != null)) {
             selectedAnnotation.unselect();
         }
@@ -129,7 +125,6 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
 
     // AnnotationViewListener implementation
 
-
     @Override
     public void onAnnotationSelected(AnnotationView annotationView) {
         unselectAnnotation(true);
@@ -137,50 +132,15 @@ public class AnnotationsLayout extends RelativeLayout implements View.OnTouchLis
     }
 
     @Override
-    public void onAnnotationDeleted(AnnotationView annotationView) {
-        unselectAnnotation(false);
+    public void onAnnotationEdited(AnnotationView annotationView) {
+        listener.onUpdateAnnotation(annotationView.getAnnotation());
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (gestureDetector.onTouchEvent(event)) {
-            invalidate();
-            return true;
-        }
-        return false;
+    public void onAnnotationDeleted(AnnotationView annotationView) {
+        unselectAnnotation(false);
+        listener.onDeleteAnnotation(annotationView.getAnnotation());
+        this.removeView(annotationView);
     }
 
-    private class AnnotationGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        private final PointF offset = new PointF(); // offset from the top left corner when an annotation is selected
-
-        @Override
-        public boolean onDown(MotionEvent me) {
-            //Log.i("IParapheurPDFPageView", "onDown");
-
-            if (selectedAnnotation != null) {
-                unselectAnnotation(true);
-            }
-            return true;
-        }
-
-
-        @Override
-        public boolean onDoubleTap(MotionEvent me) {
-            //Log.i("IParapheurPDFPageView", "onDoubleTap");
-            onLongPress(me);
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent me) {
-            //Log.i("IParapheurPDFPageView", "onLongPress");
-            createAnnotation(me.getX(), me.getY());
-        }
-
-        @Override
-        public boolean onDoubleTapEvent(MotionEvent e) {
-            return true;
-        }
-    }
 }

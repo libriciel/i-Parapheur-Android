@@ -11,9 +11,10 @@ import android.util.SparseArray;
 public class Document implements Parcelable {
 
     private final String id;
+    private final String dossierId;
     private final String name;
     private final int size; // TODO : utiliser pour ne pas telecharger des dossiers trop lourds (images à la place)
-    private final SparseArray<PageAnnotations> pagesAnnotations;
+    private SparseArray<PageAnnotations> pagesAnnotations;
 
     /**
      * URL of the document (its content)
@@ -24,8 +25,9 @@ public class Document implements Parcelable {
      */
     private String path;
 
-    public Document(String id, String name, int size, String url) {
+    public Document(String id, String dossierId, String name, int size, String url) {
         this.id = id;
+        this.dossierId = dossierId;
         this.name = name;
         this.url = url;
         this.size = size;
@@ -34,6 +36,10 @@ public class Document implements Parcelable {
 
     public String getId() {
         return id;
+    }
+
+    public String getDossierId() {
+        return dossierId;
     }
 
     public String getName() {
@@ -60,6 +66,10 @@ public class Document implements Parcelable {
         return pagesAnnotations;
     }
 
+    public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
+        this.pagesAnnotations = pagesAnnotations;
+    }
+
     // PARCELABLE IMPLEMENTATION
 
 
@@ -73,6 +83,7 @@ public class Document implements Parcelable {
         Bundle bundle = new Bundle();
         bundle.putSparseParcelableArray("pagesAnnotations", this.pagesAnnotations);
         dest.writeString(this.id);
+        dest.writeString(this.dossierId);
         dest.writeString(this.name);
         dest.writeBundle(bundle);
         dest.writeString(this.url);
@@ -82,6 +93,7 @@ public class Document implements Parcelable {
 
     private Document(Parcel in) {
         this.id = in.readString();
+        this.dossierId = in.readString();
         this.name = in.readString();
         this.pagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("pagesAnnotations");
         this.url = in.readString();

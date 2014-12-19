@@ -1,10 +1,14 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.util.SparseArray;
+
+import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.model.PageAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +69,39 @@ public interface IParapheurAPI {
      * @return
      */
     List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException;
+
+    /**
+     *
+     * @param dossierId
+     * @return les annotations graphiques déposées sur le document principal du dossier
+     * @throws IParapheurException
+     */
+    SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException;
+
+    /**
+     *
+     * @param dossierId
+     * @return l'id de l'annotation crééeles annotations graphiques déposées sur le document principal du dossier
+     * @throws IParapheurException
+     */
+    String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException;
+
+    /**
+     *
+     * @param dossierId
+     * @param annotation
+     * @param page
+     * @throws IParapheurException
+     */
+    void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException;
+
+    /**
+     *
+     * @param dossierId
+     * @param annotationId
+     * @throws IParapheurException
+     */
+    void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException;
 
     /**
      *
