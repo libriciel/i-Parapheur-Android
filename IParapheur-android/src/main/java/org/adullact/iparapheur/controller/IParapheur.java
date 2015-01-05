@@ -7,9 +7,6 @@ import android.preference.PreferenceManager;
 
 import org.adullact.iparapheur.controller.account.MyAccounts;
 
-/**
- * Created by jmaire on 23/10/13.
- */
 public class IParapheur extends Application {
 
     private static Context context;
@@ -31,7 +28,6 @@ public class IParapheur extends Application {
             editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, "secret" );
 
             editor.apply();
-            editor.commit();
         }
     }
 
