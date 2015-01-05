@@ -2,6 +2,7 @@ package org.adullact.iparapheur.controller.document;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -65,8 +66,8 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
     //</editor-fold desc="LifeCycle">
 
-    public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations) {
-        mPageLayout.update(pageImage, annotations);
+    public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations, Point initSize) {
+        mPageLayout.update(pageImage, annotations, initSize);
     }
 
     private enum ScaleType {
@@ -89,7 +90,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
             case fitWidth:
 
-                float parentWidth = ((View) mPageLayout.getParent()).getWidth();
+				float parentWidth = ((View) mPageLayout.getParent()).getWidth();
                 float initialWidth = mPageLayout.getInitialWidth();
                 float ratio = parentWidth / initialWidth;
                 int scaledWidth = Math.round(mPageLayout.getInitialWidth() * ratio);

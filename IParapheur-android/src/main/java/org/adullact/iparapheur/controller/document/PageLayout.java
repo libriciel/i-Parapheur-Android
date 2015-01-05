@@ -2,6 +2,7 @@ package org.adullact.iparapheur.controller.document;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -34,17 +35,17 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
     }
 
     private void addChildViews(int numPage) {
-        ViewGroup.LayoutParams childLayoutParam = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        this.mAnnotationsView = new AnnotationsLayout(getContext(), numPage, this);
-        this.mAnnotationsView.setLayoutParams(childLayoutParam);
+		FrameLayout.LayoutParams childLayoutParam = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        mAnnotationsView = new AnnotationsLayout(getContext(), numPage, this);
+        mAnnotationsView.setLayoutParams(childLayoutParam);
 
-        this.mImageView = new ImageView(getContext());
-        this.mImageView.setLayoutParams(childLayoutParam);
-        this.mImageView.setAdjustViewBounds(true);
-        this.mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        mImageView = new ImageView(getContext());
+        mImageView.setLayoutParams(childLayoutParam);
+        mImageView.setAdjustViewBounds(true);
+        mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        this.addView(this.mImageView);
-        this.addView(this.mAnnotationsView);
+        addView(mImageView);
+        addView(mAnnotationsView);
     }
 
     private void scalePage() {
@@ -56,17 +57,17 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
         ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams((int) (mInitialWidth * mPageScale), (int) (mInitialHeight * mPageScale));
         layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
 
-        this.setLayoutParams(layoutParam);
+        setLayoutParams(layoutParam);
         setScaleX(mPageScale);
         setScaleY(mPageScale);
     }
 
-    public void update(Bitmap pageImage, PageAnnotations annotations) {
+    public void update(Bitmap pageImage, PageAnnotations annotations, Point initSize) {
         mAnnotationsView.setAnnotations(annotations);
         mImageView.setImageBitmap(pageImage);
 
-        mInitialWidth = pageImage.getWidth();
-        mInitialHeight = pageImage.getHeight();
+        mInitialWidth = initSize.x;
+        mInitialHeight = initSize.y;
         mChildScale = 1.0f;
         mPageScale = 1.0f;
 

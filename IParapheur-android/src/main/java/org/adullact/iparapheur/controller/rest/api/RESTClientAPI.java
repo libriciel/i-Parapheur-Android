@@ -75,7 +75,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 					}
 				}
 			} catch (JSONException ex) {
-				Log.e("Adrien", "Error : " + ex.getMessage());
 				throw new IParapheurException(R.string.error_parse, null);
 			}
 		}
@@ -131,7 +130,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		} catch (FileNotFoundException e) {
 			throw new IParapheurException(R.string.error_file_not_found, null);
 		} catch (IOException e) {
-			Log.w("Adrien", "error = " + e.getMessage());
 			throw new IParapheurException(R.string.error_parse, null);
 		} finally {
 			if (fileOutput != null) {
