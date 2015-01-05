@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -17,79 +16,68 @@ import org.adullact.iparapheur.controller.document.annotation.AnnotationsLayout;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
 
-/**
- * Created by jmaire on 28/11/2014.
- */
 public class PageLayout extends FrameLayout implements View.OnTouchListener, AnnotationsLayout.AnnotationsLayoutListener {
 
-    private AnnotationsLayout annotationsView;
-    private ImageView imageView;
-    private int initialWidth = 0;
-    private int initialHeight = 0;
-    //private ScaleGestureDetector scaleGestureDetector;
-    private GestureDetector gestureDetector;
-    private boolean scaling = false;
-    private float pageMaxScale, pageScale, childScale;
+    private AnnotationsLayout mAnnotationsView;
+    private ImageView mImageView;
+    private int mInitialWidth = 0;
+    private int mInitialHeight = 0;
+    private GestureDetector mGestureDetector;
+    private float mPageScale, mChildScale;
     private PageLayoutListener mPageLayoutListener;
 
     public PageLayout(Context context, int numPage) {
         super(context);
         addChildViews(numPage);
-        // scaleGestureDetector = new ScaleGestureDetector(context, new AnnotationScaleGestureListener());
-        gestureDetector = new GestureDetector(context, new AnnotationGestureListener());
+        mGestureDetector = new GestureDetector(context, new AnnotationGestureListener());
         setOnTouchListener(this);
     }
 
     private void addChildViews(int numPage) {
         ViewGroup.LayoutParams childLayoutParam = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        this.annotationsView = new AnnotationsLayout(getContext(), numPage, this);
-        this.annotationsView.setLayoutParams(childLayoutParam);
+        this.mAnnotationsView = new AnnotationsLayout(getContext(), numPage, this);
+        this.mAnnotationsView.setLayoutParams(childLayoutParam);
 
-        this.imageView = new ImageView(getContext());
-        this.imageView.setLayoutParams(childLayoutParam);
-        this.imageView.setAdjustViewBounds(true);
-        this.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        this.mImageView = new ImageView(getContext());
+        this.mImageView.setLayoutParams(childLayoutParam);
+        this.mImageView.setAdjustViewBounds(true);
+        this.mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        this.addView(this.imageView);
-        this.addView(this.annotationsView);
+        this.addView(this.mImageView);
+        this.addView(this.mAnnotationsView);
     }
 
     private void scalePage() {
-        annotationsView.setScaleX(childScale);
-        annotationsView.setScaleY(childScale);
-        imageView.setScaleX(childScale);
-        imageView.setScaleY(childScale);
+        mAnnotationsView.setScaleX(mChildScale);
+        mAnnotationsView.setScaleY(mChildScale);
+        mImageView.setScaleX(mChildScale);
+        mImageView.setScaleY(mChildScale);
 
-        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams((int) (initialWidth * pageScale), (int) (initialHeight * pageScale));
+        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams((int) (mInitialWidth * mPageScale), (int) (mInitialHeight * mPageScale));
         layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
 
         this.setLayoutParams(layoutParam);
-        setScaleX(pageScale);
-        setScaleY(pageScale);
-
-        //Log.i("debug", "child X : " + annotationsView.getX() + "child Y : " + annotationsView.getY());
-        //Log.i("debug", "Y | SCROLL Y | TOP | BOTTOM | TRANSLATION Y | SCALE Y" + getY());
-        //Log.i("debug", "" + getY() + " | "+ getScrollY() + " | " + getTop() + " | " + getBottom() + " | " + getTranslationY() + " | " + getScaleY());
+        setScaleX(mPageScale);
+        setScaleY(mPageScale);
     }
 
     public void update(Bitmap pageImage, PageAnnotations annotations) {
-        this.annotationsView.setAnnotations(annotations);
-        this.imageView.setImageBitmap(pageImage);
+        mAnnotationsView.setAnnotations(annotations);
+        mImageView.setImageBitmap(pageImage);
 
-        this.initialWidth = pageImage.getWidth();
-        this.initialHeight = pageImage.getHeight();
-        this.pageMaxScale = 1.0f; //((RelativeLayout) getParent()).getWidth() * 0.85f / initialWidth;
-        this.childScale = 1.0f;
-        this.pageScale = 1.0f;
+        mInitialWidth = pageImage.getWidth();
+        mInitialHeight = pageImage.getHeight();
+        mChildScale = 1.0f;
+        mPageScale = 1.0f;
 
-        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams(initialWidth, initialHeight);
+        ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams(mInitialWidth, mInitialHeight);
         layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
-        this.setLayoutParams(layoutParam);
+        setLayoutParams(layoutParam);
         scalePage();
 
-        this.requestLayout();
-        this.requestLayout();
-        this.invalidate();
+        requestLayout();
+        requestLayout();
+        invalidate();
     }
 
     //AnnotationsLayout callbacks implementation
@@ -131,24 +119,24 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        boolean ret = gestureDetector.onTouchEvent(event);
+        boolean ret = mGestureDetector.onTouchEvent(event);
 //        ret = ret || scaleGestureDetector.onTouchEvent(event);
         return ret || super.onTouchEvent(event);
     }
 
     public int getInitialWidth() {
-        return initialWidth;
+        return mInitialWidth;
     }
 
     public int getInitialHeight() {
-        return initialHeight;
+        return mInitialHeight;
     }
 
     private class AnnotationGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onDown(MotionEvent me) {
-            annotationsView.unselectAnnotation(true);
+            mAnnotationsView.unselectAnnotation(true);
             return true;
         }
 
@@ -163,7 +151,7 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
         @Override
         public void onLongPress(MotionEvent me) {
-            annotationsView.createAnnotation(me.getX(), me.getY());
+            mAnnotationsView.createAnnotation(me.getX(), me.getY());
         }
 
         @Override
@@ -171,54 +159,6 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
             return false;
         }
     }
-
-//    private class AnnotationScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-//        @Override
-//        public boolean onScale(ScaleGestureDetector detector) {
-//            scale *= detector.getScaleFactor();
-//            // Don't let the object get too small or too large.
-//            scale = Math.max(1.0f, Math.min(scale, 3.0f));
-//            if (scale > pageMaxScale) {
-//                childScale = 1 + scale - pageMaxScale;
-//                pageScale = pageMaxScale;
-//
-//            } else {
-//                pageScale = scale;
-//                childScale = 1.0f;
-//            }
-//            scalePage();
-//            return true;
-//        }
-//
-//        @Override
-//        public boolean onScaleBegin(ScaleGestureDetector detector) {
-//            scaling = true;
-//            Log.i("debug", "FOCUS : (" + detector.getFocusX() + ", " + detector.getFocusY() + ")");
-//            int[] parentLocation = new int[2];
-//            int[] childLocation = new int[2];
-//            getLocationInWindow(parentLocation);
-//            imageView.getLocationInWindow(childLocation);
-//            Log.i("debug", "PARENT LOC : (" + parentLocation[0] + ", " + parentLocation[1] + ")");
-//            Log.i("debug", "CHILD LOC : (" + childLocation[0] + ", " + childLocation[1] + ")");
-//            float childPivotX = detector.getFocusX() + parentLocation[0] - childLocation[0];
-//            float childPivotY = detector.getFocusY() + parentLocation[1] - childLocation[1];
-//            //setPivotX(detector.getFocusX());
-//            //setPivotY(detector.getFocusY());*/
-//            float previousPivotX = annotationsView.getPivotX();
-//            float previousPivotY = annotationsView.getPivotY();
-//            annotationsView.setPivotX(detector.getFocusX());
-//            annotationsView.setPivotY(detector.getFocusY());
-//            imageView.setPivotX(detector.getFocusX());
-//            imageView.setPivotY(detector.getFocusY());
-//            return super.onScaleBegin(detector);
-//        }
-//
-//        @Override
-//        public void onScaleEnd(ScaleGestureDetector detector) {
-//            scaling = false;
-//            super.onScaleEnd(detector);
-//        }
-//    }
 
     //<editor-fold desc="PageLayoutListener"
 

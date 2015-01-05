@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,8 +19,8 @@ import org.adullact.iparapheur.model.PageAnnotations;
  */
 public class DocumentPageFragment extends Fragment implements PageLayout.PageLayoutListener {
 
-    private int numPage;
-    private PageLayout pageLayout;
+    private int mNumPage;
+    private PageLayout mPageLayout;
     private ScaleType mCurrentScaleType = ScaleType.fitHeight;
 
     public DocumentPageFragment() {}
@@ -30,7 +31,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if ((getArguments() != null) && getArguments().containsKey("NUM_PAGE")) {
-            this.numPage = getArguments().getInt("NUM_PAGE");
+            mNumPage = getArguments().getInt("NUM_PAGE");
         }
     }
 
@@ -43,10 +44,10 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
         scrollView.setLayoutParams(lp);
 
         // PageLayout containing imageView for the page and the annotationsLayout
-        pageLayout = new PageLayout(getActivity(), numPage);
-        pageLayout.setPageLayoutListener(this);
+        mPageLayout = new PageLayout(getActivity(), mNumPage);
+        mPageLayout.setPageLayoutListener(this);
 
-        scrollView.addView(pageLayout);
+        scrollView.addView(mPageLayout);
         return scrollView;
     }
 
@@ -59,44 +60,44 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
     public void onStop() {
         super.onStop();
 
-        pageLayout.setPageLayoutListener(null);
+        mPageLayout.setPageLayoutListener(null);
     }
 
     //</editor-fold desc="LifeCycle">
 
     public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations) {
-        pageLayout.update(pageImage, annotations);
+        mPageLayout.update(pageImage, annotations);
     }
 
     private enum ScaleType {
-        fitHeight, fitWidth; // TODO : zoom
+        fitHeight, fitWidth // TODO : zoom
     }
 
     private void scale(ScaleType scaleType) {
-        pageLayout.setBackgroundColor(Color.RED);
+        mPageLayout.setBackgroundColor(Color.RED);
         switch (scaleType)
         {
             case fitHeight:
 
-                ScrollView.LayoutParams fitHeightLP = new ScrollView.LayoutParams(pageLayout.getInitialWidth(), pageLayout.getInitialHeight());
+                ScrollView.LayoutParams fitHeightLP = new ScrollView.LayoutParams(mPageLayout.getInitialWidth(), mPageLayout.getInitialHeight());
                 fitHeightLP.gravity = Gravity.CENTER_HORIZONTAL;
 
-                pageLayout.setLayoutParams(fitHeightLP);
-                pageLayout.setTranslationY(0);
+                mPageLayout.setLayoutParams(fitHeightLP);
+                mPageLayout.setTranslationY(0);
 
                 break;
 
             case fitWidth:
 
-                float parentWidth = ((View) pageLayout.getParent()).getWidth();
-                float initialWidth =pageLayout.getInitialWidth();
+                float parentWidth = ((View) mPageLayout.getParent()).getWidth();
+                float initialWidth = mPageLayout.getInitialWidth();
                 float ratio = parentWidth / initialWidth;
-                int scaledWidth = Math.round(pageLayout.getInitialWidth() * ratio);
-                int scaledHeight = Math.round(pageLayout.getInitialHeight() * ratio);
+                int scaledWidth = Math.round(mPageLayout.getInitialWidth() * ratio);
+                int scaledHeight = Math.round(mPageLayout.getInitialHeight() * ratio);
 
                 ScrollView.LayoutParams fitWidthLP = new ScrollView.LayoutParams(scaledWidth, scaledHeight);
                 fitWidthLP.gravity = Gravity.CENTER_HORIZONTAL;
-                pageLayout.setLayoutParams(fitWidthLP);
+                mPageLayout.setLayoutParams(fitWidthLP);
 
                 break;
         }

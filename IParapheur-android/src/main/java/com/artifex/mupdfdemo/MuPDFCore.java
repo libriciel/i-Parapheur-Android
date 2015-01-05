@@ -118,8 +118,8 @@ public class MuPDFCore
         else if (page < 0)
             page = 0;
         gotoPageInternal(page);
-        this.pageWidth = getPageWidth();
-        this.pageHeight = getPageHeight();
+        pageWidth = getPageWidth();
+        pageHeight = getPageHeight();
     }
 
     public synchronized PointF getPageSize(int page) {

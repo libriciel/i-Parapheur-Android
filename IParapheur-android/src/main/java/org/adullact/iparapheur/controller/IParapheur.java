@@ -10,7 +10,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 public class IParapheur extends Application {
 
     private static Context context;
-    public static final boolean OFFLINE = true;
+    public static final boolean OFFLINE = false;
 
     @Override
     public void onCreate() {
@@ -23,7 +23,7 @@ public class IParapheur extends Application {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX, "iParapheur demo" );
-            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, "parapheur.demonstrations.adullact.org" );
+            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, "parapheur.test.adullact.org" );
             editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_LOGIN_SUFFIX, "bma" );
             editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, "secret" );
 
