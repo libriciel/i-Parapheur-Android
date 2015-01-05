@@ -21,9 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
-/**
- * Created by jmaire on 09/06/2014.
- */
 public abstract class RESTClientAPI implements IParapheurAPI {
 
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";

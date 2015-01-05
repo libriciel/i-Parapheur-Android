@@ -4,3 +4,5 @@
 /build
 *.iml
 .DS_Store
+IParapheur-android/IParapheur-android-release.apk
+IParapheur-android/manifest-merger-release-report.txt
