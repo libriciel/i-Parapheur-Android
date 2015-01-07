@@ -18,9 +18,6 @@ import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.PageAnnotations;
 
-/**
- * Created by jmaire on 29/01/2014.
- */
 public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
 	private Context context;
@@ -134,9 +131,9 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		@Override
 		protected void onPostExecute(String error) {
 			super.onPostExecute(error);
-			if ((error == null) && (muPDFCore != null)) {
+
+			if ((error == null) && (muPDFCore != null))
 				updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);
-			}
 		}
 	}
 }

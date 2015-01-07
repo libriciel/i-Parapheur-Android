@@ -3,9 +3,6 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by jmaire on 19/11/2013.
- */
 public class Bureau implements Parcelable {
 
     private String id;

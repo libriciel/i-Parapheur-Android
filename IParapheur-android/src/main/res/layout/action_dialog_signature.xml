@@ -12,7 +12,7 @@
         android:id="@+id/textView" />
 
     <EditText
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
@@ -33,7 +33,7 @@
         android:id="@+id/textView2" />
 
     <EditText
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
@@ -53,7 +53,7 @@
         android:id="@+id/action_dialog_signature_cert_info" />
 
     <ListView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:id="@+id/action_dialog_dossiers"
         android:layout_weight="1" />

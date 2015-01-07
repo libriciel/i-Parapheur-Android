@@ -6,8 +6,8 @@
     android:minHeight="48dp">
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/filter_etat_spinner_text"
         android:layout_gravity="center_horizontal"
