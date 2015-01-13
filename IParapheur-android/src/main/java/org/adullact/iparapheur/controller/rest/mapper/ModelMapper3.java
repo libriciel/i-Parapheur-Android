@@ -48,7 +48,6 @@ public class ModelMapper3 extends ModelMapper
         JSONArray documents = jsonObject.optJSONArray("documents");
         if (documents != null)
         {
-
             for (int index = 0; index < documents.length(); index++)
             {
                 JSONObject doc = documents.optJSONObject(index);

@@ -32,10 +32,10 @@ public class ModelMapper {
 
     public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
         Dossier dossier = null;
+
         if (requestResponse.getResponse() != null)
-        {
             dossier = getDossier(requestResponse.getResponse());
-        }
+
         return dossier;
     }
 

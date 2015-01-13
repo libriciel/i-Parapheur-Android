@@ -24,7 +24,7 @@ import java.util.Date;
 public abstract class RESTClientAPI implements IParapheurAPI {
 
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";
-	private static final long SESSION_TIMEOUT = 1800000L; // 30 minutes d'inactivité
+	private static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
 
 	@Override
 	public int test(Account account) throws IParapheurException {
@@ -34,7 +34,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		if (response != null) {
 			if (response.getCode() == HttpStatus.SC_OK) {
 				messageRes = R.string.test_ok;
-			} else {
+			}
+			else {
 				switch (response.getCode()) {
 					case HttpStatus.SC_FORBIDDEN:
 						messageRes = R.string.test_forbidden;
@@ -55,8 +56,10 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 	@Override
 	public String getTicket(Account account) throws IParapheurException {
+
 		String ticket = account.getTicket();
 		Long time = new Date().getTime();
+
 		if ((ticket == null) || ((time - account.getLastRequest()) > SESSION_TIMEOUT)) {
 			try {
 				String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
@@ -71,10 +74,12 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 						}
 					}
 				}
-			} catch (JSONException ex) {
+			}
+			catch (JSONException ex) {
 				throw new IParapheurException(R.string.error_parse, null);
 			}
 		}
+
 		return ticket;
 	}
 
@@ -104,8 +109,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		String state = Environment.getExternalStorageState();
 
-		if (!Environment.MEDIA_MOUNTED.equals(state))
-			throw new IParapheurException(R.string.error_no_storage, null);
+		if (!Environment.MEDIA_MOUNTED.equals(state)) throw new IParapheurException(R.string.error_no_storage, null);
 
 		File file = new File(path);
 		String fullUrl = buildUrl(url);
@@ -124,15 +128,19 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			//close the output stream when done
 			fileOutput.close();
 
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			throw new IParapheurException(R.string.error_file_not_found, null);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new IParapheurException(R.string.error_parse, null);
-		} finally {
+		}
+		finally {
 			if (fileOutput != null) {
 				try {
 					fileOutput.close();
-				} catch (IOException logOrIgnore) {
+				}
+				catch (IOException logOrIgnore) {
 					logOrIgnore.printStackTrace();
 				}
 			}

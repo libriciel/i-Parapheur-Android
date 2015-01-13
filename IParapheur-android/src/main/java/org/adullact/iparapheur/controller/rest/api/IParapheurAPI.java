@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by jmaire on 09/06/2014.
- */
 public interface IParapheurAPI {
 
     public static final String BASE_PATH = "https://m.";

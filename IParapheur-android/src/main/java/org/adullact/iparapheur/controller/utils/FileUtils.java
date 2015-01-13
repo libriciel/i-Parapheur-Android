@@ -26,7 +26,6 @@ public class FileUtils {
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
 		}
         else {
-			context.getAssets();
 			return createFileFromAsset(context, "offline_test_file.pdf");
 		}
     }
