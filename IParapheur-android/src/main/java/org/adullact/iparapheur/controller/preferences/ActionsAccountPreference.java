@@ -1,23 +1,15 @@
 package org.adullact.iparapheur.controller.preferences;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.preference.Preference;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
 import org.adullact.iparapheur.model.Account;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
 
 /**
  * Created by jmaire on 29/10/13.

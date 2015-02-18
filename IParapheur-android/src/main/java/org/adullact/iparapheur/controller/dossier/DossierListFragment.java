@@ -84,10 +84,11 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof DossierListFragmentListener)) {
+		if (!(activity instanceof DossierListFragmentListener))
 			throw new IllegalStateException("Activity must implement DossierListFragmentListener.");
-		}
+
 		listener = (DossierListFragmentListener) activity;
 	}
 
@@ -275,10 +276,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
 			// FIXME : changement d'api avec toutes les actions..
+
 			Action actionDemandee = dossier.getActionDemandee();
-			if (actionDemandee != null) {
+			if (actionDemandee != null)
 				((ImageView) cellView.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
-			}
 
 			CheckBox c = (CheckBox) cellView.findViewById(R.id.dossiers_list_item_checkBox);
 			if (dossiers.get(position).hasActions()) {
@@ -321,21 +322,22 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		@Override
 		public void onClick(View v) {
+
 			switch (v.getId()) {
 				case R.id.dossiers_list_item_checkBox:
 					if (!isRefreshing()) {
 						Dossier dossier = dossiers.get((Integer) v.getTag());
-						if (((CheckBox) v).isChecked()) {
+
+						if (((CheckBox) v).isChecked())
 							checkedDossiers.add(dossier);
-						}
-						else {
+						else
 							checkedDossiers.remove(dossier);
-						}
+
 						// will update ActionMode, so the actions will be updated
 						listener.onDossierCheckedChanged();
 					}
 					break;
-				case R.id.dossiers_list_item_selectable_layout:
+				default:
 					Integer position = (Integer) v.getTag();
 					if (position != selectedDossier && !isRefreshing()) {
 						listener.onDossierSelected(dossiers.get(position).getId(), bureauId);
@@ -412,7 +414,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		@Override
 		protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
-			if (isCancelled()) {return;}
+			if (isCancelled()) {
+				return;
+			}
 			if (!IParapheur.OFFLINE) {
 				dossiers = RESTClient.INSTANCE.getDossiers(params[0]);
 			}

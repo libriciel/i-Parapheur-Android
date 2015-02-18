@@ -139,36 +139,34 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		this.dossierId = dossierId;
 		this.dossier = null;
 		closeDetails();
-		if (dossierId != null) {
+
+		if (dossierId != null)
 			getDossierDetails(false);
-		}
-		else {
+		else
 			updateReader();
-		}
 	}
 
 	private void getDossierDetails(boolean forceReload) {
-		if (dossier == null) {
+		if (dossier == null)
 			dossier = listener.getDossier(dossierId);
-		}
+
 		// To force reload dossier details, just delete its main document path (on local storage).
-		if (forceReload) {
+		if (forceReload)
 			dossier.clearDetails();
-		}
+
 		// Download information only if details aren't already available
-		if (!dossier.isDetailsAvailable()) {
+		if (!dossier.isDetailsAvailable())
 			new DossierLoadingTask(getActivity(), this).execute();
-		}
-		else {
+		else
 			onDataChanged();
-		}
 	}
 
 	@Override
 	public void onDataChanged() {
-		if (!IParapheur.OFFLINE) {
+
+		if (!IParapheur.OFFLINE)
 			updateDetails();
-		}
+
 		updateReader();
 	}
 
@@ -296,7 +294,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		@Override
 		protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
-			if (isCancelled()) return;
+			if (isCancelled())
+				return;
 
 			//Log.d("debug", "getting dossier details");
 			if (!IParapheur.OFFLINE) {
