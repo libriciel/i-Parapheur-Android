@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,45 +36,26 @@ import java.util.UUID;
  */
 public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public interface DossierDetailListener {
-		Dossier getDossier(String id);
-	}
-
 	public static String TAG = "Dossier_details";
 	/**
 	 * the bureau where the dossier belongs.
 	 */
 	private String bureauId;
-
 	/**
 	 * The Dossier id this fragment is presenting. Used only in initialisation.
 	 */
 	private String dossierId;
-
 	/**
 	 * The Dossier this fragment is presenting.
 	 */
 	private Dossier dossier;
-
 	private DossierDetailListener listener;
-
 	private boolean isReaderEnabled;
-
-	//private DocumentReader reader;
-
 	/**
 	 * Used to display the document's pages. Each page is managed by a fragment.
 	 */
 	private ViewPager viewPager;
-	/**
-	 * Used to navigate through document's pages.
-	 */
-	private PagerTitleStrip pagerTitleStrip;
-
 	private int currentPage;
-
-	//private SeekBar seekBar;
-
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -83,6 +63,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	 */
 	public DossierDetailFragment() {
 	}
+
+	//private SeekBar seekBar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -106,10 +88,9 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		super.onViewCreated(view, savedInstanceState);
 		this.isReaderEnabled = true;
 		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
-        seekBar.setVisibility(View.INVISIBLE);
+		seekBar.setVisibility(View.INVISIBLE);
         seekBar.setOnSeekBarChangeListener(this);*/
 		this.viewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
-		this.pagerTitleStrip = (PagerTitleStrip) view.findViewById(R.id.fragment_dossier_detail_title_strip);
 
 	}
 
@@ -144,22 +125,14 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-        /*if (reader != null) {
-            reader.clean();
+		/*if (reader != null) {
+			reader.clean();
         }*/
 	}
 
-    /*@Override
-    public void onPageChange(int numPage) {
-        currentPage = numPage;*/
-        /*if (seekBar != null) {
-            seekBar.setProgress(currentPage);
-        }*/
-	//}
-
 	public void update(String bureauId, String dossierId) {
-        /*if (reader != null) {
-            reader.clean();
+		/*if (reader != null) {
+			reader.clean();
         }
         ((FrameLayout) getView().findViewById(R.id.fragment_dossier_detail_reader_view)).removeAllViews();*/
 		this.bureauId = bureauId;
@@ -168,7 +141,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		closeDetails();
 		if (dossierId != null) {
 			getDossierDetails(false);
-		} else {
+		}
+		else {
 			updateReader();
 		}
 	}
@@ -184,7 +158,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		// Download information only if details aren't already available
 		if (!dossier.isDetailsAvailable()) {
 			new DossierLoadingTask(getActivity(), this).execute();
-		} else {
+		}
+		else {
 			onDataChanged();
 		}
 	}
@@ -208,27 +183,24 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 						try {
 							((DocumentPagerAdapter) viewPager.getAdapter()).setDocument(document);
 							viewPager.setCurrentItem(0, false);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							//e.printStackTrace();
 							Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
 						}
 					}
 				});
-				//reader.setDisplayedViewIndex(currentPage);
-                /*int pagesCount = reader.getPagesCount();
-                seekBar.setMax((pagesCount > 0)? pagesCount - 1 :0);
-                seekBar.setProgress(0);
-                seekBar.setVisibility(View.VISIBLE);*/
-				//layout.invalidate();
 			}
-		} else {
+		}
+		else {
 			this.viewPager.post(new Runnable() {
 				@Override
 				public void run() {
 					try {
 						((DocumentPagerAdapter) viewPager.getAdapter()).setDocument(null);
 						//viewPager.setCurrentItem(0, false);
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						//e.printStackTrace();
 						Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
 					}
@@ -277,7 +249,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
 		if (details.getVisibility() == View.VISIBLE) {
 			details.setVisibility(View.INVISIBLE);
-		} else if ((dossier != null) && dossier.isDetailsAvailable()) {
+		}
+		else if ((dossier != null) && dossier.isDetailsAvailable()) {
 			details.setVisibility(View.VISIBLE);
 		}
 	}
@@ -289,11 +262,12 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
-    /* SeekBar Listener implementation */
-
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
 	}
+
+    /* SeekBar Listener implementation */
 
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar) {
@@ -308,6 +282,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
+	public interface DossierDetailListener {
+
+		Dossier getDossier(String id);
+	}
+
 	private class DossierLoadingTask extends LoadingTask {
 
 		public DossierLoadingTask(Activity context, DataChangeListener listener) {
@@ -317,16 +296,16 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		@Override
 		protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
-			if (isCancelled()) {
-				return;
-			}
+			if (isCancelled()) return;
+
 			//Log.d("debug", "getting dossier details");
 			if (!IParapheur.OFFLINE) {
 				Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
 				if (dossier != null) {
 					dossier.saveDetails(d);
 				}
-			} else {
+			}
+			else {
 				dossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "ducument par defaut", -1, ""));
 			}
 			if (isCancelled()) {
@@ -351,11 +330,13 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 							document.setPath(path);
 							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId));
 						}
-					} else {
+					}
+					else {
 						document.setPath(path);
 						if (file.exists()) {
 							//Log.d("debug", "Document par defaut trouvé");
-						} else {
+						}
+						else {
 							//Log.d("debug", "Document par defaut non trouvé");
 						}
 					}

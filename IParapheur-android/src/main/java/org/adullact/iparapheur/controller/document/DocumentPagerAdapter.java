@@ -20,9 +20,9 @@ import org.adullact.iparapheur.model.PageAnnotations;
 
 public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
+	private final SparseArray<PointF> pageSizes = new SparseArray<PointF>();
 	private Context context;
 	private MuPDFCore muPDFCore;
-	private final SparseArray<PointF> pageSizes = new SparseArray<PointF>();
 	private Document document;
 
 	public DocumentPagerAdapter(Context context, FragmentManager fm) {
@@ -55,7 +55,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 	}
 
 	@Override
-	public CharSequence getPageTitle(int position) {
+	public String getPageTitle(int position) {
 		return "page " + position;
 	}
 
@@ -69,7 +69,8 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		this.pageSizes.clear();
 		if (document != null) {
 			muPDFCore = new MuPDFCore(context, document.getPath());
-		} else if (muPDFCore != null) {
+		}
+		else if (muPDFCore != null) {
 			muPDFCore.onDestroy();
 			muPDFCore = null;
 		}
@@ -132,8 +133,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		protected void onPostExecute(String error) {
 			super.onPostExecute(error);
 
-			if ((error == null) && (muPDFCore != null))
-				updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);
+			if ((error == null) && (muPDFCore != null)) updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);
 		}
 	}
 }

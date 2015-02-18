@@ -8,17 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="right"
-        android:background="@color/canvas">
-
-        <android.support.v4.view.PagerTabStrip
-            android:id="@+id/fragment_dossier_detail_title_strip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:background="@color/bar"
-            android:textColor="#fff" />
-
-    </android.support.v4.view.ViewPager>
+        android:background="@color/canvas"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -35,7 +25,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/fragment_dossier_detail_title"
-            android:layout_margin="10dp" />
+            android:layout_margin="10dp"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -47,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/fragment_dossier_detail_typologie"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
@@ -58,14 +48,14 @@
             android:textStyle="bold"
             android:id="@+id/fragment_dossier_detail_circuit_label"
             android:gravity="center"
-            android:layout_marginTop="25dp" />
+            android:layout_marginTop="25dp"/>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/fragment_dossier_detail_circuit"
             android:layout_weight="1"
-            android:choiceMode="none" />
+            android:choiceMode="none"/>
 
         <LinearLayout
             android:orientation="horizontal"
