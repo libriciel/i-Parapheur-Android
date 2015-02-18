@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="mockup_dossier_title">Dossier titre</string>
+    <string name="mockup_dossier_subtitle">Dossier Details / Dossier description</string>
+
+</resources>

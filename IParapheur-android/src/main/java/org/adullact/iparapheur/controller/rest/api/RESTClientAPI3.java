@@ -242,6 +242,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
     @Override
     public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+       	/** FIXME : weird copy/paste. Maybe it has no utility too.
         String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
         try {
             JSONObject json = new JSONObject();
@@ -253,7 +254,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
         } catch (JSONException e) {
             throw new RuntimeException("Une erreur est survenue lors de l'archivage", e);
-        }
+        }*/
+		return false;
     }
 
     @Override
@@ -273,7 +275,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
     }
 
     @Override
-    public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+    public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes,
+								 String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
         String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
         try {
             JSONObject json = new JSONObject();
@@ -294,7 +297,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
     }
 
     @Override
-    public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+    public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC,
+								List<String> destinatairesCCI, String sujet, String message, String password,
+								boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
 
         String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
         try {

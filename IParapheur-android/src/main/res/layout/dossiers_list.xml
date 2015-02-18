@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@drawable/background_light_right_edge"
-              android:paddingLeft="8dp"
-              android:paddingRight="8dp">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:paddingRight="1dp"
+             android:background="@drawable/background_light_right_edge">
 
     <ListView
         android:id="@android:id/list"
@@ -17,22 +16,21 @@
         android:divider="@android:color/holo_blue_light"
         android:dividerHeight="1dp"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:visibility="gone"
-        android:clickable="true">
-
+        android:orientation="vertical"
+        android:gravity="center">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView"
             android:src="@drawable/ic_action_collection"
-            android:contentDescription="@string/no_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/no_dossiers"
             android:clickable="true"/>
 
         <TextView
@@ -41,13 +39,13 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/no_dossiers"
             android:id="@+id/textView"
-            android:layout_below="@+id/imageView"
-            android:layout_centerHorizontal="true"
             android:textColor="@android:color/darker_gray"
             android:textStyle="bold"
+            android:gravity="center_horizontal"
             android:layout_margin="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:clickable="true"/>
-    </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

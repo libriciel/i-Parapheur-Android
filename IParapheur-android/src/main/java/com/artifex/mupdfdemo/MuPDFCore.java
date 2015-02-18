@@ -7,128 +7,143 @@ import android.graphics.RectF;
 
 import org.adullact.iparapheur.R;
 
-public class MuPDFCore
-{
-    /* load our native library */
-    static {
-        System.loadLibrary("mupdf");
-    }
+public class MuPDFCore {
 
-    /* Readable members */
-    private int numPages = -1;
-    private float pageWidth;
-    private float pageHeight;
-    private long globals;
-    private byte fileBuffer[];
-    private String file_format;
+	/* load our native library */
+	static {
+		System.loadLibrary("mupdf");
+	}
 
-    /* The native functions */
-    private native long openFile(String filename);
-    private native long openBuffer();
-    private native String fileFormatInternal();
-    private native int countPagesInternal();
-    private native void gotoPageInternal(int localActionPageNum);
-    private native float getPageWidth();
-    private native float getPageHeight();
-    private native void drawPage(Bitmap bitmap,
-                                 int pageW, int pageH,
-                                 int patchX, int patchY,
-                                 int patchW, int patchH);
-    private native void updatePageInternal(Bitmap bitmap,
-                                           int page,
-                                           int pageW, int pageH,
-                                           int patchX, int patchY,
-                                           int patchW, int patchH);
-    private native RectF[] searchPage(String text);
-    //private native TextChar[][][][] text();
-    private native byte[] textAsHtml();
-    private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
-    private native void addInkAnnotationInternal(PointF[][] arcs);
-    private native void deleteAnnotationInternal(int annot_index);
-    private native int passClickEventInternal(int page, float x, float y);
-    private native void setFocusedWidgetChoiceSelectedInternal(String [] selected);
-    private native String [] getFocusedWidgetChoiceSelected();
-    private native String [] getFocusedWidgetChoiceOptions();
-    private native int getFocusedWidgetSignatureState();
-    private native String checkFocusedSignatureInternal();
-    private native boolean signFocusedSignatureInternal(String keyFile, String password);
-    private native int setFocusedWidgetTextInternal(String text);
-    private native String getFocusedWidgetTextInternal();
-    private native int getFocusedWidgetTypeInternal();
-    //private native LinkInfo [] getPageLinksInternal(int page);
-    private native RectF[] getWidgetAreasInternal(int page);
-    //private native Annotation[] getAnnotationsInternal(int page);
-    //private native OutlineItem [] getOutlineInternal();
-    private native boolean hasOutlineInternal();
-    private native boolean needsPasswordInternal();
-    private native boolean authenticatePasswordInternal(String password);
-    //private native MuPDFAlertInternal waitForAlertInternal();
-    //private native void replyToAlertInternal(MuPDFAlertInternal alert);
-    private native void startAlertsInternal();
-    private native void stopAlertsInternal();
-    private native void destroying();
-    private native boolean hasChangesInternal();
-    private native void saveInternal();
+	/* Readable members */
+	private int numPages = -1;
+	private float pageWidth;
+	private float pageHeight;
+	private long globals;
+	private byte fileBuffer[];
+	private String file_format;
 
-    public static native boolean javascriptSupported();
+	public MuPDFCore(Context context, String filename) throws Exception {
+		globals = openFile(filename);
 
-    public MuPDFCore(Context context, String filename) throws Exception
-    {
-        globals = openFile(filename);
-        if (globals == 0)
-        {
-            throw new Exception(String.format(context.getString(R.string.cannot_open_file_Path), filename));
-        }
-        file_format = fileFormatInternal();
-    }
+		if (globals == 0)
+			throw new Exception(String.format(context.getString(R.string.cannot_open_file_Path), filename));
 
-    public MuPDFCore(Context context, byte buffer[]) throws Exception
-    {
-        fileBuffer = buffer;
-        globals = openBuffer();
-        if (globals == 0)
-        {
-            throw new Exception(context.getString(R.string.cannot_open_buffer));
-        }
-        file_format = fileFormatInternal();
-    }
+		file_format = fileFormatInternal();
+	}
 
-    public  int countPages()
-    {
-        if (numPages < 0)
-            numPages = countPagesSynchronized();
+	public MuPDFCore(Context context, byte buffer[]) throws Exception {
+		fileBuffer = buffer;
+		globals = openBuffer();
+		if (globals == 0) {
+			throw new Exception(context.getString(R.string.cannot_open_buffer));
+		}
+		file_format = fileFormatInternal();
+	}
 
-        return numPages;
-    }
+	public static native boolean javascriptSupported();
 
-    public String fileFormat()
-    {
-        return file_format;
-    }
+	/* The native functions */
+	private native long openFile(String filename);
 
-    private synchronized int countPagesSynchronized() {
-        return countPagesInternal();
-    }
+	private native long openBuffer();
 
-    /* Shim function */
-    private void gotoPage(int page)
-    {
-        if (page > numPages-1)
-            page = numPages-1;
-        else if (page < 0)
-            page = 0;
-        gotoPageInternal(page);
-        pageWidth = getPageWidth();
-        pageHeight = getPageHeight();
-    }
+	private native String fileFormatInternal();
 
-    public synchronized PointF getPageSize(int page) {
-        gotoPage(page);
-        return new PointF(pageWidth, pageHeight);
-    }
+	private native int countPagesInternal();
+
+	private native void gotoPageInternal(int localActionPageNum);
+
+	private native float getPageWidth();
+
+	private native float getPageHeight();
+
+	private native void drawPage(Bitmap bitmap, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH);
+
+	private native void updatePageInternal(Bitmap bitmap, int page, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH);
+
+	private native RectF[] searchPage(String text);
+
+	//private native TextChar[][][][] text();
+	private native byte[] textAsHtml();
+
+	private native void addMarkupAnnotationInternal(PointF[] quadPoints, int type);
+
+	private native void addInkAnnotationInternal(PointF[][] arcs);
+
+	private native void deleteAnnotationInternal(int annot_index);
+
+	private native int passClickEventInternal(int page, float x, float y);
+
+	private native void setFocusedWidgetChoiceSelectedInternal(String[] selected);
+
+	private native String[] getFocusedWidgetChoiceSelected();
+
+	public synchronized void setFocusedWidgetChoiceSelected(String[] selected) {
+		setFocusedWidgetChoiceSelectedInternal(selected);
+	}
+
+	private native String[] getFocusedWidgetChoiceOptions();
+
+	private native int getFocusedWidgetSignatureState();
+
+	private native String checkFocusedSignatureInternal();
+
+	private native boolean signFocusedSignatureInternal(String keyFile, String password);
+
+	private native int setFocusedWidgetTextInternal(String text);
+
+	private native String getFocusedWidgetTextInternal();
+
+	private native int getFocusedWidgetTypeInternal();
+
+	//private native LinkInfo [] getPageLinksInternal(int page);
+	private native RectF[] getWidgetAreasInternal(int page);
+
+	//private native Annotation[] getAnnotationsInternal(int page);
+	//private native OutlineItem [] getOutlineInternal();
+	private native boolean hasOutlineInternal();
+
+	private native boolean needsPasswordInternal();
+
+	private native boolean authenticatePasswordInternal(String password);
+
+	//private native MuPDFAlertInternal waitForAlertInternal();
+	//private native void replyToAlertInternal(MuPDFAlertInternal alert);
+	private native void startAlertsInternal();
+
+	private native void stopAlertsInternal();
+
+	private native void destroying();
+
+	private native boolean hasChangesInternal();
+
+	private native void saveInternal();
+
+	public int countPages() {
+		if (numPages < 0) numPages = countPagesSynchronized();
+
+		return numPages;
+	}
+
+	public String fileFormat() {
+		return file_format;
+	}
+
+	private synchronized int countPagesSynchronized() {
+		return countPagesInternal();
+	}
+
+	/* Shim function */
+	private void gotoPage(int page) {
+		if (page > numPages - 1) page = numPages - 1;
+		else if (page < 0) page = 0;
+		gotoPageInternal(page);
+		pageWidth = getPageWidth();
+		pageHeight = getPageHeight();
+	}
 
     /*public MuPDFAlert waitForAlert() {
-        MuPDFAlertInternal alert = waitForAlertInternal();
+		MuPDFAlertInternal alert = waitForAlertInternal();
         return alert != null ? alert.toAlert() : null;
     }
 
@@ -136,36 +151,31 @@ public class MuPDFCore
         replyToAlertInternal(new MuPDFAlertInternal(alert));
     }*/
 
-    public void stopAlerts() {
-        stopAlertsInternal();
-    }
+	public synchronized PointF getPageSize(int page) {
+		gotoPage(page);
+		return new PointF(pageWidth, pageHeight);
+	}
 
-    public void startAlerts() {
-        startAlertsInternal();
-    }
+	public void stopAlerts() {
+		stopAlertsInternal();
+	}
 
-    public synchronized void onDestroy() {
-        destroying();
-        globals = 0;
-    }
+	public void startAlerts() {
+		startAlertsInternal();
+	}
 
-    public synchronized void drawPage(Bitmap bm, int page,
-                                      int pageW, int pageH,
-                                      int patchX, int patchY,
-                                      int patchW, int patchH) {
-        gotoPage(page);
-        drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH);
-    }
+	public synchronized void onDestroy() {
+		destroying();
+		globals = 0;
+	}
 
-    public synchronized void updatePage(Bitmap bm, int page,
-                                        int pageW, int pageH,
-                                        int patchX, int patchY,
-                                        int patchW, int patchH) {
-        updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH);
-    }
+	public synchronized void drawPage(Bitmap bm, int page, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH) {
+		gotoPage(page);
+		drawPage(bm, pageW, pageH, patchX, patchY, patchW, patchH);
+	}
 
     /*public synchronized PassClickResult passClickEvent(int page, float x, float y) {
-        boolean changed = passClickEventInternal(page, x, y) != 0;
+		boolean changed = passClickEventInternal(page, x, y) != 0;
 
         switch (WidgetType.values()[getFocusedWidgetTypeInternal()])
         {
@@ -182,50 +192,50 @@ public class MuPDFCore
 
     }*/
 
-    public synchronized boolean setFocusedWidgetText(int page, String text) {
-        boolean success;
-        gotoPage(page);
-        success = setFocusedWidgetTextInternal(text) != 0 ? true : false;
+	public synchronized void updatePage(Bitmap bm, int page, int pageW, int pageH, int patchX, int patchY, int patchW, int patchH) {
+		updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH);
+	}
 
-        return success;
-    }
+	public synchronized boolean setFocusedWidgetText(int page, String text) {
+		boolean success;
+		gotoPage(page);
+		success = setFocusedWidgetTextInternal(text) != 0 ? true : false;
 
-    public synchronized void setFocusedWidgetChoiceSelected(String [] selected) {
-        setFocusedWidgetChoiceSelectedInternal(selected);
-    }
+		return success;
+	}
 
-    public synchronized String checkFocusedSignature() {
-        return checkFocusedSignatureInternal();
-    }
+	public synchronized String checkFocusedSignature() {
+		return checkFocusedSignatureInternal();
+	}
 
-    public synchronized boolean signFocusedSignature(String keyFile, String password) {
-        return signFocusedSignatureInternal(keyFile, password);
-    }
+	public synchronized boolean signFocusedSignature(String keyFile, String password) {
+		return signFocusedSignatureInternal(keyFile, password);
+	}
 
     /*public synchronized LinkInfo [] getPageLinks(int page) {
-        return getPageLinksInternal(page);
+		return getPageLinksInternal(page);
     }*/
 
-    public synchronized RectF [] getWidgetAreas(int page) {
-        return getWidgetAreasInternal(page);
-    }
+	public synchronized RectF[] getWidgetAreas(int page) {
+		return getWidgetAreasInternal(page);
+	}
 
     /*public synchronized Annotation [] getAnnotations(int page) {
-        return getAnnotationsInternal(page);
+		return getAnnotationsInternal(page);
     }*/
 
-    public synchronized RectF [] searchPage(int page, String text) {
-        gotoPage(page);
-        return searchPage(text);
-    }
+	public synchronized RectF[] searchPage(int page, String text) {
+		gotoPage(page);
+		return searchPage(text);
+	}
 
-    public synchronized byte[] html(int page) {
-        gotoPage(page);
-        return textAsHtml();
-    }
+	public synchronized byte[] html(int page) {
+		gotoPage(page);
+		return textAsHtml();
+	}
 
     /*public synchronized TextWord [][] textLines(int page) {
-        gotoPage(page);
+		gotoPage(page);
         TextChar[][][][] chars = text();
 
         // The text of the page held in a hierarchy (blocks, lines, spans).
@@ -263,41 +273,41 @@ public class MuPDFCore
     }*/
 
     /*public synchronized void addMarkupAnnotation(int page, PointF[] quadPoints, Annotation.Type type) {
-        gotoPage(page);
+		gotoPage(page);
         addMarkupAnnotationInternal(quadPoints, type.ordinal());
     }*/
 
-    public synchronized void addInkAnnotation(int page, PointF[][] arcs) {
-        gotoPage(page);
-        addInkAnnotationInternal(arcs);
-    }
+	public synchronized void addInkAnnotation(int page, PointF[][] arcs) {
+		gotoPage(page);
+		addInkAnnotationInternal(arcs);
+	}
 
-    public synchronized void deleteAnnotation(int page, int annot_index) {
-        gotoPage(page);
-        deleteAnnotationInternal(annot_index);
-    }
+	public synchronized void deleteAnnotation(int page, int annot_index) {
+		gotoPage(page);
+		deleteAnnotationInternal(annot_index);
+	}
 
-    public synchronized boolean hasOutline() {
-        return hasOutlineInternal();
-    }
+	public synchronized boolean hasOutline() {
+		return hasOutlineInternal();
+	}
 
     /*public synchronized OutlineItem [] getOutline() {
         return getOutlineInternal();
     }*/
 
-    public synchronized boolean needsPassword() {
-        return needsPasswordInternal();
-    }
+	public synchronized boolean needsPassword() {
+		return needsPasswordInternal();
+	}
 
-    public synchronized boolean authenticatePassword(String password) {
-        return authenticatePasswordInternal(password);
-    }
+	public synchronized boolean authenticatePassword(String password) {
+		return authenticatePasswordInternal(password);
+	}
 
-    public synchronized boolean hasChanges() {
-        return hasChangesInternal();
-    }
+	public synchronized boolean hasChanges() {
+		return hasChangesInternal();
+	}
 
-    public synchronized void save() {
-        saveInternal();
-    }
+	public synchronized void save() {
+		saveInternal();
+	}
 }

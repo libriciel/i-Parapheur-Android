@@ -104,8 +104,6 @@ public class RESTClientAPI1 extends RESTClientAPI {
         return modelMapper.getCircuit(RESTUtils.post(url, body));
     }
 
-
-
     @Override
     public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
         String url = buildUrl(ACTION_GET_ANNOTATIONS);
@@ -234,12 +232,15 @@ public class RESTClientAPI1 extends RESTClientAPI {
     }
 
     @Override
-    public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+    public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes,
+								 String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
         return false;
     }
 
     @Override
-    public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+    public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC,
+								List<String> destinatairesCCI, String sujet, String message, String password,
+								boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
         return false;
     }
 
