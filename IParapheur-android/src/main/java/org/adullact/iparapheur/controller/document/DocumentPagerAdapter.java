@@ -78,8 +78,13 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 	}
 
 	private void updateFragment(int position, Bitmap bm, float scale, DocumentPageFragment fragment, Point initSize) {
-		if ((fragment != null) && (fragment.getActivity() != null))
-			fragment.updatePage(document.getDossierId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize);
+		if ((fragment != null) && (fragment.getActivity() != null)) {
+			Point pdfSize = null;
+			if (pageSizes.get(position) != null)
+				pdfSize = new Point(Math.round(pageSizes.get(position).x), Math.round(pageSizes.get(position).y));
+
+			fragment.updatePage(document.getDossierId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize, pdfSize);
+		}
 	}
 
 	private class DocumentPageLoadingTask extends LoadingTask {
@@ -104,36 +109,38 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		@Override
 		protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
-			if (isCancelled()) return;
+			if ((muPDFCore == null) || isCancelled())
+				return;
 
-			if (muPDFCore != null) {
-				PointF pageSize = pageSizes.get(mNumPage);
+			PointF pageSize = pageSizes.get(mNumPage);
 
-				if (pageSize == null) {
-					pageSize = muPDFCore.getPageSize(mNumPage);
-					pageSizes.put(mNumPage, pageSize);
-				}
-
-				if (isCancelled()) return;
-
-				float initScale = Math.min(mContainerWidth / pageSize.x, mContainerHeight / pageSize.y);
-				mInitSize = new Point((int) (pageSize.x * initScale), (int) (pageSize.y * initScale));
-
-				mScale = Math.max(mContainerWidth / pageSize.x, mContainerHeight / pageSize.y);
-				Point scaledSize = new Point((int) (pageSize.x * mScale), (int) (pageSize.y * mScale));
-				mBitmap = Bitmap.createBitmap(scaledSize.x, scaledSize.y, Bitmap.Config.ARGB_8888);
-
-				if (isCancelled()) return;
-
-				muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
+			if (pageSize == null) {
+				pageSize = muPDFCore.getPageSize(mNumPage);
+				pageSizes.put(mNumPage, pageSize);
 			}
+
+			if (isCancelled())
+				return;
+
+			float initScale = Math.min(mContainerWidth / pageSize.x, mContainerHeight / pageSize.y);
+			mInitSize = new Point((int) (pageSize.x * initScale), (int) (pageSize.y * initScale));
+
+			mScale = Math.max(mContainerWidth / pageSize.x, mContainerHeight / pageSize.y);
+			Point scaledSize = new Point((int) (pageSize.x * mScale), (int) (pageSize.y * mScale));
+			mBitmap = Bitmap.createBitmap(scaledSize.x, scaledSize.y, Bitmap.Config.ARGB_8888);
+
+			if (isCancelled())
+				return;
+
+			muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
 		}
 
 		@Override
 		protected void onPostExecute(String error) {
 			super.onPostExecute(error);
 
-			if ((error == null) && (muPDFCore != null)) updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);
+			if ((error == null) && (muPDFCore != null))
+				updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);
 		}
 	}
 }

@@ -6,60 +6,55 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by jmaire on 20/03/2014.
- */
 public class PageAnnotations implements Parcelable {
 
-    private List<Annotation> annotations;
+	public static Parcelable.Creator<PageAnnotations> CREATOR = new Parcelable.Creator<PageAnnotations>() {
+		public PageAnnotations createFromParcel(Parcel source) {
+			return new PageAnnotations(source);
+		}
 
-    public PageAnnotations(List<Annotation> annotations) {
-        this.annotations = (annotations == null)?
-                new ArrayList<Annotation>() :
-                annotations;
-    }
+		public PageAnnotations[] newArray(int size) {
+			return new PageAnnotations[size];
+		}
+	};
 
-    public PageAnnotations() {
-        this.annotations = new ArrayList<Annotation>();
-    }
+	private List<Annotation> mAnnotations;
 
-    public List<Annotation> getAnnotations() {
-        return annotations;
-    }
+	public PageAnnotations(List<Annotation> annotations) {
+		mAnnotations = (annotations == null) ? new ArrayList<Annotation>() : annotations;
+	}
 
-    public void setAnnotations(List<Annotation> annotations) {
-        this.annotations = annotations;
-    }
+	public PageAnnotations() {
+		mAnnotations = new ArrayList<Annotation>();
+	}
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+	private PageAnnotations(Parcel in) {
+		in.readTypedList(mAnnotations, Annotation.CREATOR);
+	}
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(annotations);
-    }
+	public List<Annotation> getAnnotations() {
+		return mAnnotations;
+	}
 
-    private PageAnnotations(Parcel in) {
-        in.readTypedList(annotations, Annotation.CREATOR);
-    }
+	public void setAnnotations(List<Annotation> annotations) {
+		mAnnotations = annotations;
+	}
 
-    public static Parcelable.Creator<PageAnnotations> CREATOR = new Parcelable.Creator<PageAnnotations>() {
-        public PageAnnotations createFromParcel(Parcel source) {
-            return new PageAnnotations(source);
-        }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-        public PageAnnotations[] newArray(int size) {
-            return new PageAnnotations[size];
-        }
-    };
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeTypedList(mAnnotations);
+	}
 
-    public void add(Annotation annotation) {
-        this.annotations.add(annotation);
-    }
+	public void add(Annotation annotation) {
+		mAnnotations.add(annotation);
+	}
 
-    public void remove(Annotation annotation) {
-        this.annotations.remove(annotation);
-    }
+	public void remove(Annotation annotation) {
+		mAnnotations.remove(annotation);
+	}
 }

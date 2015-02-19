@@ -62,13 +62,15 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	//</editor-fold desc="LifeCycle">
 
-	public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations, Point initSize) {
-		mPageLayout.update(pageImage, annotations, initSize);
+	public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations, Point initSize, Point pdfSize) {
+		mPageLayout.update(pageImage, annotations, initSize, pdfSize);
 	}
 
 	private void scale(ScaleType scaleType) {
 		mPageLayout.setBackgroundColor(Color.RED);
+
 		switch (scaleType) {
+
 			case fitHeight:
 
 				ScrollView.LayoutParams fitHeightLP = new ScrollView.LayoutParams(mPageLayout.getInitialWidth(), mPageLayout.getInitialHeight());
@@ -76,6 +78,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 				mPageLayout.setLayoutParams(fitHeightLP);
 				mPageLayout.setTranslationY(0);
+				mPageLayout.refreshDisplayedAnnotations(new Point(mPageLayout.getInitialWidth(), mPageLayout.getInitialHeight()));
 
 				break;
 
@@ -90,6 +93,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 				ScrollView.LayoutParams fitWidthLP = new ScrollView.LayoutParams(scaledWidth, scaledHeight);
 				fitWidthLP.gravity = Gravity.CENTER_HORIZONTAL;
 				mPageLayout.setLayoutParams(fitWidthLP);
+				mPageLayout.refreshDisplayedAnnotations(new Point(scaledWidth, scaledHeight));
 
 				break;
 		}

@@ -27,313 +27,294 @@ import java.util.Map;
 /**
  * Created by jmaire on 09/06/2014.
  * API i-Parapheur version 3
- *
+ * <p/>
  * a partir de la v4.2.00 / v3.6.00 (comprise)
- *
+ * <p/>
  * Refonte totale de l'API.
  * On passe sur une API Restful CRUDL
- *
+ * <p/>
  * Il y a des sous ressources (ex. les bureaux de l'utilisateur),
  * et quelques action spécifiques qui ne suivent pas l'architecture CRUDL
  * (ex. mise à jour des classifications ACTES).
- *
  */
 public class RESTClientAPI3 extends RESTClientAPI {
 
-    /* Ressources principales */
-    private static final String RESOURCE_BUREAUX = "/parapheur/bureaux";
-    private static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
-    private static final String RESOURCE_DOSSIER_CIRCUIT = "/parapheur/dossiers/%s/circuit";
-    private static final String RESOURCE_TYPES = "/parapheur/types";
-    private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
-    private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
-    private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
+	/* Ressources principales */
+	private static final String RESOURCE_BUREAUX = "/parapheur/bureaux";
+	private static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
+	private static final String RESOURCE_DOSSIER_CIRCUIT = "/parapheur/dossiers/%s/circuit";
+	private static final String RESOURCE_TYPES = "/parapheur/types";
+	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
+	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
+	private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
 
-    /* Ressources secondaires */
-    private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
-    private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
-    private static final String RESOURCE_JOURNAL_EVENEMENT = "/parapheur/dossiers/%s/evenements";
+	/* Ressources secondaires */
+	private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
+	private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
+	private static final String RESOURCE_JOURNAL_EVENEMENT = "/parapheur/dossiers/%s/evenements";
 
     /* Resources sur la lecture des documents */
-    /**
-     * Le premier argument est l'id du dossier, le second l'id du document, le dernier le numéro de page
-     */
-    private static final String RESOURCE_DOCUMENT_PAGE = "/parapheur/dossiers/%s/%s/%d";
-    private static final String RESOURCE_XEMELIOS_VIEWER = "/parapheur/dossiers/%s/%s/xemelios";
+	/**
+	 * Le premier argument est l'id du dossier, le second l'id du document, le dernier le numéro de page
+	 */
+	private static final String RESOURCE_DOCUMENT_PAGE = "/parapheur/dossiers/%s/%s/%d";
+	private static final String RESOURCE_XEMELIOS_VIEWER = "/parapheur/dossiers/%s/%s/xemelios";
 
-    /* Actions de validation principales les dossiers */
-    private static final String ACTION_VISA = "/parapheur/dossiers/%s/visa";
-    private static final String ACTION_SIGNATURE = "/parapheur/dossiers/%s/signature";
-    private static final String ACTION_TDT_ACTES = "/parapheur/dossiers/%s/tdtActes";
-    private static final String ACTION_TDT_HELIOS = "/parapheur/dossiers/%s/tdtHelios";
-    private static final String ACTION_MAILSEC = "/parapheur/dossiers/%s/mailsec";
-    private static final String ACTION_ARCHIVAGE = "/parapheur/dossiers/%s/archive";
-    private static final String ACTION_REJET = "/parapheur/dossiers/%s/rejet";
+	/* Actions de validation principales les dossiers */
+	private static final String ACTION_VISA = "/parapheur/dossiers/%s/visa";
+	private static final String ACTION_SIGNATURE = "/parapheur/dossiers/%s/signature";
+	private static final String ACTION_TDT_ACTES = "/parapheur/dossiers/%s/tdtActes";
+	private static final String ACTION_TDT_HELIOS = "/parapheur/dossiers/%s/tdtHelios";
+	private static final String ACTION_MAILSEC = "/parapheur/dossiers/%s/mailsec";
+	private static final String ACTION_ARCHIVAGE = "/parapheur/dossiers/%s/archive";
+	private static final String ACTION_REJET = "/parapheur/dossiers/%s/rejet";
 
-    /* Autres actions possibles sur les dossiers */
-    private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
-    private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
+	/* Autres actions possibles sur les dossiers */
+	private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
+	private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
 
+	protected ModelMapper modelMapper = new ModelMapper3();
 
-    protected ModelMapper modelMapper = new ModelMapper3();
+	@Override
+	public List<Bureau> getBureaux() throws IParapheurException {
+		return modelMapper.getBureaux(RESTUtils.get(buildUrl(RESOURCE_BUREAUX)));
+	}
 
-    @Override
-    public List<Bureau> getBureaux() throws IParapheurException {
-        return modelMapper.getBureaux(RESTUtils.get(buildUrl(RESOURCE_BUREAUX)));
-    }
+	@Override
+	public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
+		String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
+		return modelMapper.getDossier(RESTUtils.get(url));
+	}
 
-    @Override
-    public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-        String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
-        return modelMapper.getDossier(RESTUtils.get(url));
-    }
+	@Override
+	public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 
-    @Override
-    public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
+		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+		if (filter == null) {
+			filter = new Filter();
+		}
+		String params = "asc=true" +
+				"&bureau=" + bureauId +
+				"&corbeilleName=" + filter.getEtat() +
+				"&filter=" + filter.getJSONFilter() +
+				"&metas={}" +
+				"&page=0" +
+				"&pageSize=25" +
+				"&pendingFile=0" +
+				"&skipped=0" +
+				"&sort=cm:created";
+		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
+		String url = buildUrl(RESOURCE_DOSSIERS, params);
 
-        Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-        if (filter == null) {
-            filter = new Filter();
-        }
-        String params = "asc=true" +
-                "&bureau=" + bureauId +
-                "&corbeilleName=" + filter.getEtat() +
-                "&filter=" + filter.getJSONFilter() +
-                "&metas={}" +
-                "&page=0" +
-                "&pageSize=25" +
-                "&pendingFile=0" +
-                "&skipped=0" +
-                "&sort=cm:created";
-        //Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
-        String url = buildUrl(RESOURCE_DOSSIERS, params);
+		return modelMapper.getDossiers(RESTUtils.get(url));
+	}
 
-        return modelMapper.getDossiers(RESTUtils.get(url));
-    }
+	@Override
+	public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+		String url = buildUrl(RESOURCE_TYPES);
+		return modelMapper.getTypologie(RESTUtils.get(url));
+	}
 
-    @Override
-    public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
-        String url = buildUrl(RESOURCE_TYPES);
-        return modelMapper.getTypologie(RESTUtils.get(url));
-    }
+	@Override
+	public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
+		return modelMapper.getCircuit(RESTUtils.get(url));
+	}
 
-    @Override
-    public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
-        String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
-        return modelMapper.getCircuit(RESTUtils.get(url));
-    }
+	@Override
+	public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+		return modelMapper.getAnnotations(RESTUtils.get(url));
+	}
 
-    @Override
-    public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
-        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
-        return modelMapper.getAnnotations(RESTUtils.get(url));
-    }
+	@Override
+	public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+		JSONObject annot = new JSONObject();
+		float annotHeight = annotation.getRect().height();
+		float annotwidth = annotation.getRect().width();
+		float centerX = annotation.getRect().centerX();
+		float centerY = annotation.getRect().centerY();
 
-    @Override
-    public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
-        JSONObject annot = new JSONObject();
-        float annotHeight = annotation.getRect().height();
-        float annotwidth = annotation.getRect().width();
-        float centerX = annotation.getRect().centerX();
-        float centerY = annotation.getRect().centerY();
+		try {
+			JSONObject rect = new JSONObject().putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
-        try {
-            JSONObject rect = new JSONObject()
-                    .putOpt("bottomRight",
-                            new JSONObject().put("x", centerX + annotwidth / 2)
-                                    .put("y", centerY - annotHeight / 2))
-                    .putOpt("topLeft",
-                            new JSONObject().put("x", centerX - annotwidth / 2)
-                                    .put("y", centerY + annotHeight / 2));
+			annot.put("author", annotation.getAuthor()).put("date", annotation.getDate()).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect");
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
+		}
 
-        annot.put("author", annotation.getAuthor())
-                .put("date", annotation.getDate())
-                .put("page", page)
-                .put("rect", rect)
-                .put("text", annotation.getText())
-                .put("type", "rect");
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
-        }
+		RequestResponse response = RESTUtils.post(url, annot.toString());
+		if (response != null && response.getCode() == HttpStatus.SC_OK) {
+			JSONObject idObj = response.getResponse();
+			if (idObj != null) {
+				return idObj.optString("id", null);
+			}
+		}
+		return null;
+	}
 
-        RequestResponse response = RESTUtils.post(url, annot.toString());
-        if (response != null && response.getCode() == HttpStatus.SC_OK) {
-            JSONObject idObj = response.getResponse();
-            if (idObj != null) {
-                return idObj.optString("id", null);
-            }
-        }
-        return null;
-    }
+	@Override
+	public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
+		JSONObject annot = new JSONObject();
+		float annotHeight = annotation.getRect().height();
+		float annotwidth = annotation.getRect().width();
+		float centerX = annotation.getRect().centerX();
+		float centerY = annotation.getRect().centerY();
 
-    @Override
-    public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
-        JSONObject annot = new JSONObject();
-        float annotHeight = annotation.getRect().height();
-        float annotwidth = annotation.getRect().width();
-        float centerX = annotation.getRect().centerX();
-        float centerY = annotation.getRect().centerY();
+		try {
+			JSONObject rect = new JSONObject().putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
-        try {
-            JSONObject rect = new JSONObject()
-                    .putOpt("bottomRight",
-                            new JSONObject().put("x", centerX + annotwidth / 2)
-                                    .put("y", centerY - annotHeight / 2))
-                    .putOpt("topLeft",
-                            new JSONObject().put("x", centerX - annotwidth / 2)
-                                    .put("y", centerY + annotHeight / 2));
+			annot.put("author", annotation.getAuthor()).put("date", annotation.getDate()).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect");
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
+		}
 
-            annot.put("author", annotation.getAuthor())
-                    .put("date", annotation.getDate())
-                    .put("page", page)
-                    .put("rect", rect)
-                    .put("text", annotation.getText())
-                    .put("type", "rect");
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
-        }
+		RequestResponse response = RESTUtils.put(url, annot.toString());
+		if (response == null || response.getCode() != HttpStatus.SC_OK) {
+			throw new IParapheurException(R.string.error_annotation_update, "");
+		}
+	}
 
-        RequestResponse response = RESTUtils.put(url, annot.toString());
-        if (response == null || response.getCode() != HttpStatus.SC_OK) {
-            throw new IParapheurException(R.string.error_annotation_update, "");
-        }
-    }
+	@Override
+	public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
+		RESTUtils.delete(url);
+	}
 
-    @Override
-    public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
-        String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
-        RESTUtils.delete(url);
-    }
+	@Override
+	public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_VISA, dossier.getId());
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-    @Override
-    public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-        String actionUrl = String.format(Locale.US, ACTION_VISA, dossier.getId());
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("annotPub", annotPub);
-            json.put("annotPriv", annotPriv);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors du visa", e);
+		}
+	}
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors du visa", e);
-        }
-    }
+	@Override
+	public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			json.put("signature", signValue);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-    @Override
-    public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-        String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("annotPub", annotPub);
-            json.put("annotPriv", annotPriv);
-            json.put("signature", signValue);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
+		}
+	}
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de la signature", e);
-        }
-    }
+	@Override
+	public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+		/** FIXME : weird copy/paste. Maybe it has no utility too.
+		 String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
+		 try {
+		 JSONObject json = new JSONObject();
+		 json.put("bureauCourant", bureauId);
+		 json.put("name", archiveTitle);
+		 json.put("annexesInclude", withAnnexes);
+		 RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+		 return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-    @Override
-    public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
-       	/** FIXME : weird copy/paste. Maybe it has no utility too.
-        String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("name", archiveTitle);
-            json.put("annexesInclude", withAnnexes);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
-
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de l'archivage", e);
-        }*/
+		 } catch (JSONException e) {
+		 throw new RuntimeException("Une erreur est survenue lors de l'archivage", e);
+		 }*/
 		return false;
-    }
+	}
 
-    @Override
-    public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-        String actionUrl = String.format(Locale.US, ACTION_TDT_HELIOS, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("annotPub", annotPub);
-            json.put("annotPriv", annotPriv);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+	@Override
+	public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_TDT_HELIOS, dossierId);
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de l'envoi au TdT (Helios)", e);
-        }
-    }
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de l'envoi au TdT (Helios)", e);
+		}
+	}
 
-    @Override
-    public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes,
-								 String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-        String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("annotPub", annotPub);
-            json.put("annotPriv", annotPriv);
-            json.put("objet", objet);
-            json.put("nature", nature);
-            json.put("classification", classification);
-            json.put("numero", numero);
-            json.put("dateActes", dateActes);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+	@Override
+	public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			json.put("objet", objet);
+			json.put("nature", nature);
+			json.put("classification", classification);
+			json.put("numero", numero);
+			json.put("dateActes", dateActes);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de l'envoi au TdT (ACTES)", e);
-        }
-    }
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de l'envoi au TdT (ACTES)", e);
+		}
+	}
 
-    @Override
-    public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC,
-								List<String> destinatairesCCI, String sujet, String message, String password,
-								boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override
+	public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
 
-        String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("destinataires", destinataires);
-            json.put("destinatairesCC", destinatairesCC);
-            json.put("destinatairesCCI", destinatairesCCI);
-            json.put("objet", sujet);
-            json.put("message", message);
-            json.put("password", password);
-            json.put("showpass", showPassword);
-            json.put("annexesIncluded", annexesIncluded);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("destinataires", destinataires);
+			json.put("destinatairesCC", destinatairesCC);
+			json.put("destinatairesCCI", destinatairesCCI);
+			json.put("objet", sujet);
+			json.put("message", message);
+			json.put("password", password);
+			json.put("showpass", showPassword);
+			json.put("annexesIncluded", annexesIncluded);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors de l'envoi par mail sécurisé", e);
-        }
-    }
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de l'envoi par mail sécurisé", e);
+		}
+	}
 
-    @Override
-    public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-        String actionUrl = String.format(Locale.US, ACTION_REJET, dossierId);
-        try {
-            JSONObject json = new JSONObject();
-            json.put("bureauCourant", bureauId);
-            json.put("annotPub", annotPub);
-            json.put("annotPriv", annotPriv);
-            RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-            return (response != null && response.getCode() == HttpStatus.SC_OK);
+	@Override
+	public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_REJET, dossierId);
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpStatus.SC_OK);
 
-        } catch (JSONException e) {
-            throw new RuntimeException("Une erreur est survenue lors du rejet", e);
-        }
-    }
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors du rejet", e);
+		}
+	}
 }

@@ -25,12 +25,17 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 	private GestureDetector mGestureDetector;
 	private float mPageScale, mChildScale;
 	private PageLayoutListener mPageLayoutListener;
+	private Point mPdfSize;
 
 	public PageLayout(Context context, int numPage) {
 		super(context);
 		addChildViews(numPage);
 		mGestureDetector = new GestureDetector(context, new AnnotationGestureListener());
 		setOnTouchListener(this);
+	}
+
+	public void setPageLayoutListener(PageLayoutListener pageLayoutListener) {
+		mPageLayoutListener = pageLayoutListener;
 	}
 
 	private void addChildViews(int numPage) {
@@ -61,14 +66,12 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		setScaleY(mPageScale);
 	}
 
-	public void update(Bitmap pageImage, PageAnnotations annotations, Point initSize) {
-		mAnnotationsView.setAnnotations(annotations);
-		mImageView.setImageBitmap(pageImage);
-
+	public void update(Bitmap pageImage, PageAnnotations annotations, Point initSize, Point pdfSize) {
 		mInitialWidth = initSize.x;
 		mInitialHeight = initSize.y;
 		mChildScale = 1.0f;
 		mPageScale = 1.0f;
+		mPdfSize = pdfSize;
 
 		ScrollView.LayoutParams layoutParam = new ScrollView.LayoutParams(mInitialWidth, mInitialHeight);
 		layoutParam.gravity = Gravity.CENTER_HORIZONTAL;
@@ -78,9 +81,18 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		requestLayout();
 		requestLayout();
 		invalidate();
+
+		mAnnotationsView.setAnnotations(annotations);
+		refreshDisplayedAnnotations(initSize);
+
+		mImageView.setImageBitmap(pageImage);
 	}
 
-	//AnnotationsLayout callbacks implementation
+	public void refreshDisplayedAnnotations(Point targetSize) {
+		mAnnotationsView.refreshDisplayedAnnotations(mPdfSize, targetSize);
+	}
+
+	// <editor-fold desc="AnnotationsLayoutListener">
 
 	@Override
 	public void onCreateAnnotation(Annotation annotation) {
@@ -97,8 +109,8 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 	public void onUpdateAnnotation(Annotation annotation) {
 		// TODO : save annotation
 		Log.i("debug", "onUpdateAnnotation");
-        /*try {
-            RESTClient.INSTANCE.updateAnnotation(dossierId, annotation, numPage);
+		/*try {
+			RESTClient.INSTANCE.updateAnnotation(dossierId, annotation, numPage);
         } catch (IParapheurException e) {
             Toast.makeText(getActivity(), e.getResId(), Toast.LENGTH_LONG).show();
         }*/
@@ -108,20 +120,19 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 	public void onDeleteAnnotation(Annotation annotation) {
 		// TODO : save annotation
 		Log.i("debug", "onDeleteAnnotation");
-        /*try {
-            RESTClient.INSTANCE.deleteAnnotation(dossierId, annotation.getUuid(), numPage);
+		/*try {
+			RESTClient.INSTANCE.deleteAnnotation(dossierId, annotation.getUuid(), numPage);
         } catch (IParapheurException e) {
             Toast.makeText(getActivity(), e.getResId(), Toast.LENGTH_LONG).show();
         }*/
 	}
 
-	// Scaling gestures
+	// </editor-fold desc="AnnotationsLayoutListener">
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		boolean ret = mGestureDetector.onTouchEvent(event);
-//        ret = ret || scaleGestureDetector.onTouchEvent(event);
-		return ret || super.onTouchEvent(event);
+		return (ret || super.onTouchEvent(event));
 	}
 
 	public int getInitialWidth() {
@@ -132,22 +143,20 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		return mInitialHeight;
 	}
 
-	public void setPageLayoutListener(PageLayoutListener pageLayoutListener) {
-		mPageLayoutListener = pageLayoutListener;
-	}
-
-	//<editor-fold desc="PageLayoutListener"
+	//<editor-fold desc="Listener"
 
 	public interface PageLayoutListener {
 
 		public void onDoubleTap(MotionEvent me);
 	}
 
+	//</editor-fold desc="Listener"
+
 	private class AnnotationGestureListener extends GestureDetector.SimpleOnGestureListener {
 
 		@Override
 		public boolean onDown(MotionEvent me) {
-			mAnnotationsView.unselectAnnotation(true);
+			mAnnotationsView.deselectAnnotation(true);
 			return true;
 		}
 
@@ -170,7 +179,4 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 			return false;
 		}
 	}
-
-	//</editor-fold desc="PageLayoutListener"
-
 }
