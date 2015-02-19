@@ -157,7 +157,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	@Override
 	public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
+
+		// Build Json object
+
 		JSONObject annot = new JSONObject();
 		float annotHeight = annotation.getRect().height();
 		float annotwidth = annotation.getRect().width();
@@ -165,18 +167,31 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		float centerY = annotation.getRect().centerY();
 
 		try {
-			JSONObject rect = new JSONObject().putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			JSONObject rect = new JSONObject();
+			rect.putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2));
+			rect.putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			annot.put("rect", rect);
 
-			annot.put("author", annotation.getAuthor()).put("date", annotation.getDate()).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect");
+			annot.put("author", annotation.getAuthor());
+			annot.put("date", annotation.getDate());
+			annot.put("page", page);
+			annot.put("text", annotation.getText());
+			annot.put("type", "rect");
+			annot.put("id", annotation.getUuid());
+			annot.put("uuid", annotation.getUuid());
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
 		}
 
+		// Send request
+
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
+
 		RequestResponse response = RESTUtils.put(url, annot.toString());
-		if (response == null || response.getCode() != HttpStatus.SC_OK) {
+
+		if (response == null || response.getCode() != HttpStatus.SC_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
-		}
 	}
 
 	@Override

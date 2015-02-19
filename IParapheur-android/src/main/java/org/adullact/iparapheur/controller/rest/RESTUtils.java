@@ -1,8 +1,8 @@
 package org.adullact.iparapheur.controller.rest;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.model.RequestResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
