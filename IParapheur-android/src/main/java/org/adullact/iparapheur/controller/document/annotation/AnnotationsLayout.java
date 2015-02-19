@@ -132,6 +132,16 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 		return new RectF(resultLeft, resultTop, resultRight, resultBottom);
 	}
 
+	private RectF annotationLayoutCoordinatesToPdfCoordinates(RectF rect) {
+
+		float resultLeft = rect.left * mPdfSize.x / mInitialSize.x;
+		float resultTop = rect.top * mPdfSize.x / mInitialSize.x;
+		float resultBottom = rect.bottom * mPdfSize.x / mInitialSize.x;
+		float resultRight = rect.right * mPdfSize.x / mInitialSize.x;
+
+		return new RectF(resultLeft, resultTop, resultRight, resultBottom);
+	}
+
 	private AnnotationView createAnnotationView(Annotation annotation) {
 
 		AnnotationView annotationView = new AnnotationView(getContext(), annotation, this);
@@ -163,7 +173,7 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 
 	public void deselectAnnotation(boolean informChild) {
 		if (informChild && (mSelectedAnnotation != null))
-			mSelectedAnnotation.unselect();
+			mSelectedAnnotation.deselect();
 
 		mSelectedAnnotation = null;
 	}
@@ -185,7 +195,6 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 
 	@Override
 	public void onAnnotationEdited(AnnotationView annotationView) {
-		Annotation annotation = annotationView.getAnnotation();
 		mListener.onUpdateAnnotation(annotationView.getAnnotation());
 	}
 
@@ -194,6 +203,12 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 		deselectAnnotation(false);
 		mListener.onDeleteAnnotation(annotationView.getAnnotation());
 		removeView(annotationView);
+	}
+
+	@Override
+	public void onAnnotationSizeChanged(AnnotationView annotationView, RectF currentLayoutSize) {
+		RectF scaledCoordinates = annotationLayoutCoordinatesToPdfCoordinates(currentLayoutSize);
+		annotationView.getAnnotation().setRect(scaledCoordinates.left, scaledCoordinates.top, scaledCoordinates.right, scaledCoordinates.bottom);
 	}
 
 	// </editor-fold desc="AnnotationViewListener">

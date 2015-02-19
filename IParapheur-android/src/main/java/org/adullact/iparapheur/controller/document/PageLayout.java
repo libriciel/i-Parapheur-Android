@@ -3,7 +3,6 @@ package org.adullact.iparapheur.controller.document;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -96,35 +95,20 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
 	@Override
 	public void onCreateAnnotation(Annotation annotation) {
-		// TODO : save annotation
-		Log.i("debug", "onCreateAnnotation");
-		/*try {
-			RESTClient.INSTANCE.createAnnotation(dossierId, annotation, numPage);
-        } catch (IParapheurException e) {
-            Toast.makeText(getActivity(), e.getResId(), Toast.LENGTH_LONG).show();
-        }*/
+		if (mPageLayoutListener != null)
+			mPageLayoutListener.onCreateAnnotation(annotation);
 	}
 
 	@Override
 	public void onUpdateAnnotation(Annotation annotation) {
-		// TODO : save annotation
-		Log.i("debug", "onUpdateAnnotation");
-		/*try {
-			RESTClient.INSTANCE.updateAnnotation(dossierId, annotation, numPage);
-        } catch (IParapheurException e) {
-            Toast.makeText(getActivity(), e.getResId(), Toast.LENGTH_LONG).show();
-        }*/
+		if (mPageLayoutListener != null)
+			mPageLayoutListener.onUpdateAnnotation(annotation);
 	}
 
 	@Override
 	public void onDeleteAnnotation(Annotation annotation) {
-		// TODO : save annotation
-		Log.i("debug", "onDeleteAnnotation");
-		/*try {
-			RESTClient.INSTANCE.deleteAnnotation(dossierId, annotation.getUuid(), numPage);
-        } catch (IParapheurException e) {
-            Toast.makeText(getActivity(), e.getResId(), Toast.LENGTH_LONG).show();
-        }*/
+		if (mPageLayoutListener != null)
+			mPageLayoutListener.onDeleteAnnotation(annotation);
 	}
 
 	// </editor-fold desc="AnnotationsLayoutListener">
@@ -146,6 +130,12 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 	//<editor-fold desc="Listener"
 
 	public interface PageLayoutListener {
+
+		public void onCreateAnnotation(Annotation annotation);
+
+		public void onUpdateAnnotation(Annotation annotation);
+
+		public void onDeleteAnnotation(Annotation annotation);
 
 		public void onDoubleTap(MotionEvent me);
 	}

@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.document;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
@@ -11,7 +12,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
 
 public class DocumentPageFragment extends Fragment implements PageLayout.PageLayoutListener {
@@ -19,6 +24,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	private int mNumPage;
 	private PageLayout mPageLayout;
 	private ScaleType mCurrentScaleType = ScaleType.fitHeight;
+	private String mCurrentDossierId;
 
 	public DocumentPageFragment() {}
 
@@ -63,6 +69,8 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	//</editor-fold desc="LifeCycle">
 
 	public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations, Point initSize, Point pdfSize) {
+		mCurrentDossierId = dossierId;
+
 		mPageLayout.update(pageImage, annotations, initSize, pdfSize);
 	}
 
@@ -103,6 +111,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	@Override
 	public void onDoubleTap(MotionEvent me) {
+
 		// Loop around mCurrentScaleType to the next available.
 		int nextScaleTypeOrdinal = (mCurrentScaleType.ordinal() + 1) % ScaleType.values().length;
 		mCurrentScaleType = ScaleType.values()[nextScaleTypeOrdinal];
@@ -110,10 +119,102 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		scale(mCurrentScaleType);
 	}
 
-	private enum ScaleType {
-		fitHeight, fitWidth // TODO : zoom
+	@Override
+	public void onCreateAnnotation(final Annotation annotation) {
+
+		new AsyncTask<Void, Void, Void>() {
+
+			private IParapheurException mException;
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, annotation, mNumPage);
+				}
+				catch (IParapheurException e) {
+					mException = e;
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+
+				if (mException != null)
+					Toast.makeText(getActivity(), mException.getResId(), Toast.LENGTH_LONG).show();
+			}
+
+		}.execute(null, null, null);
+	}
+
+	@Override
+	public void onUpdateAnnotation(final Annotation annotation) {
+
+		new AsyncTask<Void, Void, Void>() {
+
+			private IParapheurException mException;
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					RESTClient.INSTANCE.updateAnnotation(mCurrentDossierId, annotation, mNumPage);
+				}
+				catch (IParapheurException e) {
+					mException = e;
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+
+				if (mException != null)
+					Toast.makeText(getActivity(), mException.getResId(), Toast.LENGTH_LONG).show();
+			}
+
+		}.execute(null, null, null);
+	}
+
+	@Override
+	public void onDeleteAnnotation(final Annotation annotation) {
+
+		new AsyncTask<Void, Void, Void>() {
+
+			private IParapheurException mException;
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+					RESTClient.INSTANCE.deleteAnnotation(mCurrentDossierId, annotation.getUuid(), mNumPage);
+				}
+				catch (IParapheurException e) {
+					mException = e;
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+
+				if (mException != null)
+					Toast.makeText(getActivity(), mException.getResId(), Toast.LENGTH_LONG).show();
+			}
+
+		}.execute(null, null, null);
 	}
 
 	//</editor-fold desc="PageLayoutListener">
 
+	private enum ScaleType {
+		fitHeight, fitWidth // TODO : zoom?
+	}
 }

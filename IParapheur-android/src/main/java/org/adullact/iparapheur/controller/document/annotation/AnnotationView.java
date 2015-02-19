@@ -5,13 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,9 +20,6 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.model.Annotation;
 
-/**
- * Created by jmaire on 31/01/2014.
- */
 public class AnnotationView extends View implements View.OnTouchListener, TextWatcher {
 
 	public static final int BORDER_WIDTH = 4;
@@ -32,32 +27,28 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 	public static final int MIN_WIDTH = 160;
 	public static final int MIN_HEIGHT = 120;
 	public static final int LINE_WIDTH = 3;
-	// Button's drawings line size
-	public static final int LINE_HALF_LENGTH = 7;
-	// Space between two buttons from center to center
-	public static final int BUTTONS_SPACE = 42;
+	public static final int LINE_HALF_LENGTH = 7; // Button's drawings line size
+	public static final int BUTTONS_SPACE = 42; // Space between two buttons from center to center
 	public static final int COLOR_SELECTED = Color.parseColor("#ffff4444");
 	public static final int COLOR_BORDER = Color.BLACK;
 	public static final int BUTTON_RADIUS = 16;
 	public static final int BUTTON_TOUCH_RADIUS = 19;
 	public static final int BUTTON_COLOR = Color.BLACK;
 	public static final int BUTTON_BORDER_COLOR = Color.WHITE;
-	public static final int POSTIT_WIDTH = 220;
-	public static final int POSTIT_HEIGHT = 180;
-	public static final int POSTIT_COLOR = Color.parseColor("#ffffbb33");
+	public static final int POST_IT_WIDTH = 220;
+	public static final int POST_IT_HEIGHT = 180;
+	public static final int POST_IT_COLOR = Color.parseColor("#ffffbb33");
 	public static final int TEXT_COLOR = Color.BLACK;
 	public static final int TEXT_SIZE = 12;
-	public static final int TEXT_PADDING = 5;
-	public static final int INFOS_WIDTH = 180;
-	public static final int INFOS_HEIGHT = 120;
-	public static final int INFOS_COLOR = Color.parseColor("#ff33b5e5");
-	public static final int INFOS_ALPHA = 230; //90%
-	public static final int INFOS_BORDER_WIDTH = 3;
-	public static final int INFOS_BORDER_COLOR = Color.BLACK;
+	public static final int INFO_WIDTH = 180;
+	public static final int INFO_HEIGHT = 120;
+	public static final int INFO_COLOR = Color.parseColor("#ff33b5e5");
 	public static final int ALPHA_SELECTED = 51; //20%
 	public static final int ALPHA_BORDER = 179; //70%
+
+	private Paint paint = new Paint();
 	private Annotation annotation;
-	private EditText postItEditText;
+	private EditText mPostItEditText;
 	private TextView infoTextView;
 	private boolean selected = false;
 	private boolean minimized = false;
@@ -71,17 +62,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		this.annotation = annotation;
 		gestureDetector = new GestureDetector(context, new AnnotationViewGestureListener());
 		setOnTouchListener(this);
-		mode = mode.NONE;
-	}
-
-	public AnnotationView(Context context, AttributeSet attrs, Annotation annotation) {
-		super(context, attrs);
-		this.annotation = annotation;
-	}
-
-	public AnnotationView(Context context, AttributeSet attrs, int defStyleAttr, Annotation annotation) {
-		super(context, attrs, defStyleAttr);
-		this.annotation = annotation;
+		mode = AnnotationView.Mode.NONE;
 	}
 
 	private void selectInternal() {
@@ -94,10 +75,10 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		invalidate();
 	}
 
-	public void unselect() {
+	public void deselect() {
 		this.selected = false;
-		if (this.postItEditText != null) {
-			this.postItEditText.setVisibility(GONE);
+		if (this.mPostItEditText != null) {
+			this.mPostItEditText.setVisibility(GONE);
 		}
 		if (this.infoTextView != null) {
 			this.infoTextView.setVisibility(GONE);
@@ -112,9 +93,9 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 			((ViewGroup) getParent()).removeView(infoTextView);
 			infoTextView = null;
 		}
-		if (postItEditText != null) {
-			((ViewGroup) getParent()).removeView(postItEditText);
-			postItEditText = null;
+		if (mPostItEditText != null) {
+			((ViewGroup) getParent()).removeView(mPostItEditText);
+			mPostItEditText = null;
 		}
 		this.setVisibility(GONE);
 	}
@@ -124,37 +105,37 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 	}
 
 	public void toggleText() {
-		if (postItEditText == null) {
+		if (mPostItEditText == null) {
 			createEditText();
 		}
-		if (postItEditText.getVisibility() == GONE) {
-			postItEditText.setVisibility(VISIBLE);
+		if (mPostItEditText.getVisibility() == GONE) {
+			mPostItEditText.setVisibility(VISIBLE);
 		}
 		else {
-			postItEditText.setVisibility(GONE);
+			mPostItEditText.setVisibility(GONE);
 		}
 	}
 
 	private void createEditText() {
-		postItEditText = new EditText(getContext());
-		postItEditText.setCursorVisible(true);
-		postItEditText.setTextSize(TEXT_SIZE);
-		postItEditText.setTextColor(TEXT_COLOR);
-		postItEditText.setBackgroundColor(POSTIT_COLOR);
-		postItEditText.setClickable(true);
-		postItEditText.setHorizontallyScrolling(false);
-		postItEditText.setTextSize(14);
-		postItEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-		postItEditText.setText(annotation.getText(), TextView.BufferType.EDITABLE);
-		postItEditText.addTextChangedListener(this);
+		mPostItEditText = new EditText(getContext());
+		mPostItEditText.setCursorVisible(true);
+		mPostItEditText.setTextSize(TEXT_SIZE);
+		mPostItEditText.setTextColor(TEXT_COLOR);
+		mPostItEditText.setBackgroundColor(POST_IT_COLOR);
+		mPostItEditText.setClickable(true);
+		mPostItEditText.setHorizontallyScrolling(false);
+		mPostItEditText.setTextSize(14);
+		mPostItEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+		mPostItEditText.setText(annotation.getText(), TextView.BufferType.EDITABLE);
+		mPostItEditText.addTextChangedListener(this);
 		placeTextView();
-		postItEditText.setVisibility(GONE);
-		((ViewGroup) getParent()).addView(postItEditText);
+		mPostItEditText.setVisibility(GONE);
+		((ViewGroup) getParent()).addView(mPostItEditText);
 	}
 
-	public void toggleInfos() {
+	public void toggleInfo() {
 		if (infoTextView == null) {
-			createInfos();
+			createInfo();
 		}
 		if (infoTextView.getVisibility() == GONE) {
 			infoTextView.setVisibility(VISIBLE);
@@ -164,15 +145,15 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		}
 	}
 
-	private void createInfos() {
+	private void createInfo() {
 		infoTextView = new TextView(getContext());
 
 		infoTextView.setTextSize(TEXT_SIZE);
 		infoTextView.setTextColor(TEXT_COLOR);
-		infoTextView.setBackgroundColor(INFOS_COLOR);
+		infoTextView.setBackgroundColor(INFO_COLOR);
 		infoTextView.setClickable(false);
 		infoTextView.setSingleLine(false);
-		infoTextView.setInputType(InputType.TYPE_NULL | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+		infoTextView.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		infoTextView.setTextSize(12);
 		infoTextView.setHorizontallyScrolling(false);
 		infoTextView.setText(Html.fromHtml(annotation.getAuthor() + "<br />" + annotation.getDate()), TextView.BufferType.NORMAL);
@@ -182,22 +163,22 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 	}
 
 	private void placeTextView() {
-		if ((postItEditText != null) && (postItEditText.getVisibility() != GONE)) {
+		if ((mPostItEditText != null) && (mPostItEditText.getVisibility() != GONE)) {
 			int parentHeight = ((AnnotationsLayout) getParent()).getHeight();
 			RelativeLayout.LayoutParams annotationLP = (RelativeLayout.LayoutParams) getLayoutParams();
-			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(POSTIT_WIDTH, POSTIT_HEIGHT);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(POST_IT_WIDTH, POST_IT_HEIGHT);
 			int left = annotationLP.leftMargin + BUTTON_RADIUS;
 			int top = annotationLP.topMargin + annotationLP.height;
-			if (top > (parentHeight - POSTIT_HEIGHT)) {
-				top = annotationLP.topMargin - POSTIT_HEIGHT;
+			if (top > (parentHeight - POST_IT_HEIGHT)) {
+				top = annotationLP.topMargin - POST_IT_HEIGHT;
 				if (top < 0) {
-					top = (parentHeight - POSTIT_HEIGHT);
+					top = (parentHeight - POST_IT_HEIGHT);
 					left += BUTTON_RADIUS;
 				}
 			}
 			lp.leftMargin = left;
 			lp.topMargin = top;
-			postItEditText.setLayoutParams(lp);
+			mPostItEditText.setLayoutParams(lp);
 		}
 	}
 
@@ -206,15 +187,15 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 			int parentWidth = ((AnnotationsLayout) getParent()).getWidth();
 			int parentHeight = ((AnnotationsLayout) getParent()).getHeight();
 			RelativeLayout.LayoutParams annotationLP = (RelativeLayout.LayoutParams) getLayoutParams();
-			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(INFOS_WIDTH, INFOS_HEIGHT);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(INFO_WIDTH, INFO_HEIGHT);
 			int left = (annotationLP.leftMargin + annotationLP.width);
 			int top = annotationLP.topMargin + BUTTON_RADIUS;
-			int maxLeft = (parentWidth - INFOS_WIDTH);
+			int maxLeft = (parentWidth - INFO_WIDTH);
 			if (left > maxLeft) {
 				left = maxLeft;
 				top = annotationLP.topMargin + annotationLP.height;
-				if (top > parentHeight - INFOS_HEIGHT) {
-					top = (annotationLP.topMargin - INFOS_HEIGHT);
+				if (top > parentHeight - INFO_HEIGHT) {
+					top = (annotationLP.topMargin - INFO_HEIGHT);
 					if (top < 0) {
 						top = annotationLP.topMargin;
 					}
@@ -234,13 +215,15 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		int parentWidth = ((AnnotationsLayout) getParent()).getWidth();
 		int parentHeight = ((AnnotationsLayout) getParent()).getHeight();
 		RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) getLayoutParams();
-		PointF newOffset = new PointF(Math.max(0, Math.min(parentWidth - lp.width, x + offset.x)), Math.max(0, Math.min(parentHeight - lp.height, y + offset.y)));
+		PointF newOffset = new PointF(0, 0);
 
 		if (lp != null) {
+			newOffset = new PointF(Math.max(0, Math.min(parentWidth - lp.width, x + offset.x)), Math.max(0, Math.min(parentHeight - lp.height, y + offset.y)));
 			lp.leftMargin = (int) newOffset.x;
 			lp.topMargin = (int) newOffset.y;
+			setLayoutParams(lp);
 		}
-		setLayoutParams(lp);
+
 		return newOffset;
 	}
 
@@ -311,21 +294,17 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		return center;
 	}
 
-	private RectF getInfosRect() {
-		return new RectF(annotation.getRect().left, annotation.getRect().bottom + 5, annotation.getRect().left + INFOS_WIDTH, annotation.getRect().bottom + INFOS_HEIGHT);
-	}
-
 	// Methods and utilities for drawing
-
-	public Rect getTextRect() {
-		return new Rect((int) annotation.getRect().left, (int) annotation.getRect().bottom + 10, (int) annotation.getRect().left + POSTIT_WIDTH, (int) annotation.getRect().bottom + POSTIT_HEIGHT);
-	}
 
 	@Override
 	public void setLayoutParams(ViewGroup.LayoutParams params) {
 		super.setLayoutParams(params);
 		placeTextView();
 		placeInfosView();
+
+		RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) params;
+		if (listener != null)
+			listener.onAnnotationSizeChanged(this, new RectF(lp.leftMargin, lp.topMargin, lp.leftMargin + lp.width, lp.topMargin + lp.height));
 	}
 
 	@Override
@@ -376,10 +355,10 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		//Log.d("debug", "ONDRAW");
+
 		if (!annotation.isDeleted()) {
-			Paint paint = new Paint();
 			paint.setAntiAlias(true);
+
 			if (minimized) {
 				drawButton(canvas, paint, Button.DELETE);
 				drawButton(canvas, paint, Button.MINIMIZE);
@@ -395,6 +374,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 				}
 			}
 		}
+
 		super.onDraw(canvas);
 	}
 
@@ -488,7 +468,6 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 					listener.onAnnotationDeleted(this);
 				}
 			}
-			;
 		}
 		return false;
 	}
@@ -536,6 +515,8 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 		void onAnnotationEdited(AnnotationView annotationView);
 
 		void onAnnotationDeleted(AnnotationView annotationView);
+
+		void onAnnotationSizeChanged(AnnotationView annotationView, RectF currentLayoutSize);
 	}
 
 	private class AnnotationViewGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -576,10 +557,10 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 						toggleSize();
 						break;
 					case INFO:
-						toggleInfos();
+						toggleInfo();
 						break;
 					case DELETE:
-						// TODO : possibilité d'annuler la suppression?
+						// TODO : cancelling ?
 						delete();
 						break;
 				}

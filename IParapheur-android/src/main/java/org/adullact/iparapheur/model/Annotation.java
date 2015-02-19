@@ -87,7 +87,7 @@ public class Annotation implements Parcelable {
 		this.rect.set(x, y, r, b);
 		this.updated = true;
 	}
-
+	
 	public RectF getUnscaledRect() {
 		return new RectF(rect.left / scale, rect.top / scale, rect.right / scale, rect.bottom / scale);
 	}
