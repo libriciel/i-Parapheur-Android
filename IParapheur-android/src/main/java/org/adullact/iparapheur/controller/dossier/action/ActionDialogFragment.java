@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.util.ArrayList;

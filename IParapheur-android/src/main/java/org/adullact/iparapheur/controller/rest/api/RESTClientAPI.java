@@ -5,7 +5,7 @@ import android.os.Environment;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.apache.http.HttpStatus;

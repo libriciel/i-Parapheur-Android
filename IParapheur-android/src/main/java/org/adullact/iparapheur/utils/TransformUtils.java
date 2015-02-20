@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.controller.utils;
+package org.adullact.iparapheur.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

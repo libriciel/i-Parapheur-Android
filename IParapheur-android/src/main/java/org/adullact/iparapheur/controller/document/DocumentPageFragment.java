@@ -15,9 +15,9 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.IParapheurException;
 
 public class DocumentPageFragment extends Fragment implements PageLayout.PageLayoutListener {
 

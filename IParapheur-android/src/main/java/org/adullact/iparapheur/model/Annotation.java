@@ -5,8 +5,6 @@ import android.graphics.RectF;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.adullact.iparapheur.controller.document.annotation.AnnotationView;
-
 public class Annotation implements Parcelable {
 
 	public static Parcelable.Creator<Annotation> CREATOR = new Parcelable.Creator<Annotation>() {
@@ -32,13 +30,13 @@ public class Annotation implements Parcelable {
 	private boolean updated = false;
 	private boolean deleted = false;
 
-	public Annotation(String author, int page, boolean secretaire, String date, float x, float y, String text, int step) {
+	public Annotation(String author, int page, boolean secretaire, String date, RectF rect, String text, int step) {
 
 		this.author = author;
 		this.page = page;
 		this.secretaire = secretaire;
 		this.date = date;
-		this.rect = new RectF(x - AnnotationView.MIN_WIDTH / 2, y - AnnotationView.MIN_HEIGHT / 2, x + AnnotationView.MIN_WIDTH / 2, y + AnnotationView.MIN_HEIGHT / 2);
+		this.rect = rect;
 		this.text = text;
 		this.step = step;
 	}
@@ -87,7 +85,7 @@ public class Annotation implements Parcelable {
 		this.rect.set(x, y, r, b);
 		this.updated = true;
 	}
-	
+
 	public RectF getUnscaledRect() {
 		return new RectF(rect.left / scale, rect.top / scale, rect.right / scale, rect.bottom / scale);
 	}

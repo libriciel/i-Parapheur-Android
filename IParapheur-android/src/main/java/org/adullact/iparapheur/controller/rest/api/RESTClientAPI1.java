@@ -7,7 +7,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;

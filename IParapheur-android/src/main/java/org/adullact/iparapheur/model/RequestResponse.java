@@ -2,9 +2,9 @@ package org.adullact.iparapheur.model;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
-import org.adullact.iparapheur.controller.utils.TransformUtils;
+import org.adullact.iparapheur.utils.TransformUtils;
 import org.apache.http.HttpStatus;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

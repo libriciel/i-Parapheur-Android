@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;

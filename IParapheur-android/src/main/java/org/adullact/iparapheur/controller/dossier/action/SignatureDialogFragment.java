@@ -9,10 +9,10 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.controller.utils.LoadingWithProgressTask;
+import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.util.ArrayList;
 

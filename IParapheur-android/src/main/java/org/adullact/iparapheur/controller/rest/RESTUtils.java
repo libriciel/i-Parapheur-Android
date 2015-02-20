@@ -1,7 +1,7 @@
 package org.adullact.iparapheur.controller.rest;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.RequestResponse;
 
 import java.io.ByteArrayInputStream;

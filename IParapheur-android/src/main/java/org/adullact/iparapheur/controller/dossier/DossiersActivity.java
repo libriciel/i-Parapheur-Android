@@ -30,7 +30,7 @@ import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;

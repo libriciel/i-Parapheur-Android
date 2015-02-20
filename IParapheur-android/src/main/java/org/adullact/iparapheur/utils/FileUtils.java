@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.controller.utils;
+package org.adullact.iparapheur.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;

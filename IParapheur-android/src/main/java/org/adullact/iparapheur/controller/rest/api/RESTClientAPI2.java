@@ -2,7 +2,7 @@ package org.adullact.iparapheur.controller.rest.api;
 
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.util.ArrayList;
 

@@ -3,7 +3,7 @@ package org.adullact.iparapheur.controller.rest.mapper;
 import android.graphics.RectF;
 import android.util.SparseArray;
 
-import org.adullact.iparapheur.controller.utils.TransformUtils;
+import org.adullact.iparapheur.utils.TransformUtils;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;

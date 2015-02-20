@@ -1,6 +1,4 @@
-package org.adullact.iparapheur.controller.utils;
-
-import org.adullact.iparapheur.controller.utils.IParapheurException;
+package org.adullact.iparapheur.utils;
 
 /**
  * Created by jmaire on 20/08/2014.

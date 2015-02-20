@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.DeviceUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -111,7 +112,12 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 	public void createAnnotation(float x, float y) {
 		String date = DateFormat.getDateTimeInstance().format(new Date());
 
-		Annotation annotation = new Annotation(MyAccounts.INSTANCE.getSelectedAccount().getLogin(), mNumPage, false, date, x, y, "", 0); // FIXME
+		int annotationHeight = Math.round(DeviceUtils.dipsToPixels(getContext(), AnnotationView.MIN_HEIGHT));
+		int annotationWidth = Math.round(DeviceUtils.dipsToPixels(getContext(), AnnotationView.MIN_WIDTH));
+		RectF annotationLayoutRect = new RectF(x - (annotationWidth / 2), y - (annotationHeight / 2), x + (annotationWidth / 2), y + (annotationHeight / 2));
+		RectF annotationsPdfRect = annotationLayoutCoordinatesToPdfCoordinates(annotationLayoutRect);
+
+		Annotation annotation = new Annotation(MyAccounts.INSTANCE.getSelectedAccount().getLogin(), mNumPage, false, date, annotationsPdfRect, "", 0);
 		mAnnotations.add(annotation);
 
 		AnnotationView annotationView = createAnnotationView(annotation);

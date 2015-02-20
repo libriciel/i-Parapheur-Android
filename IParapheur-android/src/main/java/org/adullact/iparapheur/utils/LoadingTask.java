@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.controller.utils;
+package org.adullact.iparapheur.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,7 +12,7 @@ import org.adullact.iparapheur.controller.IParapheur;
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
- * If a {@link org.adullact.iparapheur.controller.utils.LoadingTask.DataChangeListener} is defined, this
+ * If a {@link org.adullact.iparapheur.utils.LoadingTask.DataChangeListener} is defined, this
  * listener is notified when the task finishes.
  * It automatically manage exceptions and feed back the user with a Toast.
  * Subclasses must Override

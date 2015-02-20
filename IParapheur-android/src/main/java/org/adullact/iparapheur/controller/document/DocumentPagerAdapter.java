@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 
 import com.artifex.mupdfdemo.MuPDFCore;
 
-import org.adullact.iparapheur.controller.utils.IParapheurException;
-import org.adullact.iparapheur.controller.utils.LoadingTask;
+import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.PageAnnotations;
 

@@ -1,6 +1,6 @@
 package org.adullact.iparapheur.controller.rest.mapper;
 
-import org.adullact.iparapheur.controller.utils.TransformUtils;
+import org.adullact.iparapheur.utils.TransformUtils;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
