@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -510,13 +511,13 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
 	public interface AnnotationViewListener {
 
-		void onAnnotationSelected(AnnotationView annotationView);
+		void onAnnotationSelected(@NonNull AnnotationView annotationView);
 
-		void onAnnotationEdited(AnnotationView annotationView);
+		void onAnnotationEdited(@NonNull AnnotationView annotationView);
 
-		void onAnnotationDeleted(AnnotationView annotationView);
+		void onAnnotationDeleted(@NonNull AnnotationView annotationView);
 
-		void onAnnotationSizeChanged(AnnotationView annotationView, RectF currentLayoutSize);
+		void onAnnotationSizeChanged(@NonNull AnnotationView annotationView, @NonNull RectF currentLayoutSize);
 	}
 
 	private class AnnotationViewGestureListener extends GestureDetector.SimpleOnGestureListener {

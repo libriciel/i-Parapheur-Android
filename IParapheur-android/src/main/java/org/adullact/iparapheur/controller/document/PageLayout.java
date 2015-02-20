@@ -3,6 +3,8 @@ package org.adullact.iparapheur.controller.document;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -33,7 +35,7 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		setOnTouchListener(this);
 	}
 
-	public void setPageLayoutListener(PageLayoutListener pageLayoutListener) {
+	public void setPageLayoutListener(@Nullable PageLayoutListener pageLayoutListener) {
 		mPageLayoutListener = pageLayoutListener;
 	}
 
@@ -65,7 +67,7 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		setScaleY(mPageScale);
 	}
 
-	public void update(Bitmap pageImage, PageAnnotations annotations, Point initSize, Point pdfSize) {
+	public void update(@NonNull Bitmap pageImage, @NonNull PageAnnotations annotations, @NonNull Point initSize, @NonNull Point pdfSize) {
 		mInitialWidth = initSize.x;
 		mInitialHeight = initSize.y;
 		mChildScale = 1.0f;
@@ -87,26 +89,26 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 		mImageView.setImageBitmap(pageImage);
 	}
 
-	public void refreshDisplayedAnnotations(Point targetSize) {
+	public void refreshDisplayedAnnotations(@NonNull Point targetSize) {
 		mAnnotationsView.refreshDisplayedAnnotations(mPdfSize, targetSize);
 	}
 
 	// <editor-fold desc="AnnotationsLayoutListener">
 
 	@Override
-	public void onCreateAnnotation(Annotation annotation) {
+	public void onCreateAnnotation(@NonNull Annotation annotation) {
 		if (mPageLayoutListener != null)
 			mPageLayoutListener.onCreateAnnotation(annotation);
 	}
 
 	@Override
-	public void onUpdateAnnotation(Annotation annotation) {
+	public void onUpdateAnnotation(@NonNull Annotation annotation) {
 		if (mPageLayoutListener != null)
 			mPageLayoutListener.onUpdateAnnotation(annotation);
 	}
 
 	@Override
-	public void onDeleteAnnotation(Annotation annotation) {
+	public void onDeleteAnnotation(@NonNull Annotation annotation) {
 		if (mPageLayoutListener != null)
 			mPageLayoutListener.onDeleteAnnotation(annotation);
 	}
@@ -114,7 +116,7 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 	// </editor-fold desc="AnnotationsLayoutListener">
 
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	public boolean onTouch(@NonNull View v, @NonNull MotionEvent event) {
 		boolean ret = mGestureDetector.onTouchEvent(event);
 		return (ret || super.onTouchEvent(event));
 	}
@@ -131,13 +133,13 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
 	public interface PageLayoutListener {
 
-		public void onCreateAnnotation(Annotation annotation);
+		public void onCreateAnnotation(@NonNull Annotation annotation);
 
-		public void onUpdateAnnotation(Annotation annotation);
+		public void onUpdateAnnotation(@NonNull Annotation annotation);
 
-		public void onDeleteAnnotation(Annotation annotation);
+		public void onDeleteAnnotation(@NonNull Annotation annotation);
 
-		public void onDoubleTap(MotionEvent me);
+		public void onDoubleTap(@NonNull MotionEvent me);
 	}
 
 	//</editor-fold desc="Listener"

@@ -2,13 +2,30 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class PageAnnotations implements Parcelable {
 
+	// We may want to sort annotations, to have small annotations over big ones,
+	// To ease touch events, and be able to select every one.
+	public static Comparator<Annotation> ANNOTATIONS_SIZE_COMPARATOR = new Comparator<Annotation>() {
+
+		@Override public int compare(Annotation lhs, Annotation rhs) {
+
+			int lhsArea = Math.round(lhs.getRect().width() * lhs.getRect().height());
+			int rhsArea = Math.round(rhs.getRect().width() * rhs.getRect().height());
+
+			return (rhsArea - lhsArea);
+		}
+	};
+
 	public static Parcelable.Creator<PageAnnotations> CREATOR = new Parcelable.Creator<PageAnnotations>() {
+
 		public PageAnnotations createFromParcel(Parcel source) {
 			return new PageAnnotations(source);
 		}
@@ -20,12 +37,19 @@ public class PageAnnotations implements Parcelable {
 
 	private List<Annotation> mAnnotations;
 
-	public PageAnnotations(List<Annotation> annotations) {
-		mAnnotations = (annotations == null) ? new ArrayList<Annotation>() : annotations;
+	public PageAnnotations(@Nullable List<Annotation> annotations) {
+
+		if (annotations == null) {
+			mAnnotations = new ArrayList<>();
+		}
+		else {
+			Collections.sort(annotations, ANNOTATIONS_SIZE_COMPARATOR);
+			mAnnotations = annotations;
+		}
 	}
 
 	public PageAnnotations() {
-		mAnnotations = new ArrayList<Annotation>();
+		mAnnotations = new ArrayList<>();
 	}
 
 	private PageAnnotations(Parcel in) {
@@ -36,9 +60,12 @@ public class PageAnnotations implements Parcelable {
 		return mAnnotations;
 	}
 
-	public void setAnnotations(List<Annotation> annotations) {
-		mAnnotations = annotations;
+	public void add(Annotation annotation) {
+		mAnnotations.add(annotation);
+		Collections.sort(mAnnotations, ANNOTATIONS_SIZE_COMPARATOR);
 	}
+
+	// <editor-fold desc="Parcelable">
 
 	@Override
 	public int describeContents() {
@@ -50,11 +77,5 @@ public class PageAnnotations implements Parcelable {
 		dest.writeTypedList(mAnnotations);
 	}
 
-	public void add(Annotation annotation) {
-		mAnnotations.add(annotation);
-	}
-
-	public void remove(Annotation annotation) {
-		mAnnotations.remove(annotation);
-	}
+	// </editor-fold desc="Parcelable">
 }

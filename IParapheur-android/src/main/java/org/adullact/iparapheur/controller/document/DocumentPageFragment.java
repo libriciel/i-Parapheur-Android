@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -68,13 +69,13 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	//</editor-fold desc="LifeCycle">
 
-	public void updatePage(String dossierId, Bitmap pageImage, PageAnnotations annotations, Point initSize, Point pdfSize) {
+	public void updatePage(@NonNull String dossierId, @NonNull Bitmap pageImage, @NonNull PageAnnotations annotations, @NonNull Point initSize, @NonNull Point pdfSize) {
 		mCurrentDossierId = dossierId;
 
 		mPageLayout.update(pageImage, annotations, initSize, pdfSize);
 	}
 
-	private void scale(ScaleType scaleType) {
+	private void scale(@NonNull ScaleType scaleType) {
 		mPageLayout.setBackgroundColor(Color.RED);
 
 		switch (scaleType) {
@@ -110,7 +111,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	//<editor-fold desc="PageLayoutListener">
 
 	@Override
-	public void onDoubleTap(MotionEvent me) {
+	public void onDoubleTap(@NonNull MotionEvent me) {
 
 		// Loop around mCurrentScaleType to the next available.
 		int nextScaleTypeOrdinal = (mCurrentScaleType.ordinal() + 1) % ScaleType.values().length;
@@ -120,7 +121,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	}
 
 	@Override
-	public void onCreateAnnotation(final Annotation annotation) {
+	public void onCreateAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
@@ -151,7 +152,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	}
 
 	@Override
-	public void onUpdateAnnotation(final Annotation annotation) {
+	public void onUpdateAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
@@ -182,7 +183,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	}
 
 	@Override
-	public void onDeleteAnnotation(final Annotation annotation) {
+	public void onDeleteAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
