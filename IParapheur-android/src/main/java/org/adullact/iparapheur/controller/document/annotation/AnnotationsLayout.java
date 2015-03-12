@@ -98,7 +98,17 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 
 		for (Annotation annotation : mAnnotations.getAnnotations()) {
 			if (annotation != null) {
+
 				View annotationView = findViewWithTag(annotation.getUuid());
+
+				// FIXME : Quick hack for (== null) misbehavior.
+				// Useful on created annotations (without uuid yet), and obviously no tag either.
+				// We have to set a proper way tag the view, after the create request...
+				if (annotationView == null)
+					for (int i = 0; i < getChildCount(); i++)
+						if (getChildAt(i) instanceof AnnotationView)
+							if (((AnnotationView) getChildAt(i)).getAnnotation().getUuid().contentEquals(annotation.getUuid()))
+								annotationView = getChildAt(i);
 
 				if (annotationView == null) {
 					annotationView = createAnnotationView(annotation);
@@ -211,6 +221,7 @@ public class AnnotationsLayout extends RelativeLayout implements AnnotationView.
 		deselectAnnotation(false);
 		mListener.onDeleteAnnotation(annotationView.getAnnotation());
 		removeView(annotationView);
+		mAnnotations.getAnnotations().remove(annotationView.getAnnotation());
 	}
 
 	@Override

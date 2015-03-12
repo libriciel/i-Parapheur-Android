@@ -97,8 +97,8 @@ public class PageLayout extends FrameLayout implements View.OnTouchListener, Ann
 
 	@Override
 	public void onCreateAnnotation(@NonNull Annotation annotation) {
-		if (mPageLayoutListener != null)
-			mPageLayoutListener.onCreateAnnotation(annotation);
+			if (mPageLayoutListener != null)
+				mPageLayoutListener.onCreateAnnotation(annotation);
 	}
 
 	@Override

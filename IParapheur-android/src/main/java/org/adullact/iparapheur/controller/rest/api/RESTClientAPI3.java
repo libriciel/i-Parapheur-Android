@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
@@ -7,7 +9,6 @@ import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
-import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
@@ -15,9 +16,11 @@ import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,7 @@ import java.util.Map;
  * et quelques action spécifiques qui ne suivent pas l'architecture CRUDL
  * (ex. mise à jour des classifications ACTES).
  */
+// TODO : JSONStringer, maybe ?
 public class RESTClientAPI3 extends RESTClientAPI {
 
 	/* Ressources principales */
@@ -128,57 +132,89 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	}
 
 	@Override
-	public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
-		JSONObject annot = new JSONObject();
-		float annotHeight = annotation.getRect().height();
-		float annotwidth = annotation.getRect().width();
-		float centerX = annotation.getRect().centerX();
-		float centerY = annotation.getRect().centerY();
+	public String createAnnotation(@NonNull String dossierId, @NonNull Annotation annotation, int page) throws IParapheurException {
+
+		// Build json object
+
+		JSONStringer annotJson = new JSONStringer();
 
 		try {
-			JSONObject rect = new JSONObject().putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			annotJson.object();
+			annotJson.key("rect").object();
+			{
+				annotJson.key("topLeft");
+				annotJson.object();
+				annotJson.key("x").value(annotation.getRect().left);
+				annotJson.key("y").value(annotation.getRect().top);
+				annotJson.endObject();
 
-			annot.put("author", annotation.getAuthor()).put("date", annotation.getDate()).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect");
+				annotJson.key("bottomRight");
+				annotJson.object();
+				annotJson.key("x").value(annotation.getRect().right);
+				annotJson.key("y").value(annotation.getRect().bottom);
+				annotJson.endObject();
+			}
+			annotJson.endObject();
+
+			annotJson.key("author").value(annotation.getAuthor());
+			annotJson.key("date").value(annotation.getDate());
+			annotJson.key("page").value(page);
+			annotJson.key("text").value(annotation.getText());
+			annotJson.key("type").value("rect");
+			annotJson.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
 		}
 
-		RequestResponse response = RESTUtils.post(url, annot.toString());
+		// Send request
+
+		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+		RequestResponse response = RESTUtils.post(url, annotJson.toString());
+
 		if (response != null && response.getCode() == HttpStatus.SC_OK) {
 			JSONObject idObj = response.getResponse();
-			if (idObj != null) {
+
+			if (idObj != null)
 				return idObj.optString("id", null);
-			}
 		}
+
 		return null;
 	}
 
 	@Override
-	public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
+	public void updateAnnotation(@NonNull String dossierId, @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build Json object
 
-		JSONObject annot = new JSONObject();
-		float annotHeight = annotation.getRect().height();
-		float annotwidth = annotation.getRect().width();
-		float centerX = annotation.getRect().centerX();
-		float centerY = annotation.getRect().centerY();
+		JSONStringer annotJson = new JSONStringer();
 
 		try {
-			JSONObject rect = new JSONObject();
-			rect.putOpt("bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2));
-			rect.putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
-			annot.put("rect", rect);
+			annotJson.object();
+			annotJson.key("rect").object();
+			{
+				annotJson.key("topLeft");
+				annotJson.object();
+				annotJson.key("x").value(annotation.getRect().left);
+				annotJson.key("y").value(annotation.getRect().top);
+				annotJson.endObject();
 
-			annot.put("author", annotation.getAuthor());
-			annot.put("date", annotation.getDate());
-			annot.put("page", page);
-			annot.put("text", annotation.getText());
-			annot.put("type", "rect");
-			annot.put("id", annotation.getUuid());
-			annot.put("uuid", annotation.getUuid());
+				annotJson.key("bottomRight");
+				annotJson.object();
+				annotJson.key("x").value(annotation.getRect().right);
+				annotJson.key("y").value(annotation.getRect().bottom);
+				annotJson.endObject();
+			}
+			annotJson.endObject();
+
+			annotJson.key("author").value(annotation.getAuthor());
+			annotJson.key("date").value(annotation.getDate());
+			annotJson.key("page").value(page);
+			annotJson.key("text").value(annotation.getText());
+			annotJson.key("type").value("rect");
+			annotJson.key("id").value(annotation.getUuid());
+			annotJson.key("uuid").value(annotation.getUuid());
+			annotJson.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
@@ -188,20 +224,18 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
 
-		RequestResponse response = RESTUtils.put(url, annot.toString());
+		RequestResponse response = RESTUtils.put(url, annotJson.toString());
 
 		if (response == null || response.getCode() != HttpStatus.SC_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
 	}
 
-	@Override
-	public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String annotationId, int page) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
 		RESTUtils.delete(url);
 	}
 
-	@Override
-	public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_VISA, dossier.getId());
 		try {
 			JSONObject json = new JSONObject();
@@ -210,15 +244,13 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("annotPriv", annotPriv);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
 			return (response != null && response.getCode() == HttpStatus.SC_OK);
-
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors du visa", e);
 		}
 	}
 
-	@Override
-	public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -228,15 +260,13 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("signature", signValue);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
 			return (response != null && response.getCode() == HttpStatus.SC_OK);
-
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
 		}
 	}
 
-	@Override
-	public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
 		/** FIXME : weird copy/paste. Maybe it has no utility too.
 		 String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
 		 try {
@@ -253,8 +283,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return false;
 	}
 
-	@Override
-	public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_HELIOS, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -270,8 +299,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -292,8 +320,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
 
 		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
 		try {
@@ -316,8 +343,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_REJET, dossierId);
 		try {
 			JSONObject json = new JSONObject();

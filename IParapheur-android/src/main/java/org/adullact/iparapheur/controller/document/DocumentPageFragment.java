@@ -71,7 +71,6 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	public void updatePage(@NonNull String dossierId, @NonNull Bitmap pageImage, @NonNull PageAnnotations annotations, @NonNull Point initSize, @NonNull Point pdfSize) {
 		mCurrentDossierId = dossierId;
-
 		mPageLayout.update(pageImage, annotations, initSize, pdfSize);
 	}
 
@@ -126,11 +125,12 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		new AsyncTask<Void, Void, Void>() {
 
 			private IParapheurException mException;
+			private String mUuidResponse;
 
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, annotation, mNumPage);
+					mUuidResponse = RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, annotation, mNumPage);
 				}
 				catch (IParapheurException e) {
 					mException = e;
@@ -146,6 +146,8 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 				if (mException != null)
 					Toast.makeText(getActivity(), mException.getResId(), Toast.LENGTH_LONG).show();
+				else
+					annotation.setUuid(mUuidResponse);
 			}
 
 		}.execute(null, null, null);

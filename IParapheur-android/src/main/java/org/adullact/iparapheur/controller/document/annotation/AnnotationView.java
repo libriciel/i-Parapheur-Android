@@ -99,6 +99,7 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 			mPostItEditText = null;
 		}
 		this.setVisibility(GONE);
+		listener.onAnnotationDeleted(this);
 	}
 
 	public void toggleSize() {
@@ -455,18 +456,19 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
+
 		if (gestureDetector.onTouchEvent(event)) {
 			invalidate();
 			return true;
 		}
 		if (event.getAction() == MotionEvent.ACTION_UP) {
 			if (selected) {
-				if (annotation.isUpdated()) {
+				if (annotation.isDeleted()) {
+					listener.onAnnotationDeleted(this);
+				}
+				else if (annotation.isUpdated()) {
 					listener.onAnnotationEdited(this);
 					annotation.setUpdated(false);
-				}
-				else if (annotation.isDeleted()) {
-					listener.onAnnotationDeleted(this);
 				}
 			}
 		}
@@ -551,8 +553,8 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 			// Nouvelle selection ou déselection
 			if (selected) {
 				switch (getArea(me.getX(), me.getY())) {
-					case EDIT:
-						toggleText();
+					case DELETE:
+						delete();
 						break;
 					case MINIMIZE:
 						toggleSize();
@@ -560,9 +562,8 @@ public class AnnotationView extends View implements View.OnTouchListener, TextWa
 					case INFO:
 						toggleInfo();
 						break;
-					case DELETE:
-						// TODO : cancelling ?
-						delete();
+					case EDIT:
+						toggleText();
 						break;
 				}
 			}

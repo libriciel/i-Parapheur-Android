@@ -11,6 +11,8 @@ import java.util.List;
 
 public class PageAnnotations implements Parcelable {
 
+	//<editor-fold desc="Static methods">
+
 	// We may want to sort annotations, to have small annotations over big ones,
 	// To ease touch events, and be able to select every one.
 	public static Comparator<Annotation> ANNOTATIONS_SIZE_COMPARATOR = new Comparator<Annotation>() {
@@ -34,6 +36,8 @@ public class PageAnnotations implements Parcelable {
 			return new PageAnnotations[size];
 		}
 	};
+
+	//</editor-fold desc="Static methods">
 
 	private List<Annotation> mAnnotations;
 
@@ -63,6 +67,10 @@ public class PageAnnotations implements Parcelable {
 	public void add(Annotation annotation) {
 		mAnnotations.add(annotation);
 		Collections.sort(mAnnotations, ANNOTATIONS_SIZE_COMPARATOR);
+	}
+
+	@Override public String toString() {
+		return "{PageAnnotations - mAnnotations:\n" + mAnnotations + "}";
 	}
 
 	// <editor-fold desc="Parcelable">
