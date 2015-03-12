@@ -1,7 +1,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
@@ -224,7 +223,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
 
-		RequestResponse response = RESTUtils.put(url, annotJson.toString());
+		RequestResponse response = RESTUtils.put(url, annotJson.toString(), true);
 
 		if (response == null || response.getCode() != HttpStatus.SC_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
@@ -232,7 +231,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String annotationId, int page) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
-		RESTUtils.delete(url);
+		RESTUtils.delete(url, true);
 	}
 
 	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {

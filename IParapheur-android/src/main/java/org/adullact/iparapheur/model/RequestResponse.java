@@ -22,19 +22,25 @@ public class RequestResponse {
 	private JSONArray responseArray;
 
 	public RequestResponse(HttpURLConnection httpURLConnection) throws IParapheurException {
+		this(httpURLConnection, false);
+	}
+
+	public RequestResponse(HttpURLConnection httpURLConnection, boolean ignoreResponseData) throws IParapheurException {
 		String data;
 		try {
 			this.code = httpURLConnection.getResponseCode();
+
 			if (this.code < HttpStatus.SC_BAD_REQUEST) { // if code < 400, response is in inputStream
-				data = TransformUtils.inputStreamToString(httpURLConnection.getInputStream());
-				//Log.d("debug", "data : " + data);
-				Object json = new JSONTokener(data).nextValue();
-				//Log.d("debug", "json : " + json);
-				if (json instanceof JSONObject) {
-					this.response = (JSONObject) json;
-				}
-				else if (json instanceof JSONArray) {
-					this.responseArray = (JSONArray) json;
+				if (!ignoreResponseData) {
+					data = TransformUtils.inputStreamToString(httpURLConnection.getInputStream());
+					//Log.d("debug", "data : " + data);
+					Object json = new JSONTokener(data).nextValue();
+					//Log.d("debug", "json : " + json);
+
+					if (json instanceof JSONObject)
+						this.response = (JSONObject) json;
+					else if (json instanceof JSONArray)
+						this.responseArray = (JSONArray) json;
 				}
 			}
 			else { // if code >= 400, response is in errorStream
@@ -46,7 +52,6 @@ public class RequestResponse {
 				}
 				throw RESTUtils.getExceptionForError(this.code, error);
 			}
-
 		}
 		catch (JSONException e) {
 			throw new IParapheurException(R.string.error_parse, null);

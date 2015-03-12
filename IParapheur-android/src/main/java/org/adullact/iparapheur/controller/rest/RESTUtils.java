@@ -1,8 +1,8 @@
 package org.adullact.iparapheur.controller.rest;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -98,6 +98,10 @@ public class RESTUtils {
 	}
 
 	public static RequestResponse put(String url, String body) throws IParapheurException {
+		return put(url, body, false);
+	}
+
+	public static RequestResponse put(String url, String body, boolean ignoreResponseData) throws IParapheurException {
 		//Log.d("debug", "POST request on : " + url);
 		//Log.d("debug", "with body : " + body);
 		RequestResponse res;
@@ -115,7 +119,7 @@ public class RESTUtils {
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
 			output = connection.getOutputStream();
 			output.write(body.getBytes());
-			res = new RequestResponse(connection);
+			res = new RequestResponse(connection, ignoreResponseData);
 		}
 		catch (IParapheurException e) { throw e; }
 		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
@@ -156,6 +160,10 @@ public class RESTUtils {
 	}
 
 	public static RequestResponse delete(String url) throws IParapheurException {
+		return delete(url, false);
+	}
+
+	public static RequestResponse delete(String url, boolean ignoreResponseData) throws IParapheurException {
 		//Log.d("debug", "GET request on : " + url);
 		RequestResponse res;
 		String urlStr = url;
@@ -171,7 +179,7 @@ public class RESTUtils {
 			//connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
 
-			res = new RequestResponse(connection);
+			res = new RequestResponse(connection, ignoreResponseData);
 		}
 		catch (IParapheurException e) {
 			throw e;
