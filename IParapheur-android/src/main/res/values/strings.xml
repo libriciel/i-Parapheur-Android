@@ -6,6 +6,7 @@
     <string name="account_new">Nouveau compte</string>
     <string name="search">Rechercher</string>
     <string name="settings">Préférences</string>
+    <string name="about">À propos</string>
     <string name="media_not_mounted">Aucun stockage disponible, les documents ne seront pas visualisables.</string>
     <string name="type">Type</string>
     <string name="sous_type">Sous-Type</string>
@@ -63,7 +64,8 @@
     <string name="test_forbidden">Nom d\'utilisateur ou mot de passe incorrect</string>
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
-    <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string><string name="pref_account_test">Tester la connexion</string>
+    <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string>
+    <string name="pref_account_test">Tester la connexion</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
     <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
@@ -97,5 +99,22 @@
     <string name="action_mode_nb_dossiers">%d dossier(s)</string>
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
+
+    <!-- About panel -->
+    <string name="about_main_title">Aide</string>
+    <string name="about_version_number">I-Parapheur Android - Version -version-</string>
+    <string name="about_copyright">Copyright © 2012–2015, ADULLACT–Projet \nInitié et Developpé par ADULLACT-Projet S.A.</string>
+    <string name="about_legal_title">Informations légales</string>
+    <string name="about_legal_content_part1">IPARAPHEUR-ANDROID est un logiciel libre ; vous pouvez le redistribuer ou le modifier suivant les termes de la GNU Affero General Public License telle que publiée par la Free Software Foundation : soit la version 3 de cette licence, soit (à votre gré) toute version ultérieure.</string>
+    <string name="about_legal_content_part2">IPARAPHEUR-ANDROID est distribué dans l\'espoir qu\'il vous sera utile, mais SANS AUCUNE GARANTIE : sans même la garantie implicite de COMMERCIALISABILITÉ ni d\'ADÉQUATION À UN OBJECTIF PARTICULIER. Consultez la Licence Générale Publique GNU Affero pour plus de détails.</string>
+    <string name="about_library_licenses_title">Licences Open Sources</string>
+
+    <string name="about_library_license_mupdf_title">MuPDF</string>
+    <string name="about_library_license_mupdf_copyright">Copyright 2006–2013 Artifex Software, Inc.</string>
+    <string name="about_library_license_mupdf_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
+
+    <string name="about_library_license_android_support_title">Android Support Libraries</string>
+    <string name="about_library_license_android_support_copyright">Copyright © 2011 The Android Open Source Project</string>
+    <string name="about_library_license_android_support_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
 
 </resources>

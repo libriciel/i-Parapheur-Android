@@ -16,92 +16,96 @@ import java.util.List;
  * handset devices, settings are presented as a single list. On tablets,
  * settings are split by category, with category headers shown to the left of
  * the list of settings.
- * <p>
+ * <p/>
  * See <a href="http://developer.android.com/design/patterns/settings.html">
  * Android Design: Settings</a> for design guidelines and the <a
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends PreferenceActivity
-{
+public class SettingsActivity extends PreferenceActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-    }
+	/**
+	 * A preference value change listener that updates the preference's title
+	 * to reflect its new value.
+	 */
+	private static Preference.OnPreferenceChangeListener sBindPreferenceTitleToValueListener = new Preference.OnPreferenceChangeListener() {
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object value) {
+			preference.setTitle(value.toString());
+			return true;
+		}
+	};
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
+	/**
+	 * Binds a preference's summary to its value. More specifically, when the
+	 * preference's value is changed, its summary (line of text below the
+	 * preference title) is updated to reflect the value. The summary is also
+	 * immediately updated upon calling this method. The exact display format is
+	 * dependent on the type of preference.
+	 *
+	 * @see #sBindPreferenceTitleToValueListener
+	 */
+	public static void bindPreferenceTitleToValue(Preference preference) {
+		// Set the listener to watch for value changes.
+		preference.setOnPreferenceChangeListener(sBindPreferenceTitleToValueListener);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
-    }
+		// Trigger the listener immediately with the preference's
+		// current value.
+		//sBindPreferenceTitleToValueListener.onPreferenceChange(preference, PreferenceManager
+		//        .getDefaultSharedPreferences(preference.getContext())
+		//        .getString(preference.getKey(), ""));
+	}
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
-    }
+	public static void bindPreferenceTitleToPreferenceValue(Preference preference, Preference reference) {
+		preference.setOnPreferenceChangeListener(sBindPreferenceTitleToValueListener);
+	}
 
-    /** {@inheritDoc} */
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceTitleToValueListener
-     */
-    public static void bindPreferenceTitleToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceTitleToValueListener);
+		if (getActionBar() != null)
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
 
-        // Trigger the listener immediately with the preference's
-        // current value.
-        //sBindPreferenceTitleToValueListener.onPreferenceChange(preference, PreferenceManager
-        //        .getDefaultSharedPreferences(preference.getContext())
-        //        .getString(preference.getKey(), ""));
-    }
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+	}
 
-    public static void bindPreferenceTitleToPreferenceValue(Preference preference, Preference reference) {
-        preference.setOnPreferenceChangeListener(sBindPreferenceTitleToValueListener);
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
+	}
 
-    /**
-     * A preference value change listener that updates the preference's title
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceTitleToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            preference.setTitle(value.toString());
-            return true;
-        }
-    };
+	@Override
+	protected void onPause() {
+		super.onPause();
+		PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	@Override
+	public void onBuildHeaders(List<Header> target) {
+		loadHeadersFromResource(R.xml.pref_headers, target);
+	}
 
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        return (AccountsPreferenceFragment.class.getName().equals(fragmentName)
-             || GeneralPreferenceFragment.class.getName().equals(fragmentName));
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == android.R.id.home) {
+			finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected boolean isValidFragment(String fragmentName) {
+
+		boolean isAccount = AccountsPreferenceFragment.class.getName().equals(fragmentName);
+		boolean isGeneral = GeneralPreferenceFragment.class.getName().equals(fragmentName);
+		boolean isAbout = AboutPreferenceFragment.class.getName().equals(fragmentName);
+
+		return (isAccount || isGeneral || isAbout);
+	}
 }

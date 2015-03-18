@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/about_margin_vertical"
+        android:paddingBottom="@dimen/about_margin_vertical"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/about_margin_horizontal"
+            android:paddingRight="@dimen/about_margin_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:text="@string/about_main_title"/>
+
+            <!-- About -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:id="@+id/about_version_number_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:textStyle="bold"
+                android:text="@string/about_version_number"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_copyright"/>
+
+            <!-- Legal -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:textStyle="bold"
+                android:text="@string/about_legal_title"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_legal_content_part1"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_legal_content_part2"/>
+
+            <!-- Licenses -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_xlarge"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:text="@string/about_library_licenses_title"/>
+
+            <!-- MuPDF license -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:textStyle="bold"
+                android:text="@string/about_library_license_mupdf_title"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_mupdf_copyright"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_mupdf_license"/>
+
+            <!-- Android support license -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:textStyle="bold"
+                android:text="@string/about_library_license_android_support_title"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_android_support_copyright"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_android_support_license"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

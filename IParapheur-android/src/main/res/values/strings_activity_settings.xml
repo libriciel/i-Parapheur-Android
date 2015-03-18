@@ -26,6 +26,7 @@
 
     <!-- Example settings for accounts -->
     <string name="pref_header_accounts">Comptes</string>
+    <string name="pref_header_about">À propos</string>
 
     <string name="pref_accounts">Mes Comptes</string>
     <string name="pref_accounts_new">Nouveau compte</string>
