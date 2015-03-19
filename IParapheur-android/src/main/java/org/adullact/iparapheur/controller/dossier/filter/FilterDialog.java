@@ -19,14 +19,14 @@ import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
 
-/**
- * Created by jmaire on 07/02/2014.
- */
 public class FilterDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
     public interface FilterDialogListener {
+
         void onFilterSave(Filter filter);
+
         void onFilterChange(Filter filter);
+
         void onFilterCancel();
     }
 

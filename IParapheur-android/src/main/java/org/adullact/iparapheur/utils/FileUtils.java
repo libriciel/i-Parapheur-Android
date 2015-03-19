@@ -14,26 +14,26 @@ import java.io.OutputStream;
 
 public class FileUtils {
 
-    public static File getDirectoryForDossier(String dossierId) {
-		File directory = new File (IParapheur.getContext().getExternalCacheDir(), dossierId);
+	public static File getDirectoryForDossier(String dossierId) {
+		File directory = new File(IParapheur.getContext().getExternalCacheDir(), dossierId);
 		directory.mkdirs();
 
 		return directory;
 	}
 
-    public static File getFileForDocument(Context context, String dossierId, String documentId) {
-        if (!IParapheur.OFFLINE) {
+	public static File getFileForDocument(Context context, String dossierId, String documentId) {
+		if (!IParapheur.OFFLINE) {
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
 		}
-        else {
+		else {
 			return createFileFromAsset(context, "offline_test_file.pdf");
 		}
-    }
+	}
 
-    public static boolean isStorageAvailable() {
+	public static boolean isStorageAvailable() {
 		String state = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(state);
-    }
+		return Environment.MEDIA_MOUNTED.equals(state);
+	}
 
 	/**
 	 * Creates a file form an Asset, through {@link #createFileFromInputStream}.
@@ -81,7 +81,8 @@ public class FileUtils {
 			inputStream.close();
 
 			return file;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 

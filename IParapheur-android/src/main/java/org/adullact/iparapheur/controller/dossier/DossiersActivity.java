@@ -30,10 +30,10 @@ import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
-import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,31 +58,13 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	public static final String BUREAU_ID = "bureau_id";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	/**
-	 * Main Layout off the screen
-	 */
-	private DrawerLayout drawerLayout;
-
-	/**
-	 * Left panel acting as a menu
-	 */
-	private FrameLayout drawerMenu;
-
-	/**
-	 * Used to control the drawer state.
-	 */
-	private ActionBarDrawerToggle drawerToggle;
+	private DrawerLayout drawerLayout; // Main Layout off the screen
+	private FrameLayout drawerMenu; // Left panel acting as a menu
+	private ActionBarDrawerToggle drawerToggle; // Used to control the drawer state.
 	private boolean openDrawerwhenFinishedLoading = false;
 	private boolean manageDrawerwhenFinishedLoading = false;
-
-	/**
-	 * Adapter for action bar, used to display user's filters
-	 */
-	private FilterAdapter filterAdapter;
-	/**
-	 * The actionMode used when dossiers are checked
-	 */
-	private ActionMode mActionMode;
+	private FilterAdapter filterAdapter; // Adapter for action bar, used to display user's filters
+	private ActionMode mActionMode; // The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -114,119 +96,77 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		super.onResume();
 		if (manageDrawerwhenFinishedLoading) {
 			if (drawerLayout != null) {
-				if (openDrawerwhenFinishedLoading) {
+				if (openDrawerwhenFinishedLoading)
 					drawerLayout.openDrawer(drawerMenu);
-				}
-				else {
+				else
 					drawerLayout.closeDrawer(drawerMenu);
-				}
 			}
 			manageDrawerwhenFinishedLoading = false;
 		}
 	}
 
-	/**
-	 * Save accounts state for later use. In our case, the latest selected account
-	 * will be automatically selected if the application is killed and relaunched.
-	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+		// Save accounts state for later use. In our case, the latest selected account
+		// will be automatically selected if the application is killed and relaunched.
 		MyAccounts.INSTANCE.saveState();
 	}
 
-	// DossierListFragmentListener implementations
 	@Override
-	public void onDossierSelected(String dossierId, String bureauId) {
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
-
-		if (fragment != null)
-			((DossierDetailFragment) fragment).update(bureauId, dossierId);
-	}
-
-	/**
-	 * Update actionMode
-	 */
-	@Override
-	public void onDossierCheckedChanged() {
-
-		if (mActionMode == null) {
-			mActionMode = startActionMode(this);
-		}
-		else {
-			mActionMode.invalidate();
-		}
-
-	}
-
-	@Override
-	public void onDossiersLoaded(int size) {
-		onDossierSelected(null, null);
-
-		if ((getActionBar() != null) && (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
-			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			if (filterAdapter == null) {
-				filterAdapter = new FilterAdapter(this);
-			}
-			getActionBar().setListNavigationCallbacks(filterAdapter, this);
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == EDIT_PREFERENCE_REQUEST) {
+			// Don't check if result is ok as the user can press back after modifying an Account
+			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
+			BureauxFragment bureauxFragment = (BureauxFragment) getSupportFragmentManager().findFragmentByTag(BureauxFragment.TAG);
+			if (bureauxFragment != null)
+				bureauxFragment.accountsChanged();
 		}
 	}
 
+	// <editor-fold desc="ActionBar">
+
 	@Override
-	public void onDossiersNotLoaded() {
-		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.dossiers_menu, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
-	// DossierDetailListener implementation
 	@Override
-	public Dossier getDossier(String id) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		return (fragment == null) ? null : fragment.getDossier(id);
+	public boolean onPrepareOptionsMenu(Menu menu) {
+
+		// Show or hide specific menu actions depending on Drawer state.
+		if ((drawerLayout != null) && (drawerMenu != null)) {
+			boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
+			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
+			return super.onPrepareOptionsMenu(menu);
+		}
+
+		return false;
 	}
 
-	// BureauSelectedListener implementation
 	@Override
-	public void onBureauSelected(String id) {
-		if (drawerLayout == null) {
-			manageDrawerwhenFinishedLoading = true;
-			openDrawerwhenFinishedLoading = (id == null);
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		// Pass the event to ActionBarDrawerToggle, if it returns
+		// true, then it has handled the app icon touch event
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
 		}
-		else {
-			if (id == null) {
-				drawerLayout.openDrawer(drawerMenu);
-			}
-			else {
-				drawerLayout.closeDrawer(drawerMenu);
-			}
-		}
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		if (listFragment != null) {
-			// this method will reload dossiers fragments
-			listFragment.setBureauId(id);
+
+		// TODO : handle dossier(s) actions
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+			case R.id.action_settings:
+				startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
-
-	// FilterDialogListener methods passed by the parent Activity
-
-	public void onFilterSave(Filter filter) {
-		MyFilters.INSTANCE.selectFilter(filter);
-		MyFilters.INSTANCE.save(filter);
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-		filterAdapter.notifyDataSetChanged();
-		onDataChanged();
-	}
-
-	public void onFilterChange(Filter filter) {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-		MyFilters.INSTANCE.selectFilter(filter);
-		onDataChanged();
-	}
-
-	public void onFilterCancel() {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
-	}
-
-	// OnNavigationListener implementation
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -248,7 +188,99 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		return false;
 	}
 
-	//LoadingTask implementation
+	// </editor-fold desc="ActionBar">
+
+	// <editor-fold desc="DossierListFragmentListener">
+
+	@Override
+	public void onDossierSelected(String dossierId, String bureauId) {
+		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+
+		if (fragment != null)
+			((DossierDetailFragment) fragment).update(bureauId, dossierId);
+	}
+
+	@Override
+	public void onDossierCheckedChanged() {
+		if (mActionMode == null)
+			mActionMode = startActionMode(this);
+		else
+			mActionMode.invalidate();
+	}
+
+	@Override
+	public void onDossiersLoaded(int size) {
+		onDossierSelected(null, null);
+
+		if ((getActionBar() != null) && (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
+			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			if (filterAdapter == null) {
+				filterAdapter = new FilterAdapter(this);
+			}
+			getActionBar().setListNavigationCallbacks(filterAdapter, this);
+		}
+	}
+
+	@Override
+	public void onDossiersNotLoaded() {
+		if (getActionBar() != null)
+			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	}
+
+	// </editor-fold desc="DossierListFragmentListener">
+
+	@Override
+	public Dossier getDossier(String id) {
+		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		return (fragment == null) ? null : fragment.getDossier(id);
+	}
+
+	// <editor-fold desc="BureauSelectedListener">
+
+	@Override
+	public void onBureauSelected(String id) {
+		if (drawerLayout == null) {
+			manageDrawerwhenFinishedLoading = true;
+			openDrawerwhenFinishedLoading = (id == null);
+		}
+		else {
+			if (id == null)
+				drawerLayout.openDrawer(drawerMenu);
+			else
+				drawerLayout.closeDrawer(drawerMenu);
+		}
+
+		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		if (listFragment != null) {
+			// this method will reload dossiers fragments
+			listFragment.setBureauId(id);
+		}
+	}
+
+	// </editor-fold desc="BureauSelectedListener">
+
+	public void onFilterSave(Filter filter) {
+		MyFilters.INSTANCE.selectFilter(filter);
+		MyFilters.INSTANCE.save(filter);
+
+		if (getActionBar() != null)
+			getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+
+		filterAdapter.notifyDataSetChanged();
+		onDataChanged();
+	}
+
+	// <editor-fold desc="FilterDialogListener">
+
+	public void onFilterChange(Filter filter) {
+		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+		MyFilters.INSTANCE.selectFilter(filter);
+		onDataChanged();
+	}
+
+	public void onFilterCancel() {
+		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+	}
 
 	/**
 	 * Called when an action is done on a dossier. We have to force reload dossier list and
@@ -261,68 +293,14 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 			// this method will reload dossiers fragments
 			listFragment.reload();
 		}
+
 		onDossierSelected(null, null);
 		invalidateOptionsMenu();
 	}
 
-	// ACTIONBAR METHODS
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.dossiers_menu, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+	// </editor-fold desc="FilterDialogListener">
 
-	/* Will also call onPrepareOptionsMenu on each Fragments.
-	 * DossierListFragment will update possible actions on checked dossiers.
-	 */
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// show or hide specific menu actions depending on Drawer state
-		if ((drawerLayout != null) && (drawerMenu != null)) {
-			boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
-			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
-			return super.onPrepareOptionsMenu(menu);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Pass the event to ActionBarDrawerToggle, if it returns
-		// true, then it has handled the app icon touch event
-		if (drawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
-		// TODO : handle dossier(s) actions
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-			case R.id.action_settings:
-				startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
-	// Return of the settings Activity.
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == EDIT_PREFERENCE_REQUEST) {
-			/* Don't check if result is ok as the user can press back after modifying an Account
-			   only notify BureauxFragments to update accounts list (the bureau will update back this
-               Activity if needed).*/
-			BureauxFragment bureauxFragment = (BureauxFragment) getSupportFragmentManager().findFragmentByTag(BureauxFragment.TAG);
-			if (bureauxFragment != null) {
-				bureauxFragment.accountsChanged();
-			}
-		}
-	}
-
-    /*
-	 * ActionMode.Callback implementation
-     */
+	//LoadingTask implementation
 
 	@Override
 	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -331,6 +309,10 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		inflater.inflate(R.menu.dossiers_list_menu_actions, menu);
 		return true;
 	}
+
+    /*
+	 * ActionMode.Callback implementation
+     */
 
 	@Override
 	public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
@@ -463,4 +445,5 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 			invalidateOptionsMenu();
 		}
 	}
+
 }
