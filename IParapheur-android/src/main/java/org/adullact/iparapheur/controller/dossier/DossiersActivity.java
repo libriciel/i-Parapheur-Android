@@ -61,8 +61,8 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	private DrawerLayout drawerLayout; // Main Layout off the screen
 	private FrameLayout drawerMenu; // Left panel acting as a menu
 	private ActionBarDrawerToggle drawerToggle; // Used to control the drawer state.
-	private boolean openDrawerwhenFinishedLoading = false;
-	private boolean manageDrawerwhenFinishedLoading = false;
+	private boolean _openDrawerWhenFinishedLoading = false;
+	private boolean _manageDrawerWhenFinishedLoading = false;
 	private FilterAdapter filterAdapter; // Adapter for action bar, used to display user's filters
 	private ActionMode mActionMode; // The actionMode used when dossiers are checked
 
@@ -94,14 +94,14 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (manageDrawerwhenFinishedLoading) {
+		if (_manageDrawerWhenFinishedLoading) {
 			if (drawerLayout != null) {
-				if (openDrawerwhenFinishedLoading)
+				if (_openDrawerWhenFinishedLoading)
 					drawerLayout.openDrawer(drawerMenu);
 				else
 					drawerLayout.closeDrawer(drawerMenu);
 			}
-			manageDrawerwhenFinishedLoading = false;
+			_manageDrawerWhenFinishedLoading = false;
 		}
 	}
 
@@ -179,9 +179,9 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		}
 		else {
 			Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-			if (filter == null) {
+			if (filter == null)
 				filter = new Filter();
-			}
+
 			FilterDialog.newInstance(filter).show(getSupportFragmentManager(), FilterDialog.TAG);
 
 		}
@@ -190,117 +190,7 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 	// </editor-fold desc="ActionBar">
 
-	// <editor-fold desc="DossierListFragmentListener">
-
-	@Override
-	public void onDossierSelected(String dossierId, String bureauId) {
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
-
-		if (fragment != null)
-			((DossierDetailFragment) fragment).update(bureauId, dossierId);
-	}
-
-	@Override
-	public void onDossierCheckedChanged() {
-		if (mActionMode == null)
-			mActionMode = startActionMode(this);
-		else
-			mActionMode.invalidate();
-	}
-
-	@Override
-	public void onDossiersLoaded(int size) {
-		onDossierSelected(null, null);
-
-		if ((getActionBar() != null) && (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
-			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			if (filterAdapter == null) {
-				filterAdapter = new FilterAdapter(this);
-			}
-			getActionBar().setListNavigationCallbacks(filterAdapter, this);
-		}
-	}
-
-	@Override
-	public void onDossiersNotLoaded() {
-		if (getActionBar() != null)
-			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-	}
-
-	// </editor-fold desc="DossierListFragmentListener">
-
-	@Override
-	public Dossier getDossier(String id) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		return (fragment == null) ? null : fragment.getDossier(id);
-	}
-
-	// <editor-fold desc="BureauSelectedListener">
-
-	@Override
-	public void onBureauSelected(String id) {
-		if (drawerLayout == null) {
-			manageDrawerwhenFinishedLoading = true;
-			openDrawerwhenFinishedLoading = (id == null);
-		}
-		else {
-			if (id == null)
-				drawerLayout.openDrawer(drawerMenu);
-			else
-				drawerLayout.closeDrawer(drawerMenu);
-		}
-
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		if (listFragment != null) {
-			// this method will reload dossiers fragments
-			listFragment.setBureauId(id);
-		}
-	}
-
-	// </editor-fold desc="BureauSelectedListener">
-
-	public void onFilterSave(Filter filter) {
-		MyFilters.INSTANCE.selectFilter(filter);
-		MyFilters.INSTANCE.save(filter);
-
-		if (getActionBar() != null)
-			getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-
-		filterAdapter.notifyDataSetChanged();
-		onDataChanged();
-	}
-
-	// <editor-fold desc="FilterDialogListener">
-
-	public void onFilterChange(Filter filter) {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
-		MyFilters.INSTANCE.selectFilter(filter);
-		onDataChanged();
-	}
-
-	public void onFilterCancel() {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
-	}
-
-	/**
-	 * Called when an action is done on a dossier. We have to force reload dossier list and
-	 * dismiss details.
-	 */
-	@Override
-	public void onDataChanged() {
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		if (listFragment != null) {
-			// this method will reload dossiers fragments
-			listFragment.reload();
-		}
-
-		onDossierSelected(null, null);
-		invalidateOptionsMenu();
-	}
-
-	// </editor-fold desc="FilterDialogListener">
-
-	//LoadingTask implementation
+	// <editor-fold desc="ActionMode">
 
 	@Override
 	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -309,10 +199,6 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		inflater.inflate(R.menu.dossiers_list_menu_actions, menu);
 		return true;
 	}
-
-    /*
-	 * ActionMode.Callback implementation
-     */
 
 	@Override
 	public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
@@ -415,6 +301,122 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 		mActionMode = null;
 	}
+
+	// </editor-fold desc="ActionMode">
+
+	public void onFilterSave(Filter filter) {
+		MyFilters.INSTANCE.selectFilter(filter);
+		MyFilters.INSTANCE.save(filter);
+
+		if (getActionBar() != null)
+			getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+
+		filterAdapter.notifyDataSetChanged();
+		onDataChanged();
+	}
+
+	// <editor-fold desc="BureauSelectedListener">
+
+	@Override
+	public void onBureauSelected(String id) {
+		if (drawerLayout == null) {
+			_manageDrawerWhenFinishedLoading = true;
+			_openDrawerWhenFinishedLoading = (id == null);
+		}
+		else {
+			if (id == null)
+				drawerLayout.openDrawer(drawerMenu);
+			else
+				drawerLayout.closeDrawer(drawerMenu);
+		}
+
+		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		if (listFragment != null) {
+			// this method will reload dossiers fragments
+			listFragment.setBureauId(id);
+		}
+	}
+
+	// </editor-fold desc="BureauSelectedListener">
+
+	// <editor-fold desc="DossierDetailListener">
+
+	@Override
+	public Dossier getDossier(String id) {
+		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		return (fragment == null) ? null : fragment.getDossier(id);
+	}
+
+	// </editor-fold desc="DossierDetailListener">
+
+	// <editor-fold desc="FilterDialogListener">
+
+	public void onFilterChange(Filter filter) {
+		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+		MyFilters.INSTANCE.selectFilter(filter);
+		onDataChanged();
+	}
+
+	public void onFilterCancel() {
+		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+	}
+
+	/**
+	 * Called when an action is done on a dossier. We have to force reload dossier list and
+	 * dismiss details.
+	 */
+	@Override
+	public void onDataChanged() {
+		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		if (listFragment != null) {
+			// this method will reload dossiers fragments
+			listFragment.reload();
+		}
+
+		onDossierSelected(null, null);
+		invalidateOptionsMenu();
+	}
+
+	// </editor-fold desc="FilterDialogListener">
+
+	// <editor-fold desc="DossierListFragmentListener">
+
+	@Override
+	public void onDossierSelected(String dossierId, String bureauId) {
+		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+
+		if (fragment != null)
+			((DossierDetailFragment) fragment).update(bureauId, dossierId);
+	}
+
+	@Override
+	public void onDossierCheckedChanged() {
+		if (mActionMode == null)
+			mActionMode = startActionMode(this);
+		else
+			mActionMode.invalidate();
+	}
+
+	@Override
+	public void onDossiersLoaded(int size) {
+		onDossierSelected(null, null);
+
+		if ((getActionBar() != null) && (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
+			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+			if (filterAdapter == null) {
+				filterAdapter = new FilterAdapter(this);
+			}
+			getActionBar().setListNavigationCallbacks(filterAdapter, this);
+		}
+	}
+
+	@Override
+	public void onDossiersNotLoaded() {
+		if (getActionBar() != null)
+			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	}
+
+	// </editor-fold desc="DossierListFragmentListener">
 
 	/**
 	 * Listener used on the Drawer Layout used to control the Action Bar content depending

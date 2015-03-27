@@ -217,23 +217,12 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	 */
 	public interface DossierListFragmentListener {
 
-		/**
-		 * Callback used when a dossier has been selected.
-		 */
 		void onDossierSelected(String dossierId, String bureauId);
 
-		/**
-		 * Callback used when a dossiers has been loaded.
-		 *
-		 * @param size
-		 */
 		void onDossiersLoaded(int size);
 
 		void onDossiersNotLoaded();
 
-		/**
-		 * Callback used when a dossier has been checked.
-		 */
 		void onDossierCheckedChanged();
 	}
 
