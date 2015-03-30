@@ -17,10 +17,14 @@
         <item name="colorPrimary">@color/primary_500</item>
         <item name="colorPrimaryDark">@color/primary_700</item>
         <item name="android:textColorPrimary">@color/text_white</item>
-        <item name="android:textColorSecondary">@color/text_white</item>
+        <item name="android:textColorSecondary">@color/text_black_secondary</item>
     </style>
 
     <style name="AppTheme.Main" parent="AppTheme.Main.Base"/>
+
+    <style name="AppTheme.Main.Toolbar" parent="AppTheme.Main">
+        <item name="android:textColorSecondary">@color/text_white</item>
+    </style>
 
     <!-- Settings -->
 
