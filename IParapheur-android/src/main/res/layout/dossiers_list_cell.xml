@@ -7,7 +7,7 @@
               android:layout_height="wrap_content"
               android:paddingLeft="4dp"
               android:paddingRight="4dp"
-              android:background="?android:activatedBackgroundIndicator">
+              android:background="@drawable/list_background_color">
 
     <ImageView
         android:id="@+id/dossiers_list_item_image"

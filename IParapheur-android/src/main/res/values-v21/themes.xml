@@ -13,7 +13,7 @@
     <!-- Main -->
 
     <style name="AppTheme.Main" parent="AppTheme.Main.Base">
-        <item name="android:colorAccent">@color/secondary_500</item>
+        <item name="colorAccent">@color/secondary_500</item>
     </style>
 
 </resources>
