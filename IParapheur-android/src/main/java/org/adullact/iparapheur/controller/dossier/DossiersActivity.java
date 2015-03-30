@@ -6,17 +6,19 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
@@ -34,6 +36,7 @@ import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.util.ArrayList;
@@ -53,7 +56,7 @@ import java.util.HashSet;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxFragment.BureauSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionBar.OnNavigationListener, ActionMode.Callback {
+public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxFragment.BureauSelectedListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
 	public static final String DOSSIER_ID = "dossier_id";
 	public static final String BUREAU_ID = "bureau_id";
@@ -65,6 +68,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	private boolean mOpenDrawerWhenFinishedLoading = false;
 	private boolean mManageDrawerWhenFinishedLoading = false;
 	private FilterAdapter mFilterAdapter; // Adapter for action bar, used to display user's filters
+	private Spinner mFiltersSpinner;
 	private ActionMode mActionMode; // The actionMode used when dossiers are checked
 
 	@Override
@@ -77,6 +81,9 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
 		mDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
+		mFiltersSpinner = (Spinner) findViewById(R.id.activity_dossiers_toolbar_spinner);
+
+		mFiltersSpinner.setOnItemSelectedListener(this);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -138,6 +145,12 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.dossiers_menu, menu);
 
+		// Alignment in TopBar isn't working on XML, but works programmatically
+
+		Toolbar.LayoutParams spinnerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
+		spinnerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
+		mFiltersSpinner.setLayoutParams(spinnerLayoutParams);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -173,10 +186,10 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		}
 	}
 
-	@Override
-	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		if (itemPosition < mFilterAdapter.getCount() - 1) {
-			Filter filter = mFilterAdapter.getItem(itemPosition);
+	@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+		if (position < mFilterAdapter.getCount() - 1) {
+			Filter filter = mFilterAdapter.getItem(position);
 			if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
 				MyFilters.INSTANCE.selectFilter(filter);
 				onDataChanged();
@@ -188,9 +201,11 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 				filter = new Filter();
 
 			FilterDialog.newInstance(filter).show(getSupportFragmentManager(), FilterDialog.TAG);
-
 		}
-		return false;
+	}
+
+	@Override public void onNothingSelected(AdapterView<?> parent) {
+
 	}
 
 	// </editor-fold desc="ActionBar">
@@ -313,8 +328,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		MyFilters.INSTANCE.selectFilter(filter);
 		MyFilters.INSTANCE.save(filter);
 
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(filter));
+		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter), true);
 
 		mFilterAdapter.notifyDataSetChanged();
 		onDataChanged();
@@ -358,16 +372,14 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 	public void onFilterChange(Filter filter) {
 
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(filter));
+		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter));
 
 		MyFilters.INSTANCE.selectFilter(filter);
 		onDataChanged();
 	}
 
 	public void onFilterCancel() {
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
 	}
 
 	/**
@@ -410,21 +422,16 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	public void onDossiersLoaded(int size) {
 		onDossierSelected(null, null);
 
-		if ((getSupportActionBar() != null) && (getSupportActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
+		if (mFilterAdapter == null)
+			mFilterAdapter = new FilterAdapter(this);
 
-			getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-			if (mFilterAdapter == null)
-				mFilterAdapter = new FilterAdapter(this);
-
-			getSupportActionBar().setListNavigationCallbacks(mFilterAdapter, this);
-		}
+		mFiltersSpinner.setAdapter(mFilterAdapter);
+		mFiltersSpinner.setVisibility(View.VISIBLE);
 	}
 
 	@Override
 	public void onDossiersNotLoaded() {
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		mFiltersSpinner.setVisibility(View.INVISIBLE);
 	}
 
 	// </editor-fold desc="DossierListFragmentListener">

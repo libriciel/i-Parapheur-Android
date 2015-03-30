@@ -10,9 +10,8 @@
     android:id="@+id/toolbar">
 
     <Spinner
-        android:id="@+id/spinner_toolbar"
+        android:id="@+id/activity_dossiers_toolbar_spinner"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"/>
+        android:layout_height="match_parent"/>
 
 </android.support.v7.widget.Toolbar>
