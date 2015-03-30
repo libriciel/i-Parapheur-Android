@@ -1,15 +1,16 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.view.ActionMode;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,56 +53,60 @@ import java.util.HashSet;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends FragmentActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxFragment.BureauSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionBar.OnNavigationListener, ActionMode.Callback {
+public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxFragment.BureauSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionBar.OnNavigationListener, ActionMode.Callback {
 
 	public static final String DOSSIER_ID = "dossier_id";
 	public static final String BUREAU_ID = "bureau_id";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	private DrawerLayout drawerLayout; // Main Layout off the screen
-	private FrameLayout drawerMenu; // Left panel acting as a menu
-	private ActionBarDrawerToggle drawerToggle; // Used to control the drawer state.
-	private boolean _openDrawerWhenFinishedLoading = false;
-	private boolean _manageDrawerWhenFinishedLoading = false;
-	private FilterAdapter filterAdapter; // Adapter for action bar, used to display user's filters
+	private DrawerLayout mDrawerLayout; // Main Layout off the screen
+	private FrameLayout mDrawerMenu; // Left panel acting as a menu
+	private ActionBarDrawerToggle mDrawerToggle; // Used to control the drawer state.
+	private boolean mOpenDrawerWhenFinishedLoading = false;
+	private boolean mManageDrawerWhenFinishedLoading = false;
+	private FilterAdapter mFilterAdapter; // Adapter for action bar, used to display user's filters
 	private ActionMode mActionMode; // The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		// Loading indicator
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_dossiers);
 
-		drawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
-		drawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
+		mDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
 		// Used to listen open and close events on the Drawer Layout
-		drawerToggle = new DossiersActionBarDrawerToggle(this, drawerLayout);
-		drawerLayout.setDrawerListener(drawerToggle);
+		mDrawerToggle = new DossiersActionBarDrawerToggle(this, mDrawerLayout);
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		if (getActionBar() != null)
-			getActionBar().setDisplayHomeAsUpEnabled(true);
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
-		drawerToggle.syncState();
+		mDrawerToggle.syncState();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (_manageDrawerWhenFinishedLoading) {
-			if (drawerLayout != null) {
-				if (_openDrawerWhenFinishedLoading)
-					drawerLayout.openDrawer(drawerMenu);
+		if (mManageDrawerWhenFinishedLoading) {
+			if (mDrawerLayout != null) {
+				if (mOpenDrawerWhenFinishedLoading)
+					mDrawerLayout.openDrawer(mDrawerMenu);
 				else
-					drawerLayout.closeDrawer(drawerMenu);
+					mDrawerLayout.closeDrawer(mDrawerMenu);
 			}
-			_manageDrawerWhenFinishedLoading = false;
+			mManageDrawerWhenFinishedLoading = false;
 		}
 	}
 
@@ -129,18 +134,18 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu items for use in the action bar
+
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.dossiers_menu, menu);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-
 		// Show or hide specific menu actions depending on Drawer state.
-		if ((drawerLayout != null) && (drawerMenu != null)) {
-			boolean actionsVisibility = !drawerLayout.isDrawerVisible(drawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
+		if ((mDrawerLayout != null) && (mDrawerMenu != null)) {
+			boolean actionsVisibility = !mDrawerLayout.isDrawerVisible(mDrawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
 			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
 			return super.onPrepareOptionsMenu(menu);
 		}
@@ -153,7 +158,7 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 		// Pass the event to ActionBarDrawerToggle, if it returns
 		// true, then it has handled the app icon touch event
-		if (drawerToggle.onOptionsItemSelected(item)) {
+		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
 		}
 
@@ -170,8 +175,8 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		if (itemPosition < filterAdapter.getCount() - 1) {
-			Filter filter = filterAdapter.getItem(itemPosition);
+		if (itemPosition < mFilterAdapter.getCount() - 1) {
+			Filter filter = mFilterAdapter.getItem(itemPosition);
 			if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
 				MyFilters.INSTANCE.selectFilter(filter);
 				onDataChanged();
@@ -308,10 +313,10 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		MyFilters.INSTANCE.selectFilter(filter);
 		MyFilters.INSTANCE.save(filter);
 
-		if (getActionBar() != null)
-			getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(filter));
 
-		filterAdapter.notifyDataSetChanged();
+		mFilterAdapter.notifyDataSetChanged();
 		onDataChanged();
 	}
 
@@ -319,15 +324,15 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 
 	@Override
 	public void onBureauSelected(String id) {
-		if (drawerLayout == null) {
-			_manageDrawerWhenFinishedLoading = true;
-			_openDrawerWhenFinishedLoading = (id == null);
+		if (mDrawerLayout == null) {
+			mManageDrawerWhenFinishedLoading = true;
+			mOpenDrawerWhenFinishedLoading = (id == null);
 		}
 		else {
 			if (id == null)
-				drawerLayout.openDrawer(drawerMenu);
+				mDrawerLayout.openDrawer(mDrawerMenu);
 			else
-				drawerLayout.closeDrawer(drawerMenu);
+				mDrawerLayout.closeDrawer(mDrawerMenu);
 		}
 
 		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
@@ -352,13 +357,17 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	// <editor-fold desc="FilterDialogListener">
 
 	public void onFilterChange(Filter filter) {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(filter));
+
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(filter));
+
 		MyFilters.INSTANCE.selectFilter(filter);
 		onDataChanged();
 	}
 
 	public void onFilterCancel() {
-		getActionBar().setSelectedNavigationItem(filterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setSelectedNavigationItem(mFilterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
 	}
 
 	/**
@@ -392,7 +401,7 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	@Override
 	public void onDossierCheckedChanged() {
 		if (mActionMode == null)
-			mActionMode = startActionMode(this);
+			mActionMode = startSupportActionMode(this);
 		else
 			mActionMode.invalidate();
 	}
@@ -401,19 +410,21 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	public void onDossiersLoaded(int size) {
 		onDossierSelected(null, null);
 
-		if ((getActionBar() != null) && (getActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
-			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-			if (filterAdapter == null) {
-				filterAdapter = new FilterAdapter(this);
-			}
-			getActionBar().setListNavigationCallbacks(filterAdapter, this);
+		if ((getSupportActionBar() != null) && (getSupportActionBar().getNavigationMode() != ActionBar.NAVIGATION_MODE_LIST)) {
+
+			getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+			if (mFilterAdapter == null)
+				mFilterAdapter = new FilterAdapter(this);
+
+			getSupportActionBar().setListNavigationCallbacks(mFilterAdapter, this);
 		}
 	}
 
 	@Override
 	public void onDossiersNotLoaded() {
-		if (getActionBar() != null)
-			getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 
 	// </editor-fold desc="DossierListFragmentListener">
@@ -425,13 +436,13 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
 
 		public DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
-			super(activity, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 
 		@Override
 		public void onDrawerClosed(View view) {
-			if ((getActionBar() != null) && (MyAccounts.INSTANCE.getSelectedAccount() != null))
-				getActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			if ((getSupportActionBar() != null) && (MyAccounts.INSTANCE.getSelectedAccount() != null))
+				getSupportActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
 
 			// calls onPrepareOptionMenu to show context specific actions
 			invalidateOptionsMenu();
@@ -440,8 +451,8 @@ public class DossiersActivity extends FragmentActivity implements DossierListFra
 		@Override
 		/** Called when a drawer has settled in a completely open state. */
 		public void onDrawerOpened(View drawerView) {
-			if (getActionBar() != null)
-				getActionBar().setTitle(R.string.app_name);
+			if (getSupportActionBar() != null)
+				getSupportActionBar().setTitle(R.string.app_name);
 
 			// calls onPrepareOptionMenu to hide context specific actions
 			invalidateOptionsMenu();

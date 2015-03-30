@@ -233,7 +233,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		private HashSet<Dossier> checkedDossiers;
 
 		public DossierListAdapter(Context context, DossierListFragmentListener listener) {
-			super(context, R.layout.dossiers_list_item, R.id.dossiers_list_item_title);
+			super(context, R.layout.dossiers_list_cell, R.id.dossiers_list_item_title);
 			this.listener = listener;
 			this.checkedDossiers = new HashSet<>();
 		}

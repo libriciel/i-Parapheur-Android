@@ -1,52 +1,66 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/activity_dossiers_drawer_layout"
     android:orientation="vertical"
-    android:divider="@android:drawable/divider_horizontal_bright">
+    android:divider="@android:drawable/divider_horizontal_bright"
+    tools:context=".MainActivity">
 
-    <FrameLayout
-        android:orientation="vertical"
+    <!-- The main content view -->
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:baselineAligned="false">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <include layout="@layout/activity_dossiers_toolbar"/>
+
+        <FrameLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:baselineAligned="false">
 
-            <fragment
-                android:id="@+id/dossier_list"
-                android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:layout="@android:layout/list_content"
-                android:tag="Dossiers_list"
-                android:layout_weight="1" />
+                android:baselineAligned="false">
 
-            <fragment
-                android:id="@+id/dossier_detail"
-                android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
-                android:tag="Dossier_details"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:layout_weight="3"
-                tools:layout="@layout/fragment_dossier_detail" />
-        </LinearLayout>
+                <fragment
+                    android:id="@+id/dossier_list"
+                    android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    tools:layout="@android:layout/list_content"
+                    android:tag="Dossiers_list"
+                    android:layout_weight="1"/>
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:max="100"
-            android:visibility="invisible" />
+                <fragment
+                    android:id="@+id/dossier_detail"
+                    android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
+                    android:tag="Dossier_details"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:layout_weight="3"
+                    tools:layout="@layout/fragment_dossier_detail"/>
+            </LinearLayout>
 
-    </FrameLayout>
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:max="100"
+                android:visibility="invisible"/>
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- The navigation drawer -->
 
     <FrameLayout
         android:orientation="horizontal"
@@ -55,13 +69,14 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:baselineAligned="false">
+
         <fragment
             android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
             android:id="@+id/activity_dossiers_bureaux_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/bureaux"
-            android:tag="Bureaux_list" />
+            android:tag="Bureaux_list"/>
     </FrameLayout>
 
 </android.support.v4.widget.DrawerLayout>

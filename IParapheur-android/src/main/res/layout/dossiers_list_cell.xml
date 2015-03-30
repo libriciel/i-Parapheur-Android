@@ -35,6 +35,7 @@
             android:gravity="bottom"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textColor="@color/text_black"
             android:text="@string/mockup_dossier_title"/>
 
         <TextView
@@ -44,6 +45,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textColor="@color/text_black_secondary"
             android:text="@string/mockup_dossier_subtitle"/>
     </LinearLayout>
 
