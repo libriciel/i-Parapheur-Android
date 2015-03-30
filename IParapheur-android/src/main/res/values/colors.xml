@@ -5,6 +5,7 @@
     <color name="primary_100">@color/light_blue_100</color>
     <color name="primary_500">@color/light_blue_500</color>
     <color name="primary_700">@color/light_blue_700</color>
+    <color name="primary_900">@color/light_blue_900</color>
     <color name="secondary_100">@color/brown_100</color>
     <color name="secondary_500">@color/brown_500</color>
 
@@ -25,6 +26,7 @@
     <color name="light_blue_100">#b3e5fc</color>
     <color name="light_blue_500">#03a9f4</color>
     <color name="light_blue_700">#0288d1</color>
+    <color name="light_blue_900">#01579b</color>
 
     <!-- Grey material design colors -->
     <color name="grey_100">#f5f5f5</color>
