@@ -47,6 +47,7 @@ import java.util.List;
 public class DossierListFragment extends SwipeRefreshListFragment implements LoadingTask.DataChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
 	public static String TAG = "Dossiers_list";
+	public static String ARG_BUREAU_ID = "bureau_id";
 
 	private DossierListFragmentListener listener;
 	private String mBureauId; // Bureau id where the dossiers belongs
@@ -79,7 +80,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override
 	public View getInitialView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.dossiers_list, container, true);
+		return inflater.inflate(R.layout.dossiers_list, container, false);
 	}
 
 	@Override
@@ -99,6 +100,11 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		setOnRefreshListener(this);
 		setHasOptionsMenu(false);
 		setColorScheme(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
+	}
+
+	@Override public void onStart() {
+		super.onStart();
+		setBureauId(getArguments().getString(ARG_BUREAU_ID, null));
 	}
 
 	@Override

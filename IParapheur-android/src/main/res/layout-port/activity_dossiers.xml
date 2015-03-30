@@ -26,13 +26,10 @@
                 android:layout_height="match_parent"
                 android:baselineAligned="false">
 
-                <fragment
-                    android:id="@+id/dossier_list"
-                    android:name="org.adullact.iparapheur.controller.dossier.DossierListFragment"
+                <FrameLayout
+                    android:id="@+id/left_fragment"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    tools:layout="@android:layout/list_content"
-                    android:tag="Dossiers_list"
                     android:layout_weight="1"/>
 
                 <fragment

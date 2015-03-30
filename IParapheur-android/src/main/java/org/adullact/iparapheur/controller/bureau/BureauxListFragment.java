@@ -11,13 +11,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
@@ -26,14 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BureauxFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener {
+public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
-	public static final String TAG = "Bureaux_list";
-	private BureauSelectedListener listener;
-	/**
-	 * list of accounts displayed in the spinner
-	 */
-	private List<Account> accounts;
+	public static final String TAG = "bureaux_list_fragment";
+	private BureauListFragmentListener listener;
+
 	/**
 	 * list of bureaux currently displayed in this Fragment
 	 */
@@ -47,10 +42,6 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 	 */
 	private ListView listView;
 	/**
-	 * Spinner containing user's accounts.
-	 */
-	private Spinner accountsSpinner;
-	/**
 	 * Swipe refresh layout on top of the list view
 	 */
 	private SwipeRefreshLayout swipeRefreshLayout;
@@ -60,22 +51,22 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		accounts = new ArrayList<>();
 	}
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof BureauSelectedListener)) {
+		if (!(activity instanceof BureauListFragmentListener))
 			throw new IllegalStateException("Activity must implement BureauSelectedListener.");
-		}
-		listener = (BureauSelectedListener) activity;
+
+		listener = (BureauListFragmentListener) activity;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.bureaux, container, false);
+		return inflater.inflate(R.layout.bureaux_list_fragment, container, false);
 	}
 
 	@Override
@@ -84,8 +75,6 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 		listView = (ListView) view.findViewById(R.id.bureaux_list);
 		listView.setOnItemClickListener(this);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
-		accountsSpinner = (Spinner) view.findViewById(R.id.bureaux_accounts_spinner);
-		accountsSpinner.setOnItemSelectedListener(this);
 		swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bureaux_refresh_layout);
 		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
 	}
@@ -94,30 +83,15 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		listView.setAdapter(new BureauListAdapter(getActivity()));
-		accountsSpinner.setAdapter(new AccountSpinnerAdapter(getActivity()));
 		swipeRefreshLayout.setOnRefreshListener(this);
-
-		// Todo : Adrien, fix that
-		// updateAccounts();
-		// updateBureaux(false);
 	}
 
-	private void updateAccounts() {
-		accounts.clear();
-		int i = -1;
-		for (Account account : MyAccounts.INSTANCE.getAccounts()) {
-			if (account.isValid()) {
-				accounts.add(account);
-				i++;
-				if ((MyAccounts.INSTANCE.getSelectedAccount() != null) && account.equals(MyAccounts.INSTANCE.getSelectedAccount())) {
-					accountsSpinner.setSelection(i);
-				}
-			}
-		}
-		((AccountSpinnerAdapter) accountsSpinner.getAdapter()).notifyDataSetChanged();
+	@Override public void onStart() {
+		super.onStart();
+		updateBureaux(true);
 	}
 
-	private void updateBureaux(boolean forceReload) {
+	public void updateBureaux(boolean forceReload) {
 		if (forceReload) {
 			this.bureaux = null;
 		}
@@ -127,27 +101,11 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 		onDataChanged();
 	}
 
-	// onItemSelected implementation (used on accounts spinner)
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-		Account newlySelectedAccount = accounts.get(i);
-		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
-		if ((selectedAccount == null) || !newlySelectedAccount.equals(selectedAccount)) {
-			MyAccounts.INSTANCE.selectAccount(newlySelectedAccount.getId());
-			updateBureaux(true);
-		}
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> adapterView) {
-
-	}
-
 	// OnItemClickListener implementation (used on bureaux list)
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (position != selectedBureau) {
-			listener.onBureauSelected(bureaux.get(position).getId());
+			listener.onBureauListFragmentSelected(bureaux.get(position).getId());
 		}
 	}
 
@@ -155,19 +113,11 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 	@Override
 	public void onDataChanged() {
 		((BureauListAdapter) listView.getAdapter()).notifyDataSetChanged();
-		/* if there's only 1 bureau, select it automatically
-		 *
-         */
-		if ((bureaux != null) && (bureaux.size() == 1)) {
-			listener.onBureauSelected(bureaux.get(0).getId());
-		}
-		else {
-			/* if a bureau was previously selected, we have to notify the parent
-			 * activity that the data has changed, so the activity remove the previously selected
-             * dossiers list and details
-             */
-			listener.onBureauSelected(null);
-		}
+
+		// if a bureau was previously selected, we have to notify the parent
+		// activity that the data has changed, so the activity remove the previously selected
+		// dossiers list and details
+		listener.onBureauListFragmentSelected(null);
 	}
 
 	// SwipeRefreshLayout listener
@@ -176,17 +126,11 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 		new BureauxLoadingTask(getActivity(), this).execute();
 	}
 
-	public void accountsChanged() {
-		updateAccounts();
-		updateBureaux(true);
-		listener.onBureauSelected(null);
-	}
-
 	/**
 	 * The parent activity must implement this interface.
 	 * Used to notify the activity on bureaux changes
 	 */
-	public interface BureauSelectedListener {
+	public interface BureauListFragmentListener {
 
 		/**
 		 * Called when the bureau identified by the id passed in parameter has been
@@ -194,7 +138,7 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 		 *
 		 * @param id the bureau id or null if none is selected (data changed)
 		 */
-		void onBureauSelected(String id);
+		void onBureauListFragmentSelected(String id);
 	}
 
 	private class BureauxLoadingTask extends LoadingTask {
@@ -260,30 +204,4 @@ public class BureauxFragment extends Fragment implements LoadingTask.DataChangeL
 		}
 	}
 
-	private class AccountSpinnerAdapter extends ArrayAdapter<Account> {
-
-		public AccountSpinnerAdapter(Context context) {
-			super(context, android.R.layout.simple_list_item_activated_1, android.R.id.text1);
-		}
-
-		@Override
-		public int getCount() {
-			return (accounts == null) ? 0 : accounts.size();
-		}
-
-		@Override
-		public Account getItem(int position) {
-			return accounts.get(position);
-		}
-
-		@Override
-		public int getPosition(Account item) {
-			return accounts.indexOf(item);
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return (accounts == null) || accounts.isEmpty();
-		}
-	}
 }
