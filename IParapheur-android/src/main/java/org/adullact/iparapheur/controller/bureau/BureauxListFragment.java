@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
@@ -29,27 +30,16 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	public static final String TAG = "bureaux_list_fragment";
 	private BureauListFragmentListener listener;
 
-	/**
-	 * list of bureaux currently displayed in this Fragment
-	 */
-	private List<Bureau> bureaux;
-	/**
-	 * the currently selected dossier
-	 */
-	private int selectedBureau = ListView.INVALID_POSITION;
-	/**
-	 * listView used to show the bureaux of the currently selected account
-	 */
-	private ListView listView;
-	/**
-	 * Swipe refresh layout on top of the list view
-	 */
-	private SwipeRefreshLayout swipeRefreshLayout;
+	private List<Bureau> mBureaux; // List of mBureaux currently displayed in this Fragment
+	private int selectedBureau = ListView.INVALID_POSITION; // The currently selected dossier
+	private ListView listView; // ListView used to show the mBureaux of the currently selected account
+	private SwipeRefreshLayout swipeRefreshLayout; // Swipe refresh layout on top of the list view
 
-	// Called only once as retainInstance is set to true.
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Called only once as retainInstance is set to true.
 		setRetainInstance(true);
 	}
 
@@ -86,30 +76,34 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		swipeRefreshLayout.setOnRefreshListener(this);
 	}
 
-	@Override public void onStart() {
+	@Override
+	public void onStart() {
 		super.onStart();
 		updateBureaux(true);
 	}
 
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload) {
-			this.bureaux = null;
+			this.mBureaux = null;
 		}
-		if ((bureaux == null) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
+		if ((mBureaux == null) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
 			new BureauxLoadingTask(getActivity(), this).execute();
 		}
 		onDataChanged();
 	}
 
-	// OnItemClickListener implementation (used on bureaux list)
+	// <editor-fold desc="OnItemClickListener">
+
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (position != selectedBureau) {
-			listener.onBureauListFragmentSelected(bureaux.get(position).getId());
+			listener.onBureauListFragmentSelected(mBureaux.get(position).getId());
 		}
 	}
 
-	// DataChangeListener
+	// </editor-fold desc="OnItemClickListener">
+
+	// <editor-fold desc="DataChangeListener">
 	@Override
 	public void onDataChanged() {
 		((BureauListAdapter) listView.getAdapter()).notifyDataSetChanged();
@@ -120,11 +114,15 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		listener.onBureauListFragmentSelected(null);
 	}
 
-	// SwipeRefreshLayout listener
+	// </editor-fold desc="DataChangeListener">
+
+	// <editor-fold desc="SwipeRefreshLayout">
 	@Override
 	public void onRefresh() {
 		new BureauxLoadingTask(getActivity(), this).execute();
 	}
+
+	// </editor-fold desc="SwipeRefreshLayout">
 
 	/**
 	 * The parent activity must implement this interface.
@@ -152,11 +150,11 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			// Check if this task is cancelled as often as possible.
 			if (isCancelled()) {return;}
 			if (!IParapheur.OFFLINE) {
-				bureaux = RESTClient.INSTANCE.getBureaux();
+				mBureaux = RESTClient.INSTANCE.getBureaux();
 			}
 			else {
-				bureaux = new ArrayList<>();
-				bureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
+				mBureaux = new ArrayList<>();
+				mBureaux.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
 			}
 		}
 
@@ -174,33 +172,59 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	private class BureauListAdapter extends ArrayAdapter<Bureau> {
 
 		public BureauListAdapter(Context context) {
-			super(context, android.R.layout.simple_list_item_activated_1, android.R.id.text1);
+			super(context, R.layout.bureaux_list_cell, R.id.bureau_list_cell_title);
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			// TODO : update more info here
-			return super.getView(position, convertView, parent);
+
+			View cell = super.getView(position, convertView, parent);
+
+			TextView lateBadgeTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_late);
+			TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo_count);
+
+			Bureau currentBureau = getItem(position);
+			if (currentBureau != null) {
+
+				// Determines subtitle content
+
+				String subtitle;
+
+				if (currentBureau.getTodoCount() == 0)
+					subtitle = getString(R.string.no_dossier);
+				else if (currentBureau.getTodoCount() == 1)
+					subtitle = getString(R.string.one_dossier);
+				else
+					subtitle = getString(R.string.nb_dossiers).replace("-number-", String.valueOf(currentBureau.getTodoCount()));
+
+				// Applies values
+
+				todoCountTextView.setText(subtitle);
+				lateBadgeTextView.setText(String.valueOf(currentBureau.getLateCount()));
+				lateBadgeTextView.setVisibility((currentBureau.getLateCount() != 0 ? View.VISIBLE : View.INVISIBLE));
+			}
+
+			return cell;
 		}
 
 		@Override
 		public int getCount() {
-			return (bureaux == null) ? 0 : bureaux.size();
+			return (mBureaux == null) ? 0 : mBureaux.size();
 		}
 
 		@Override
 		public Bureau getItem(int position) {
-			return bureaux.get(position);
+			return mBureaux.get(position);
 		}
 
 		@Override
 		public int getPosition(Bureau item) {
-			return bureaux.indexOf(item);
+			return mBureaux.indexOf(item);
 		}
 
 		@Override
 		public boolean isEmpty() {
-			return (bureaux == null) || bureaux.isEmpty();
+			return (mBureaux == null) || mBureaux.isEmpty();
 		}
 	}
 

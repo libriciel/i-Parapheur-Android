@@ -20,7 +20,9 @@
     <color name="text_white_disabled30">#4DFFFFFF</color>
     <color name="text_white_divider">#1FFFFFFF</color>
 
-    <!-- White text material color -->
+    <!-- Red material color -->
+
+    <color name="red_500">#f44336</color>
 
     <!-- Light Blue material design colors -->
     <color name="light_blue_100">#b3e5fc</color>

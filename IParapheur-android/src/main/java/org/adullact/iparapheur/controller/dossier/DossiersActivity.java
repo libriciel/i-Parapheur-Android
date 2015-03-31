@@ -109,7 +109,8 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		mDrawerToggle.syncState();
 	}
 
-	@Override protected void onStart() {
+	@Override
+	protected void onStart() {
 		super.onStart();
 
 		// Replace whatever is in the fragment_container view with this fragment.
@@ -173,7 +174,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		// Alignment in TopBar isn't working on XML, but works programmatically
 
-		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
+		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
 		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
 		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
 
@@ -387,22 +388,22 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 	@Override
 	public void onBureauSelected(String id) {
-		if (mDrawerLayout == null) {
-			mManageDrawerWhenFinishedLoading = true;
-			mOpenDrawerWhenFinishedLoading = (id == null);
-		}
-		else {
-			if (id == null)
-				mDrawerLayout.openDrawer(mDrawerMenu);
-			else
-				mDrawerLayout.closeDrawer(mDrawerMenu);
-		}
-
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		if (listFragment != null) {
-			// this method will reload dossiers fragments
-			// listFragment.setBureauId(id);
-		}
+//		if (mDrawerLayout == null) {
+//			mManageDrawerWhenFinishedLoading = true;
+//			mOpenDrawerWhenFinishedLoading = (id == null);
+//		}
+//		else {
+//			if (id == null)
+//				mDrawerLayout.openDrawer(mDrawerMenu);
+//			else
+//				mDrawerLayout.closeDrawer(mDrawerMenu);
+//		}
+//
+//		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+//		if (listFragment != null) {
+//			// this method will reload dossiers fragments
+//			listFragment.setBureauId(id);
+//		}
 	}
 
 	// </editor-fold desc="BureauSelectedListener">
