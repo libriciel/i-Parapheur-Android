@@ -1,4 +1,4 @@
-package org.adullact.iparapheur.controller.bureau;
+package org.adullact.iparapheur.controller.account;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheur;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class AccountListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 	public static final String TAG = "bureaux_list_fragment";
 	private BureauListFragmentListener listener;

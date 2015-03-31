@@ -23,9 +23,9 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxFragment;
-import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
@@ -60,7 +60,7 @@ import java.util.HashSet;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxListFragment.BureauListFragmentListener, BureauxFragment.BureauSelectedListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
+public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, AccountListFragment.BureauListFragmentListener, BureauxFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
 	public static final String DOSSIER_ID = "dossier_id";
 	public static final String BUREAU_ID = "bureau_id";
@@ -115,10 +115,10 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		BureauxListFragment bureauxListFragment = new BureauxListFragment();
+		AccountListFragment bureauxListFragment = new AccountListFragment();
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(0, 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, bureauxListFragment);
+		transaction.replace(R.id.left_fragment, bureauxListFragment, AccountListFragment.TAG);
 		transaction.commit();
 
 		// We select the first account by default, the demo one
@@ -384,53 +384,30 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		transaction.commit();
 	}
 
-	// <editor-fold desc="BureauSelectedListener">
+	// <editor-fold desc="AccountFragmentListener">
 
 	@Override
-	public void onBureauSelected(String id) {
-//		if (mDrawerLayout == null) {
-//			mManageDrawerWhenFinishedLoading = true;
-//			mOpenDrawerWhenFinishedLoading = (id == null);
-//		}
-//		else {
-//			if (id == null)
-//				mDrawerLayout.openDrawer(mDrawerMenu);
-//			else
-//				mDrawerLayout.closeDrawer(mDrawerMenu);
-//		}
-//
-//		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-//		if (listFragment != null) {
-//			// this method will reload dossiers fragments
-//			listFragment.setBureauId(id);
-//		}
+	public void onAccountSelected(@NonNull Account account) {
+		mDrawerLayout.closeDrawer(mDrawerMenu);
+		MyAccounts.INSTANCE.selectAccount(account.getId());
+
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		if (dossierListFragment != null)
+			onBackPressed();
+
+		AccountListFragment bureauxFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.TAG);
+		if (bureauxFragment != null)
+			bureauxFragment.updateBureaux(true);
 	}
 
-	// </editor-fold desc="BureauSelectedListener">
+	// </editor-fold desc="AccountFragmentListener">
 
 	// <editor-fold desc="BureauListFragmentListener">
 
 	@Override
 	public void onBureauListFragmentSelected(String id) {
-
 		if (id != null)
 			replaceLeftFragment(id);
-//		if (mDrawerLayout == null) {
-//			mManageDrawerWhenFinishedLoading = true;
-//			mOpenDrawerWhenFinishedLoading = (id == null);
-//		}
-//		else {
-//			if (id == null)
-//				mDrawerLayout.openDrawer(mDrawerMenu);
-//			else
-//				mDrawerLayout.closeDrawer(mDrawerMenu);
-//		}
-//
-//		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-//		if (listFragment != null) {
-//			// this method will reload dossiers fragments
-//			listFragment.setBureauId(id);
-//		}
 	}
 
 	// </editor-fold desc="BureauListFragmentListener">
