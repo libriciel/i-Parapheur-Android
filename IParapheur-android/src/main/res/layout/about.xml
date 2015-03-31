@@ -128,6 +128,30 @@
                 android:layout_marginTop="@dimen/about_text_margin_medium"
                 android:text="@string/about_library_license_android_support_license"/>
 
+            <!-- Gson license -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:textStyle="bold"
+                android:text="@string/about_library_license_gson_title"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_gson_copyright"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_gson_license"/>
+
         </LinearLayout>
     </ScrollView>
 

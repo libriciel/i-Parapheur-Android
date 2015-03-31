@@ -120,4 +120,8 @@
     <string name="about_library_license_android_support_copyright">Copyright © 2011 The Android Open Source Project</string>
     <string name="about_library_license_android_support_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
 
+    <string name="about_library_license_gson_title">Google Gson</string>
+    <string name="about_library_license_gson_copyright">Copyright © 2008–2009 Google Inc</string>
+    <string name="about_library_license_gson_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
+
 </resources>
