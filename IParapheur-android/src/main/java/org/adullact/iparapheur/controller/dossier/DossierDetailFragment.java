@@ -21,11 +21,11 @@ import org.adullact.iparapheur.controller.IParapheur;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.model.Document;
-import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
 import java.util.UUID;
@@ -37,34 +37,16 @@ import java.util.UUID;
 public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
 	public static String TAG = "Dossier_details";
-	/**
-	 * the bureau where the dossier belongs.
-	 */
-	private String bureauId;
-	/**
-	 * The Dossier id this fragment is presenting. Used only in initialisation.
-	 */
-	private String dossierId;
-	/**
-	 * The Dossier this fragment is presenting.
-	 */
-	private Dossier dossier;
+
+	private String bureauId; // The Bureau where the dossier belongs.
+	private String dossierId; // The Dossier id this fragment is presenting. Used only in initialisation.
+	private Dossier dossier; // The Dossier this fragment is presenting.
 	private DossierDetailListener listener;
 	private boolean isReaderEnabled;
-	/**
-	 * Used to display the document's pages. Each page is managed by a fragment.
-	 */
-	private ViewPager viewPager;
+	private ViewPager viewPager; // Used to display the document's pages. Each page is managed by a fragment.
 	private int currentPage;
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
-	public DossierDetailFragment() {
-	}
-
-	//private SeekBar seekBar;
+	public DossierDetailFragment() { }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -113,12 +95,14 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		setHasOptionsMenu(true);
 	}
 
+	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof DossierDetailListener)) {
+		if (!(activity instanceof DossierDetailListener))
 			throw new IllegalStateException("Activity must implement DossierDetailListener.");
-		}
+
 		listener = (DossierDetailListener) activity;
 	}
 
@@ -129,6 +113,36 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			reader.clean();
         }*/
 	}
+
+	// <editor-fold desc="ActionBar">
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.dossier_details_menu, menu);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		MenuItem item = menu.findItem(R.id.action_details);
+		item.setVisible((dossier != null) && dossier.isDetailsAvailable());
+		super.onPrepareOptionsMenu(menu);
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+			case R.id.action_details:
+				toggleDetails();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	// </editor-fold desc="ActionBar">
 
 	public void update(String bureauId, String dossierId) {
 		/*if (reader != null) {
@@ -217,32 +231,6 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.dossier_details_menu, menu);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		MenuItem item = menu.findItem(R.id.action_details);
-		item.setVisible((dossier != null) && dossier.isDetailsAvailable());
-		super.onPrepareOptionsMenu(menu);
-
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-			case R.id.action_details:
-				toggleDetails();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
 	private void toggleDetails() {
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
 		if (details.getVisibility() == View.VISIBLE) {
@@ -261,16 +249,12 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
-	}
-
-    /* SeekBar Listener implementation */
+	// <editor-fold desc="SeekBar Listener">
 
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-
-	}
+	public void onStartTrackingTouch(SeekBar seekBar) { }
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
@@ -280,10 +264,16 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
+	// </editor-fold desc="SeekBar Listener">
+
+	// <editor-fold desc="Listener">
+
 	public interface DossierDetailListener {
 
 		Dossier getDossier(String id);
 	}
+
+	// </editor-fold desc="Listener">
 
 	private class DossierLoadingTask extends LoadingTask {
 

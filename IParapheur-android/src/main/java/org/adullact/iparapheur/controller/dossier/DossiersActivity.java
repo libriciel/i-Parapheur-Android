@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +73,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	private boolean mManageDrawerWhenFinishedLoading = false;
 	private FilterAdapter mFilterAdapter; // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
+
 	private ActionMode mActionMode; // The actionMode used when dossiers are checked
 
 	@Override
@@ -118,7 +118,6 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(0, 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
 		transaction.replace(R.id.left_fragment, bureauxListFragment);
-		transaction.addToBackStack(null);
 		transaction.commit();
 
 		// We select the first account by default, the demo one
@@ -174,16 +173,21 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		// Alignment in TopBar isn't working on XML, but works programmatically
 
-		Toolbar.LayoutParams spinnerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
-		spinnerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
-		mFiltersSpinner.setLayoutParams(spinnerLayoutParams);
+		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
+		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
+		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
 
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		// Show or hide specific menu actions depending on displayed fragment
+		Fragment dossierFragment = getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
+
 		// Show or hide specific menu actions depending on Drawer state.
+
 		if ((mDrawerLayout != null) && (mDrawerMenu != null)) {
 			boolean actionsVisibility = !mDrawerLayout.isDrawerVisible(mDrawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
 			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
@@ -363,8 +367,6 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 	private void replaceLeftFragment(@NonNull String bureauId) {
 
-		Log.i("Adrien", "replace");
-
 		// Create fragment and give it an argument specifying the Bureau it should show
 
 		DossierListFragment dossierFragment = new DossierListFragment();
@@ -376,7 +378,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(R.anim.push_right_to_center, R.anim.push_center_to_left, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, dossierFragment);
+		transaction.replace(R.id.left_fragment, dossierFragment, DossierListFragment.TAG);
 		transaction.addToBackStack(null);
 		transaction.commit();
 	}
@@ -478,8 +480,8 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 	@Override
 	public void onDossierSelected(String dossierId, String bureauId) {
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
 
+		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
 		if (fragment != null)
 			((DossierDetailFragment) fragment).update(bureauId, dossierId);
 	}

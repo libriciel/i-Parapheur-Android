@@ -5,18 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_below="@+id/linearLayout"
+    android:background="@drawable/background_light_right_edge"
     android:id="@+id/bureaux_refresh_layout">
-
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/bureaux_list"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/holo_blue_light"
-        android:dividerHeight="1dp"
-        android:layout_margin="4dp"
-        android:background="@android:color/background_light"/>
+        android:layout_margin="4dp"/>
 
     <LinearLayout
         android:id="@android:id/empty"
@@ -25,9 +22,7 @@
         android:visibility="gone"
         android:clickable="true"
         android:orientation="vertical"
-        android:gravity="center"
-        android:background="@android:color/background_light">
-
+        android:gravity="center">
 
         <ImageView
             android:layout_width="wrap_content"
