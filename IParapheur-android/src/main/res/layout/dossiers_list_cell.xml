@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/dossiers_list_item_selectable_layout"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingLeft="4dp"
-              android:paddingRight="4dp"
-              android:background="@drawable/list_background_color">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dossiers_list_item_selectable_layout"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
+    android:background="@drawable/list_background_color">
 
     <ImageView
         android:id="@+id/dossiers_list_item_image"

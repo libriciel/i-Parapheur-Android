@@ -23,9 +23,9 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.AccountListFragment;
+import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
 import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.bureau.BureauxFragment;
+import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
@@ -60,21 +60,21 @@ import java.util.HashSet;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, AccountListFragment.BureauListFragmentListener, BureauxFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
+public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
 	public static final String DOSSIER_ID = "dossier_id";
 	public static final String BUREAU_ID = "bureau_id";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	private DrawerLayout mDrawerLayout; // Main Layout off the screen
-	private FrameLayout mDrawerMenu; // Left panel acting as a menu
-	private ActionBarDrawerToggle mDrawerToggle; // Used to control the drawer state.
+	private DrawerLayout mDrawerLayout; 						// Main Layout off the screen
+	private FrameLayout mDrawerMenu; 							// Left panel acting as a menu
+	private ActionBarDrawerToggle mDrawerToggle; 				// Used to control the drawer state.
 	private boolean mOpenDrawerWhenFinishedLoading = false;
 	private boolean mManageDrawerWhenFinishedLoading = false;
-	private FilterAdapter mFilterAdapter; // Adapter for action bar, used to display user's filters
+	private FilterAdapter mFilterAdapter; 						// Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
 
-	private ActionMode mActionMode; // The actionMode used when dossiers are checked
+	private ActionMode mActionMode; 							// The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -115,10 +115,10 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		AccountListFragment bureauxListFragment = new AccountListFragment();
+		BureauxListFragment bureauxListFragment = new BureauxListFragment();
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(0, 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, bureauxListFragment, AccountListFragment.TAG);
+		transaction.replace(R.id.left_fragment, bureauxListFragment, BureauxListFragment.TAG);
 		transaction.commit();
 
 		// We select the first account by default, the demo one
@@ -158,9 +158,9 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		if (requestCode == EDIT_PREFERENCE_REQUEST) {
 			// Don't check if result is ok as the user can press back after modifying an Account
 			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			BureauxFragment bureauxFragment = (BureauxFragment) getSupportFragmentManager().findFragmentByTag(BureauxFragment.TAG);
-			if (bureauxFragment != null)
-				bureauxFragment.accountsChanged();
+			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.TAG);
+			if (accountListFragment != null)
+				accountListFragment.accountsChanged();
 		}
 	}
 
@@ -395,7 +395,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		if (dossierListFragment != null)
 			onBackPressed();
 
-		AccountListFragment bureauxFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.TAG);
+		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
 		if (bureauxFragment != null)
 			bureauxFragment.updateBureaux(true);
 	}

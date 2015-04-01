@@ -35,7 +35,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"/>
-                
+
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
@@ -74,7 +74,7 @@
         android:baselineAligned="false">
 
         <fragment
-            android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
+            android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
             android:id="@+id/activity_dossiers_bureaux_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

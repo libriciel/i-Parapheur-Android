@@ -59,7 +59,7 @@
     </LinearLayout>
 
     <fragment
-        android:name="org.adullact.iparapheur.controller.bureau.BureauxFragment"
+        android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
         android:id="@+id/activity_dossiers_left_drawer"
         android:layout_width="240dp"
         android:layout_height="match_parent"
