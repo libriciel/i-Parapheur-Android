@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_below="@+id/linearLayout"
-    android:background="@drawable/background_light_right_edge"
+    android:background="@android:color/background_light"
     android:id="@+id/bureaux_refresh_layout">
 
     <ListView

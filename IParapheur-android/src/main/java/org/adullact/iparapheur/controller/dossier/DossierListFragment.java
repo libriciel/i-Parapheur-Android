@@ -25,6 +25,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SwipeRefreshListFragment;
+import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,16 +51,15 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public static String ARG_BUREAU_ID = "bureau_id";
 
 	private DossierListFragmentListener listener;
-	private String mBureauId; // Bureau id where the dossiers belongs
-	private List<Dossier> mDossiersList; // List of dossiers displayed in this fragment
-	private int selectedDossier = ListView.INVALID_POSITION; // The currently selected dossier
+	private String mBureauId;                                   // Bureau id where the dossiers belongs
+	private List<Dossier> mDossiersList;                        // List of dossiers displayed in this fragment
+	private int selectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
+	private View mSpinnerProgress;
+	private View mContentView;
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
-	public DossierListFragment() {
-	}
+	public DossierListFragment() { }
+
+	// <editor-fold desc="LifeCycle">
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -80,7 +80,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override
 	public View getInitialView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.dossiers_list, container, false);
+		View view = inflater.inflate(R.layout.dossiers_list, container, false);
+		mContentView = view.findViewById(android.R.id.content);
+		mSpinnerProgress = view.findViewById(android.R.id.progress);
+		return view;
 	}
 
 	@Override
@@ -99,11 +102,18 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		setListAdapter(new DossierListAdapter(getActivity(), listener));
 		setOnRefreshListener(this);
 		setHasOptionsMenu(false);
+
+		// TODO : fix colours to material design scheme
 		setColorScheme(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
 	}
 
-	@Override public void onStart() {
+	@Override
+	public void onStart() {
 		super.onStart();
+
+		mSpinnerProgress.setVisibility(View.VISIBLE);
+		mContentView.setVisibility(View.INVISIBLE);
+
 		setBureauId(getArguments().getString(ARG_BUREAU_ID, null));
 	}
 
@@ -113,6 +123,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		// Reset the active callbacks interface .
 		listener = null;
 	}
+
+	// </editor-fold desc="LifeCycle">
 
 	public String getBureauId() {
 		return mBureauId;
@@ -138,6 +150,24 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		}
 	}
 
+	private void setActivatedPosition(int position) {
+		if (position == ListView.INVALID_POSITION) {
+			getListView().clearChoices();
+		}
+		else {
+			getListView().setItemChecked(position, true);
+		}
+		selectedDossier = position;
+	}
+
+	public HashSet<Dossier> getCheckedDossiers() {
+		return ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
+	}
+
+	public void clearSelection() {
+		((DossierListAdapter) getListAdapter()).clearSelection();
+	}
+
 	/**
 	 * Used by the containing activity to pass a dossier to the detail fragment.
 	 * We get the dossier from here because this fragment has its instance state retained
@@ -149,16 +179,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public Dossier getDossier(String id) {
 		int position = mDossiersList.indexOf(new Dossier(id));
 		return mDossiersList.get(position);
-	}
-
-	private void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			getListView().clearChoices();
-		}
-		else {
-			getListView().setItemChecked(position, true);
-		}
-		selectedDossier = position;
 	}
 
 	/**
@@ -177,8 +197,11 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		getDossiers(true);
 	}
 
+	// <editor-fold desc="DataChangeListener">
+
 	@Override
 	public void onDataChanged() {
+
 		((DossierListAdapter) getListView().getAdapter()).clearSelection();
 		if (mBureauId != null) {
 			listener.onDossiersLoaded(this.mDossiersList.size());
@@ -198,6 +221,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		}
 	}
 
+	// </editor-fold desc="DataChangeListener">
+
+	// <editor-fold desc="OnRefreshListener">
+
 	@Override
 	public void onRefresh() {
 		if (this.mBureauId != null) {
@@ -208,13 +235,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		}
 	}
 
-	public HashSet<Dossier> getCheckedDossiers() {
-		return ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
-	}
+	// </editor-fold desc="OnRefreshListener">
 
-	public void clearSelection() {
-		((DossierListAdapter) getListAdapter()).clearSelection();
-	}
+	// <editor-fold desc="Listener">
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -231,6 +254,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		void onDossierCheckedChanged();
 	}
+
+	// </editor-fold desc="Listener">
 
 	private class DossierListAdapter extends ArrayAdapter<Dossier> implements View.OnClickListener, View.OnTouchListener {
 
@@ -406,12 +431,18 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		@Override
 		protected void showProgress() {
-			setRefreshing(true);
+			if (mSpinnerProgress.getVisibility() != View.VISIBLE)
+				setRefreshing(true);
 		}
 
 		@Override
 		protected void hideProgress() {
-			setRefreshing(false);
+
+			if (mSpinnerProgress.getVisibility() == View.VISIBLE)
+				ViewUtils.crossfade(getActivity(), mContentView, mSpinnerProgress);
+
+			if (isRefreshing())
+				setRefreshing(false);
 		}
 	}
 }

@@ -8,7 +8,7 @@ import android.view.View;
 
 public class ViewUtils {
 
-	private void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
+	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
 		// System default length
 		int mShortAnimationDuration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
 
