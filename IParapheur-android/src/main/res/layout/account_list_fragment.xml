@@ -20,6 +20,15 @@
             android:layout_height="178dp"
             android:background="@drawable/navigation_drawer_header_gradient"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/parapheurs"
+            android:textColor="@color/text_white"
+            android:layout_gravity="bottom"
+            android:padding="25dp"
+            android:textSize="23sp"/>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="25dp"

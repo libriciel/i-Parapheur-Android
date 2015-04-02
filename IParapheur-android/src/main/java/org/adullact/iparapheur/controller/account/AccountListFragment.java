@@ -104,7 +104,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private class AccountListAdapter extends ArrayAdapter<Account> {
 
 		public AccountListAdapter(Context context) {
-			super(context, android.R.layout.simple_list_item_activated_1, android.R.id.text1);
+			super(context, R.layout.account_list_fragment_cell, android.R.id.text1);
 		}
 
 		@Override

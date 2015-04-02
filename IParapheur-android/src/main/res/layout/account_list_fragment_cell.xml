@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/list_background_color">
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="@color/text_black"
+        android:text="@string/mockup_dossier_title"
+        android:padding="16dp"
+        android:gravity="center_vertical"/>
+
+</LinearLayout>

@@ -8,6 +8,7 @@
     <color name="primary_900">@color/light_blue_900</color>
     <color name="secondary_50">@color/brown_50</color>
     <color name="secondary_100">@color/brown_100</color>
+    <color name="secondary_200">@color/brown_200</color>
     <color name="secondary_300">@color/brown_300</color>
     <color name="secondary_500">@color/brown_500</color>
     <color name="secondary_700">@color/brown_700</color>
@@ -41,6 +42,7 @@
     <!-- Brown material design colors -->
     <color name="brown_50">#efebe9</color>
     <color name="brown_100">#d7ccc8</color>
+    <color name="brown_200">#bcaaa4</color>
     <color name="brown_300">#a1887f</color>
     <color name="brown_500">#795548</color>
     <color name="brown_700">#5d4037</color>
