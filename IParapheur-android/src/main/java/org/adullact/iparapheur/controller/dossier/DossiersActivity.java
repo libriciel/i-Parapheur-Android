@@ -94,7 +94,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		mFiltersSpinner.setOnItemSelectedListener(this);
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		setSupportActionBar(toolbar);
 
 		// Used to listen open and close events on the Drawer Layout
