@@ -8,6 +8,14 @@ import android.view.View;
 
 public class ViewUtils {
 
+	/**
+	 * Swap smoothly between content and spinner, the Google way.
+	 * http://developer.android.com/training/animation/crossfade.html
+	 *
+	 * @param context
+	 * @param contentView
+	 * @param spinnerView
+	 */
 	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
 		// System default length
 		int mShortAnimationDuration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
@@ -28,6 +36,7 @@ public class ViewUtils {
 			@Override
 			public void onAnimationEnd(Animator animation) {
 				spinnerView.setVisibility(View.GONE);
+				spinnerView.setAlpha(1f);
 			}
 		});
 	}

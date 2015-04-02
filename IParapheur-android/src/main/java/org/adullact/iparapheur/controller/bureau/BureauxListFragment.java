@@ -94,8 +94,8 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			this.mBureaux = null;
 
 		if ((mBureaux == null) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
+			swipeRefreshLayout.setVisibility(View.INVISIBLE);
 			mSpinnerProgressView.setVisibility(View.VISIBLE);
-			swipeRefreshLayout.setVisibility(View.GONE);
 			new BureauxLoadingTask(getActivity(), this).execute();
 		}
 
