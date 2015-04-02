@@ -43,7 +43,7 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/text_black_divider"/>
+                    android:background="#8A8A8A"/>
 
                 <fragment
                     android:id="@+id/dossier_detail"

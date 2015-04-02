@@ -10,228 +10,209 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by jmaire on 01/11/2013.
- */
 public class Dossier implements Parcelable {
 
-    private final String id;
+	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
+		public Dossier createFromParcel(Parcel source) {
+			return new Dossier(source);
+		}
 
-    private final String name;
+		public Dossier[] newArray(int size) {
+			return new Dossier[size];
+		}
+	};
+	private final String id;
+	private final String name;
+	private final Action actionDemandee;
+	private final String type;
+	private final String sousType;
+	private final Date dateCreation;
+	private final Date dateLimite;
+	private final List<Document> mainDocuments = new ArrayList<Document>();
+	private final List<Document> annexes = new ArrayList<Document>();
+	private List<Action> actions;
+	private List<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
 
-    private final Action actionDemandee;
+	// TODO : remove
+	public Dossier(int i) {
+		this(UUID.randomUUID().toString(), "Dossier " + i, Action.VISA, new ArrayList<Action>(), "Type", "SousType", Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
+		getActions().add(Action.VISA);
+	}
 
-    private List<Action> actions;
+	/**
+	 * Constructor used to search a dossier in a list (only the id is used for comparisons).
+	 *
+	 * @param id
+	 */
+	public Dossier(String id) {
+		this.id = id;
+		this.name = this.type = this.sousType = null;
+		this.dateCreation = this.dateLimite = null;
+		this.actionDemandee = null;
+		this.actions = new ArrayList<Action>();
+	}
 
-    private final String type;
+	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
+		this.id = id;
+		this.name = name;
+		this.actionDemandee = actionDemandee;
+		this.actions = actions;
+		this.type = type;
+		this.sousType = sousType;
+		this.dateCreation = dateCreation;
+		this.dateLimite = dateLimite;
+	}
 
-    private final String sousType;
+	private Dossier(Parcel in) {
+		this.id = in.readString();
+		this.name = in.readString();
+		int tmpActionDemandee = in.readInt();
+		this.actionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
+		in.readTypedList(actions, Action.CREATOR);
+		this.type = in.readString();
+		this.sousType = in.readString();
+		long tmpDateCreation = in.readLong();
+		this.dateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
+		long tmpDateLimite = in.readLong();
+		this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
+		in.readTypedList(mainDocuments, Document.CREATOR);
+		in.readTypedList(annexes, Document.CREATOR);
+		in.readTypedList(circuit, EtapeCircuit.CREATOR);
+	}
 
-    private final Date dateCreation;
+	public boolean isDetailsAvailable() {
+		return (!circuit.isEmpty() && !mainDocuments.isEmpty());
+	}
 
-    private final Date dateLimite;
+	public boolean hasActions() {
+		return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
+	}
 
-    private final List<Document> mainDocuments = new ArrayList<Document>();
+	@Override
+	public String toString() {
+		return name;
+	}
 
-    private final List<Document> annexes = new ArrayList<Document>();
+	// Setters (only for documents and details)
 
-    private List<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
+	// FIXME plus tard: pour le moment, il n'y a QU'UN SEUL DOCUMENT, les autres pieces sont necessairement des ANNEXES !
 
-    // TODO : remove
-    public Dossier(int i) {
-        this(UUID.randomUUID().toString(),
-                "Dossier " + i,
-                Action.VISA,
-                new ArrayList<Action>(),
-                "Type",
-                "SousType",
-                Calendar.getInstance().getTime(),
-                Calendar.getInstance().getTime());
-        getActions().add(Action.VISA);
-    }
+	// Equals and hashCode overriding, so we can find dossier with its id.
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Dossier) {
+			Dossier toCompare = (Dossier) o;
+			return this.id.equals(toCompare.id);
+		}
+		else if (o instanceof String) {
+			return this.id.equals(o);
+		}
+		return false;
+	}
 
-    /**
-     * Constructor used to search a dossier in a list (only the id is used for comparisons).
-     * @param id
-     */
-    public Dossier(String id) {
-        this.id = id;
-        this.name = this.type = this.sousType = null;
-        this.dateCreation = this.dateLimite = null;
-        this.actionDemandee = null;
-        this.actions = new ArrayList<Action>();
-    }
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
 
-    public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
-        this.id = id;
-        this.name = name;
-        this.actionDemandee = actionDemandee;
-        this.actions = actions;
-        this.type = type;
-        this.sousType = sousType;
-        this.dateCreation = dateCreation;
-        this.dateLimite = dateLimite;
-    }
+	public void addDocument(Document document) {
+		if (mainDocuments.isEmpty()) {
+			this.mainDocuments.add(document);
+		}
+		else {
+			this.annexes.add(document);
+		}
+	}
 
-    public boolean isDetailsAvailable() {
-        return (!circuit.isEmpty() && !mainDocuments.isEmpty());
-    }
+	// Getters
 
-    public boolean hasActions() {
-        return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
-    }
-    @Override
-    public String toString() {
-        return name;
-    }
+	public void saveDetails(Dossier dossier) {
+		this.mainDocuments.addAll(dossier.getMainDocuments());
+		this.annexes.addAll(dossier.getAnnexes());
+	}
 
-    // Equals and hashCode overriding, so we can find dossier with its id.
-    @Override
-    public boolean equals(Object o){
-        if(o instanceof Dossier){
-            Dossier toCompare = (Dossier) o;
-            return this.id.equals(toCompare.id);
-        }
-        else if (o instanceof String) {
-            return this.id.equals(o);
-        }
-        return false;
-    }
+	public void clearDetails() {
+		this.mainDocuments.clear();
+		this.annexes.clear();
+		this.circuit.clear();
+	}
 
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
+	public String getId() {
+		return id;
+	}
 
-    // Setters (only for documents and details)
+	public String getName() {
+		return name;
+	}
 
-    // FIXME plus tard: pour le moment, il n'y a QU'UN SEUL DOCUMENT, les autres pieces sont necessairement des ANNEXES !
+	public List<Action> getActions() {
+		return actions;
+	}
 
-    public void addDocument(Document document) {
-        if (mainDocuments.isEmpty()) {
-            this.mainDocuments.add(document);
-        }
-        else {
-            this.annexes.add(document);
-        }
-    }
+	public String getType() {
+		return type;
+	}
 
-    public void saveDetails(Dossier dossier) {
-        this.mainDocuments.addAll(dossier.getMainDocuments());
-        this.annexes.addAll(dossier.getAnnexes());
-    }
+	public String getSousType() {
+		return sousType;
+	}
 
-    public void clearDetails() {
-        this.mainDocuments.clear();
-        this.annexes.clear();
-        this.circuit.clear();
-    }
+	public String getDateCreation() {
+		return DateFormat.getDateInstance().format(dateCreation);
+	}
 
-    // Getters
+	public String getDateLimite() {
+		return (dateLimite == null) ? "" : DateFormat.getDateInstance().format(dateLimite);
+	}
 
-    public String getId() {
-        return id;
-    }
+	public List<Document> getMainDocuments() {
+		return mainDocuments;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public List<Document> getAnnexes() {
+		return annexes;
+	}
 
-    public List<Action> getActions() {
-        return actions;
-    }
+	/**
+	 * Return all documents (main and annexes).
+	 *
+	 * @return main documents and annexes
+	 */
+	public List<Document> getDocuments() {
+		List<Document> documents = new ArrayList<Document>(mainDocuments);
+		documents.addAll(annexes);
+		return documents;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public List<EtapeCircuit> getCircuit() {
+		return circuit;
+	}
 
-    public String getSousType() {
-        return sousType;
-    }
+	public void setCircuit(List<EtapeCircuit> circuit) {
+		this.circuit = circuit;
+	}
 
-    public String getDateCreation() {
-        return DateFormat.getDateInstance().format(dateCreation);
-    }
+	public Action getActionDemandee() {
+		return actionDemandee;
+	}
 
-    public String getDateLimite() {
-        return (dateLimite == null)? "" : DateFormat.getDateInstance().format(dateLimite);
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    public List<Document> getMainDocuments() {
-        return mainDocuments;
-    }
-
-    public List<Document> getAnnexes() {
-        return annexes;
-    }
-
-    /**
-     * Return all documents (main and annexes).
-     * @return main documents and annexes
-     */
-    public List<Document> getDocuments() {
-        List<Document> documents = new ArrayList<Document>(mainDocuments);
-        documents.addAll(annexes);
-        return documents;
-    }
-
-    public void setCircuit(List<EtapeCircuit> circuit) {
-        this.circuit = circuit;
-    }
-
-    public List<EtapeCircuit> getCircuit() {
-        return circuit;
-    }
-
-    public Action getActionDemandee() {
-        return actionDemandee;
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
-        dest.writeString(this.name);
-        dest.writeInt(this.actionDemandee == null ? -1 : this.actionDemandee.ordinal());
-        dest.writeTypedList(actions);
-        dest.writeString(this.type);
-        dest.writeString(this.sousType);
-        dest.writeLong(dateCreation != null ? dateCreation.getTime() : -1);
-        dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
-        dest.writeTypedList(mainDocuments);
-        dest.writeTypedList(annexes);
-        dest.writeTypedList(circuit);
-    }
-
-    private Dossier(Parcel in) {
-        this.id = in.readString();
-        this.name = in.readString();
-        int tmpActionDemandee = in.readInt();
-        this.actionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
-        in.readTypedList(actions, Action.CREATOR);
-        this.type = in.readString();
-        this.sousType = in.readString();
-        long tmpDateCreation = in.readLong();
-        this.dateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
-        long tmpDateLimite = in.readLong();
-        this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-        in.readTypedList(mainDocuments, Document.CREATOR);
-        in.readTypedList(annexes, Document.CREATOR);
-        in.readTypedList(circuit, EtapeCircuit.CREATOR);
-    }
-
-    public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
-        public Dossier createFromParcel(Parcel source) {
-            return new Dossier(source);
-        }
-
-        public Dossier[] newArray(int size) {
-            return new Dossier[size];
-        }
-    };
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.id);
+		dest.writeString(this.name);
+		dest.writeInt(this.actionDemandee == null ? -1 : this.actionDemandee.ordinal());
+		dest.writeTypedList(actions);
+		dest.writeString(this.type);
+		dest.writeString(this.sousType);
+		dest.writeLong(dateCreation != null ? dateCreation.getTime() : -1);
+		dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
+		dest.writeTypedList(mainDocuments);
+		dest.writeTypedList(annexes);
+		dest.writeTypedList(circuit);
+	}
 }

@@ -38,14 +38,6 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	private View mSpinnerProgressView;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		// Called only once as retainInstance is set to true.
-		setRetainInstance(true);
-	}
-
-	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
@@ -71,9 +63,6 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		swipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 
 		mSpinnerProgressView = view.findViewById(android.R.id.progress);
-
-		swipeRefreshLayout.setVisibility(View.INVISIBLE);
-		mSpinnerProgressView.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -86,6 +75,9 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	@Override
 	public void onStart() {
 		super.onStart();
+
+		swipeRefreshLayout.setVisibility(View.INVISIBLE);
+		mSpinnerProgressView.setVisibility(View.VISIBLE);
 		updateBureaux(true);
 	}
 

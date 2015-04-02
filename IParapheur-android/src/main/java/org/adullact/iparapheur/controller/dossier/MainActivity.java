@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -60,21 +61,18 @@ import java.util.HashSet;
  * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class DossiersActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, DossierDetailFragment.DossierDetailListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
+public class MainActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
-	public static final String DOSSIER_ID = "dossier_id";
-	public static final String BUREAU_ID = "bureau_id";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
-	private FrameLayout mDrawerMenu;                            // Left panel acting as a menu
-	private ActionBarDrawerToggle mDrawerToggle;                // Used to control the drawer state.
+	private DrawerLayout mDrawerLayout;                                 // Main Layout off the screen
+	private FrameLayout mDrawerMenu;                                    // Left panel acting as a menu
+	private ActionBarDrawerToggle mDrawerToggle;                        // Used to control the drawer state.
 	private boolean mOpenDrawerWhenFinishedLoading = false;
 	private boolean mManageDrawerWhenFinishedLoading = false;
-	private FilterAdapter mFilterAdapter;                        // Adapter for action bar, used to display user's filters
+	private FilterAdapter mFilterAdapter;                               // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
-
-	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
+	private ActionMode mActionMode;                                     // The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +83,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
 		// Loading indicator
+
 		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.activity_dossiers);
 
@@ -96,14 +95,11 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Used to listen open and close events on the Drawer Layout
 		mDrawerToggle = new DossiersActionBarDrawerToggle(this, mDrawerLayout);
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-		if (getSupportActionBar() != null) {
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		}
 	}
 
 	@Override
@@ -117,21 +113,24 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	protected void onStart() {
 		super.onStart();
 
+		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
+
+		if (fragmentToDisplay != null)
+			return;
+
+		fragmentToDisplay = new BureauxListFragment();
+
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		BureauxListFragment bureauxListFragment = new BureauxListFragment();
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(0, 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, bureauxListFragment, BureauxListFragment.TAG);
+		transaction.replace(R.id.left_fragment, fragmentToDisplay, BureauxListFragment.TAG);
 		transaction.commit();
 
 		// We select the first account by default, the demo one
 		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
 		if (selectedAccount == null)
 			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts().get(0).getId());
-
-//		BureauxListFragment bureauxlistFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
-//		bureauxlistFragment.updateBureaux(true);
 	}
 
 	@Override
@@ -416,16 +415,6 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 
 	// </editor-fold desc="BureauListFragmentListener">
 
-	// <editor-fold desc="DossierDetailListener">
-
-	@Override
-	public Dossier getDossier(String id) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
-		return (fragment == null) ? null : fragment.getDossier(id);
-	}
-
-	// </editor-fold desc="DossierDetailListener">
-
 	// <editor-fold desc="FilterDialogListener">
 
 	public void onFilterChange(Filter filter) {
@@ -461,11 +450,11 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	// <editor-fold desc="DossierListFragmentListener">
 
 	@Override
-	public void onDossierSelected(String dossierId, String bureauId) {
+	public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
 
 		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
 		if (fragment != null)
-			((DossierDetailFragment) fragment).update(bureauId, dossierId);
+			((DossierDetailFragment) fragment).update(dossier, bureauId);
 	}
 
 	@Override
@@ -501,7 +490,7 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
 
 		public DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
-			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.toolbar), R.string.drawer_open, R.string.drawer_close);
+			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.home_toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 
 		@Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -73,12 +74,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
-
-	@Override
 	public View getInitialView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.dossiers_list, container, false);
 		mContentView = view.findViewById(android.R.id.content);
@@ -108,9 +103,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public void onStart() {
 		super.onStart();
 
-		mSpinnerProgress.setVisibility(View.VISIBLE);
-		mContentView.setVisibility(View.INVISIBLE);
-
 		setBureauId(getArguments().getString(ARG_BUREAU_ID, null));
 	}
 
@@ -134,6 +126,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (bureauId == null)
 				this.mDossiersList = null;
 
+			mSpinnerProgress.setVisibility(View.VISIBLE);
+			mContentView.setVisibility(View.INVISIBLE);
 			getDossiers(true);
 		}
 	}
@@ -243,7 +237,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	 */
 	public interface DossierListFragmentListener {
 
-		void onDossierSelected(String dossierId, String bureauId);
+		void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId);
 
 		void onDossiersLoaded(int size);
 
@@ -337,7 +331,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				default:
 					Integer position = (Integer) v.getTag();
 					if (position != selectedDossier && !isRefreshing()) {
-						listener.onDossierSelected(mDossiersList.get(position).getId(), mBureauId);
+						listener.onDossierSelected(mDossiersList.get(position), mBureauId);
 						setActivatedPosition(position);
 					}
 					break;

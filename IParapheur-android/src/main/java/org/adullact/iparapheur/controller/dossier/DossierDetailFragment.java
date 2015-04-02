@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,25 +27,27 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
 import java.util.UUID;
 
 /**
  * A fragment representing a single Dossier detail screen.
- * This fragment is contained in a {@link DossiersActivity}.
+ * This fragment is contained in a {@link MainActivity}.
  */
 public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static String TAG = "Dossier_details";
+	public static final String TAG = "Dossier_details";
+	public static final String DOSSIER = "dossier";
+	public static final String BUREAU_ID = "bureau_id";
 
 	private String bureauId; // The Bureau where the dossier belongs.
-	private String dossierId; // The Dossier id this fragment is presenting. Used only in initialisation.
 	private Dossier dossier; // The Dossier this fragment is presenting.
-	private DossierDetailListener listener;
 	private boolean isReaderEnabled;
 	private ViewPager viewPager; // Used to display the document's pages. Each page is managed by a fragment.
 	private int currentPage;
+	private boolean shouldReload = false;
 
 	public DossierDetailFragment() { }
 
@@ -54,10 +57,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		setRetainInstance(true);
 
 		if (getArguments() != null) {
-			bureauId = getArguments().getString(DossiersActivity.BUREAU_ID);
-			dossierId = getArguments().getString(DossiersActivity.DOSSIER_ID);
+			bureauId = getArguments().getString(BUREAU_ID);
+			dossier = getArguments().getParcelable(DOSSIER);
 		}
-		this.currentPage = 0;
+		currentPage = 0;
 	}
 
 	@Override
@@ -74,6 +77,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         seekBar.setOnSeekBarChangeListener(this);*/
 		this.viewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
 
+		// Reload data after rotation
+
+		if (savedInstanceState != null)
+			shouldReload = true;
 	}
 
 	@Override
@@ -89,29 +96,20 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
 			this.isReaderEnabled = false;
 		}
-		if (dossierId != null) {
+		if (dossier != null) {
 			getDossierDetails(false);
 		}
 		setHasOptionsMenu(true);
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	public void onStart() {
+		super.onStart();
 
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof DossierDetailListener))
-			throw new IllegalStateException("Activity must implement DossierDetailListener.");
-
-		listener = (DossierDetailListener) activity;
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		/*if (reader != null) {
-			reader.clean();
-        }*/
+		if (shouldReload) {
+			shouldReload = false;
+			update(dossier, bureauId);
+		}
 	}
 
 	// <editor-fold desc="ActionBar">
@@ -144,25 +142,19 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// </editor-fold desc="ActionBar">
 
-	public void update(String bureauId, String dossierId) {
-		/*if (reader != null) {
-			reader.clean();
-        }
-        ((FrameLayout) getView().findViewById(R.id.fragment_dossier_detail_reader_view)).removeAllViews();*/
+	public void update(Dossier dossier, String bureauId) {
 		this.bureauId = bureauId;
-		this.dossierId = dossierId;
-		this.dossier = null;
+		this.dossier = dossier;
+
 		closeDetails();
 
-		if (dossierId != null)
+		if (dossier != null && dossier.getId() != null)
 			getDossierDetails(false);
 		else
 			updateReader();
 	}
 
 	private void getDossierDetails(boolean forceReload) {
-		if (dossier == null)
-			dossier = listener.getDossier(dossierId);
 
 		// To force reload dossier details, just delete its main document path (on local storage).
 		if (forceReload)
@@ -197,7 +189,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 							viewPager.setCurrentItem(0, false);
 						}
 						catch (Exception e) {
-							//e.printStackTrace();
+							e.printStackTrace();
 							Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
 						}
 					}
@@ -232,7 +224,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	private void toggleDetails() {
+		if (getView() == null)
+			return;
+
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+
 		if (details.getVisibility() == View.VISIBLE) {
 			details.setVisibility(View.INVISIBLE);
 		}
@@ -242,7 +238,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	private void closeDetails() {
+		if (getView() == null)
+			return;
+
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+
 		if ((details != null) && (details.getVisibility() == View.VISIBLE)) {
 			details.setVisibility(View.INVISIBLE);
 		}
@@ -266,15 +266,6 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// </editor-fold desc="SeekBar Listener">
 
-	// <editor-fold desc="Listener">
-
-	public interface DossierDetailListener {
-
-		Dossier getDossier(String id);
-	}
-
-	// </editor-fold desc="Listener">
-
 	private class DossierLoadingTask extends LoadingTask {
 
 		public DossierLoadingTask(Activity context, DataChangeListener listener) {
@@ -295,7 +286,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				}
 			}
 			else {
-				dossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "ducument par defaut", -1, ""));
+				dossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, ""));
 			}
 			if (isCancelled()) {
 				return;
@@ -317,7 +308,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					if (!IParapheur.OFFLINE) {
 						if (RESTClient.INSTANCE.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);
-							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId));
+							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossier != null ? dossier.getId() : null));
 						}
 					}
 					else {
