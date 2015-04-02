@@ -68,7 +68,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		listView.setOnItemClickListener(this);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
 		swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bureaux_refresh_layout);
-		swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
+		swipeRefreshLayout.setColorSchemeResources(R.color.primary_500, R.color.secondary_500);
 
 		mSpinnerProgressView = view.findViewById(android.R.id.progress);
 
@@ -172,13 +172,13 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 		@Override
 		protected void showProgress() {
-			if (mSpinnerProgressView.getVisibility() != View.VISIBLE)
+			if (isAdded() && mSpinnerProgressView.getVisibility() != View.VISIBLE)
 				swipeRefreshLayout.setRefreshing(true);
 		}
 
 		@Override
 		protected void hideProgress() {
-			if (mSpinnerProgressView.getVisibility() == View.VISIBLE)
+			if (isAdded() && mSpinnerProgressView.getVisibility() == View.VISIBLE)
 				ViewUtils.crossfade(getActivity(), swipeRefreshLayout, mSpinnerProgressView);
 
 			if (swipeRefreshLayout.isRefreshing())

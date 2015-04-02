@@ -23,9 +23,9 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
+import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
@@ -66,19 +66,23 @@ public class DossiersActivity extends ActionBarActivity implements DossierListFr
 	public static final String BUREAU_ID = "bureau_id";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	private DrawerLayout mDrawerLayout; 						// Main Layout off the screen
-	private FrameLayout mDrawerMenu; 							// Left panel acting as a menu
-	private ActionBarDrawerToggle mDrawerToggle; 				// Used to control the drawer state.
+	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
+	private FrameLayout mDrawerMenu;                            // Left panel acting as a menu
+	private ActionBarDrawerToggle mDrawerToggle;                // Used to control the drawer state.
 	private boolean mOpenDrawerWhenFinishedLoading = false;
 	private boolean mManageDrawerWhenFinishedLoading = false;
-	private FilterAdapter mFilterAdapter; 						// Adapter for action bar, used to display user's filters
+	private FilterAdapter mFilterAdapter;                        // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
 
-	private ActionMode mActionMode; 							// The actionMode used when dossiers are checked
+	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// To have a transparent StatusBar, and a background color behind
+
+		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
 		// Loading indicator
 		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);

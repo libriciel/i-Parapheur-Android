@@ -1,46 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/background_light">
 
-    <ListView
+    <!-- Header -->
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/account_list"
-        android:choiceMode="singleChoice"/>
+        android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@android:id/empty"
+        <!-- Fake status bar background -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="178dp"
+            android:background="@drawable/navigation_drawer_header_gradient"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@color/secondary_700"/>
+    </FrameLayout>
+
+    <!-- List -->
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
+        <ListView
+            android:id="@+id/account_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView"
-            android:src="@drawable/ic_action_dock"
-            android:contentDescription="@string/no_content"
-            android:clickable="true"/>
+        <LinearLayout
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/no_bureaux"
-            android:id="@+id/textView"
-            android:textColor="@android:color/darker_gray"
-            android:textStyle="bold"
-            android:layout_margin="8dp"
-            android:layout_marginTop="16dp"
-            android:clickable="true"/>
-    </LinearLayout>
-</FrameLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:src="@drawable/ic_action_dock"
+                android:contentDescription="@string/no_content"
+                android:clickable="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/no_bureaux"
+                android:id="@+id/textView"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold"
+                android:layout_margin="8dp"
+                android:layout_marginTop="16dp"
+                android:clickable="true"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
 
