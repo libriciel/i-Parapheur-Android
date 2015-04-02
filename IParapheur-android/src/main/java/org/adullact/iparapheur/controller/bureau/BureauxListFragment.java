@@ -32,7 +32,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	private BureauListFragmentListener listener;
 
 	private List<Bureau> mBureaux;                                // List of mBureaux currently displayed in this Fragment
-	private int selectedBureau = ListView.INVALID_POSITION;    // The currently selected dossier
+	private int selectedBureau = ListView.INVALID_POSITION;       // The currently selected dossier
 	private ListView listView;                                    // ListView used to show the mBureaux of the currently selected account
 	private SwipeRefreshLayout swipeRefreshLayout;                // Swipe refresh layout on top of the list view
 	private View mSpinnerProgressView;
@@ -68,7 +68,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		listView.setOnItemClickListener(this);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
 		swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bureaux_refresh_layout);
-		swipeRefreshLayout.setColorSchemeResources(R.color.primary_500, R.color.secondary_500);
+		swipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 
 		mSpinnerProgressView = view.findViewById(android.R.id.progress);
 

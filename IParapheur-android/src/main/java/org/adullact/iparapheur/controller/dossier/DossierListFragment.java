@@ -102,9 +102,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		setListAdapter(new DossierListAdapter(getActivity(), listener));
 		setOnRefreshListener(this);
 		setHasOptionsMenu(false);
-
-		// TODO : fix colours to material design scheme
-		setColorScheme(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
 	}
 
 	@Override

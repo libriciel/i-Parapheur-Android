@@ -18,7 +18,9 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <include layout="@layout/activity_dossiers_toolbar"/>
+        <include
+            android:id="@+id/home_toolbar"
+            layout="@layout/activity_dossiers_toolbar"/>
 
         <FrameLayout
             android:orientation="vertical"
