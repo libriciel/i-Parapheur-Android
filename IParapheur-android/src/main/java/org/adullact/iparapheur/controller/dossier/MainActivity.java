@@ -2,6 +2,7 @@ package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
@@ -65,13 +66,13 @@ import java.util.HashSet;
  */
 public class MainActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
+	private static final String SHARED_PREFERENCES = ":iparapheur:shared_preferences_main";
+	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = ":iparapheur:is_drawer_known";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
 	private DrawerLayout mDrawerLayout;                                 // Main Layout off the screen
 	private FrameLayout mDrawerMenu;                                    // Left panel acting as a menu
 	private ActionBarDrawerToggle mDrawerToggle;                        // Used to control the drawer state.
-	private boolean mOpenDrawerWhenFinishedLoading = false;
-	private boolean mManageDrawerWhenFinishedLoading = false;
 	private FilterAdapter mFilterAdapter;                               // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
 	private ActionMode mActionMode;                                     // The actionMode used when dossiers are checked
@@ -138,14 +139,19 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (mManageDrawerWhenFinishedLoading) {
-			if (mDrawerLayout != null) {
-				if (mOpenDrawerWhenFinishedLoading)
-					mDrawerLayout.openDrawer(mDrawerMenu);
-				else
-					mDrawerLayout.closeDrawer(mDrawerMenu);
-			}
-			mManageDrawerWhenFinishedLoading = false;
+
+		// On first launch, we have to open the NavigationDrawer.
+		// It's in the Android guidelines, the user have to know it's here.
+
+		SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES, 0);
+		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
+
+		if (!isDrawerKnown) {
+			mDrawerLayout.openDrawer(mDrawerMenu);
+
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
+			editor.apply();
 		}
 	}
 
