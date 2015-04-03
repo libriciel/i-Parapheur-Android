@@ -49,13 +49,29 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.account_list_fragment, container, false);
+		View content = inflater.inflate(R.layout.account_list_fragment, container, false);
+		mListView = (ListView) content.findViewById(R.id.account_list);
+
+		// Adding footers
+
+		View separatorView = inflater.inflate(R.layout.account_list_fragment_footer_separator, mListView, false);
+		mListView.addFooterView(separatorView, null, false);
+
+		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
+		footerView.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				if (mListener != null)
+					mListener.onCreateAccountInvoked();
+			}
+		});
+		mListView.addFooterView(footerView, null, false);
+
+		return content;
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		mListView = (ListView) view.findViewById(R.id.account_list);
 		mListView.setOnItemClickListener(this);
 		mListView.setEmptyView(view.findViewById(android.R.id.empty));
 	}
@@ -66,6 +82,16 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		updateAccounts();
 		mListView.setAdapter(new AccountListAdapter(getActivity()));
+
+		// Setting selected view
+
+		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+		if (selectedAccount == null)
+			selectedAccount = MyAccounts.INSTANCE.getAccounts().get(0);
+
+		for (int i = 0; i < mAccounts.size(); i++)
+			if (selectedAccount.getId().contentEquals(mAccounts.get(i).getId()))
+				mListView.setItemChecked(i, true);
 	}
 
 	private void updateAccounts() {
@@ -84,9 +110,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//		if (position != selectedBureau) {
 		mListener.onAccountSelected(mAccounts.get(position));
-//		}
 	}
 
 	// </editor-fold desc="OnItemClickListener">
@@ -96,6 +120,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	public interface AccountFragmentListener {
 
 		public void onAccountSelected(@NonNull Account account);
+
+		public void onCreateAccountInvoked();
 
 	}
 

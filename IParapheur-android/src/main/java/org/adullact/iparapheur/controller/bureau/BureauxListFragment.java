@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Bureau;
@@ -98,9 +98,8 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		if (position != selectedBureau) {
+		if (position != selectedBureau)
 			listener.onBureauListFragmentSelected(mBureaux.get(position).getId());
-		}
 	}
 
 	// </editor-fold desc="OnItemClickListener">
@@ -153,7 +152,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			if (isCancelled())
 				return;
 
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				mBureaux = RESTClient.INSTANCE.getBureaux();
 			}
 			else {

@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -170,7 +170,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	@Override
 	public void onDataChanged() {
 
-		if (!IParapheur.OFFLINE)
+		if (!IParapheurApplication.OFFLINE)
 			updateDetails();
 
 		updateReader();
@@ -279,7 +279,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				return;
 
 			//Log.d("debug", "getting dossier details");
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
 				if (dossier != null) {
 					dossier.saveDetails(d);
@@ -291,7 +291,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			if (isCancelled()) {
 				return;
 			}
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				dossier.setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
 			}
 			if (isCancelled()) {
@@ -305,7 +305,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					File file = FileUtils.getFileForDocument(getActivity(), dossier.getId(), document.getId());
 					String path = file.getAbsolutePath();
 					//Log.d("debug", "saving document on disk");
-					if (!IParapheur.OFFLINE) {
+					if (!IParapheurApplication.OFFLINE) {
 						if (RESTClient.INSTANCE.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);
 							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossier != null ? dossier.getId() : null));

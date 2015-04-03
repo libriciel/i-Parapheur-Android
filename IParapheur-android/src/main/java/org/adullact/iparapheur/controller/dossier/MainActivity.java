@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.dossier;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -36,6 +37,7 @@ import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
+import org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
@@ -186,7 +188,9 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+
 		// Show or hide specific menu actions depending on displayed fragment
+
 		Fragment dossierFragment = getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 		mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
 
@@ -221,7 +225,8 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 		if (position < mFilterAdapter.getCount() - 1) {
 			Filter filter = mFilterAdapter.getItem(position);
@@ -239,7 +244,8 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onNothingSelected(AdapterView<?> parent) {
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
 
 	}
 
@@ -401,6 +407,13 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
 		if (bureauxFragment != null)
 			bureauxFragment.updateBureaux(true);
+	}
+
+	@Override
+	public void onCreateAccountInvoked() {
+		Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
+		startActivityForResult(preferencesIntent, EDIT_PREFERENCE_REQUEST);
 	}
 
 	// </editor-fold desc="AccountFragmentListener">

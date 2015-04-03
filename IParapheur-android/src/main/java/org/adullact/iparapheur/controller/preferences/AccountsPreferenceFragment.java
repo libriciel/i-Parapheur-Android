@@ -48,9 +48,10 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 		String title = getResources().getString(R.string.pref_header_accounts) + " " + getResources().getString(R.string.app_name);
 		accountsScreen.setTitle(title);
 
-		for (Account account : MyAccounts.INSTANCE.getAccounts()) {
-			buildAccountPrefScreen(accountsScreen, account);
-		}
+		for (Account account : MyAccounts.INSTANCE.getAccounts())
+			if (!account.getId().contentEquals("AccountTest0"))
+				buildAccountPrefScreen(accountsScreen, account);
+
 		setPreferenceScreen(accountsScreen);
 
 		return v;

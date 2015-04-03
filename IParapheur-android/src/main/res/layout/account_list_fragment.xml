@@ -11,7 +11,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp">
 
         <!-- Fake status bar background -->
 
@@ -45,7 +46,10 @@
             android:id="@+id/account_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice"/>
+            android:choiceMode="singleChoice"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false"
+            android:divider="@android:color/transparent"/>
 
         <LinearLayout
             android:id="@android:id/empty"

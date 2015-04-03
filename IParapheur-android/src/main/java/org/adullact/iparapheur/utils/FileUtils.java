@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,14 +15,14 @@ import java.io.OutputStream;
 public class FileUtils {
 
 	public static File getDirectoryForDossier(String dossierId) {
-		File directory = new File(IParapheur.getContext().getExternalCacheDir(), dossierId);
+		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
 		directory.mkdirs();
 
 		return directory;
 	}
 
 	public static File getFileForDocument(Context context, String dossierId, String documentId) {
-		if (!IParapheur.OFFLINE) {
+		if (!IParapheurApplication.OFFLINE) {
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
 		}
 		else {

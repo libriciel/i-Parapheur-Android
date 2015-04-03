@@ -19,7 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -408,7 +408,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (isCancelled()) {
 				return;
 			}
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				mDossiersList = RESTClient.INSTANCE.getDossiers(params[0]);
 			}
 			else {

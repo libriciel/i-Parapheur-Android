@@ -3,7 +3,7 @@ package org.adullact.iparapheur.controller.account;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Account;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	public List<Account> getAccounts() {
 		if (accounts == null) {
 			accounts = new ArrayList<Account>();
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 
 			for (String pref : sharedPreferences.getAll().keySet()) {
 				if (pref.startsWith(PREFS_ACCOUNT_PREFIX)) {
@@ -60,7 +60,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	}
 
 	public void save(Account account) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_TITLE_SUFFIX, account.getTitle());
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_URL_SUFFIX, account.getUrl());
@@ -72,7 +72,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 
 	public void delete(Account account) {
 		String id = account.getId();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 		Set<String> keySet = sharedPreferences.getAll().keySet();
 		if (keySet.contains(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX)) {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -119,7 +119,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 
 	public void saveState() {
 		if (selectedAccount != null) {
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(PREFS_SELECTED_ACCOUNT, selectedAccount.getId());
 			editor.apply();
