@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,6 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
 import java.util.UUID;
@@ -280,8 +278,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 			//Log.d("debug", "getting dossier details");
 			if (!IParapheurApplication.OFFLINE) {
-				Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
 				if (dossier != null) {
+					Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
 					dossier.saveDetails(d);
 				}
 			}
