@@ -23,10 +23,19 @@
         <item name="android:actionModeBackground">@color/contextual_500</item>
     </style>
 
-    <style name="AppTheme.Main" parent="AppTheme.Main.Base"/>
+    <style name="AppTheme.Main" parent="AppTheme.Main.Base">
+        <item name="actionModeStyle">@style/AppTheme.Main.CAB</item>
+    </style>
 
-    <style name="AppTheme.Main.Toolbar" parent="AppTheme.Main">
+    <!-- Toolbars -->
+
+    <style name="AppTheme.Main.Toolbar" parent="Widget.AppCompat.Light.ActionBar.Solid">
         <item name="android:textColorSecondary">@color/text_white</item>
+    </style>
+
+    <style name="AppTheme.Main.CAB" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="background">@color/contextual_500</item>
+        <item name="backgroundSplit">@color/contextual_500</item>
     </style>
 
     <!-- Settings -->

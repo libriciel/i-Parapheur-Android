@@ -539,12 +539,20 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		}
 
 		@Override
-		/** Called when a drawer has settled in a completely open state. */
 		public void onDrawerOpened(View drawerView) {
 			if (getSupportActionBar() != null)
 				getSupportActionBar().setTitle(R.string.app_name);
 
 			// calls onPrepareOptionMenu to hide context specific actions
+			invalidateOptionsMenu();
+		}
+
+		@Override public void onDrawerStateChanged(int newState) {
+
+			if (newState == DrawerLayout.STATE_SETTLING)
+				if (mActionMode != null)
+					mActionMode.finish();
+
 			invalidateOptionsMenu();
 		}
 	}
