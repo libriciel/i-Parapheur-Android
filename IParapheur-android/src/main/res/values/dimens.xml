@@ -5,4 +5,5 @@
     <dimen name="about_text_margin_medium">12dp</dimen>
     <dimen name="about_text_margin_large">32dp</dimen>
     <dimen name="about_text_margin_xlarge">64dp</dimen>
+    <dimen name="navigation_drawer_list_padding">16dp</dimen>
 </resources>

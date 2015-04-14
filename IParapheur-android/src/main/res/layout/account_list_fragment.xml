@@ -11,8 +11,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="12dp">
+        android:layout_height="wrap_content">
 
         <!-- Fake status bar background -->
 
@@ -28,11 +27,11 @@
             android:textColor="@color/text_white"
             android:layout_gravity="bottom"
             android:padding="25dp"
-            android:textSize="23sp"/>
+            android:textSize="14sp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="24dp"
             android:background="@color/secondary_700"/>
     </FrameLayout>
 
@@ -40,7 +39,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp">
 
         <ListView
             android:id="@+id/account_list"
