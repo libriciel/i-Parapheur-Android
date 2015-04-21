@@ -100,6 +100,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		for (Account account : MyAccounts.INSTANCE.getAccounts())
 			if (account.isValid())
 				mAccounts.add(account);
+
+		((AccountListAdapter) mListView.getAdapter()).notifyDataSetChanged();
 	}
 
 	public void accountsChanged() {

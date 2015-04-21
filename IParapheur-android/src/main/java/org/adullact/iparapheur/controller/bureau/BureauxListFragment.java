@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.bureau;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -137,7 +138,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		 *
 		 * @param id the bureau id or null if none is selected (data changed)
 		 */
-		void onBureauListFragmentSelected(String id);
+		void onBureauListFragmentSelected(@Nullable String id);
 	}
 
 	private class BureauxLoadingTask extends LoadingTask {

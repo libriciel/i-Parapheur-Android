@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.GestureDetector;
@@ -59,6 +60,22 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	private View mContentView;
 
 	public DossierListFragment() { }
+
+	/**
+	 * Instantiate a new Fragment, and give it an argument specifying the Bureau it should show
+	 *
+	 * @param bureauId Targeted bureau id
+	 * @return a Fragment
+	 */
+	public static @NonNull DossierListFragment newInstance(@NonNull String bureauId) {
+		DossierListFragment dossierFragment = new DossierListFragment();
+
+		Bundle args = new Bundle();
+		args.putString(ARG_BUREAU_ID, bureauId);
+		dossierFragment.setArguments(args);
+
+		return dossierFragment;
+	}
 
 	// <editor-fold desc="LifeCycle">
 
@@ -120,7 +137,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	}
 
 	public void setBureauId(String bureauId) {
-		if (mBureauId != bureauId) {
+		if ((mBureauId == null) || !(mBureauId.contentEquals(bureauId))) {
 			mBureauId = bureauId;
 
 			if (bureauId == null)

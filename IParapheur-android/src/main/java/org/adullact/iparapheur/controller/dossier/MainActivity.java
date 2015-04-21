@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.dossier;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -72,12 +73,12 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = ":iparapheur:is_drawer_known";
 	private static final int EDIT_PREFERENCE_REQUEST = 0;
 
-	private DrawerLayout mDrawerLayout;                                 // Main Layout off the screen
-	private FrameLayout mDrawerMenu;                                    // Left panel acting as a menu
-	private ActionBarDrawerToggle mDrawerToggle;                        // Used to control the drawer state.
-	private FilterAdapter mFilterAdapter;                               // Adapter for action bar, used to display user's filters
+	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
+	private FrameLayout mDrawerMenu;                           // Left panel acting as a menu
+	private ActionBarDrawerToggle mDrawerToggle;               // Used to control the drawer state.
+	private FilterAdapter mFilterAdapter;                      // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
-	private ActionMode mActionMode;                                     // The actionMode used when dossiers are checked
+	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -127,12 +128,11 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(0, 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, fragmentToDisplay, BureauxListFragment.TAG);
-		transaction.commit();
+		if (findViewById(R.id.left_fragment) != null)
+			replaceLeftFragment(fragmentToDisplay, BureauxListFragment.TAG, false);
 
-		// We select the first account by default, the demo one
+		// Selecting the first account by default, the demo one
+
 		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
 		if (selectedAccount == null)
 			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts().get(0).getId());
@@ -158,6 +158,22 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	}
 
 	@Override
+	public void onBackPressed() {
+
+		if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+			getSupportFragmentManager().popBackStack();
+			return;
+		}
+
+		if (mDrawerLayout.isDrawerOpen(mDrawerMenu)) {
+			mDrawerLayout.closeDrawer(mDrawerMenu);
+			return;
+		}
+
+		super.onBackPressed();
+	}
+
+	@Override
 	protected void onPause() {
 		super.onPause();
 
@@ -172,6 +188,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 			// Don't check if result is ok as the user can press back after modifying an Account
 			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
 			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.TAG);
+
 			if (accountListFragment != null)
 				accountListFragment.accountsChanged();
 		}
@@ -398,20 +415,34 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		onDataChanged();
 	}
 
-	private void replaceLeftFragment(@NonNull String bureauId) {
+	private void replaceLeftFragment(@NonNull Fragment fragment, @NonNull String tag, boolean animated) {
 
-		// Create fragment and give it an argument specifying the Bureau it should show
+		// Bypass and send to the Drawer, if there isn't any left panel
 
-		DossierListFragment dossierFragment = new DossierListFragment();
-		Bundle args = new Bundle();
-		args.putString(DossierListFragment.ARG_BUREAU_ID, bureauId);
-		dossierFragment.setArguments(args);
+		if (findViewById(R.id.left_fragment) == null) {
+			replaceDrawerFragment(fragment, tag, animated);
+			return;
+		}
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(R.anim.push_right_to_center, R.anim.push_center_to_left, R.anim.push_center_to_right, R.anim.push_left_to_center);
-		transaction.replace(R.id.left_fragment, dossierFragment, DossierListFragment.TAG);
+		transaction.setCustomAnimations(animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
+		transaction.replace(R.id.left_fragment, fragment, tag);
+
+		if (animated)
+			transaction.addToBackStack(null);
+
+		transaction.commit();
+	}
+
+	private void replaceDrawerFragment(@NonNull Fragment fragment, @NonNull String tag, boolean animated) {
+
+		// Replace whatever is in the fragment_container view with this fragment.
+
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
+		transaction.replace(R.id.drawer_panel, fragment, tag);
 		transaction.addToBackStack(null);
 		transaction.commit();
 	}
@@ -420,7 +451,15 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	@Override
 	public void onAccountSelected(@NonNull Account account) {
-		mDrawerLayout.closeDrawer(mDrawerMenu);
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			BureauxListFragment bureauxFragment = new BureauxListFragment();
+			replaceDrawerFragment(bureauxFragment, BureauxListFragment.TAG, true);
+		}
+		else {
+			mDrawerLayout.closeDrawer(mDrawerMenu);
+		}
+
 		MyAccounts.INSTANCE.selectAccount(account.getId());
 
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
@@ -444,9 +483,11 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	// <editor-fold desc="BureauListFragmentListener">
 
 	@Override
-	public void onBureauListFragmentSelected(String id) {
-		if (id != null)
-			replaceLeftFragment(id);
+	public void onBureauListFragmentSelected(@Nullable String id) {
+		if (id != null) {
+			DossierListFragment fragment = DossierListFragment.newInstance(id);
+			replaceLeftFragment(fragment, DossierListFragment.TAG, true);
+		}
 	}
 
 	// </editor-fold desc="BureauListFragmentListener">
@@ -488,8 +529,11 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	@Override
 	public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
 
+		if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
+			mDrawerLayout.closeDrawer(mDrawerMenu);
+
 		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
-		if (fragment != null)
+		if ((fragment != null) && (dossier != null) && (bureauId != null))
 			((DossierDetailFragment) fragment).update(dossier, bureauId);
 	}
 

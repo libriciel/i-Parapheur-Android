@@ -3,6 +3,8 @@ package org.adullact.iparapheur.controller.dossier;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -48,6 +50,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	private boolean shouldReload = false;
 
 	public DossierDetailFragment() { }
+
+	// <editor-fold desc="LifeCycle">
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
+	// </editor-fold desc="LifeCycle">
+
 	// <editor-fold desc="ActionBar">
 
 	@Override
@@ -140,13 +146,13 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// </editor-fold desc="ActionBar">
 
-	public void update(Dossier dossier, String bureauId) {
+	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		this.bureauId = bureauId;
 		this.dossier = dossier;
 
 		closeDetails();
 
-		if (dossier != null && dossier.getId() != null)
+		if ((dossier != null) && dossier.getId() != null)
 			getDossierDetails(false);
 		else
 			updateReader();
