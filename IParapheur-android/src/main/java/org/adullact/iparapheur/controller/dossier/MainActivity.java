@@ -121,13 +121,12 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
 
-		if (fragmentToDisplay != null)
-			return;
-
-		fragmentToDisplay = new BureauxListFragment();
+		if (fragmentToDisplay == null)
+			fragmentToDisplay = new BureauxListFragment();
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
+		fragmentToDisplay.setRetainInstance(true);
 		if (findViewById(R.id.left_fragment) != null)
 			replaceLeftFragment(fragmentToDisplay, BureauxListFragment.TAG, false);
 
@@ -529,8 +528,9 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	@Override
 	public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
 
-		if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
-			mDrawerLayout.closeDrawer(mDrawerMenu);
+		if (dossier != null)
+			if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
+				mDrawerLayout.closeDrawer(mDrawerMenu);
 
 		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
 		if ((fragment != null) && (dossier != null) && (bureauId != null))

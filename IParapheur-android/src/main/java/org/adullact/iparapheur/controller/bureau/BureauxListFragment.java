@@ -57,9 +57,11 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
 		listView = (ListView) view.findViewById(R.id.bureaux_list);
 		listView.setOnItemClickListener(this);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
+
 		swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bureaux_refresh_layout);
 		swipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 

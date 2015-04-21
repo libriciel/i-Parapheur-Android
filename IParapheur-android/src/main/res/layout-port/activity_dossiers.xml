@@ -99,7 +99,7 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/drawer_panel"
+                android:id="@+id/left_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 

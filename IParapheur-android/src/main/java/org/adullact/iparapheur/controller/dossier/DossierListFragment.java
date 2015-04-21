@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class DossierListFragment extends SwipeRefreshListFragment implements LoadingTask.DataChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
-	public static String TAG = "Dossiers_list";
+	public static String TAG = "dossiers_list_fragment";
 	public static String ARG_BUREAU_ID = "bureau_id";
 
 	private DossierListFragmentListener listener;
@@ -74,6 +74,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		args.putString(ARG_BUREAU_ID, bureauId);
 		dossierFragment.setArguments(args);
 
+		dossierFragment.setRetainInstance(true);
 		return dossierFragment;
 	}
 
