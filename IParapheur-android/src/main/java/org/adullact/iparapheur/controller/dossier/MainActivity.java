@@ -143,12 +143,17 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		// On first launch, we have to open the NavigationDrawer.
 		// It's in the Android guidelines, the user have to know it's here.
+		// (And we want to open it in portrait in any case, otherwise the user sees a weird grey panel)
 
 		SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES, 0);
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
+		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-		if (!isDrawerKnown) {
+		if (!isDrawerKnown || isDeviceInPortrait) {
+
 			mDrawerLayout.openDrawer(mDrawerMenu);
+
+			// Registering the fact that the user knows the drawer
 
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
