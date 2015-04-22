@@ -157,22 +157,6 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	}
 
 	@Override
-	public void onBackPressed() {
-
-		if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-			getSupportFragmentManager().popBackStack();
-			return;
-		}
-
-		if (mDrawerLayout.isDrawerOpen(mDrawerMenu)) {
-			mDrawerLayout.closeDrawer(mDrawerMenu);
-			return;
-		}
-
-		super.onBackPressed();
-	}
-
-	@Override
 	protected void onPause() {
 		super.onPause();
 
@@ -191,6 +175,49 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 			if (accountListFragment != null)
 				accountListFragment.accountsChanged();
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+			// First, try to pop backstack (and open the drawer to show it)
+
+			if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+
+				if (!mDrawerLayout.isDrawerOpen(mDrawerMenu))
+					mDrawerLayout.openDrawer(mDrawerMenu);
+
+				getSupportFragmentManager().popBackStack();
+				return;
+			}
+
+			// Then, close the drawer
+
+			if (mDrawerLayout.isDrawerOpen(mDrawerMenu)) {
+				mDrawerLayout.closeDrawer(mDrawerMenu);
+				return;
+			}
+		}
+		else {
+
+			// First, close the drawer
+
+			if (mDrawerLayout.isDrawerOpen(mDrawerMenu)) {
+				mDrawerLayout.closeDrawer(mDrawerMenu);
+				return;
+			}
+
+			// Then, try to pop backstack
+
+			if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+				getSupportFragmentManager().popBackStack();
+				return;
+			}
+		}
+
+		super.onBackPressed();
 	}
 
 	// <editor-fold desc="ActionBar">
@@ -442,7 +469,10 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.setCustomAnimations(animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
 		transaction.replace(R.id.drawer_panel, fragment, tag);
-		transaction.addToBackStack(null);
+
+		if (animated)
+			transaction.addToBackStack(null);
+
 		transaction.commit();
 	}
 
