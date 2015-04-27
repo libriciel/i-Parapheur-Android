@@ -166,17 +166,21 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 		@Override
 		protected void showProgress() {
-			if (isAdded() && mSpinnerProgressView.getVisibility() != View.VISIBLE)
-				swipeRefreshLayout.setRefreshing(true);
+			if (isAdded())
+				if (mSpinnerProgressView.getVisibility() != View.VISIBLE)
+					swipeRefreshLayout.setRefreshing(true);
 		}
 
 		@Override
 		protected void hideProgress() {
-			if (isAdded() && mSpinnerProgressView.getVisibility() == View.VISIBLE)
-				ViewUtils.crossfade(getActivity(), swipeRefreshLayout, mSpinnerProgressView);
+			if (isAdded()) {
 
-			if (swipeRefreshLayout.isRefreshing())
-				swipeRefreshLayout.setRefreshing(false);
+				if (mSpinnerProgressView.getVisibility() == View.VISIBLE)
+					ViewUtils.crossfade(getActivity(), swipeRefreshLayout, mSpinnerProgressView);
+
+				if (swipeRefreshLayout.isRefreshing())
+					swipeRefreshLayout.setRefreshing(false);
+			}
 		}
 	}
 

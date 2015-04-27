@@ -210,23 +210,24 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override
 	public void onDataChanged() {
+		if (isAdded()) {
 
-		((DossierListAdapter) getListView().getAdapter()).clearSelection();
-		if (mBureauId != null) {
-			listener.onDossiersLoaded(this.mDossiersList.size());
-		}
-		else {
-			listener.onDossiersNotLoaded();
-		}
+			((DossierListAdapter) getListView().getAdapter()).clearSelection();
 
-		if (selectedDossier != ListView.INVALID_POSITION) {
-			selectedDossier = ListView.INVALID_POSITION;
-			setActivatedPosition(ListView.INVALID_POSITION);
-			/* if a dossier was previously selected, we have to notify the parent
-			 * activity that the data has changed, so the activity remove the previously selected
-             * dossier details
-             */
-			listener.onDossierSelected(null, null);
+			if (mBureauId != null)
+				listener.onDossiersLoaded(this.mDossiersList.size());
+			else
+				listener.onDossiersNotLoaded();
+
+			if (selectedDossier != ListView.INVALID_POSITION) {
+				selectedDossier = ListView.INVALID_POSITION;
+				setActivatedPosition(ListView.INVALID_POSITION);
+				/* if a dossier was previously selected, we have to notify the parent
+				 * activity that the data has changed, so the activity remove the previously selected
+				 * dossier details
+				 */
+				listener.onDossierSelected(null, null);
+			}
 		}
 	}
 
@@ -440,18 +441,21 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		@Override
 		protected void showProgress() {
-			if (mSpinnerProgress.getVisibility() != View.VISIBLE)
-				setRefreshing(true);
+			if (isAdded())
+				if (mSpinnerProgress.getVisibility() != View.VISIBLE)
+					setRefreshing(true);
 		}
 
 		@Override
 		protected void hideProgress() {
+			if (isAdded()) {
 
-			if (mSpinnerProgress.getVisibility() == View.VISIBLE)
-				ViewUtils.crossfade(getActivity(), mContentView, mSpinnerProgress);
+				if (mSpinnerProgress.getVisibility() == View.VISIBLE)
+					ViewUtils.crossfade(getActivity(), mContentView, mSpinnerProgress);
 
-			if (isRefreshing())
-				setRefreshing(false);
+				if (isRefreshing())
+					setRefreshing(false);
+			}
 		}
 	}
 }

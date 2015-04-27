@@ -123,7 +123,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		// Clear backStack (wrong backStack can stay after rotation)
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
 		//
 
