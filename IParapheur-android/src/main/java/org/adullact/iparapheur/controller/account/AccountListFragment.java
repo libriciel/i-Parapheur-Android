@@ -20,8 +20,6 @@ import java.util.List;
 
 public class AccountListFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-	public static final String TAG = "account_fragment_tag";
-
 	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account

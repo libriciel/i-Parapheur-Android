@@ -184,7 +184,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		if (requestCode == EDIT_PREFERENCE_REQUEST) {
 			// Don't check if result is ok as the user can press back after modifying an Account
 			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.TAG);
+			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.account_fragment_tag));
 
 			if (accountListFragment != null)
 				accountListFragment.accountsChanged();
@@ -505,9 +505,15 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		MyAccounts.INSTANCE.selectAccount(account.getId());
 
+		// If we selected a new account, and we are on the DossierFragment displayed
+		// We'll want to pop the BackStack to get on the BureauFragment
+
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 		if (dossierListFragment != null)
-			onBackPressed();
+			if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+				getSupportFragmentManager().popBackStack();
+
+		// Then , we just update the BureauFragment to the accurate Account
 
 		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
 		if (bureauxFragment != null)
@@ -516,6 +522,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	@Override
 	public void onCreateAccountInvoked() {
+
 		Intent preferencesIntent = new Intent(this, SettingsActivity.class);
 		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
 		startActivityForResult(preferencesIntent, EDIT_PREFERENCE_REQUEST);
