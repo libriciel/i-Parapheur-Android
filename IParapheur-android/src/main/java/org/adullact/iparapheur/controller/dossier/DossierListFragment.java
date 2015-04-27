@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -288,8 +288,23 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			// FIXME : changement d'api avec toutes les actions..
 
 			Action actionDemandee = dossier.getActionDemandee();
-			if (actionDemandee != null)
+
+			if (actionDemandee != null) {
+				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image));
+
+				//TODO : Adrien : remove next line when every icon will be generated
 				((ImageView) cellView.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
+
+				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
+
+					if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_signer)))
+						iconImageView.setImageResource(R.drawable.ic_sign_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_archiver)))
+						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_viser)))
+						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+				}
+			}
 
 			CheckBox c = (CheckBox) cellView.findViewById(R.id.dossiers_list_item_checkBox);
 			if (mDossiersList.get(position).hasActions()) {
@@ -303,7 +318,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				c.setVisibility(View.GONE);
 			}
 
-			LinearLayout l = (LinearLayout) cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
+			View l = cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
 			l.setTag(position);
 			l.setOnClickListener(this);
 
