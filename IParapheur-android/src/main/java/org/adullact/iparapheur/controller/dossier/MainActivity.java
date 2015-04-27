@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -71,7 +72,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	private static final String SHARED_PREFERENCES = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = ":iparapheur:is_drawer_known";
-	private static final int EDIT_PREFERENCE_REQUEST = 0;
+	private static final int EDIT_PREFERENCE_REQUEST = 50;
 
 	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
 	private FrameLayout mDrawerMenu;                           // Left panel acting as a menu
@@ -118,6 +119,13 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 	@Override
 	protected void onStart() {
 		super.onStart();
+
+		// Clear backStack (wrong backStack can stay after rotation)
+
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+		//
 
 		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
 
@@ -172,6 +180,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
 		if (requestCode == EDIT_PREFERENCE_REQUEST) {
 			// Don't check if result is ok as the user can press back after modifying an Account
 			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
@@ -187,7 +196,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-			// First, try to pop backstack (and open the drawer to show it)
+			// First, try to pop backStack (and open the drawer to show it)
 
 			if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
 

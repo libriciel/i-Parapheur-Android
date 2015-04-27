@@ -25,6 +25,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account
+	private AccountListAdapter mAccountListAdapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,8 +81,9 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
+		mAccountListAdapter = new AccountListAdapter(getActivity());
+		mListView.setAdapter(mAccountListAdapter);
 		updateAccounts();
-		mListView.setAdapter(new AccountListAdapter(getActivity()));
 
 		// Setting selected view
 
@@ -101,8 +103,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 			if (account.isValid())
 				mAccounts.add(account);
 
-		if ((mListView != null) && (mListView.getAdapter() != null))
-			((AccountListAdapter) mListView.getAdapter()).notifyDataSetChanged();
+		if (mAccountListAdapter != null)
+			mAccountListAdapter.notifyDataSetChanged();
 	}
 
 	public void accountsChanged() {

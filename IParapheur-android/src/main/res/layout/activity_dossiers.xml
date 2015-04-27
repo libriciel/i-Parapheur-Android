@@ -120,6 +120,7 @@
                     android:id="@+id/activity_dossiers_bureaux_fragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:tag="account_fragment_tag"
                     tools:layout="@layout/account_list_fragment"/>
 
             </FrameLayout>
