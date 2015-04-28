@@ -281,7 +281,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View cellView = super.getView(position, convertView, parent);
+			final View cellView = super.getView(position, convertView, parent);
 			Dossier dossier = mDossiersList.get(position);
 
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
@@ -290,10 +290,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			Action actionDemandee = dossier.getActionDemandee();
 
 			if (actionDemandee != null) {
-				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image));
+				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
 
 				//TODO : Adrien : remove next line when every icon will be generated
-				((ImageView) cellView.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
+				iconImageView.setImageResource(actionDemandee.getIcon(false));
 
 				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
 
@@ -303,6 +303,16 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
 					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_viser)))
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+
+					cellView.findViewById(R.id.dossiers_list_item_image).setOnClickListener(new View.OnClickListener() {
+						@Override public void onClick(View view) {
+
+							View mainView = view.findViewById(R.id.dossiers_list_item_image_main);
+							View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector);
+
+							ViewUtils.flip(getActivity(), mainView, selectorView);
+						}
+					});
 				}
 			}
 

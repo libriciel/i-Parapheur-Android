@@ -7,15 +7,30 @@
     android:layout_height="wrap_content"
     android:background="@drawable/list_background_color">
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/dossiers_list_item_image"
+        android:layout_gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:contentDescription="@string/etape_courante"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ir_visa"/>
+        android:layout_marginStart="16dp">
+
+        <ImageView
+            android:id="@+id/dossiers_list_item_image_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/etape_courante"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_sign_24dp"/>
+
+        <ImageView
+            android:id="@+id/dossiers_list_item_image_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_archivage_24dp"
+            android:visibility="gone"/>
+    </FrameLayout>
 
     <LinearLayout
         android:orientation="vertical"

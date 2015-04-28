@@ -1,20 +1,25 @@
 package org.adullact.iparapheur.utils;
 
 import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
+
+import org.adullact.iparapheur.R;
 
 public class ViewUtils {
 
 	/**
 	 * Swap smoothly between content and spinner, the Google way.
-	 * http://developer.android.com/training/animation/crossfade.html
+	 * <br/>
+	 * Code source : http://developer.android.com/training/animation/crossfade.html
 	 *
-	 * @param context
-	 * @param contentView
-	 * @param spinnerView
+	 * @param context     needed to load some resources
+	 * @param contentView should be invisible on start
+	 * @param spinnerView will be set to Visibility.GONE at the end
 	 */
 	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
 		// System default length
@@ -39,5 +44,30 @@ public class ViewUtils {
 				spinnerView.setAlpha(1f);
 			}
 		});
+	}
+
+	/**
+	 * Animate a flip between to views, the Google way.
+	 * <br/>
+	 * Animators source : http://developer.android.com/training/animation/cardflip.html
+	 * Animation code source : http://developer.android.com/guide/topics/graphics/prop-animation.html
+	 *
+	 * @param context       needed to load some resources
+	 * @param mainView      the card-front view
+	 * @param secondaryView the card-back view
+	 */
+	public static void flip(@NonNull Context context, @NonNull View mainView, @NonNull View secondaryView) {
+
+		secondaryView.setAlpha(1f);
+		secondaryView.setVisibility(View.VISIBLE);
+		AnimatorSet outAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_left_out);
+		outAnim.setTarget(mainView);
+		outAnim.start();
+
+		secondaryView.setAlpha(0f);
+		secondaryView.setVisibility(View.VISIBLE);
+		AnimatorSet inAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_right_in);
+		inAnim.setTarget(secondaryView);
+		inAnim.start();
 	}
 }
