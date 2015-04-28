@@ -15,7 +15,7 @@ public class AboutPreferenceFragment extends PreferenceFragment {
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.about, container, false);
+		View v = inflater.inflate(R.layout.settings_about, container, false);
 
 		// Retrieve current version name
 

@@ -92,7 +92,7 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 		// Loading indicator
 
 		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setContentView(R.layout.activity_dossiers);
+		setContentView(R.layout.main_activity);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
 		mDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);

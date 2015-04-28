@@ -14,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -283,16 +282,39 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View cellView = super.getView(position, convertView, parent);
 			Dossier dossier = mDossiersList.get(position);
+			boolean isChecked = checkedDossiers.contains(dossier);
+
+			// Text
+			// FIXME : changement d'api avec toutes les actions..
 
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
-			// FIXME : changement d'api avec toutes les actions..
+
+			// CheckBox
+
+			View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
+
+			if (mDossiersList.get(position).hasActions()) {
+				checkableLayout.setVisibility(View.VISIBLE);
+				checkableLayout.setTag(position);
+				checkableLayout.setOnClickListener(new View.OnClickListener() {
+					@Override public void onClick(View view) {
+						toggleSelection(view);
+					}
+				});
+			}
+			else {
+				checkableLayout.setVisibility(View.GONE);
+			}
+
+			// Main icon
 
 			Action actionDemandee = dossier.getActionDemandee();
 
 			if (actionDemandee != null) {
 				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
+				View selectorImageview = cellView.findViewById(R.id.dossiers_list_item_image_selector);
 
-				//TODO : Adrien : remove next line when every icon will be generated
+				// FIXME : Adrien : remove next line when every icon will be generated
 				iconImageView.setImageResource(actionDemandee.getIcon(false));
 
 				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
@@ -303,34 +325,19 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
 					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_viser)))
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_tdt)))
+						iconImageView.setImageResource(R.drawable.ic_tdt_24dp);
 
-					cellView.findViewById(R.id.dossiers_list_item_image).setOnClickListener(new View.OnClickListener() {
-						@Override public void onClick(View view) {
-
-							View mainView = view.findViewById(R.id.dossiers_list_item_image_main);
-							View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector);
-
-							ViewUtils.flip(getActivity(), mainView, selectorView);
-						}
-					});
+					iconImageView.setAlpha(isChecked ? 0f : 1f);
+					selectorImageview.setAlpha(isChecked ? 1f : 0f);
 				}
 			}
 
-			CheckBox c = (CheckBox) cellView.findViewById(R.id.dossiers_list_item_checkBox);
-			if (mDossiersList.get(position).hasActions()) {
-				c.setVisibility(View.VISIBLE);
-				c.setTag(position);
-				// don't use setOnCheckedChangeListener, it doesn't work well with the ActionMode in DossiersActivity
-				c.setOnClickListener(this);
-				c.setChecked(checkedDossiers.contains(dossier));
-			}
-			else {
-				c.setVisibility(View.GONE);
-			}
+			// Click events
 
-			View l = cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
-			l.setTag(position);
-			l.setOnClickListener(this);
+			View selectableLayout = cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
+			selectableLayout.setTag(position);
+			selectableLayout.setOnClickListener(this);
 
 			return cellView;
 		}
@@ -355,23 +362,34 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			return (mDossiersList == null) || mDossiersList.isEmpty();
 		}
 
+		public void toggleSelection(View view) {
+			if (!isRefreshing()) {
+
+				// Toggle checked state, and animate
+
+				Dossier dossier = mDossiersList.get((Integer) view.getTag());
+				View mainView = view.findViewById(R.id.dossiers_list_item_image_main);
+				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector);
+
+				if (checkedDossiers.contains(dossier)) {
+					checkedDossiers.remove(dossier);
+					ViewUtils.flip(getActivity(), selectorView, mainView);
+				}
+				else {
+					checkedDossiers.add(dossier);
+					ViewUtils.flip(getActivity(), mainView, selectorView);
+				}
+
+				// Will update ActionMode, so the actions will be updated
+
+				listener.onDossierCheckedChanged();
+			}
+		}
+
 		@Override
 		public void onClick(View v) {
 
 			switch (v.getId()) {
-				case R.id.dossiers_list_item_checkBox:
-					if (!isRefreshing()) {
-						Dossier dossier = mDossiersList.get((Integer) v.getTag());
-
-						if (((CheckBox) v).isChecked())
-							checkedDossiers.add(dossier);
-						else
-							checkedDossiers.remove(dossier);
-
-						// will update ActionMode, so the actions will be updated
-						listener.onDossierCheckedChanged();
-					}
-					break;
 				default:
 					Integer position = (Integer) v.getTag();
 					if (position != selectedDossier && !isRefreshing()) {

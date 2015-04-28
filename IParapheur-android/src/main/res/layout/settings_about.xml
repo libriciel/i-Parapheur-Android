@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_main_title"/>
 
             <!-- About -->
@@ -36,6 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_version_number"/>
 
             <TextView
@@ -43,6 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_copyright"/>
 
             <!-- Legal -->
@@ -53,6 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_legal_title"/>
 
             <TextView
@@ -60,6 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_legal_content_part1"/>
 
             <TextView
@@ -67,6 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_legal_content_part2"/>
 
             <!-- Licenses -->
@@ -78,6 +84,7 @@
                 android:layout_marginTop="@dimen/about_text_margin_xlarge"
                 android:gravity="center_horizontal"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_licenses_title"/>
 
             <!-- MuPDF license -->
@@ -88,6 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_mupdf_title"/>
 
             <TextView
@@ -95,6 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_mupdf_copyright"/>
 
             <TextView
@@ -102,6 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_mupdf_license"/>
 
             <!-- Android support license -->
@@ -112,6 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_android_support_title"/>
 
             <TextView
@@ -119,6 +130,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_android_support_copyright"/>
 
             <TextView
@@ -126,6 +138,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_android_support_license"/>
 
             <!-- Gson license -->
@@ -136,6 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
                 android:textStyle="bold"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_gson_title"/>
 
             <TextView
@@ -143,6 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_gson_copyright"/>
 
             <TextView
@@ -150,6 +165,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:textColor="@color/text_black"
                 android:text="@string/about_library_license_gson_license"/>
 
         </LinearLayout>
