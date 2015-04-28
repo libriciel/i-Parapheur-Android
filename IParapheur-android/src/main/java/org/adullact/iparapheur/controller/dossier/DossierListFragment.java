@@ -318,14 +318,17 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				iconImageView.setImageResource(actionDemandee.getIcon(false));
 
 				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
+					String actionName = getString(actionDemandee.getTitle());
 
-					if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_signer)))
+					if (actionName.contentEquals(getString(R.string.action_signer)))
 						iconImageView.setImageResource(R.drawable.ic_sign_24dp);
-					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_archiver)))
+					else if (actionName.contentEquals(getString(R.string.action_archiver)))
 						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
-					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_viser)))
+					else if (actionName.contentEquals(getString(R.string.action_viser)))
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
-					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_tdt)))
+					else if (actionName.contentEquals(getString(R.string.action_mailsec)))
+						iconImageView.setImageResource(R.drawable.ic_mailsec_24dp);
+					else if (actionName.startsWith(getString(R.string.action_tdt))) // using startsWith, to catch helios and actes
 						iconImageView.setImageResource(R.drawable.ic_tdt_24dp);
 
 					iconImageView.setAlpha(isChecked ? 0f : 1f);
