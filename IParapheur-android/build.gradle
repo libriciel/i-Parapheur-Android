@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:1.1.0'
     }
 }
 apply plugin: 'com.android.application'
@@ -13,12 +13,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 21
+        targetSdkVersion 22
     }
 
     /*lintOptions {
@@ -29,5 +29,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v13:21.0.3'
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:22.1.0'
+    compile 'com.google.code.gson:gson:2.3'
 }

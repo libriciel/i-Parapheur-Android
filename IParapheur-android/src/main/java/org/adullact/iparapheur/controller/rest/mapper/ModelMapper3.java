@@ -6,6 +6,7 @@ import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.TransformUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -57,7 +58,7 @@ public class ModelMapper3 extends ModelMapper {
 
 	@Override
 	protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
-		ArrayList<Action> actions = new ArrayList<Action>();
+		ArrayList<Action> actions = new ArrayList<>();
 		JSONArray JSONActions = dossier.optJSONArray("actions");
 		if (JSONActions != null) {
 			for (int i = 0; i < JSONActions.length(); i++) {
@@ -72,7 +73,7 @@ public class ModelMapper3 extends ModelMapper {
 
 	@Override
 	public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
-		ArrayList<Dossier> dossiers = new ArrayList<Dossier>();
+		ArrayList<Dossier> dossiers = new ArrayList<>();
 		JSONArray array = requestResponse.getResponseArray();
 		if (array != null) {
 			for (int i = 0; i < array.length(); i++) {
@@ -109,26 +110,30 @@ public class ModelMapper3 extends ModelMapper {
 
 	@Override
 	public ArrayList<Bureau> getBureaux(RequestResponse response) {
-		ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
-		JSONArray jsonBureaux = response.getResponseArray();
-		if (jsonBureaux != null) {
-			for (int i = 0; i < jsonBureaux.length(); i++) {
-				JSONObject bureau = jsonBureaux.optJSONObject(i);
-				if (bureau != null) {
-					String bureauRef = bureau.optString("nodeRef");
-					if (bureauRef.contains("workspace://SpacesStore/")) {
-						bureauRef = bureauRef.substring("workspace://SpacesStore/".length());
-					}
-					bureaux.add(new Bureau(bureauRef, bureau.optString("name")));
-				}
-			}
+		ArrayList<Bureau> bureaux = new ArrayList<>();
+
+		if (response.getResponseArray() == null)
+			return bureaux;
+
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponseArray());
+		for (int i = 0; i < response.getResponseArray().length(); i++) {
+
+			int lateCount = jsonExplorer.find(i).optInt("en-retard", 0);
+			int todoCount = jsonExplorer.find(i).optInt("a-traiter", 0);
+			String name = jsonExplorer.find(i).optString("name", "");
+			String bureauRef = jsonExplorer.find(i).optString("nodeRef", null);
+
+			if (bureauRef != null)
+				bureaux.add(new Bureau(bureauRef, name, todoCount, lateCount));
 		}
+
 		return bureaux;
 	}
 
 	@Override
 	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
-		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<String, ArrayList<String>>();
+
+		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
 		JSONArray JSONTypes = response.getResponseArray();
 		if (JSONTypes != null) {
 
@@ -140,7 +145,7 @@ public class ModelMapper3 extends ModelMapper {
 					JSONArray JSONSousTypes = JSONType.optJSONArray("sousTypes");
 
 					if (JSONSousTypes != null) {
-						ArrayList<String> sousTypes = new ArrayList<String>(JSONSousTypes.length());
+						ArrayList<String> sousTypes = new ArrayList<>(JSONSousTypes.length());
 
 						for (int j = 0; j < JSONSousTypes.length(); j++) {
 							String sousType = JSONSousTypes.optString(j);

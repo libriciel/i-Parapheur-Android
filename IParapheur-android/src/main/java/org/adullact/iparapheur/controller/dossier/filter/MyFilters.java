@@ -3,7 +3,7 @@ package org.adullact.iparapheur.controller.dossier.filter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
     public List<Filter> getFilters() {
         if (filters == null) {
             filters = new ArrayList<Filter>();
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 
             for (String pref : sharedPreferences.getAll().keySet()) {
                 if (pref.startsWith(PREFS_PREFIX))
@@ -67,7 +67,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     public void save(Filter filter) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
         SharedPreferences.Editor editor = sharedPreferences.edit()
                 .putString( PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getNom())
                 .putString( PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitre())
@@ -87,7 +87,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 
     public void delete(Filter filter) {
         String id = filter.getId();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheur.getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
         Set<String> keySet = sharedPreferences.getAll().keySet();
         if (keySet.contains( PREFS_PREFIX + id + PREFS_NOM_SUFFIX))
         {

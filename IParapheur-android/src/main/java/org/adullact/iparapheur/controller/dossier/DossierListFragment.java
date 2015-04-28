@@ -4,27 +4,29 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SwipeRefreshListFragment;
+import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,19 +48,36 @@ import java.util.List;
  */
 public class DossierListFragment extends SwipeRefreshListFragment implements LoadingTask.DataChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
-	public static String TAG = "Dossiers_list";
+	public static String TAG = "dossiers_list_fragment";
+	public static String ARG_BUREAU_ID = "bureau_id";
 
 	private DossierListFragmentListener listener;
-	private String mBureauId; // Bureau id where the dossiers belongs
-	private List<Dossier> mDossiersList; // List of dossiers displayed in this fragment
-	private int selectedDossier = ListView.INVALID_POSITION; // The currently selected dossier
+	private String mBureauId;                                   // Bureau id where the dossiers belongs
+	private List<Dossier> mDossiersList;                        // List of dossiers displayed in this fragment
+	private int selectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
+	private View mSpinnerProgress;
+	private View mContentView;
+
+	public DossierListFragment() { }
 
 	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
+	 * Instantiate a new Fragment, and give it an argument specifying the Bureau it should show
+	 *
+	 * @param bureauId Targeted bureau id
+	 * @return a Fragment
 	 */
-	public DossierListFragment() {
+	public static @NonNull DossierListFragment newInstance(@NonNull String bureauId) {
+		DossierListFragment dossierFragment = new DossierListFragment();
+
+		Bundle args = new Bundle();
+		args.putString(ARG_BUREAU_ID, bureauId);
+		dossierFragment.setArguments(args);
+
+		dossierFragment.setRetainInstance(true);
+		return dossierFragment;
 	}
+
+	// <editor-fold desc="LifeCycle">
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -72,14 +91,11 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
-
-	@Override
 	public View getInitialView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.dossiers_list, container, true);
+		View view = inflater.inflate(R.layout.dossiers_list, container, false);
+		mContentView = view.findViewById(android.R.id.content);
+		mSpinnerProgress = view.findViewById(android.R.id.progress);
+		return view;
 	}
 
 	@Override
@@ -98,7 +114,13 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		setListAdapter(new DossierListAdapter(getActivity(), listener));
 		setOnRefreshListener(this);
 		setHasOptionsMenu(false);
-		setColorScheme(android.R.color.holo_green_light, android.R.color.holo_red_light, android.R.color.holo_blue_light, android.R.color.holo_orange_light);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		setBureauId(getArguments().getString(ARG_BUREAU_ID, null));
 	}
 
 	@Override
@@ -108,17 +130,21 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		listener = null;
 	}
 
+	// </editor-fold desc="LifeCycle">
+
 	public String getBureauId() {
 		return mBureauId;
 	}
 
 	public void setBureauId(String bureauId) {
-		if (mBureauId != bureauId) {
+		if ((mBureauId == null) || !(mBureauId.contentEquals(bureauId))) {
 			mBureauId = bureauId;
 
 			if (bureauId == null)
 				this.mDossiersList = null;
 
+			mSpinnerProgress.setVisibility(View.VISIBLE);
+			mContentView.setVisibility(View.INVISIBLE);
 			getDossiers(true);
 		}
 	}
@@ -132,6 +158,24 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		}
 	}
 
+	private void setActivatedPosition(int position) {
+		if (position == ListView.INVALID_POSITION) {
+			getListView().clearChoices();
+		}
+		else {
+			getListView().setItemChecked(position, true);
+		}
+		selectedDossier = position;
+	}
+
+	public HashSet<Dossier> getCheckedDossiers() {
+		return ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
+	}
+
+	public void clearSelection() {
+		((DossierListAdapter) getListAdapter()).clearSelection();
+	}
+
 	/**
 	 * Used by the containing activity to pass a dossier to the detail fragment.
 	 * We get the dossier from here because this fragment has its instance state retained
@@ -143,16 +187,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public Dossier getDossier(String id) {
 		int position = mDossiersList.indexOf(new Dossier(id));
 		return mDossiersList.get(position);
-	}
-
-	private void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			getListView().clearChoices();
-		}
-		else {
-			getListView().setItemChecked(position, true);
-		}
-		selectedDossier = position;
 	}
 
 	/**
@@ -171,26 +205,34 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		getDossiers(true);
 	}
 
+	// <editor-fold desc="DataChangeListener">
+
 	@Override
 	public void onDataChanged() {
-		((DossierListAdapter) getListView().getAdapter()).clearSelection();
-		if (mBureauId != null) {
-			listener.onDossiersLoaded(this.mDossiersList.size());
-		}
-		else {
-			listener.onDossiersNotLoaded();
-		}
+		if (isAdded()) {
 
-		if (selectedDossier != ListView.INVALID_POSITION) {
-			selectedDossier = ListView.INVALID_POSITION;
-			setActivatedPosition(ListView.INVALID_POSITION);
-			/* if a dossier was previously selected, we have to notify the parent
-			 * activity that the data has changed, so the activity remove the previously selected
-             * dossier details
-             */
-			listener.onDossierSelected(null, null);
+			((DossierListAdapter) getListView().getAdapter()).clearSelection();
+
+			if (mBureauId != null)
+				listener.onDossiersLoaded(this.mDossiersList.size());
+			else
+				listener.onDossiersNotLoaded();
+
+			if (selectedDossier != ListView.INVALID_POSITION) {
+				selectedDossier = ListView.INVALID_POSITION;
+				setActivatedPosition(ListView.INVALID_POSITION);
+				/* if a dossier was previously selected, we have to notify the parent
+				 * activity that the data has changed, so the activity remove the previously selected
+				 * dossier details
+				 */
+				listener.onDossierSelected(null, null);
+			}
 		}
 	}
+
+	// </editor-fold desc="DataChangeListener">
+
+	// <editor-fold desc="OnRefreshListener">
 
 	@Override
 	public void onRefresh() {
@@ -202,13 +244,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		}
 	}
 
-	public HashSet<Dossier> getCheckedDossiers() {
-		return ((DossierListAdapter) getListAdapter()).getCheckedDossiers();
-	}
+	// </editor-fold desc="OnRefreshListener">
 
-	public void clearSelection() {
-		((DossierListAdapter) getListAdapter()).clearSelection();
-	}
+	// <editor-fold desc="Listener">
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -217,7 +255,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	 */
 	public interface DossierListFragmentListener {
 
-		void onDossierSelected(String dossierId, String bureauId);
+		void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId);
 
 		void onDossiersLoaded(int size);
 
@@ -226,6 +264,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		void onDossierCheckedChanged();
 	}
 
+	// </editor-fold desc="Listener">
+
 	private class DossierListAdapter extends ArrayAdapter<Dossier> implements View.OnClickListener, View.OnTouchListener {
 
 		private final DossierListFragmentListener listener;
@@ -233,38 +273,71 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		private HashSet<Dossier> checkedDossiers;
 
 		public DossierListAdapter(Context context, DossierListFragmentListener listener) {
-			super(context, R.layout.dossiers_list_item, R.id.dossiers_list_item_title);
+			super(context, R.layout.dossiers_list_cell, R.id.dossiers_list_item_title);
 			this.listener = listener;
 			this.checkedDossiers = new HashSet<>();
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View cellView = super.getView(position, convertView, parent);
+			final View cellView = super.getView(position, convertView, parent);
 			Dossier dossier = mDossiersList.get(position);
+			boolean isChecked = checkedDossiers.contains(dossier);
 
-			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
+			// Text
 			// FIXME : changement d'api avec toutes les actions..
 
-			Action actionDemandee = dossier.getActionDemandee();
-			if (actionDemandee != null)
-				((ImageView) cellView.findViewById(R.id.dossiers_list_item_image)).setImageResource(actionDemandee.getIcon(false));
+			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(dossier.getType() + " / " + dossier.getSousType());
 
-			CheckBox c = (CheckBox) cellView.findViewById(R.id.dossiers_list_item_checkBox);
+			// CheckBox
+
+			View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
+
 			if (mDossiersList.get(position).hasActions()) {
-				c.setVisibility(View.VISIBLE);
-				c.setTag(position);
-				// don't use setOnCheckedChangeListener, it doesn't work well with the ActionMode in DossiersActivity
-				c.setOnClickListener(this);
-				c.setChecked(checkedDossiers.contains(dossier));
+				checkableLayout.setVisibility(View.VISIBLE);
+				checkableLayout.setTag(position);
+				checkableLayout.setOnClickListener(new View.OnClickListener() {
+					@Override public void onClick(View view) {
+						toggleSelection(view);
+					}
+				});
 			}
 			else {
-				c.setVisibility(View.GONE);
+				checkableLayout.setVisibility(View.GONE);
 			}
 
-			LinearLayout l = (LinearLayout) cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
-			l.setTag(position);
-			l.setOnClickListener(this);
+			// Main icon
+
+			Action actionDemandee = dossier.getActionDemandee();
+
+			if (actionDemandee != null) {
+				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
+				View selectorImageview = cellView.findViewById(R.id.dossiers_list_item_image_selector);
+
+				// FIXME : Adrien : remove next line when every icon will be generated
+				iconImageView.setImageResource(actionDemandee.getIcon(false));
+
+				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
+
+					if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_signer)))
+						iconImageView.setImageResource(R.drawable.ic_sign_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_archiver)))
+						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_viser)))
+						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+					else if (getString(actionDemandee.getTitle()).contentEquals(getString(R.string.action_tdt)))
+						iconImageView.setImageResource(R.drawable.ic_tdt_24dp);
+
+					iconImageView.setAlpha(isChecked ? 0f : 1f);
+					selectorImageview.setAlpha(isChecked ? 1f : 0f);
+				}
+			}
+
+			// Click events
+
+			View selectableLayout = cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
+			selectableLayout.setTag(position);
+			selectableLayout.setOnClickListener(this);
 
 			return cellView;
 		}
@@ -289,27 +362,38 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			return (mDossiersList == null) || mDossiersList.isEmpty();
 		}
 
+		public void toggleSelection(View view) {
+			if (!isRefreshing()) {
+
+				// Toggle checked state, and animate
+
+				Dossier dossier = mDossiersList.get((Integer) view.getTag());
+				View mainView = view.findViewById(R.id.dossiers_list_item_image_main);
+				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector);
+
+				if (checkedDossiers.contains(dossier)) {
+					checkedDossiers.remove(dossier);
+					ViewUtils.flip(getActivity(), selectorView, mainView);
+				}
+				else {
+					checkedDossiers.add(dossier);
+					ViewUtils.flip(getActivity(), mainView, selectorView);
+				}
+
+				// Will update ActionMode, so the actions will be updated
+
+				listener.onDossierCheckedChanged();
+			}
+		}
+
 		@Override
 		public void onClick(View v) {
 
 			switch (v.getId()) {
-				case R.id.dossiers_list_item_checkBox:
-					if (!isRefreshing()) {
-						Dossier dossier = mDossiersList.get((Integer) v.getTag());
-
-						if (((CheckBox) v).isChecked())
-							checkedDossiers.add(dossier);
-						else
-							checkedDossiers.remove(dossier);
-
-						// will update ActionMode, so the actions will be updated
-						listener.onDossierCheckedChanged();
-					}
-					break;
 				default:
 					Integer position = (Integer) v.getTag();
 					if (position != selectedDossier && !isRefreshing()) {
-						listener.onDossierSelected(mDossiersList.get(position).getId(), mBureauId);
+						listener.onDossierSelected(mDossiersList.get(position), mBureauId);
 						setActivatedPosition(position);
 					}
 					break;
@@ -386,7 +470,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (isCancelled()) {
 				return;
 			}
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				mDossiersList = RESTClient.INSTANCE.getDossiers(params[0]);
 			}
 			else {
@@ -400,12 +484,21 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		@Override
 		protected void showProgress() {
-			setRefreshing(true);
+			if (isAdded())
+				if (mSpinnerProgress.getVisibility() != View.VISIBLE)
+					setRefreshing(true);
 		}
 
 		@Override
 		protected void hideProgress() {
-			setRefreshing(false);
+			if (isAdded()) {
+
+				if (mSpinnerProgress.getVisibility() == View.VISIBLE)
+					ViewUtils.crossfade(getActivity(), mContentView, mSpinnerProgress);
+
+				if (isRefreshing())
+					setRefreshing(false);
+			}
 		}
 	}
 }

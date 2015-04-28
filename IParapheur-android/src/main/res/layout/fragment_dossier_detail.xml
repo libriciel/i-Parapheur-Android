@@ -67,4 +67,13 @@
 
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/loading_spinner"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="false"
+        android:visibility="gone"/>
+
 </FrameLayout>

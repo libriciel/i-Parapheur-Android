@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
@@ -32,7 +32,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPreExecute() {
-        if (IParapheur.OFFLINE) {
+        if (IParapheurApplication.OFFLINE) {
             Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
             showProgress();
         }

@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 
 import com.artifex.mupdfdemo.MuPDFCore;
 
-import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.LoadingTask;
 
 public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -43,11 +43,6 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int i) {
 		return new DocumentPageFragment();
 	}
-
-    /*@Override
-	public void destroyItem(ViewGroup container, int position, Object object) {
-        super.destroyItem(container, position, object);
-    }*/
 
 	@Override
 	public int getCount() {
@@ -132,7 +127,8 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			if (isCancelled())
 				return;
 
-			muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
+			if (muPDFCore != null)
+				muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
 		}
 
 		@Override

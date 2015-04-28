@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import org.adullact.iparapheur.R;
+
 public class SwipeRefreshListFragment extends ListFragment {
 
 	private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -37,6 +39,8 @@ public class SwipeRefreshListFragment extends ListFragment {
 
 		// Make sure that the SwipeRefreshLayout will fill the fragment
 		mSwipeRefreshLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+		mSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 
 		// Now return the SwipeRefreshLayout as this fragment's content view
 		return mSwipeRefreshLayout;
@@ -84,15 +88,6 @@ public class SwipeRefreshListFragment extends ListFragment {
 	 */
 	public void setRefreshing(boolean refreshing) {
 		mSwipeRefreshLayout.setRefreshing(refreshing);
-	}
-
-	/**
-	 * Set the color scheme for the {@link android.support.v4.widget.SwipeRefreshLayout}.
-	 *
-	 * @see android.support.v4.widget.SwipeRefreshLayout#setColorScheme(int, int, int, int)
-	 */
-	public void setColorScheme(int colorRes1, int colorRes2, int colorRes3, int colorRes4) {
-		mSwipeRefreshLayout.setColorScheme(colorRes1, colorRes2, colorRes3, colorRes4);
 	}
 
 	/**

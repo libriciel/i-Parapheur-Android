@@ -3,6 +3,8 @@ package org.adullact.iparapheur.controller.dossier;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -17,54 +19,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheur;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.model.Document;
-import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
 import java.util.UUID;
 
 /**
  * A fragment representing a single Dossier detail screen.
- * This fragment is contained in a {@link DossiersActivity}.
+ * This fragment is contained in a {@link MainActivity}.
  */
 public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static String TAG = "Dossier_details";
-	/**
-	 * the bureau where the dossier belongs.
-	 */
-	private String bureauId;
-	/**
-	 * The Dossier id this fragment is presenting. Used only in initialisation.
-	 */
-	private String dossierId;
-	/**
-	 * The Dossier this fragment is presenting.
-	 */
-	private Dossier dossier;
-	private DossierDetailListener listener;
+	public static final String TAG = "Dossier_details";
+	public static final String DOSSIER = "dossier";
+	public static final String BUREAU_ID = "bureau_id";
+
+	private String bureauId; // The Bureau where the dossier belongs.
+	private Dossier dossier; // The Dossier this fragment is presenting.
 	private boolean isReaderEnabled;
-	/**
-	 * Used to display the document's pages. Each page is managed by a fragment.
-	 */
-	private ViewPager viewPager;
+	private ViewPager viewPager; // Used to display the document's pages. Each page is managed by a fragment.
 	private int currentPage;
+	private boolean shouldReload = false;
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
-	public DossierDetailFragment() {
-	}
+	public DossierDetailFragment() { }
 
-	//private SeekBar seekBar;
+	// <editor-fold desc="LifeCycle">
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,10 +59,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		setRetainInstance(true);
 
 		if (getArguments() != null) {
-			bureauId = getArguments().getString(DossiersActivity.BUREAU_ID);
-			dossierId = getArguments().getString(DossiersActivity.DOSSIER_ID);
+			bureauId = getArguments().getString(BUREAU_ID);
+			dossier = getArguments().getParcelable(DOSSIER);
 		}
-		this.currentPage = 0;
+		currentPage = 0;
 	}
 
 	@Override
@@ -92,6 +79,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
         seekBar.setOnSeekBarChangeListener(this);*/
 		this.viewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
 
+		// Reload data after rotation
+
+		if (savedInstanceState != null)
+			shouldReload = true;
 	}
 
 	@Override
@@ -107,48 +98,67 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
 			this.isReaderEnabled = false;
 		}
-		if (dossierId != null) {
+		if (dossier != null) {
 			getDossierDetails(false);
 		}
 		setHasOptionsMenu(true);
 	}
 
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof DossierDetailListener)) {
-			throw new IllegalStateException("Activity must implement DossierDetailListener.");
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		if (shouldReload) {
+			shouldReload = false;
+			update(dossier, bureauId);
 		}
-		listener = (DossierDetailListener) activity;
+	}
+
+	// </editor-fold desc="LifeCycle">
+
+	// <editor-fold desc="ActionBar">
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.dossier_details_menu, menu);
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		/*if (reader != null) {
-			reader.clean();
-        }*/
+	public void onPrepareOptionsMenu(Menu menu) {
+		MenuItem item = menu.findItem(R.id.action_details);
+		item.setVisible((dossier != null) && dossier.isDetailsAvailable());
+		super.onPrepareOptionsMenu(menu);
+
 	}
 
-	public void update(String bureauId, String dossierId) {
-		/*if (reader != null) {
-			reader.clean();
-        }
-        ((FrameLayout) getView().findViewById(R.id.fragment_dossier_detail_reader_view)).removeAllViews();*/
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+			case R.id.action_details:
+				toggleDetails();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	// </editor-fold desc="ActionBar">
+
+	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		this.bureauId = bureauId;
-		this.dossierId = dossierId;
-		this.dossier = null;
+		this.dossier = dossier;
+
 		closeDetails();
 
-		if (dossierId != null)
+		if ((dossier != null) && dossier.getId() != null)
 			getDossierDetails(false);
 		else
 			updateReader();
 	}
 
 	private void getDossierDetails(boolean forceReload) {
-		if (dossier == null)
-			dossier = listener.getDossier(dossierId);
 
 		// To force reload dossier details, just delete its main document path (on local storage).
 		if (forceReload)
@@ -164,7 +174,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	@Override
 	public void onDataChanged() {
 
-		if (!IParapheur.OFFLINE)
+		if (!IParapheurApplication.OFFLINE)
 			updateDetails();
 
 		updateReader();
@@ -183,7 +193,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 							viewPager.setCurrentItem(0, false);
 						}
 						catch (Exception e) {
-							//e.printStackTrace();
+							e.printStackTrace();
 							Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
 						}
 					}
@@ -217,34 +227,12 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.dossier_details_menu, menu);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		MenuItem item = menu.findItem(R.id.action_details);
-		item.setVisible((dossier != null) && dossier.isDetailsAvailable());
-		super.onPrepareOptionsMenu(menu);
-
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-			case R.id.action_details:
-				toggleDetails();
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-
 	private void toggleDetails() {
+		if (getView() == null)
+			return;
+
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+
 		if (details.getVisibility() == View.VISIBLE) {
 			details.setVisibility(View.INVISIBLE);
 		}
@@ -254,23 +242,23 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	private void closeDetails() {
+		if (getView() == null)
+			return;
+
 		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+
 		if ((details != null) && (details.getVisibility() == View.VISIBLE)) {
 			details.setVisibility(View.INVISIBLE);
 		}
 	}
 
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
-	}
-
-    /* SeekBar Listener implementation */
+	// <editor-fold desc="SeekBar Listener">
 
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-
-	}
+	public void onStartTrackingTouch(SeekBar seekBar) { }
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
@@ -280,10 +268,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
-	public interface DossierDetailListener {
-
-		Dossier getDossier(String id);
-	}
+	// </editor-fold desc="SeekBar Listener">
 
 	private class DossierLoadingTask extends LoadingTask {
 
@@ -298,19 +283,19 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				return;
 
 			//Log.d("debug", "getting dossier details");
-			if (!IParapheur.OFFLINE) {
-				Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
+			if (!IParapheurApplication.OFFLINE) {
 				if (dossier != null) {
+					Dossier d = RESTClient.INSTANCE.getDossier(bureauId, dossier.getId());
 					dossier.saveDetails(d);
 				}
 			}
 			else {
-				dossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "ducument par defaut", -1, ""));
+				dossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, ""));
 			}
 			if (isCancelled()) {
 				return;
 			}
-			if (!IParapheur.OFFLINE) {
+			if (!IParapheurApplication.OFFLINE) {
 				dossier.setCircuit(RESTClient.INSTANCE.getCircuit(dossier.getId()));
 			}
 			if (isCancelled()) {
@@ -324,10 +309,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					File file = FileUtils.getFileForDocument(getActivity(), dossier.getId(), document.getId());
 					String path = file.getAbsolutePath();
 					//Log.d("debug", "saving document on disk");
-					if (!IParapheur.OFFLINE) {
+					if (!IParapheurApplication.OFFLINE) {
 						if (RESTClient.INSTANCE.downloadFile(dossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);
-							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId));
+							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossier != null ? dossier.getId() : null));
 						}
 					}
 					else {

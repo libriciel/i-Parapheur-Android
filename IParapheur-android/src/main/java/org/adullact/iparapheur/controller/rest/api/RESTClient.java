@@ -5,7 +5,6 @@ import android.util.SparseArray;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
-import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
@@ -13,6 +12,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -113,9 +113,9 @@ public enum RESTClient implements IParapheurAPI {
 
 		if (apiVersion > API_VERSION_MAX) {
 			throw new RuntimeException("La version du i-Parapheur associé au compte " +
-					MyAccounts.INSTANCE.getSelectedAccount().getTitle() +
-					" est trop récente pour cette application. " +
-					"Veuillez mettre à jour votre application.");
+											   MyAccounts.INSTANCE.getSelectedAccount().getTitle() +
+											   " est trop récente pour cette application. " +
+											   "Veuillez mettre à jour votre application.");
 		}
 
 		switch (apiVersion) {
@@ -178,7 +178,6 @@ public enum RESTClient implements IParapheurAPI {
 
 	@Override
 	public boolean downloadFile(String url, String path) throws IParapheurException {
-
 		return getRESTClient().downloadFile(url, path);
 	}
 

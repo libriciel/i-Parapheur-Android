@@ -76,6 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
 	}
 

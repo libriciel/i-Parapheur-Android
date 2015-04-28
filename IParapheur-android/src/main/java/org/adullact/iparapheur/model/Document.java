@@ -19,7 +19,7 @@ public class Document implements Parcelable {
 	private final String id;
 	private final String dossierId;
 	private final String name;
-	private final int size; // TODO : downlaod image instead of too heavy files
+	private final int size; // TODO : download image instead of too heavy files
 	/**
 	 * URL of the document (its content)
 	 */
@@ -103,5 +103,13 @@ public class Document implements Parcelable {
 		dest.writeString(this.url);
 		dest.writeInt(this.size);
 		dest.writeString(this.path);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ((o == null) || !(o instanceof Document))
+			return false;
+
+		return id.contentEquals(((Document) o).getId());
 	}
 }
