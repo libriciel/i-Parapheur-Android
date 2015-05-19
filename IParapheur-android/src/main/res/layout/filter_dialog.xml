@@ -1,40 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical">
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/filter_dialog_titre"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:hint="@string/filter_title_hint" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:hint="@string/filter_title_hint"/>
 
     <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/filter_dialog_etat_spinner"
-        android:layout_below="@+id/filter_dialog_titre"
-        android:spinnerMode="dialog"
-        android:layout_alignLeft="@+id/filter_dialog_titre"
-        android:layout_alignStart="@+id/filter_dialog_titre"
-        android:layout_alignRight="@+id/filter_dialog_titre"
-        android:layout_alignEnd="@+id/filter_dialog_titre" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:spinnerMode="dialog"/>
 
     <ExpandableListView
+        android:id="@+id/filter_dialog_typology_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/filter_dialog_typology_list"
-        android:layout_below="@+id/filter_dialog_etat_spinner"
         android:choiceMode="multipleChoice"
-        android:layout_alignLeft="@+id/filter_dialog_etat_spinner"
-        android:layout_alignStart="@+id/filter_dialog_etat_spinner"
-        android:layout_alignRight="@+id/filter_dialog_etat_spinner"
-        android:layout_alignEnd="@+id/filter_dialog_etat_spinner"
-        android:layout_marginTop="16dp" />
-</RelativeLayout>
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>
