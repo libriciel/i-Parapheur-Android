@@ -3,6 +3,7 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +16,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class Filter implements Parcelable {
+
+	public static final String REQUEST_JSON_FILTER_TYPE_METIER = "ph:typeMetier";
+	public static final String REQUEST_JSON_FILTER_SOUS_TYPE_METIER = "ph:soustypeMetier";
+	public static final String REQUEST_JSON_FILTER_TITLE = "cm:title";
+	public static final String REQUEST_JSON_FILTER_AND = "and";
+	public static final String REQUEST_JSON_FILTER_OR = "or";
 
 	public static final String DEFAULT_ID = "default-filter";
 	public static final String EDIT_FILTER_ID = "edit-filter";
@@ -141,31 +148,37 @@ public class Filter implements Parcelable {
 	}
 
 	public String getJSONFilter() {
+
 		JSONObject jsonFilter = new JSONObject();
 		try {
+
 			// TYPES
 			JSONArray jsonTypes = new JSONArray();
 			if (types != null) {
 				for (String type : types) {
-					jsonTypes.put(new JSONObject().put("ph:typeMetier", type));
+					jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringUtils.urlEncode(type)));
 				}
 			}
 			// SOUSTYPES
 			JSONArray jsonSousTypes = new JSONArray();
 			if (sousTypes != null) {
 				for (String sousType : sousTypes) {
-					jsonSousTypes.put(new JSONObject().put("ph:soustypeMetier", sousType));
+					jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringUtils.urlEncode(sousType)));
 				}
 			}
 			//TITRE
 
 			JSONArray jsonTitre = new JSONArray();
 			if ((titre != null) && (!titre.trim().isEmpty())) {
-				jsonTitre.put(new JSONObject().put("cm:title", "*" + titre.trim() + "*"));
+				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + titre.trim() + "*"));
 			}
 
 			// FILTRE FINAL
-			jsonFilter.put("and", new JSONArray().put(new JSONObject().put("or", jsonTypes)).put(new JSONObject().put("or", jsonSousTypes)).put(new JSONObject().put("or", jsonTitre))).toString();
+			jsonFilter.put(REQUEST_JSON_FILTER_AND, new JSONArray().
+					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTypes)).
+					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonSousTypes)).
+					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTitre)));
+
 		}
 		catch (JSONException e) {
 			//Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);

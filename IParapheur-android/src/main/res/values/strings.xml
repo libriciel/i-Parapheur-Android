@@ -89,6 +89,7 @@
     <string name="http_error_503">Le service est actuellement indisponible</string>
 
     <string name="error_mismatch_versions">Le i-Parapheur associé au compte %s est incompatible avec cette application</string>
+    <string name="error_send_request">Erreur à l\'envoi de la requête</string>
     <string name="error_parse">Erreur lors du traitement de la réponse</string>
     <string name="error_no_ticket">Impossible de se connecter, veuillez vérifier vos comptes</string>
     <string name="error_no_storage">Stockage inaccessible</string>

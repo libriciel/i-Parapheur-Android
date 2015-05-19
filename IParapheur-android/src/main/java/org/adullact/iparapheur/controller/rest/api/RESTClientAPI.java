@@ -1,13 +1,15 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Environment;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
-import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +19,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 
 public abstract class RESTClientAPI implements IParapheurAPI {
@@ -94,12 +98,15 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			throw new IParapheurException(R.string.error_no_ticket, null);
 		}
 		account.setLastRequest(new Date().getTime());
-		return BASE_PATH +
-				((tenant != null) ? tenant + "." : "") +
-				MyAccounts.INSTANCE.getSelectedAccount().getUrl() +
-				action +
-				"?alf_ticket=" + ticket +
-				((params != null) ? "&" + params : "");
+
+		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
+		stringBuilder.append((tenant != null) ? tenant + "." : "");
+		stringBuilder.append(MyAccounts.INSTANCE.getSelectedAccount().getUrl());
+		stringBuilder.append(action);
+		stringBuilder.append("?alf_ticket=").append(ticket);
+		stringBuilder.append(((params != null) ? "&" + params : ""));
+
+		return stringBuilder.toString();
 	}
 
 	@Override
@@ -107,7 +114,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		String state = Environment.getExternalStorageState();
 
-		if (!Environment.MEDIA_MOUNTED.equals(state)) throw new IParapheurException(R.string.error_no_storage, null);
+		if (!Environment.MEDIA_MOUNTED.equals(state))
+			throw new IParapheurException(R.string.error_no_storage, null);
 
 		File file = new File(path);
 		String fullUrl = buildUrl(url);

@@ -65,13 +65,13 @@ import java.util.HashSet;
  * is a {@link DossierDetailFragment}.
  * <p/>
  * This activity also implements the required
- * {@link org.adullact.iparapheur.controller.dossier.DossierListFragment.DossierListFragmentListener} interface
+ * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
 public class MainActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
 	private static final String SHARED_PREFERENCES = ":iparapheur:shared_preferences_main";
-	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = ":iparapheur:is_drawer_known";
+	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
 	private static final int EDIT_PREFERENCE_REQUEST = 50;
 
 	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
@@ -102,7 +102,9 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		setSupportActionBar(toolbar);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		if (getSupportActionBar() != null)
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Used to listen open and close events on the Drawer Layout
 		mDrawerToggle = new DossiersActionBarDrawerToggle(this, mDrawerLayout);
