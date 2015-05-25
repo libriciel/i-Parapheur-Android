@@ -586,8 +586,10 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 				mDrawerLayout.closeDrawer(mDrawerMenu);
 
 		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
-		if ((fragment != null) && (dossier != null) && (bureauId != null))
+		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
+			((DossierDetailFragment) fragment).showSpinner();
 			((DossierDetailFragment) fragment).update(dossier, bureauId);
+		}
 	}
 
 	@Override

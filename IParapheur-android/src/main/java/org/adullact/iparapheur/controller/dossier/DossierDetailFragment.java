@@ -28,6 +28,7 @@ import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
+import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
 import java.util.UUID;
@@ -45,9 +46,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
 	private boolean isReaderEnabled;
-	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
+
+	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
+	private View mLoadingSpinner;
 
 	public DossierDetailFragment() { }
 
@@ -79,6 +82,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		seekBar.setVisibility(View.INVISIBLE);
         seekBar.setOnSeekBarChangeListener(this);*/
 		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
+		mLoadingSpinner = view.findViewById(android.R.id.progress);
 
 		// Reload data after rotation
 
@@ -131,11 +135,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		MenuItem item = menu.findItem(R.id.action_details);
 		item.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
 		super.onPrepareOptionsMenu(menu);
-
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 			case R.id.action_details:
@@ -184,6 +188,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// TODO : aucun apercu disponible
 	private void updateReader() {
+
 		if (mDossier != null && !mDossier.getMainDocuments().isEmpty()) {
 			final Document document = mDossier.getMainDocuments().get(0);
 			if (isReaderEnabled && (document.getPath() != null)) {
@@ -193,6 +198,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 						try {
 							((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
 							mViewPager.setCurrentItem(0, false);
+							ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
 						}
 						catch (Exception e) {
 							e.printStackTrace();
@@ -252,6 +258,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		if ((details != null) && (details.getVisibility() == View.VISIBLE)) {
 			details.setVisibility(View.INVISIBLE);
 		}
+	}
+
+	public void showSpinner() {
+		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
 	}
 
 	@Override

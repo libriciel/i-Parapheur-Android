@@ -22,6 +22,11 @@ public class ViewUtils {
 	 * @param spinnerView will be set to Visibility.GONE at the end
 	 */
 	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
+
+		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+		contentView.animate().cancel();
+		spinnerView.animate().cancel();
+
 		// System default length
 		int mShortAnimationDuration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
 
