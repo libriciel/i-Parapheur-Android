@@ -19,10 +19,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SwipeRefreshListFragment;
@@ -463,8 +463,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	private class DossiersLoadingTask extends LoadingTask {
 
-		public DossiersLoadingTask(Activity context, DataChangeListener listener) {
-			super(context, listener);
+		public DossiersLoadingTask(Activity activity, DataChangeListener listener) {
+			super(activity, listener);
 		}
 
 		@Override
@@ -473,7 +473,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (isCancelled()) {
 				return;
 			}
-			if (!IParapheurApplication.OFFLINE) {
+			if (!DeviceUtils.isDebugOffline(activity)) {
 				mDossiersList = RESTClient.INSTANCE.getDossiers(params[0]);
 			}
 			else {

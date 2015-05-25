@@ -16,10 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.ViewUtils;
@@ -156,7 +156,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			if (isCancelled())
 				return;
 
-			if (!IParapheurApplication.OFFLINE) {
+			if (!DeviceUtils.isDebugOffline(activity)) {
 				try {
 					mBureaux = RESTClient.INSTANCE.getBureaux();
 				}

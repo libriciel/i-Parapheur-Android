@@ -9,29 +9,27 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 
 public class IParapheurApplication extends Application {
 
-    private static Context context;
-    public static final boolean OFFLINE = false;
+	private static Context context;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        context = this;
+	public static Context getContext() {
+		return context;
+	}
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!sharedPreferences.contains(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX))
-        {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		context = this;
 
-            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX, "iParapheur demo" );
-            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, "parapheur.demonstrations.adullact.org" );
-            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_LOGIN_SUFFIX, "bma" );
-            editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, "secret" );
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		if (!sharedPreferences.contains(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX)) {
+			SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.apply();
-        }
-    }
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX, "iParapheur demo");
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, "parapheur.demonstrations.adullact.org");
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_LOGIN_SUFFIX, "bma");
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, "secret");
 
-    public static Context getContext(){
-        return context;
-    }
+			editor.apply();
+		}
+	}
 }
