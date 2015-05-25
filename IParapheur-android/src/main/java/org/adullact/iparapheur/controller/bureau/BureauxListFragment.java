@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheurApplication;
@@ -145,8 +146,8 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 	private class BureauxLoadingTask extends LoadingTask {
 
-		public BureauxLoadingTask(Activity context, DataChangeListener listener) {
-			super(context, listener);
+		public BureauxLoadingTask(Activity activity, DataChangeListener listener) {
+			super(activity, listener);
 		}
 
 		@Override
@@ -156,7 +157,17 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 				return;
 
 			if (!IParapheurApplication.OFFLINE) {
-				mBureaux = RESTClient.INSTANCE.getBureaux();
+				try {
+					mBureaux = RESTClient.INSTANCE.getBureaux();
+				}
+				catch (final IParapheurException exception) {
+					activity.runOnUiThread(new Runnable() {
+						public void run() {
+							String message = activity.getString(exception.getResId());
+							Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+						}
+					});
+				}
 			}
 			else {
 				mBureaux = new ArrayList<>();

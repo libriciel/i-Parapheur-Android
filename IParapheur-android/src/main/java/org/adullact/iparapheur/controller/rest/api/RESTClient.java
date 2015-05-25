@@ -111,12 +111,8 @@ public enum RESTClient implements IParapheurAPI {
 		Integer apiVersion = getAPIVersion(account);
 		IParapheurAPI apiClient;
 
-		if (apiVersion > API_VERSION_MAX) {
-			throw new RuntimeException("La version du i-Parapheur associé au compte " +
-											   MyAccounts.INSTANCE.getSelectedAccount().getTitle() +
-											   " est trop récente pour cette application. " +
-											   "Veuillez mettre à jour votre application.");
-		}
+		if (apiVersion > API_VERSION_MAX)
+			throw new IParapheurException(R.string.error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
 
 		switch (apiVersion) {
 			case 1:

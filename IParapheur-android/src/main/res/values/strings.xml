@@ -103,5 +103,6 @@
     <string name="action_mode_nb_dossiers">%d dossier(s)</string>
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
+    <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
 
 </resources>

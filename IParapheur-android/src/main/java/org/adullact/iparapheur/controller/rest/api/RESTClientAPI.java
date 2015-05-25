@@ -1,7 +1,5 @@
 package org.adullact.iparapheur.controller.rest.api;
 
-import android.annotation.SuppressLint;
-import android.os.Build;
 import android.os.Environment;
 
 import org.adullact.iparapheur.R;
@@ -10,7 +8,6 @@ import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,8 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.HttpURLConnection;
 import java.util.Date;
 
 public abstract class RESTClientAPI implements IParapheurAPI {
@@ -34,18 +30,18 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
 		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
 		if (response != null) {
-			if (response.getCode() == HttpStatus.SC_OK) {
+			if (response.getCode() == HttpURLConnection.HTTP_OK) {
 				messageRes = R.string.test_ok;
 			}
 			else {
 				switch (response.getCode()) {
-					case HttpStatus.SC_FORBIDDEN:
+					case HttpURLConnection.HTTP_FORBIDDEN:
 						messageRes = R.string.test_forbidden;
 						break;
-					case HttpStatus.SC_NOT_FOUND:
+					case HttpURLConnection.HTTP_NOT_FOUND:
 						messageRes = R.string.test_not_found;
 						break;
-					case HttpStatus.SC_INTERNAL_SERVER_ERROR:
+					case HttpURLConnection.HTTP_INTERNAL_ERROR:
 						if (response.getError().contains("Tenant does not exist")) {
 							messageRes = R.string.test_tenant_not_exist;
 						}
