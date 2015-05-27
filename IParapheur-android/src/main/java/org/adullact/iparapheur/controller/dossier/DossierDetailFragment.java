@@ -180,7 +180,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	@Override
 	public void onDataChanged() {
 
-		if (!DeviceUtils.isDebugOffline(getActivity()))
+		if (!DeviceUtils.isDebugOffline())
 			updateDetails();
 
 		updateReader();
@@ -295,7 +295,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				return;
 
 			//Log.d("debug", "getting dossier details");
-			if (!DeviceUtils.isDebugOffline(getActivity())) {
+			if (!DeviceUtils.isDebugOffline()) {
 				if (mDossier != null) {
 					Dossier d = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
 					mDossier.saveDetails(d);
@@ -307,24 +307,28 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			if (isCancelled()) {
 				return;
 			}
-			if (!DeviceUtils.isDebugOffline(getActivity()) && (mDossier != null)) {
+			if (!DeviceUtils.isDebugOffline() && (mDossier != null)) {
 				mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
 			}
 			if (isCancelled()) {
 				return;
 			}
 
-			if (isReaderEnabled && (mDossier != null) && (mDossier.getMainDocuments() != null) && (mDossier.getMainDocuments().size() > 0)) {
+			if (isReaderEnabled && (mDossier != null) && (mDossier.getMainDocuments() != null) && (mDossier.getMainDocuments().size() > 0) && (mDossier.getMainDocuments().get(0) != null)) {
 				Document document = mDossier.getMainDocuments().get(0);
 
 				if ((document.getPath() == null) || !(new File(document.getPath()).exists())) {
 					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
 					String path = file.getAbsolutePath();
+
 					//Log.d("debug", "saving document on disk");
-					if (!DeviceUtils.isDebugOffline(getActivity())) {
+					if (!DeviceUtils.isDebugOffline()) {
 						if (RESTClient.INSTANCE.downloadFile(mDossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);
-							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(mDossier != null ? mDossier.getId() : null));
+
+							String documentId = mDossier.getMainDocuments().get(0).getId();
+							String dossierId = mDossier.getId();
+							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, documentId));
 						}
 					}
 					else {
@@ -338,6 +342,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					}
 				}
 			}
+
 		}
 	}
 

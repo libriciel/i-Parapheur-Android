@@ -4,15 +4,20 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
-import org.adullact.iparapheur.R;
-
 public class DeviceUtils {
+
+	private static boolean DEBUG_FORCE_OFFLINE = false;
+	private static boolean DEBUG_FORCE_SSL = true;
 
 	public static float dipsToPixels(@NonNull Context context, int dips) {
 		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dips, context.getResources().getDisplayMetrics());
 	}
 
-	public static boolean isDebugOffline(@NonNull Context context) {
-		return context.getResources().getBoolean(R.bool.debug_force_offline);
+	public static boolean isDebugOffline() {
+		return DEBUG_FORCE_OFFLINE;
+	}
+
+	public static boolean isDebugSslForced() {
+		return DEBUG_FORCE_SSL;
 	}
 }

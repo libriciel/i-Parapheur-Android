@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
@@ -127,13 +128,14 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	}
 
 	@Override
-	public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
+	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+		Log.e("Adrien", "==> " + documentId);
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
 	@Override
-	public String createAnnotation(@NonNull String dossierId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build json object
 
@@ -184,7 +186,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	}
 
 	@Override
-	public void updateAnnotation(@NonNull String dossierId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build Json object
 
@@ -232,7 +234,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	}
 
 	@Override
-	public void deleteAnnotation(@NonNull String dossierId, @NonNull String annotationId, int page) throws IParapheurException {
+	public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
 		RESTUtils.delete(url, true);
 	}

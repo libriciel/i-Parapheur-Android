@@ -78,7 +78,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			if (pageSizes.get(position) != null)
 				pdfSize = new Point(Math.round(pageSizes.get(position).x), Math.round(pageSizes.get(position).y));
 
-			fragment.updatePage(document.getDossierId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize, pdfSize);
+			fragment.updatePage(document.getDossierId(), document.getId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize, pdfSize);
 		}
 	}
 

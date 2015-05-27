@@ -156,7 +156,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			if (isCancelled())
 				return;
 
-			if (!DeviceUtils.isDebugOffline(activity)) {
+			if (!DeviceUtils.isDebugOffline()) {
 				try {
 					mBureaux = RESTClient.INSTANCE.getBureaux();
 				}

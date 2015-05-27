@@ -31,7 +31,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
 	@Override
 	protected void onPreExecute() {
-		if (DeviceUtils.isDebugOffline(activity)) {
+		if (DeviceUtils.isDebugOffline()) {
 			Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
 			showProgress();
 		}

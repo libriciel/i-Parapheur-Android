@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
@@ -23,11 +24,12 @@ public enum RESTClient implements IParapheurAPI {
 
 	INSTANCE;
 	private static final String RESOURCE_API_VERSION = "/parapheur/api/getApiLevel";
-	private static final int API_VERSION_MAX = 3;
+	private static final int API_VERSION_MAX = 4;
 
 	private final RESTClientAPI1 restClientAPI1 = new RESTClientAPI1();
 	private final RESTClientAPI2 restClientAPI2 = new RESTClientAPI2();
 	private final RESTClientAPI3 restClientAPI3 = new RESTClientAPI3();
+	private final RESTClientAPI3 restClientAPI4 = new RESTClientAPI4();
 
 	/**
 	 * Renvoie la version d'API du serveur i-Parapheur associé à ce compte.
@@ -124,6 +126,9 @@ public enum RESTClient implements IParapheurAPI {
 			case 3:
 				apiClient = restClientAPI3;
 				break;
+			case 4:
+				apiClient = restClientAPI4;
+				break;
 			default:
 				apiClient = restClientAPI2;
 				break;
@@ -153,23 +158,24 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	@Override
-	public SparseArray<PageAnnotations> getAnnotations(String dossierId) throws IParapheurException {
-		return getRESTClient().getAnnotations(dossierId);
+
+	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 
 	@Override
-	public String createAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-		return getRESTClient().createAnnotation(dossierId, annotation, page);
+	public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
 	}
 
 	@Override
-	public void updateAnnotation(String dossierId, Annotation annotation, int page) throws IParapheurException {
-		getRESTClient().updateAnnotation(dossierId, annotation, page);
+	public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+		getRESTClient().updateAnnotation(dossierId, documentId, annotation, page);
 	}
 
 	@Override
-	public void deleteAnnotation(String dossierId, String annotationId, int page) throws IParapheurException {
-		getRESTClient().deleteAnnotation(dossierId, annotationId, page);
+	public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
 	}
 
 	@Override

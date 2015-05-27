@@ -22,7 +22,7 @@ public class FileUtils {
 	}
 
 	public static File getFileForDocument(Context context, String dossierId, String documentId) {
-		if (!DeviceUtils.isDebugOffline(context)) {
+		if (!DeviceUtils.isDebugOffline()) {
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
 		}
 		else {

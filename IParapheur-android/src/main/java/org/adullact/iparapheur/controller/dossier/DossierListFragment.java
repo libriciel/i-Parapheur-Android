@@ -473,7 +473,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (isCancelled()) {
 				return;
 			}
-			if (!DeviceUtils.isDebugOffline(activity)) {
+			if (!DeviceUtils.isDebugOffline()) {
 				mDossiersList = RESTClient.INSTANCE.getDossiers(params[0]);
 			}
 			else {

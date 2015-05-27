@@ -26,6 +26,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	private PageLayout mPageLayout;
 	private ScaleType mCurrentScaleType = ScaleType.fitHeight;
 	private String mCurrentDossierId;
+	private String mCurrentDocumentId;
 
 	public DocumentPageFragment() {}
 
@@ -69,8 +70,9 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	//</editor-fold desc="LifeCycle">
 
-	public void updatePage(@NonNull String dossierId, @NonNull Bitmap pageImage, @NonNull PageAnnotations annotations, @NonNull Point initSize, @NonNull Point pdfSize) {
+	public void updatePage(@NonNull String dossierId, @NonNull String documentId, @NonNull Bitmap pageImage, @NonNull PageAnnotations annotations, @NonNull Point initSize, @NonNull Point pdfSize) {
 		mCurrentDossierId = dossierId;
+		mCurrentDocumentId = documentId;
 		mPageLayout.update(pageImage, annotations, initSize, pdfSize);
 	}
 
@@ -130,7 +132,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					mUuidResponse = RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, annotation, mNumPage);
+					mUuidResponse = RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation, mNumPage);
 				}
 				catch (IParapheurException e) {
 					mException = e;
@@ -163,7 +165,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					RESTClient.INSTANCE.updateAnnotation(mCurrentDossierId, annotation, mNumPage);
+					RESTClient.INSTANCE.updateAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation, mNumPage);
 				}
 				catch (IParapheurException e) {
 					mException = e;
@@ -194,7 +196,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
-					RESTClient.INSTANCE.deleteAnnotation(mCurrentDossierId, annotation.getUuid(), mNumPage);
+					RESTClient.INSTANCE.deleteAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation.getUuid(), mNumPage);
 				}
 				catch (IParapheurException e) {
 					mException = e;
