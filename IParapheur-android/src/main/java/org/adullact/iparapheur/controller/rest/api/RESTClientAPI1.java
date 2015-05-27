@@ -16,11 +16,11 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +131,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		}
 
 		RequestResponse response = RESTUtils.post(url, annot.toString());
-		if (response != null && response.getCode() == HttpStatus.SC_OK) {
+		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
 			JSONObject idsAnnots = response.getResponse();
 			if (idsAnnots != null) {
 				JSONArray ids = idsAnnots.optJSONArray("uuids");
@@ -162,7 +162,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		}
 
 		RequestResponse response = RESTUtils.post(url, annot.toString());
-		if (response == null || response.getCode() != HttpStatus.SC_OK) {
+		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
 			throw new IParapheurException(R.string.error_annotation_update, "");
 		}
 	}
@@ -174,7 +174,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 				"\"page\": " + page + "," +
 				"\"uuid\": \"" + annotationId + "\"}";
 		RequestResponse response = RESTUtils.post(url, body);
-		if (response == null || response.getCode() != HttpStatus.SC_OK) {
+		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
 			throw new IParapheurException(R.string.error_annotation_delete, "");
 		}
 	}

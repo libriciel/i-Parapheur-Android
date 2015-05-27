@@ -14,4 +14,12 @@
         android:propertyName="alpha"
         android:startOffset="@integer/card_flip_time_half"
         android:duration="1"/>
+
+    <!-- Then, reset the orientation. -->
+    <objectAnimator
+        android:valueFrom="180"
+        android:valueTo="0"
+        android:propertyName="rotationY"
+        android:startOffset="@integer/card_flip_time_full"
+        android:duration="0"/>
 </set>

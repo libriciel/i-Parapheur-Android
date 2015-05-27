@@ -30,8 +30,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_assignment_turned_in_grey600_24dp"
-            android:visibility="gone"/>
+            android:src="@drawable/ic_assignment_turned_in_grey600_24dp"/>
     </FrameLayout>
 
     <LinearLayout

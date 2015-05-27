@@ -9,11 +9,11 @@ import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.net.HttpURLConnection;
 import java.util.Locale;
 
 public class RESTClientAPI4 extends RESTClientAPI3 {
@@ -36,27 +36,30 @@ public class RESTClientAPI4 extends RESTClientAPI3 {
 
 		try {
 			annotJson.object();
-			annotJson.key("rect").object();
 			{
-				annotJson.key("topLeft");
+				annotJson.key("rect");
 				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().left);
-				annotJson.key("y").value(annotation.getRect().top);
+				{
+					annotJson.key("topLeft");
+					annotJson.object();
+					annotJson.key("x").value(annotation.getRect().left);
+					annotJson.key("y").value(annotation.getRect().top);
+					annotJson.endObject();
+
+					annotJson.key("bottomRight");
+					annotJson.object();
+					annotJson.key("x").value(annotation.getRect().right);
+					annotJson.key("y").value(annotation.getRect().bottom);
+					annotJson.endObject();
+				}
 				annotJson.endObject();
 
-				annotJson.key("bottomRight");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().right);
-				annotJson.key("y").value(annotation.getRect().bottom);
-				annotJson.endObject();
+				annotJson.key("author").value(annotation.getAuthor());
+				annotJson.key("date").value(annotation.getDate());
+				annotJson.key("page").value(page);
+				annotJson.key("text").value(annotation.getText());
+				annotJson.key("type").value("rect");
 			}
-			annotJson.endObject();
-
-			annotJson.key("author").value(annotation.getAuthor());
-			annotJson.key("date").value(annotation.getDate());
-			annotJson.key("page").value(page);
-			annotJson.key("text").value(annotation.getText());
-			annotJson.key("type").value("rect");
 			annotJson.endObject();
 		}
 		catch (JSONException e) {
@@ -68,7 +71,7 @@ public class RESTClientAPI4 extends RESTClientAPI3 {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId, documentId));
 		RequestResponse response = RESTUtils.post(url, annotJson.toString());
 
-		if (response != null && response.getCode() == HttpStatus.SC_OK) {
+		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
 			JSONObject idObj = response.getResponse();
 
 			if (idObj != null)
@@ -83,34 +86,37 @@ public class RESTClientAPI4 extends RESTClientAPI3 {
 
 		// Build Json object
 
-		JSONStringer annotJson = new JSONStringer();
+		JSONStringer annotationJson = new JSONStringer();
 
 		try {
-			annotJson.object();
-			annotJson.key("rect").object();
+			annotationJson.object();
 			{
-				annotJson.key("topLeft");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().left);
-				annotJson.key("y").value(annotation.getRect().top);
-				annotJson.endObject();
+				annotationJson.key("rect");
+				annotationJson.object();
+				{
+					annotationJson.key("topLeft");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().left);
+					annotationJson.key("y").value(annotation.getRect().top);
+					annotationJson.endObject();
 
-				annotJson.key("bottomRight");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().right);
-				annotJson.key("y").value(annotation.getRect().bottom);
-				annotJson.endObject();
+					annotationJson.key("bottomRight");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().right);
+					annotationJson.key("y").value(annotation.getRect().bottom);
+					annotationJson.endObject();
+				}
+				annotationJson.endObject();
+
+				annotationJson.key("author").value(annotation.getAuthor());
+				annotationJson.key("date").value(annotation.getDate());
+				annotationJson.key("page").value(page);
+				annotationJson.key("text").value(annotation.getText());
+				annotationJson.key("type").value("rect");
+				annotationJson.key("id").value(annotation.getUuid());
+				annotationJson.key("uuid").value(annotation.getUuid());
 			}
-			annotJson.endObject();
-
-			annotJson.key("author").value(annotation.getAuthor());
-			annotJson.key("date").value(annotation.getDate());
-			annotJson.key("page").value(page);
-			annotJson.key("text").value(annotation.getText());
-			annotJson.key("type").value("rect");
-			annotJson.key("id").value(annotation.getUuid());
-			annotJson.key("uuid").value(annotation.getUuid());
-			annotJson.endObject();
+			annotationJson.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
@@ -120,9 +126,9 @@ public class RESTClientAPI4 extends RESTClientAPI3 {
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, documentId, annotation.getUuid()));
 
-		RequestResponse response = RESTUtils.put(url, annotJson.toString(), true);
+		RequestResponse response = RESTUtils.put(url, annotationJson.toString(), true);
 
-		if (response == null || response.getCode() != HttpStatus.SC_OK)
+		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
 	}
 

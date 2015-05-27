@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import org.adullact.iparapheur.R;
@@ -57,22 +58,24 @@ public class ViewUtils {
 	 * Animators source : http://developer.android.com/training/animation/cardflip.html
 	 * Animation code source : http://developer.android.com/guide/topics/graphics/prop-animation.html
 	 *
-	 * @param context       needed to load some resources
-	 * @param mainView      the card-front view
-	 * @param secondaryView the card-back view
+	 * @param context           needed to load some resources
+	 * @param outView           the card-front view
+	 * @param inView            the card-back view
+	 * @param animationListener set on the inView animation
 	 */
-	public static void flip(@NonNull Context context, @NonNull View mainView, @NonNull View secondaryView) {
+	public static void flip(@NonNull Context context, @NonNull View outView, @NonNull View inView, @Nullable Animator.AnimatorListener animationListener) {
 
-		secondaryView.setAlpha(1f);
-		secondaryView.setVisibility(View.VISIBLE);
+		outView.setAlpha(1f);
 		AnimatorSet outAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_left_out);
-		outAnim.setTarget(mainView);
+		outAnim.setTarget(outView);
 		outAnim.start();
 
-		secondaryView.setAlpha(0f);
-		secondaryView.setVisibility(View.VISIBLE);
+		inView.setAlpha(0f);
 		AnimatorSet inAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_right_in);
-		inAnim.setTarget(secondaryView);
+		inAnim.setTarget(inView);
 		inAnim.start();
+
+		if (animationListener != null)
+			inAnim.addListener(animationListener);
 	}
 }

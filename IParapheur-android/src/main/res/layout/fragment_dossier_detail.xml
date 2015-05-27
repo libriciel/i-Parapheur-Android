@@ -12,7 +12,7 @@
         android:background="@color/canvas"/>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="400dp"
         android:layout_height="match_parent"
         android:layout_gravity="right"
@@ -21,51 +21,61 @@
         android:visibility="invisible"
         android:background="@android:color/background_light">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/fragment_dossier_detail_title"
-            android:layout_margin="10dp"/>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/text_black_divider"/>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/fragment_dossier_detail_typologie"
-                android:textStyle="bold"/>
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/fragment_dossier_detail_title"
+                android:layout_margin="10dp"/>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragment_dossier_detail_typologie"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/circuit"
+                android:textStyle="bold"
+                android:id="@+id/fragment_dossier_detail_circuit_label"
+                android:gravity="center"
+                android:layout_marginTop="25dp"/>
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/fragment_dossier_detail_circuit"
+                android:layout_weight="1"
+                android:choiceMode="none"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/fragment_dossier_detail_actions_container">
+
+            </LinearLayout>
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/circuit"
-            android:textStyle="bold"
-            android:id="@+id/fragment_dossier_detail_circuit_label"
-            android:gravity="center"
-            android:layout_marginTop="25dp"/>
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:id="@+id/fragment_dossier_detail_circuit"
-            android:layout_weight="1"
-            android:choiceMode="none"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/fragment_dossier_detail_actions_container">
-
-        </LinearLayout>
-
     </LinearLayout>
 
     <FrameLayout

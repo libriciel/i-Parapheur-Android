@@ -17,11 +17,11 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -139,32 +139,32 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		// Build json object
 
-		JSONStringer annotJson = new JSONStringer();
+		JSONStringer annotationJson = new JSONStringer();
 
 		try {
-			annotJson.object();
-			annotJson.key("rect").object();
+			annotationJson.object();
+			annotationJson.key("rect").object();
 			{
-				annotJson.key("topLeft");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().left);
-				annotJson.key("y").value(annotation.getRect().top);
-				annotJson.endObject();
+				annotationJson.key("topLeft");
+				annotationJson.object();
+				annotationJson.key("x").value(annotation.getRect().left);
+				annotationJson.key("y").value(annotation.getRect().top);
+				annotationJson.endObject();
 
-				annotJson.key("bottomRight");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().right);
-				annotJson.key("y").value(annotation.getRect().bottom);
-				annotJson.endObject();
+				annotationJson.key("bottomRight");
+				annotationJson.object();
+				annotationJson.key("x").value(annotation.getRect().right);
+				annotationJson.key("y").value(annotation.getRect().bottom);
+				annotationJson.endObject();
 			}
-			annotJson.endObject();
+			annotationJson.endObject();
 
-			annotJson.key("author").value(annotation.getAuthor());
-			annotJson.key("date").value(annotation.getDate());
-			annotJson.key("page").value(page);
-			annotJson.key("text").value(annotation.getText());
-			annotJson.key("type").value("rect");
-			annotJson.endObject();
+			annotationJson.key("author").value(annotation.getAuthor());
+			annotationJson.key("date").value(annotation.getDate());
+			annotationJson.key("page").value(page);
+			annotationJson.key("text").value(annotation.getText());
+			annotationJson.key("type").value("rect");
+			annotationJson.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
@@ -173,9 +173,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		// Send request
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
-		RequestResponse response = RESTUtils.post(url, annotJson.toString());
+		RequestResponse response = RESTUtils.post(url, annotationJson.toString());
 
-		if (response != null && response.getCode() == HttpStatus.SC_OK) {
+		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
 			JSONObject idObj = response.getResponse();
 
 			if (idObj != null)
@@ -229,7 +229,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		RequestResponse response = RESTUtils.put(url, annotJson.toString(), true);
 
-		if (response == null || response.getCode() != HttpStatus.SC_OK)
+		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
 	}
 
@@ -248,7 +248,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("annotPub", annotPub);
 			json.put("annotPriv", annotPriv);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors du visa", e);
@@ -265,7 +265,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("annotPriv", annotPriv);
 			json.put("signature", signValue);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
@@ -282,7 +282,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		 json.put("name", archiveTitle);
 		 json.put("annexesInclude", withAnnexes);
 		 RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-		 return (response != null && response.getCode() == HttpStatus.SC_OK);
+		 return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 
 		 } catch (JSONException e) {
 		 throw new RuntimeException("Une erreur est survenue lors de l'archivage", e);
@@ -299,7 +299,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("annotPub", annotPub);
 			json.put("annotPriv", annotPriv);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 
 		}
 		catch (JSONException e) {
@@ -321,7 +321,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("numero", numero);
 			json.put("dateActes", dateActes);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 
 		}
 		catch (JSONException e) {
@@ -345,7 +345,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("showpass", showPassword);
 			json.put("annexesIncluded", annexesIncluded);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 
 		}
 		catch (JSONException e) {
@@ -362,7 +362,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			json.put("annotPub", annotPub);
 			json.put("annotPriv", annotPriv);
 			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpStatus.SC_OK);
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 
 		}
 		catch (JSONException e) {

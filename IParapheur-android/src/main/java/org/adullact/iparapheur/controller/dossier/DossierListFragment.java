@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.dossier;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -51,7 +52,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public static String TAG = "dossiers_list_fragment";
 	public static String ARG_BUREAU_ID = "bureau_id";
 
-	private DossierListFragmentListener listener;
+	private DossierListFragmentListener mListener;
 	private String mBureauId;                                   // Bureau id where the dossiers belongs
 	private List<Dossier> mDossiersList;                        // List of dossiers displayed in this fragment
 	private int selectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
@@ -87,7 +88,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		if (!(activity instanceof DossierListFragmentListener))
 			throw new IllegalStateException("Activity must implement DossierListFragmentListener.");
 
-		listener = (DossierListFragmentListener) activity;
+		mListener = (DossierListFragmentListener) activity;
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		getListView().setDivider(new ColorDrawable(android.R.color.holo_blue_light));
 		getListView().setDividerHeight(1);
 		getListView().setBackgroundColor(getResources().getColor(android.R.color.background_light));
-		setListAdapter(new DossierListAdapter(getActivity(), listener));
+		setListAdapter(new DossierListAdapter(getActivity(), mListener));
 		setOnRefreshListener(this);
 		setHasOptionsMenu(false);
 	}
@@ -127,7 +128,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	public void onDetach() {
 		super.onDetach();
 		// Reset the active callbacks interface .
-		listener = null;
+		mListener = null;
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -176,18 +177,18 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		((DossierListAdapter) getListAdapter()).clearSelection();
 	}
 
-	/**
-	 * Used by the containing activity to pass a dossier to the detail fragment.
-	 * We get the dossier from here because this fragment has its instance state retained
-	 * (the fragment isn't destroyed, so all the dossiers information are kept in memory).
-	 *
-	 * @param id the id of the dossier.
-	 * @return the dossier with the id equal to the id passed in parameter.
-	 */
-	public Dossier getDossier(String id) {
-		int position = mDossiersList.indexOf(new Dossier(id));
-		return mDossiersList.get(position);
-	}
+//	/**
+//	 * Used by the containing activity to pass a dossier to the detail fragment.
+//	 * We get the dossier from here because this fragment has its instance state retained
+//	 * (the fragment isn't destroyed, so all the dossiers information are kept in memory).
+//	 *
+//	 * @param id the id of the dossier.
+//	 * @return the dossier with the id equal to the id passed in parameter.
+//	 */
+//	public Dossier getDossier(String id) {
+//		int position = mDossiersList.indexOf(new Dossier(id));
+//		return mDossiersList.get(position);
+//	}
 
 	/**
 	 * called by the parent Activity to reload the list
@@ -214,9 +215,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			((DossierListAdapter) getListView().getAdapter()).clearSelection();
 
 			if (mBureauId != null)
-				listener.onDossiersLoaded(this.mDossiersList.size());
+				mListener.onDossiersLoaded(this.mDossiersList.size());
 			else
-				listener.onDossiersNotLoaded();
+				mListener.onDossiersNotLoaded();
 
 			if (selectedDossier != ListView.INVALID_POSITION) {
 				selectedDossier = ListView.INVALID_POSITION;
@@ -225,7 +226,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				 * activity that the data has changed, so the activity remove the previously selected
 				 * dossier details
 				 */
-				listener.onDossierSelected(null, null);
+				mListener.onDossierSelected(null, null);
 			}
 		}
 	}
@@ -376,16 +377,25 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 				if (checkedDossiers.contains(dossier)) {
 					checkedDossiers.remove(dossier);
-					ViewUtils.flip(getActivity(), selectorView, mainView);
+
+					// We call the checkedListener with a delay,
+					// because the ActionMode cancelling calls an invalidate that breaks the animations
+					ViewUtils.flip(getActivity(), selectorView, mainView, new Animator.AnimatorListener() {
+
+						@Override public void onAnimationStart(Animator animator) { }
+
+						@Override public void onAnimationEnd(Animator animator) { listener.onDossierCheckedChanged(); }
+
+						@Override public void onAnimationCancel(Animator animator) { }
+
+						@Override public void onAnimationRepeat(Animator animator) { }
+					});
 				}
 				else {
 					checkedDossiers.add(dossier);
-					ViewUtils.flip(getActivity(), mainView, selectorView);
+					ViewUtils.flip(getActivity(), mainView, selectorView, null);
+					listener.onDossierCheckedChanged();
 				}
-
-				// Will update ActionMode, so the actions will be updated
-
-				listener.onDossierCheckedChanged();
 			}
 		}
 
@@ -437,7 +447,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 			@Override
 			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-				boolean result = false;
+
 				try {
 					float diffY = e2.getY() - e1.getY();
 					float diffX = e2.getX() - e1.getX();
@@ -455,7 +465,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				catch (Exception exception) {
 					//exception.printStackTrace();
 				}
-				return result;
+
+				return false;
 			}
 		}
 
@@ -477,7 +488,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				mDossiersList = RESTClient.INSTANCE.getDossiers(params[0]);
 			}
 			else {
-				mDossiersList = new ArrayList<Dossier>();
+				mDossiersList = new ArrayList<>();
 				Dossier dossier1 = new Dossier(1);
 				Dossier dossier2 = new Dossier(2);
 				mDossiersList.add(dossier1);

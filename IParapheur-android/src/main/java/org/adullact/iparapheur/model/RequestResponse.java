@@ -4,7 +4,6 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.TransformUtils;
-import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +29,7 @@ public class RequestResponse {
 		try {
 			this.code = httpURLConnection.getResponseCode();
 
-			if (this.code < HttpStatus.SC_BAD_REQUEST) { // if code < 400, response is in inputStream
+			if (this.code < HttpURLConnection.HTTP_BAD_REQUEST) { // if code < 400, response is in inputStream
 				if (!ignoreResponseData) {
 					data = TransformUtils.inputStreamToString(httpURLConnection.getInputStream());
 					//Log.d("debug", "data : " + data);
