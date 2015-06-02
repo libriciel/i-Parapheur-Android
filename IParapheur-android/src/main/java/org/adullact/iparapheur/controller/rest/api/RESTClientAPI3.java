@@ -1,7 +1,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
@@ -127,10 +126,19 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getCircuit(RESTUtils.get(url));
 	}
 
+	// <editor-fold desc="Annotations">
+
+	protected @NonNull String getAnnotationsUrlSuffix(@NonNull String dossierId, @NonNull String documentId) {
+		return String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId);
+	}
+
+	protected @NonNull String getAnnotationUrlSuffix(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId) {
+		return String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId);
+	}
+
 	@Override
 	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
-		Log.e("Adrien", "==> " + documentId);
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
@@ -172,7 +180,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		// Send request
 
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATIONS, dossierId));
+		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
 		RequestResponse response = RESTUtils.post(url, annotationJson.toString());
 
 		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
@@ -190,34 +198,34 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		// Build Json object
 
-		JSONStringer annotJson = new JSONStringer();
+		JSONStringer annotationJson = new JSONStringer();
 
 		try {
-			annotJson.object();
-			annotJson.key("rect").object();
+			annotationJson.object();
+			annotationJson.key("rect").object();
 			{
-				annotJson.key("topLeft");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().left);
-				annotJson.key("y").value(annotation.getRect().top);
-				annotJson.endObject();
+				annotationJson.key("topLeft");
+				annotationJson.object();
+				annotationJson.key("x").value(annotation.getRect().left);
+				annotationJson.key("y").value(annotation.getRect().top);
+				annotationJson.endObject();
 
-				annotJson.key("bottomRight");
-				annotJson.object();
-				annotJson.key("x").value(annotation.getRect().right);
-				annotJson.key("y").value(annotation.getRect().bottom);
-				annotJson.endObject();
+				annotationJson.key("bottomRight");
+				annotationJson.object();
+				annotationJson.key("x").value(annotation.getRect().right);
+				annotationJson.key("y").value(annotation.getRect().bottom);
+				annotationJson.endObject();
 			}
-			annotJson.endObject();
+			annotationJson.endObject();
 
-			annotJson.key("author").value(annotation.getAuthor());
-			annotJson.key("date").value(annotation.getDate());
-			annotJson.key("page").value(page);
-			annotJson.key("text").value(annotation.getText());
-			annotJson.key("type").value("rect");
-			annotJson.key("id").value(annotation.getUuid());
-			annotJson.key("uuid").value(annotation.getUuid());
-			annotJson.endObject();
+			annotationJson.key("author").value(annotation.getAuthor());
+			annotationJson.key("date").value(annotation.getDate());
+			annotationJson.key("page").value(page);
+			annotationJson.key("text").value(annotation.getText());
+			annotationJson.key("type").value("rect");
+			annotationJson.key("id").value(annotation.getUuid());
+			annotationJson.key("uuid").value(annotation.getUuid());
+			annotationJson.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);
@@ -225,9 +233,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		// Send request
 
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotation.getUuid()));
-
-		RequestResponse response = RESTUtils.put(url, annotJson.toString(), true);
+		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotation.getUuid()));
+		RequestResponse response = RESTUtils.put(url, annotationJson.toString(), true);
 
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
 			throw new IParapheurException(R.string.error_annotation_update, "");
@@ -235,9 +242,13 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	@Override
 	public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
-		String url = buildUrl(String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId));
+		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
 		RESTUtils.delete(url, true);
 	}
+
+	// </editor-fold desc="Annotations">
+
+	// <editor-fold desc="Actions">
 
 	@Override
 	public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
@@ -369,4 +380,6 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			throw new RuntimeException("Une erreur est survenue lors du rejet", e);
 		}
 	}
+
+	// </editor-fold desc="Actions">
 }

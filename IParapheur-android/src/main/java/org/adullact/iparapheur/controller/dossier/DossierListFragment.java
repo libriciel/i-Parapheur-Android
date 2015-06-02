@@ -313,7 +313,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 			if (actionDemandee != null) {
 				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
-				View selectorImageview = cellView.findViewById(R.id.dossiers_list_item_image_selector);
 
 				// FIXME : Adrien : remove next line when every icon will be generated
 				iconImageView.setImageResource(actionDemandee.getIcon(false));
@@ -332,8 +331,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 					else if (actionName.startsWith(getString(R.string.action_tdt))) // using startsWith, to catch helios and actes
 						iconImageView.setImageResource(R.drawable.ic_tdt_24dp);
 
-					iconImageView.setAlpha(isChecked ? 0f : 1f);
-					selectorImageview.setAlpha(isChecked ? 1f : 0f);
+					View iconImageViewContainer = cellView.findViewById(R.id.dossiers_list_item_image_main_container);
+					View selectorImageviewContainer = cellView.findViewById(R.id.dossiers_list_item_image_selector_container);
+					iconImageViewContainer.setAlpha(isChecked ? 0f : 1f);
+					selectorImageviewContainer.setAlpha(isChecked ? 1f : 0f);
 				}
 			}
 
@@ -372,8 +373,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				// Toggle checked state, and animate
 
 				Dossier dossier = mDossiersList.get((Integer) view.getTag());
-				View mainView = view.findViewById(R.id.dossiers_list_item_image_main);
-				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector);
+				View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
+				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector_container);
 
 				if (checkedDossiers.contains(dossier)) {
 					checkedDossiers.remove(dossier);

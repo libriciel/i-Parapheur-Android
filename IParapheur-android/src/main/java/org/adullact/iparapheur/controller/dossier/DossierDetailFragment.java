@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -326,19 +328,18 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 						if (RESTClient.INSTANCE.downloadFile(mDossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);
 
-							String documentId = mDossier.getMainDocuments().get(0).getId();
+							List<Document> documents = mDossier.getMainDocuments();
+							String documentId = "";
+							if ((documents != null) && (!documents.isEmpty()) && (documents.get(0) != null))
+								documentId = mDossier.getMainDocuments().get(0).getId();
+
 							String dossierId = mDossier.getId();
 							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, documentId));
 						}
 					}
 					else {
 						document.setPath(path);
-						if (file.exists()) {
-							//Log.d("debug", "Document par defaut trouvé");
-						}
-						else {
-							//Log.d("debug", "Document par defaut non trouvé");
-						}
+						Log.d("debug", file.exists() ? "Document par defaut trouvé" : "Document par defaut non trouvé");
 					}
 				}
 			}
