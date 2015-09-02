@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 	public ActionDialogFragment() {}
 
 	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getArguments() != null) {
 			this.dossiers = getArguments().getParcelableArrayList("dossiers");
 			this.bureauId = getArguments().getString("bureauId");

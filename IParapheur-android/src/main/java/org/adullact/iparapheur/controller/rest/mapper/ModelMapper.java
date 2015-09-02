@@ -120,7 +120,7 @@ public class ModelMapper {
 	}
 
 	public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
-		ArrayList<Dossier> dossiers = new ArrayList<Dossier>();
+		ArrayList<Dossier> dossiers = new ArrayList<>();
 		if (requestResponse.getResponse() != null) {
 			JSONArray array = requestResponse.getResponse().optJSONArray("dossiers");
 			if (array != null) {

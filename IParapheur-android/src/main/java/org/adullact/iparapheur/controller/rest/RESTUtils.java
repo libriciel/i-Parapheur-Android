@@ -73,7 +73,7 @@ public class RESTUtils {
 		//Log.d("debug", "POST request on : " + url);
 		//Log.d("debug", "with body : " + body);
 		RequestResponse res;
-		OutputStream output = null;
+		OutputStream output;
 
 		try {
 			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -105,7 +105,7 @@ public class RESTUtils {
 		//Log.d("debug", "POST request on : " + url);
 		//Log.d("debug", "with body : " + body);
 		RequestResponse res;
-		OutputStream output = null;
+		OutputStream output;
 
 		try {
 			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
@@ -121,7 +121,6 @@ public class RESTUtils {
 			output.write(body.getBytes());
 			res = new RequestResponse(connection, ignoreResponseData);
 		}
-		catch (IParapheurException e) { throw e; }
 		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
 		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
 		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
@@ -201,8 +200,8 @@ public class RESTUtils {
 
 	public static InputStream downloadFile(String url) throws IParapheurException {
 		//Log.d("debug", "GET (download file) request on : " + url);
-		InputStream fileStream = null;
-		HttpURLConnection connection = null;
+		InputStream fileStream;
+		HttpURLConnection connection;
 		try {
 			connection = (HttpsURLConnection) new URL(url).openConnection();
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());

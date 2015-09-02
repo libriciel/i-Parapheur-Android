@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.utils;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -76,7 +78,7 @@ public class JsonExplorer {
 
 	// <editor-fold desc="JsonElements">
 
-	public JsonExplorer findObject(String fieldName) {
+	public JsonExplorer findObject(@NonNull String fieldName) {
 		if ((_currentObject != null) && (_currentObject.isJsonObject()))
 			_currentObject = ((JsonObject) _currentObject).getAsJsonObject(fieldName);
 		else
@@ -85,7 +87,7 @@ public class JsonExplorer {
 		return this;
 	}
 
-	public JsonExplorer findArray(String fieldName) {
+	public JsonExplorer findArray(@NonNull String fieldName) {
 		if ((_currentObject != null) && (_currentObject.isJsonObject()))
 			_currentObject = ((JsonObject) _currentObject).getAsJsonArray(fieldName);
 		else
@@ -107,7 +109,11 @@ public class JsonExplorer {
 
 	// <editor-fold desc="Primitive types">
 
-	public String optString(String fieldName, String defaultValue) {
+	public String optString(@NonNull String fieldName) {
+		return optString(fieldName, null);
+	}
+
+	public String optString(@NonNull String fieldName, @Nullable String defaultValue) {
 		String result = null;
 
 		if ((_currentObject != null) && (_currentObject.isJsonObject())) {
@@ -121,7 +127,7 @@ public class JsonExplorer {
 		return (result == null) ? defaultValue : result;
 	}
 
-	public int optInt(String fieldName, int defaultValue) {
+	public int optInt(@NonNull String fieldName, int defaultValue) {
 		Integer result = null;
 
 		if ((_currentObject != null) && (_currentObject.isJsonObject())) {
@@ -135,7 +141,7 @@ public class JsonExplorer {
 		return (result == null) ? defaultValue : result;
 	}
 
-	public boolean optBoolean(String fieldName, boolean defaultValue) {
+	public boolean optBoolean(@NonNull String fieldName, boolean defaultValue) {
 		boolean result = defaultValue;
 
 		if ((_currentObject != null) && (_currentObject.isJsonObject())) {

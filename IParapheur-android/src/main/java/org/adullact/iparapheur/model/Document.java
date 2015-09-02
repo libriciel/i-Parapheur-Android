@@ -16,19 +16,14 @@ public class Document implements Parcelable {
 			return new Document[size];
 		}
 	};
+
 	private final String id;
 	private final String dossierId;
 	private final String name;
-	private final int size; // TODO : download image instead of too heavy files
-	/**
-	 * URL of the document (its content)
-	 */
-	private final String url;
+	private final int size;                  // TODO : download image instead of too heavy files
+	private final String url;                // URL of the document (its content)
 	private SparseArray<PageAnnotations> pagesAnnotations;
-	/**
-	 * path of the file (if downloaded) on the device's storage
-	 */
-	private String path;
+	private String path;                     // Path of the file (if downloaded) on the device's storage
 
 	public Document(String id, String dossierId, String name, int size, String url) {
 		this.id = id;
@@ -39,6 +34,7 @@ public class Document implements Parcelable {
 		this.pagesAnnotations = new SparseArray<>();
 	}
 
+	@SuppressWarnings("unchecked")
 	private Document(Parcel in) {
 		this.id = in.readString();
 		this.dossierId = in.readString();
@@ -48,6 +44,8 @@ public class Document implements Parcelable {
 		this.size = in.readInt();
 		this.path = in.readString();
 	}
+
+	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
 		return id;
@@ -77,8 +75,6 @@ public class Document implements Parcelable {
 		this.path = path;
 	}
 
-	// PARCELABLE IMPLEMENTATION
-
 	public SparseArray<PageAnnotations> getPagesAnnotations() {
 		return pagesAnnotations;
 	}
@@ -86,6 +82,10 @@ public class Document implements Parcelable {
 	public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
 		this.pagesAnnotations = pagesAnnotations;
 	}
+
+	// </editor-fold desc="Setters / Getters">
+
+	// <editor-fold desc="Parcelable">
 
 	@Override
 	public int describeContents() {
@@ -105,11 +105,15 @@ public class Document implements Parcelable {
 		dest.writeString(this.path);
 	}
 
+	// </editor-fold desc="Parcelable">
+
+	@Override
+	public String toString() {
+		return "{Document id:" + id + " name:" + name + "}";
+	}
+
 	@Override
 	public boolean equals(Object o) {
-		if ((o == null) || !(o instanceof Document))
-			return false;
-
-		return id.contentEquals(((Document) o).getId());
+		return (o != null) && (o instanceof Document) && (id.contentEquals(((Document) o).getId()));
 	}
 }

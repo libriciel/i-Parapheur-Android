@@ -314,9 +314,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			if (actionDemandee != null) {
 				ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
 
-				// FIXME : Adrien : remove next line when every icon will be generated
-				iconImageView.setImageResource(actionDemandee.getIcon(false));
-
 				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
 					String actionName = getString(actionDemandee.getTitle());
 
