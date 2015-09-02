@@ -25,50 +25,50 @@ public class Filter implements Parcelable {
 
 	public static final String DEFAULT_ID = "default-filter";
 	public static final String EDIT_FILTER_ID = "edit-filter";
-	public static final ArrayList<String> etats;
-	public static final HashMap<String, String> etatsTitres;
+	public static final ArrayList<String> states;
+	public static final HashMap<String, String> statesTitles;
 
 	static {
-		etats = new ArrayList<String>(12);
-		etats.add("en-preparation");
-		etats.add("a-traiter");
-		etats.add("a-archiver");
-		etats.add("retournes");
-		etats.add("en-cours");
-		etats.add("a-venir");
-		etats.add("recuperables");
-		etats.add("en-retard");
-		etats.add("traites");
-		etats.add("dossiers-delegues");
-		etats.add("no-corbeille");
-		etats.add("no-bureau");
+		states = new ArrayList<String>(12);
+		states.add("en-preparation");
+		states.add("a-traiter");
+		states.add("a-archiver");
+		states.add("retournes");
+		states.add("en-cours");
+		states.add("a-venir");
+		states.add("recuperables");
+		states.add("en-retard");
+		states.add("traites");
+		states.add("dossiers-delegues");
+		states.add("no-corbeille");
+		states.add("no-bureau");
 
-        /*etatsTitres = new HashMap<String, String>();
-		etatsTitres.put("À transmettre", "en-preparation");
-        etatsTitres.put("À traiter", "a-traiter");
-        etatsTitres.put("En fin de circuit", "a-archiver");
-        etatsTitres.put("Retournés", "retournes");
-        etatsTitres.put("En cours", "en-cours");
-        etatsTitres.put("À venir", "a-venir");
-        etatsTitres.put("Récupérables", "recuperables");
-        etatsTitres.put("En retard", "en-retard");
-        etatsTitres.put("Traités", "traites");
-        etatsTitres.put("Dossiers en délégation", "dossiers-delegues");
-        etatsTitres.put("Toutes les banettes", "no-corbeille");
-        etatsTitres.put("Tout i-P arapheur", "no-bureau");*/
-		etatsTitres = new LinkedHashMap<String, String>();
-		etatsTitres.put("en-preparation", "À transmettre");
-		etatsTitres.put("a-traiter", "À traiter");
-		etatsTitres.put("a-archiver", "En fin de circuit");
-		etatsTitres.put("retournes", "Retournés");
-		etatsTitres.put("en-cours", "En cours");
-		etatsTitres.put("a-venir", "À venir");
-		etatsTitres.put("recuperables", "Récupérables");
-		etatsTitres.put("en-retard", "En retard");
-		etatsTitres.put("traites", "Traités");
-		etatsTitres.put("dossiers-delegues", "Dossiers en délégation");
-		etatsTitres.put("no-corbeille", "Toutes les banettes");
-		etatsTitres.put("no-bureau", "Tout i-Parapheur");
+        /*statesTitles = new HashMap<String, String>();
+		statesTitles.put("À transmettre", "en-preparation");
+        statesTitles.put("À traiter", "a-traiter");
+        statesTitles.put("En fin de circuit", "a-archiver");
+        statesTitles.put("Retournés", "retournes");
+        statesTitles.put("En cours", "en-cours");
+        statesTitles.put("À venir", "a-venir");
+        statesTitles.put("Récupérables", "recuperables");
+        statesTitles.put("En retard", "en-retard");
+        statesTitles.put("Traités", "traites");
+        statesTitles.put("Dossiers en délégation", "dossiers-delegues");
+        statesTitles.put("Toutes les banettes", "no-corbeille");
+        statesTitles.put("Tout i-P arapheur", "no-bureau");*/
+		statesTitles = new LinkedHashMap<String, String>();
+		statesTitles.put("en-preparation", "À transmettre");
+		statesTitles.put("a-traiter", "À traiter");
+		statesTitles.put("a-archiver", "En fin de circuit");
+		statesTitles.put("retournes", "Retournés");
+		statesTitles.put("en-cours", "En cours");
+		statesTitles.put("a-venir", "À venir");
+		statesTitles.put("recuperables", "Récupérables");
+		statesTitles.put("en-retard", "En retard");
+		statesTitles.put("traites", "Traités");
+		statesTitles.put("dossiers-delegues", "Dossiers en délégation");
+		statesTitles.put("no-corbeille", "Toutes les banettes");
+		statesTitles.put("no-bureau", "Tout i-Parapheur");
 	}
 
 	private static final String DEFAULT_ETAT = "a-traiter";
@@ -82,38 +82,35 @@ public class Filter implements Parcelable {
 			return new Filter[size];
 		}
 	};
-	/**
-	 * id du filtre utilisé pour les préférences
-	 */
 	private String id;
 	/**
 	 * Nom du filtre sauvegardé
 	 */
-	private String nom;
+	private String name;
 	/**
 	 * Valeurs du filtre
 	 */
-	private String titre;
+	private String title;
 	private List<String> types;
-	private List<String> sousTypes;
-	private String etat;
-	private Date dateDebut;
-	private Date dateFin;
+	private List<String> subTypes;
+	private String state;
+	private Date beginDate;
+	private Date endDate;
 
 	public Filter() {
 		this.id = DEFAULT_ID;
-		this.nom = DEFAULT_NOM;
-		this.etat = DEFAULT_ETAT;
+		this.name = DEFAULT_NOM;
+		this.state = DEFAULT_ETAT;
 		this.types = new ArrayList<String>();
-		this.sousTypes = new ArrayList<String>();
+		this.subTypes = new ArrayList<String>();
 	}
 
 	public Filter(String id) {
 		this.id = id;
-		this.nom = DEFAULT_NOM;
-		this.etat = DEFAULT_ETAT;
+		this.name = DEFAULT_NOM;
+		this.state = DEFAULT_ETAT;
 		this.types = new ArrayList<String>();
-		this.sousTypes = new ArrayList<String>();
+		this.subTypes = new ArrayList<String>();
 	}
 
 	public Filter(Filter filter) {
@@ -123,28 +120,28 @@ public class Filter implements Parcelable {
 		else {
 			this.id = filter.id;
 		}
-		this.nom = filter.nom;
-		this.titre = filter.titre;
-		this.etat = filter.etat;
+		this.name = filter.name;
+		this.title = filter.title;
+		this.state = filter.state;
 		this.types = filter.types;
-		this.sousTypes = filter.sousTypes;
-		this.dateDebut = filter.dateDebut;
-		this.dateFin = filter.dateFin;
+		this.subTypes = filter.subTypes;
+		this.beginDate = filter.beginDate;
+		this.endDate = filter.endDate;
 	}
 
 	private Filter(Parcel in) {
 		this.id = in.readString();
-		this.nom = in.readString();
-		this.titre = in.readString();
+		this.name = in.readString();
+		this.title = in.readString();
 		this.types = new ArrayList<String>();
 		in.readList(this.types, String.class.getClassLoader());
-		this.sousTypes = new ArrayList<String>();
-		in.readList(this.sousTypes, String.class.getClassLoader());
-		this.etat = in.readString();
+		this.subTypes = new ArrayList<String>();
+		in.readList(this.subTypes, String.class.getClassLoader());
+		this.state = in.readString();
 		long tmpDateDebut = in.readLong();
-		this.dateDebut = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
+		this.beginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
 		long tmpDateFin = in.readLong();
-		this.dateFin = tmpDateFin == -1 ? null : new Date(tmpDateFin);
+		this.endDate = tmpDateFin == -1 ? null : new Date(tmpDateFin);
 	}
 
 	public String getJSONFilter() {
@@ -161,16 +158,16 @@ public class Filter implements Parcelable {
 			}
 			// SOUSTYPES
 			JSONArray jsonSousTypes = new JSONArray();
-			if (sousTypes != null) {
-				for (String sousType : sousTypes) {
+			if (subTypes != null) {
+				for (String sousType : subTypes) {
 					jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringUtils.urlEncode(sousType)));
 				}
 			}
 			//TITRE
 
 			JSONArray jsonTitre = new JSONArray();
-			if ((titre != null) && (!titre.trim().isEmpty())) {
-				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + titre.trim() + "*"));
+			if ((title != null) && (!title.trim().isEmpty())) {
+				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + title.trim() + "*"));
 			}
 
 			// FILTRE FINAL
@@ -184,6 +181,91 @@ public class Filter implements Parcelable {
 			//Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);
 		}
 		return jsonFilter.toString();
+	}
+
+	// <editor-fold desc="Setters / Getters">
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public List<String> getTypes() {
+		return types;
+	}
+
+	public void setTypes(List<String> types) {
+		this.types = types;
+	}
+
+	public List<String> getSubTypes() {
+		return subTypes;
+	}
+
+	public void setSubTypes(List<String> subTypes) {
+		this.subTypes = subTypes;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(long beginDate) {
+		this.beginDate = new Date(beginDate);
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(long endDate) {
+		this.endDate = new Date(endDate);
+	}
+
+	// </editor-fold desc="Setters / Getters">
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.id);
+		dest.writeString(this.name);
+		dest.writeString(this.title);
+		dest.writeList(this.types);
+		dest.writeList(this.subTypes);
+		dest.writeString(this.state);
+		dest.writeLong(beginDate != null ? beginDate.getTime() : -1);
+		dest.writeLong(endDate != null ? endDate.getTime() : -1);
 	}
 
 	@Override
@@ -202,87 +284,6 @@ public class Filter implements Parcelable {
 
 	@Override
 	public String toString() {
-		return nom;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	public String getTitre() {
-		return titre;
-	}
-
-	public void setTitre(String titre) {
-		this.titre = titre;
-	}
-
-	public List<String> getTypes() {
-		return types;
-	}
-
-	public void setTypes(List<String> types) {
-		this.types = types;
-	}
-
-	public List<String> getSousTypes() {
-		return sousTypes;
-	}
-
-	public void setSousTypes(List<String> sousTypes) {
-		this.sousTypes = sousTypes;
-	}
-
-	public String getEtat() {
-		return etat;
-	}
-
-	public void setEtat(String etat) {
-		this.etat = etat;
-	}
-
-	public Date getDateDebut() {
-		return dateDebut;
-	}
-
-	public void setDateDebut(long dateDebut) {
-		this.dateDebut = new Date(dateDebut);
-	}
-
-	public Date getDateFin() {
-		return dateFin;
-	}
-
-	public void setDateFin(long dateFin) {
-		this.dateFin = new Date(dateFin);
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.id);
-		dest.writeString(this.nom);
-		dest.writeString(this.titre);
-		dest.writeList(this.types);
-		dest.writeList(this.sousTypes);
-		dest.writeString(this.etat);
-		dest.writeLong(dateDebut != null ? dateDebut.getTime() : -1);
-		dest.writeLong(dateFin != null ? dateFin.getTime() : -1);
+		return name;
 	}
 }

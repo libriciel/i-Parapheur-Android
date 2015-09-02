@@ -84,7 +84,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 				"\"filters\": " + filter.getJSONFilter() + "," +
 				"\"page\": 0," +
 				"\"pageSize\": 15," +
-				"parent: \"" + filter.getEtat() + "\"," +
+				"parent: \"" + filter.getState() + "\"," +
 				"asc: \"false\"," +
 				"propSort: \"cm:created\"}";
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );

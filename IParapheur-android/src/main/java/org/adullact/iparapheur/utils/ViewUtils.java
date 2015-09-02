@@ -53,7 +53,7 @@ public class ViewUtils {
 	}
 
 	/**
-	 * Animate a flip between to views, the Google way.
+	 * Animate a flip between two views, the Google way.
 	 * <br/>
 	 * Animators source : http://developer.android.com/training/animation/cardflip.html
 	 * Animation code source : http://developer.android.com/guide/topics/graphics/prop-animation.html

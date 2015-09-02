@@ -217,9 +217,9 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
             if (typologie.containsKey(type)) {
                 ArrayList<String> selectedSousTypes = new ArrayList<String>(typologie.get(type));
                 ArrayList<String> currentSousTypes = new ArrayList<String>(typologie.get(type));
-                if (currentSousTypes.removeAll(filter.getSousTypes())) {
+                if (currentSousTypes.removeAll(filter.getSubTypes())) {
                     if (!currentSousTypes.isEmpty()) {
-                        selectedSousTypes.retainAll(filter.getSousTypes());
+                        selectedSousTypes.retainAll(filter.getSubTypes());
                     }
                 }
                 this.selection.put(type, selectedSousTypes);

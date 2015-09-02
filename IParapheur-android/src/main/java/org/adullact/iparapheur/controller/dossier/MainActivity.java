@@ -14,8 +14,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -68,18 +68,20 @@ import java.util.HashSet;
  * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends ActionBarActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
+public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback {
 
 	private static final String SHARED_PREFERENCES = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
 	private static final int EDIT_PREFERENCE_REQUEST = 50;
 
-	private DrawerLayout mDrawerLayout;                        // Main Layout off the screen
+	private DrawerLayout mDrawerLayout;                        // Layout off the screen
 	private FrameLayout mDrawerMenu;                           // Left panel acting as a menu
 	private ActionBarDrawerToggle mDrawerToggle;               // Used to control the drawer state.
 	private FilterAdapter mFilterAdapter;                      // Adapter for action bar, used to display user's filters
 	private Spinner mFiltersSpinner;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
+
+	// <editor-fold desc="LifeCycle">
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +237,8 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 		super.onBackPressed();
 	}
+
+	// </editor-fold desc="LifeCycle">
 
 	// <editor-fold desc="ActionBar">
 
@@ -447,16 +451,6 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	// </editor-fold desc="ActionMode">
 
-	public void onFilterSave(Filter filter) {
-		MyFilters.INSTANCE.selectFilter(filter);
-		MyFilters.INSTANCE.save(filter);
-
-		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter), true);
-
-		mFilterAdapter.notifyDataSetChanged();
-		onDataChanged();
-	}
-
 	private void replaceLeftFragment(@NonNull Fragment fragment, @NonNull String tag, boolean animated) {
 
 		// Bypass and send to the Drawer, if there isn't any left panel
@@ -546,7 +540,17 @@ public class MainActivity extends ActionBarActivity implements DossierListFragme
 
 	// <editor-fold desc="FilterDialogListener">
 
-	public void onFilterChange(Filter filter) {
+	public void onFilterSave(@NonNull Filter filter) {
+		MyFilters.INSTANCE.selectFilter(filter);
+		MyFilters.INSTANCE.save(filter);
+
+		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter), true);
+
+		mFilterAdapter.notifyDataSetChanged();
+		onDataChanged();
+	}
+
+	public void onFilterChange(@NonNull Filter filter) {
 
 		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter));
 

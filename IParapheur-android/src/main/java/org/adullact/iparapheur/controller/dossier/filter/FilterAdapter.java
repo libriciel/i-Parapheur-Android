@@ -26,7 +26,7 @@ public class FilterAdapter extends ArrayAdapter<Filter> {
 		}
 		else {
 			filter = new Filter(Filter.EDIT_FILTER_ID);
-			filter.setNom(getContext().getResources().getString(R.string.action_filtrer));
+			filter.setName(getContext().getResources().getString(R.string.action_filtrer));
 		}
 		return filter;
 	}

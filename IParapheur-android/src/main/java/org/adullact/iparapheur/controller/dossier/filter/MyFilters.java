@@ -41,18 +41,18 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
                     id = id.substring(0, id.lastIndexOf("_"));
                     Filter filter = new Filter(id);
                     if (!filters.contains(filter)) {
-                        filter.setNom(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_NOM_SUFFIX, ""));
-                        filter.setTitre(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX, ""));
-                        filter.setEtat(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX, ""));
+                        filter.setName(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_NOM_SUFFIX, ""));
+                        filter.setTitle(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX, ""));
+                        filter.setState(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX, ""));
                         filter.setTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
-                        filter.setSousTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>())));
+                        filter.setSubTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>())));
                         long debut = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX, 0L);
                         if (debut != 0L) {
-                            filter.setDateDebut(debut);
+                            filter.setBeginDate(debut);
                         }
                         long fin = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEFIN_SUFFIX, 0L);
                         if (fin != 0L) {
-                            filter.setDateFin(fin);
+                            filter.setEndDate(fin);
                         }
                         filters.add(filter);
                     }
@@ -69,16 +69,16 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
     public void save(Filter filter) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
         SharedPreferences.Editor editor = sharedPreferences.edit()
-                .putString( PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getNom())
-                .putString( PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitre())
-                .putString( PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getEtat())
+                .putString( PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getName())
+                .putString( PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitle())
+                .putString( PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getState())
                 .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, new HashSet<String>(filter.getTypes()))
-                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>(filter.getSousTypes()));
-        if (filter.getDateDebut() != null) {
-            editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEDEBUT_SUFFIX, filter.getDateDebut().getTime());
+                .putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>(filter.getSubTypes()));
+        if (filter.getBeginDate() != null) {
+            editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEDEBUT_SUFFIX, filter.getBeginDate().getTime());
         }
-        if (filter.getDateFin() != null) {
-            editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEFIN_SUFFIX, filter.getDateFin().getTime());
+        if (filter.getEndDate() != null) {
+            editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEFIN_SUFFIX, filter.getEndDate().getTime());
         }
         editor.apply();
         filters = null;
