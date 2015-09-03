@@ -96,11 +96,13 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		mViewPager.post(new Runnable() {
-			public void run() {
-				mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
-			}
-		});
+		mViewPager.post(
+				new Runnable() {
+					public void run() {
+						mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
+					}
+				}
+		);
 		String state = Environment.getExternalStorageState();
 		if (!Environment.MEDIA_MOUNTED.equals(state)) {
 			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
@@ -194,36 +196,40 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		if (mDossier != null && !mDossier.getMainDocuments().isEmpty()) {
 			final Document document = mDossier.getMainDocuments().get(0);
 			if (isReaderEnabled && (document.getPath() != null)) {
-				mViewPager.post(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
-							mViewPager.setCurrentItem(0, false);
-							ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
+				mViewPager.post(
+						new Runnable() {
+							@Override
+							public void run() {
+								try {
+									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
+									mViewPager.setCurrentItem(0, false);
+									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
+								}
+								catch (Exception e) {
+									e.printStackTrace();
+									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+								}
+							}
 						}
-						catch (Exception e) {
-							e.printStackTrace();
-							Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-						}
-					}
-				});
+				);
 			}
 		}
 		else {
-			mViewPager.post(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
-						//mViewPager.setCurrentItem(0, false);
+			mViewPager.post(
+					new Runnable() {
+						@Override
+						public void run() {
+							try {
+								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
+								//mViewPager.setCurrentItem(0, false);
+							}
+							catch (Exception e) {
+								//e.printStackTrace();
+								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+							}
+						}
 					}
-					catch (Exception e) {
-						//e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-					}
-				}
-			});
+			);
 		}
 	}
 
@@ -292,38 +298,41 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 		@Override
 		protected void load(String... params) throws IParapheurException {
-			// Check if this task is cancelled as often as possible.
+
+			// Default cases
+
+			if (mDossier == null)
+				return;
+
 			if (isCancelled())
 				return;
 
-			//Log.d("debug", "getting dossier details");
+			//
+
 			if (!DeviceUtils.isDebugOffline()) {
-				if (mDossier != null) {
-					Dossier d = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
-					mDossier.saveDetails(d);
-				}
+				Dossier d = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
+				mDossier.saveDetails(d);
 			}
 			else {
-				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, ""));
-			}
-			if (isCancelled()) {
-				return;
-			}
-			if (!DeviceUtils.isDebugOffline() && (mDossier != null)) {
-				mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
-			}
-			if (isCancelled()) {
-				return;
+				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 
-			if (isReaderEnabled && (mDossier != null) && (mDossier.getMainDocuments() != null) && (mDossier.getMainDocuments().size() > 0) && (mDossier.getMainDocuments().get(0) != null)) {
+			if (isCancelled())
+				return;
+
+			if (!DeviceUtils.isDebugOffline())
+				mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+
+			if (isCancelled())
+				return;
+
+			if (isReaderEnabled && (mDossier.getMainDocuments() != null) && (!mDossier.getMainDocuments().isEmpty())) {
 				Document document = mDossier.getMainDocuments().get(0);
 
 				if ((document.getPath() == null) || !(new File(document.getPath()).exists())) {
 					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
 					String path = file.getAbsolutePath();
 
-					//Log.d("debug", "saving document on disk");
 					if (!DeviceUtils.isDebugOffline()) {
 						if (RESTClient.INSTANCE.downloadFile(mDossier.getMainDocuments().get(0).getUrl(), path)) {
 							document.setPath(path);

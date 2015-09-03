@@ -2,6 +2,7 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -35,7 +36,16 @@ public class Dossier implements Parcelable {
 
 	// TODO : remove
 	public Dossier(int i) {
-		this(UUID.randomUUID().toString(), "Dossier " + i, Action.VISA, new ArrayList<Action>(), "Type", "SousType", Calendar.getInstance().getTime(), Calendar.getInstance().getTime());
+		this(
+				UUID.randomUUID().toString(),
+				"Dossier " + i,
+				Action.VISA,
+				new ArrayList<Action>(),
+				"Type",
+				"SousType",
+				Calendar.getInstance().getTime(),
+				Calendar.getInstance().getTime()
+		);
 		getActions().add(Action.VISA);
 	}
 
@@ -115,13 +125,15 @@ public class Dossier implements Parcelable {
 		return id.hashCode();
 	}
 
-	public void addDocument(Document document) {
-		if (mainDocuments.isEmpty()) {
-			this.mainDocuments.add(document);
-		}
-		else {
-			this.annexes.add(document);
-		}
+	public void addDocument(@Nullable Document document) {
+
+		if (document == null)
+			return;
+
+		if (document.isMainDocument())
+			mainDocuments.add(document);
+		else
+			annexes.add(document);
 	}
 
 	// Getters

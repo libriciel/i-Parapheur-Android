@@ -17,70 +17,90 @@ public class Document implements Parcelable {
 		}
 	};
 
-	private final String id;
-	private final String dossierId;
-	private final String name;
-	private final int size;                  // TODO : download image instead of too heavy files
-	private final String url;                // URL of the document (its content)
-	private SparseArray<PageAnnotations> pagesAnnotations;
-	private String path;                     // Path of the file (if downloaded) on the device's storage
+	private final String mId;
+	private final String mDossierId;
+	private final String mName;
+	private final int mSize;                  // TODO : download image instead of too heavy files
+	private final String mUrl;                // URL of the document (its content)
+	private SparseArray<PageAnnotations> mPagesAnnotations;
+	private String mPath;                     // Path of the file (if downloaded) on the device's storage
+	private boolean mIsLocked;
+	private boolean mIsMainDocument;
 
-	public Document(String id, String dossierId, String name, int size, String url) {
-		this.id = id;
-		this.dossierId = dossierId;
-		this.name = name;
-		this.url = url;
-		this.size = size;
-		this.pagesAnnotations = new SparseArray<>();
+	public Document(String id, String dossierId, String name, int size, String url, boolean isLocked, boolean isMainDocument) {
+		mId = id;
+		mDossierId = dossierId;
+		mName = name;
+		mUrl = url;
+		mSize = size;
+		mPagesAnnotations = new SparseArray<>();
+		mIsLocked = isLocked;
+		mIsMainDocument = mIsMainDocument;
 	}
 
 	@SuppressWarnings("unchecked")
 	private Document(Parcel in) {
-		this.id = in.readString();
-		this.dossierId = in.readString();
-		this.name = in.readString();
-		this.pagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("pagesAnnotations");
-		this.url = in.readString();
-		this.size = in.readInt();
-		this.path = in.readString();
+		mId = in.readString();
+		mDossierId = in.readString();
+		mName = in.readString();
+		mPagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("mPagesAnnotations");
+		mUrl = in.readString();
+		mSize = in.readInt();
+		mPath = in.readString();
 	}
 
 	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
-		return id;
+		return mId;
 	}
 
 	public String getDossierId() {
-		return dossierId;
+		return mDossierId;
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	public String getUrl() {
-		return url;
+		return mUrl;
 	}
 
 	public int getSize() {
-		return size;
+		return mSize;
 	}
 
 	public String getPath() {
-		return path;
+		return mPath;
 	}
 
 	public void setPath(String path) {
-		this.path = path;
+		mPath = path;
+	}
+
+	public boolean isLocked() {
+		return mIsLocked;
+	}
+
+	public void setIsLocked(boolean isLocked) {
+		mIsLocked = isLocked;
+	}
+
+	public boolean isMainDocument() {
+		return mIsMainDocument;
+	}
+
+	public void setIsMainDocument(boolean isLocked) {
+		mIsLocked = isLocked;
 	}
 
 	public SparseArray<PageAnnotations> getPagesAnnotations() {
-		return pagesAnnotations;
+		return mPagesAnnotations;
 	}
 
 	public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
-		this.pagesAnnotations = pagesAnnotations;
+		mPagesAnnotations = pagesAnnotations;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -95,25 +115,25 @@ public class Document implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		Bundle bundle = new Bundle();
-		bundle.putSparseParcelableArray("pagesAnnotations", this.pagesAnnotations);
-		dest.writeString(this.id);
-		dest.writeString(this.dossierId);
-		dest.writeString(this.name);
+		bundle.putSparseParcelableArray("mPagesAnnotations", mPagesAnnotations);
+		dest.writeString(mId);
+		dest.writeString(mDossierId);
+		dest.writeString(mName);
 		dest.writeBundle(bundle);
-		dest.writeString(this.url);
-		dest.writeInt(this.size);
-		dest.writeString(this.path);
+		dest.writeString(mUrl);
+		dest.writeInt(mSize);
+		dest.writeString(mPath);
 	}
 
 	// </editor-fold desc="Parcelable">
 
 	@Override
 	public String toString() {
-		return "{Document id:" + id + " name:" + name + "}";
+		return "{Document id:" + mId + " name:" + mName + "}";
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		return (o != null) && (o instanceof Document) && (id.contentEquals(((Document) o).getId()));
+		return (o != null) && (o instanceof Document) && (mId.contentEquals(((Document) o).getId()));
 	}
 }

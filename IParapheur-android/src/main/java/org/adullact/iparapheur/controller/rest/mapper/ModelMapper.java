@@ -24,10 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-/**
- * Created by jmaire on 04/11/2013.
- * Utilitaire de conversion des réponses json du serveur i-Parapheur pour les versions d'API 1 et 2.
- */
 public class ModelMapper {
 
 	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
@@ -46,23 +42,38 @@ public class ModelMapper {
 			dossierRef = dossierRef.substring("workspace://SpacesStore/".length());
 		}
 		ArrayList<Action> actions = getActionsForDossier(jsonObject);
-		Dossier dossier = new Dossier(dossierRef, jsonObject.optString("titre"), Action.valueOf(jsonObject.optString("actionDemandee", "VISA")), actions, jsonObject.optString("type"), jsonObject.optString("sousType"), TransformUtils.parseISO8601Date(jsonObject.optString("dateCreation")), TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite")));
+		Dossier dossier = new Dossier(
+				dossierRef,
+				jsonObject.optString("titre"),
+				Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
+				actions,
+				jsonObject.optString("type"),
+				jsonObject.optString("sousType"),
+				TransformUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
+				TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite"))
+		);
 
 		JSONArray documents = jsonObject.optJSONArray("documents");
 		if (documents != null) {
 
 			for (int index = 0; index < documents.length(); index++) {
 				JSONObject doc = documents.optJSONObject(index);
+
 				if (doc != null) {
 					String docRef = jsonObject.optString("dossierRef");
-					if (docRef.contains("workspace://SpacesStore/")) {
+					if (docRef.contains("workspace://SpacesStore/"))
 						docRef = dossierRef.substring("workspace://SpacesStore/".length());
-					}
+
 					String downloadUrl = doc.optString("downloadUrl");
 					if (doc.has("visuelPdfUrl")) {
 						downloadUrl += ";ph:visuel-pdf";
 					}
-					dossier.addDocument(new Document(docRef, dossierRef, doc.optString("name"), doc.optInt("size", -1), downloadUrl));
+
+					dossier.addDocument(
+							new Document(
+									docRef, dossierRef, doc.optString("name"), doc.optInt("size", -1), downloadUrl, false, (index == 0)
+							)
+					);
 				}
 			}
 		}
@@ -142,10 +153,20 @@ public class ModelMapper {
 		ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
 		if (response.getResponse() != null) {
 			JSONArray circuitArray = response.getResponse().optJSONArray("circuit");
-			if (circuit != null) {
+			if (circuitArray != null) {
 				for (int i = 0; i < circuitArray.length(); i++) {
 					JSONObject etapeObject = circuitArray.optJSONObject(i);
-					circuit.add(new EtapeCircuit(TransformUtils.parseISO8601Date(etapeObject.optString("dateValidation")), etapeObject.optBoolean("approved"), etapeObject.optBoolean("rejected", false), etapeObject.optString("parapheurName"), etapeObject.optString("signataire"), Action.valueOf(etapeObject.optString("actionDemandee", "VISA")), etapeObject.optString("annotPub")));
+					circuit.add(
+							new EtapeCircuit(
+									TransformUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
+									etapeObject.optBoolean("approved"),
+									etapeObject.optBoolean("rejected", false),
+									etapeObject.optString("parapheurName"),
+									etapeObject.optString("signataire"),
+									Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
+									etapeObject.optString("annotPub")
+							)
+					);
 
 				}
 			}
@@ -224,7 +245,9 @@ public class ModelMapper {
 								try {
 									Date date = null;
 									try {
-										date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US).parse(jsonAnnotation.getString("date"));
+										date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US).parse(
+												jsonAnnotation.getString("date")
+										);
 									}
 									catch (ParseException e) {
 										date = new Date();
@@ -237,9 +260,23 @@ public class ModelMapper {
 									JSONObject jsonRect = jsonAnnotation.getJSONObject("rect");
 									JSONObject topLeft = jsonRect.getJSONObject("topLeft");
 									JSONObject bottomRight = jsonRect.getJSONObject("bottomRight");
-									RectF rect = new RectF(topLeft.getLong("x"), topLeft.getLong("y"), bottomRight.getLong("x"), bottomRight.getLong("y"));
+									RectF rect = new RectF(
+											topLeft.getLong("x"), topLeft.getLong("y"), bottomRight.getLong("x"), bottomRight.getLong("y")
+									);
 
-									pageAnnotations.add(new Annotation(jsonAnnotation.optString("id"), jsonAnnotation.optString("author"), Integer.parseInt(pageStr), jsonAnnotation.optBoolean("secretaire"), outDate, rect, jsonAnnotation.optString("text"), jsonAnnotation.optString("type", "rect"), step));
+									pageAnnotations.add(
+											new Annotation(
+													jsonAnnotation.optString("id"),
+													jsonAnnotation.optString("author"),
+													Integer.parseInt(pageStr),
+													jsonAnnotation.optBoolean("secretaire"),
+													outDate,
+													rect,
+													jsonAnnotation.optString("text"),
+													jsonAnnotation.optString("type", "rect"),
+													step
+											)
+									);
 								}
 								catch (JSONException e) {
 									// Tant pis, on passe l'annotation

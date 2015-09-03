@@ -1,5 +1,8 @@
 package org.adullact.iparapheur.controller.rest.mapper;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
@@ -15,11 +18,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
-/**
- * Created by jmaire on 04/11/2013.
- * Utilitaire de conversion des réponses json du serveur i-Parapheur pour la version d'API 3.
- */
 public class ModelMapper3 extends ModelMapper {
+
+	public static String DOSSIER_ID = "id";
+	public static String DOSSIER_TITLE = "title";
+	public static String DOSSIER_TYPE = "type";
+	public static String DOSSIER_SUBTYPE = "sousType";
+	public static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
+	public static String DOSSIER_EMISSION_DATE = "dateEmission";
+	public static String DOSSIER_DATE_LIMITE = "dateLimite";
+	public static String DOSSIER_DOCUMENTS = "documents";
+
+	public static String DOCUMENT_ID = "id";
+	public static String DOCUMENT_NAME = "name";
+	public static String DOCUMENT_VISUEL_PDF = "visuelPdf";
+	public static String DOCUMENT_SIZE = "size";
+	public static String DOCUMENT_IS_LOCKED = "isLocked";
+	public static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
 
 	@Override
 	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
@@ -34,26 +49,49 @@ public class ModelMapper3 extends ModelMapper {
 	@Override
 	protected Dossier getDossier(JSONObject jsonObject) {
 
-		String dossierId = jsonObject.optString("id");
+		String dossierId = jsonObject.optString(DOSSIER_ID);
 		ArrayList<Action> actions = getActionsForDossier(jsonObject);
-		Dossier dossier = new Dossier(dossierId, jsonObject.optString("title"), Action.valueOf(jsonObject.optString("actionDemandee", "VISA")), actions, jsonObject.optString("type"), jsonObject.optString("sousType"), TransformUtils.parseISO8601Date(jsonObject.optString("dateEmission")), TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite")));
 
-		JSONArray documents = jsonObject.optJSONArray("documents");
+		Dossier dossier = new Dossier(
+				jsonObject.optString(DOSSIER_ID),
+				jsonObject.optString(DOSSIER_TITLE),
+				Action.valueOf(jsonObject.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
+				actions,
+				jsonObject.optString(DOSSIER_TYPE),
+				jsonObject.optString(DOSSIER_SUBTYPE),
+				TransformUtils.parseISO8601Date(jsonObject.optString(DOSSIER_EMISSION_DATE)),
+				TransformUtils.parseISO8601Date(jsonObject.optString(DOSSIER_DATE_LIMITE))
+		);
+
+		JSONArray documents = jsonObject.optJSONArray(DOSSIER_DOCUMENTS);
 		if (documents != null) {
 			for (int index = 0; index < documents.length(); index++) {
 				JSONObject doc = documents.optJSONObject(index);
-				if (doc != null) {
-					String docId = doc.optString("id");
-					String downloadUrl = "/api/node/workspace/SpacesStore/" + docId + "/content";
-
-					if (doc.optBoolean("visuelPdf", false))
-						downloadUrl += ";ph:visuel-pdf";
-
-					dossier.addDocument(new Document(docId, dossierId, doc.optString("name"), doc.optInt("size", -1), downloadUrl));
-				}
+				dossier.addDocument(parseDocument(doc, dossierId, index));
 			}
 		}
+
 		return dossier;
+	}
+
+	private @Nullable Document parseDocument(@Nullable JSONObject documentJson, @NonNull String dossierId, int index) {
+
+		if (documentJson == null)
+			return null;
+
+		String downloadUrl = "/api/node/workspace/SpacesStore/" + documentJson.optString(DOCUMENT_ID) + "/content";
+		if (documentJson.optBoolean(DOCUMENT_VISUEL_PDF, false))
+			downloadUrl += ";ph:visuel-pdf";
+
+		return new Document(
+				documentJson.optString(DOCUMENT_ID),
+				dossierId,
+				documentJson.optString(DOCUMENT_NAME),
+				documentJson.optInt(DOCUMENT_SIZE, -1),
+				downloadUrl,
+				documentJson.optBoolean(DOCUMENT_IS_LOCKED, false),
+				documentJson.optBoolean(DOCUMENT_IS_MAIN_DOCUMENT, (index == 0))
+		);
 	}
 
 	@Override
@@ -99,7 +137,17 @@ public class ModelMapper3 extends ModelMapper {
 				if (circuitArray != null) {
 					for (int i = 0; i < circuitArray.length(); i++) {
 						JSONObject etapeObject = circuitArray.optJSONObject(i);
-						circuit.add(new EtapeCircuit(new Date(etapeObject.optLong("dateValidation")), etapeObject.optBoolean("approved"), etapeObject.optBoolean("rejected"), etapeObject.optString("parapheurName"), etapeObject.optString("signataire"), Action.valueOf(etapeObject.optString("actionDemandee", "VISA")), etapeObject.optString("annotPub")));
+						circuit.add(
+								new EtapeCircuit(
+										new Date(etapeObject.optLong("dateValidation")),
+										etapeObject.optBoolean("approved"),
+										etapeObject.optBoolean("rejected"),
+										etapeObject.optString("parapheurName"),
+										etapeObject.optString("signataire"),
+										Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
+										etapeObject.optString("annotPub")
+								)
+						);
 
 					}
 				}
