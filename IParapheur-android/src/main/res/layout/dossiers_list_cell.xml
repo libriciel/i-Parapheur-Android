@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/etape_courante"
-                android:src="@drawable/ic_assignment_turned_in_white_24dp"/>
+                android:src="@drawable/ic_done_white_24dp"/>
         </FrameLayout>
 
     </FrameLayout>

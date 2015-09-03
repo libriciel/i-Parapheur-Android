@@ -220,6 +220,6 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	//</editor-fold desc="PageLayoutListener">
 
 	private enum ScaleType {
-		fitHeight, fitWidth // TODO : zoom?
+		fitHeight, fitWidth // TODO : zoom
 	}
 }

@@ -1,79 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/dossiers_menu_actions" >
-        <group android:id="@+id/dossiers_menu_main_actions" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:iparapheur="http://schemas.android.com/apk/res-auto">
 
-            <item android:id="@+id/action_visa"
+    <group android:id="@+id/dossiers_menu_actions">
+        <group android:id="@+id/dossiers_menu_main_actions">
+
+            <item
+                android:id="@+id/action_visa"
                 android:title="@string/action_viser"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_signature"
+            <item
+                android:id="@+id/action_signature"
                 android:title="@string/action_signer"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_mailsec"
+            <item
+                android:id="@+id/action_mailsec"
                 android:title="@string/action_mailsec"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_tdt"
+            <item
+                android:id="@+id/action_tdt"
                 android:title="@string/action_tdt"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
 
-            <item android:id="@+id/action_tdt_actes"
+            <item
+                android:id="@+id/action_tdt_actes"
                 android:title="@string/action_tdt_actes"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_tdt_helios"
+            <item
+                android:id="@+id/action_tdt_helios"
                 android:title="@string/action_tdt_helios"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_archivage"
+            <item
+                android:id="@+id/action_archivage"
                 android:title="@string/action_archiver"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
 
-            <item android:id="@+id/action_rejet"
+            <item
+                android:id="@+id/action_rejet"
                 android:title="@string/action_rejeter"
-                android:showAsAction="ifRoom" />
+                iparapheur:showAsAction="ifRoom"/>
         </group>
-        <group android:id="@+id/dossiers_menu_other_actions" >
+        <group android:id="@+id/dossiers_menu_other_actions">
 
-            <item android:id="@+id/action_secretariat"
+            <item
+                android:id="@+id/action_secretariat"
                 android:title="@string/action_secretariat"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_remord"
+            <item
+                android:id="@+id/action_remord"
                 android:title="@string/action_remord"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_avis"
+            <item
+                android:id="@+id/action_avis"
                 android:title="@string/action_avis"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_transfert_signature"
+            <item
+                android:id="@+id/action_transfert_signature"
                 android:title="@string/action_transfertsign"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_ajout_signature"
+            <item
+                android:id="@+id/action_ajout_signature"
                 android:title="@string/action_ajoutsign"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_mail"
+            <item
+                android:id="@+id/action_mail"
                 android:title="@string/action_mail"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_enregistrer"
+            <item
+                android:id="@+id/action_enregistrer"
                 android:title="@string/action_enregistrer"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_supprimer"
+            <item
+                android:id="@+id/action_supprimer"
                 android:title="@string/action_supprimer"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
 
-            <item android:id="@+id/action_journal"
+            <item
+                android:id="@+id/action_journal"
                 android:title="@string/action_journal"
-                android:showAsAction="never" />
+                iparapheur:showAsAction="never"/>
         </group>
     </group>
 </menu>
