@@ -28,6 +28,7 @@ public class ModelMapper3 extends ModelMapper {
 	public static String DOSSIER_EMISSION_DATE = "dateEmission";
 	public static String DOSSIER_DATE_LIMITE = "dateLimite";
 	public static String DOSSIER_DOCUMENTS = "documents";
+	public static String DOSSIER_CIRCUIT = "circuit";
 
 	public static String DOCUMENT_ID = "id";
 	public static String DOCUMENT_NAME = "name";
@@ -35,6 +36,15 @@ public class ModelMapper3 extends ModelMapper {
 	public static String DOCUMENT_SIZE = "size";
 	public static String DOCUMENT_IS_LOCKED = "isLocked";
 	public static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
+
+	public static String CIRCUIT_ETAPES = "etapes";
+	public static String CIRCUIT_DATE_VALIDATION = "dateValidation";
+	public static String CIRCUIT_APPROVED = "approved";
+	public static String CIRCUIT_REJECTED = "rejected";
+	public static String CIRCUIT_PARAPHEUR_NAME = "parapheurName";
+	public static String CIRCUIT_SIGNATAIRE = "signataire";
+	public static String CIRCUIT_ACTION_DEMANDEE = "actionDemandee";
+	public static String CIRCUIT_PUBLIC_ANNOTATIONS = "annotPub";
 
 	@Override
 	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
@@ -128,31 +138,34 @@ public class ModelMapper3 extends ModelMapper {
 	}
 
 	@Override
-	public ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
-		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
-		if (response.getResponse() != null) {
-			JSONObject circuitObject = response.getResponse().optJSONObject("circuit");
-			if (circuitObject != null) {
-				JSONArray circuitArray = circuitObject.optJSONArray("etapes");
-				if (circuitArray != null) {
-					for (int i = 0; i < circuitArray.length(); i++) {
-						JSONObject etapeObject = circuitArray.optJSONObject(i);
-						circuit.add(
-								new EtapeCircuit(
-										new Date(etapeObject.optLong("dateValidation")),
-										etapeObject.optBoolean("approved"),
-										etapeObject.optBoolean("rejected"),
-										etapeObject.optString("parapheurName"),
-										etapeObject.optString("signataire"),
-										Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
-										etapeObject.optString("annotPub")
-								)
-						);
+	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
 
-					}
-				}
-			}
+		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
+		boolean jsonNodeExists = jsonExplorer.findObject(DOSSIER_CIRCUIT).findArray(CIRCUIT_ETAPES).rebase();
+
+		// Default value
+
+		if (!jsonNodeExists)
+			return circuit;
+
+		// Parsing
+
+		for (int index = 0; index < jsonExplorer.getCurrentArraySize(); index++) {
+
+			EtapeCircuit currentEtape = new EtapeCircuit(
+					new Date(jsonExplorer.find(index).optLong(CIRCUIT_DATE_VALIDATION, -1)),
+					jsonExplorer.find(index).optBoolean(CIRCUIT_APPROVED, false),
+					jsonExplorer.find(index).optBoolean(CIRCUIT_REJECTED, false),
+					jsonExplorer.find(index).optString(CIRCUIT_PARAPHEUR_NAME),
+					jsonExplorer.find(index).optString(CIRCUIT_SIGNATAIRE),
+					Action.valueOf(jsonExplorer.find(index).optString(CIRCUIT_ACTION_DEMANDEE, Action.VISA.toString())),
+					jsonExplorer.find(index).optString(CIRCUIT_PUBLIC_ANNOTATIONS)
+			);
+
+			circuit.add(currentEtape);
 		}
+
 		return circuit;
 	}
 

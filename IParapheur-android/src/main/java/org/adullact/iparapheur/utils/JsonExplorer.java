@@ -15,16 +15,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Allows to fetch a value for any given JsonObject or string, in a single line.
+ * Allows to fetch a value for any given {@link JsonObject} or {@link String}, in a single line.
  * <p/>
  * <br/>
  * <p/>
  * It won't crash or throw an exception on any problem. It will just send null, and this null will be sent through the entire search.
- * On the last parse of a primitive element, it will give you the given default value, wherever the problem was.
+ * On the last parse of a primitive element, it will give you the given default value, wherever the problem was, and reset the explorer to the root element.
+ * You can {@link #rebase()} the current found element, to set the root element to the current found node.
  * <p/>
  * <br/>
  * Example :
- * <code>String title = new JSONUtils.JsonExplorer(JsonObject).findObject("content").findArray("texts").find(0).optString("title", "defaultValue")</code>
+ * <code>String title = new JsonExplorer(JsonObject).findObject("content").findArray("texts").find(0).optString("title", "defaultValue")</code>
  */
 @SuppressWarnings("unused")
 public class JsonExplorer {
@@ -105,6 +106,32 @@ public class JsonExplorer {
 		return this;
 	}
 
+	/**
+	 * Returns the current found array size, and reset the explorer to the root.
+	 *
+	 * @return -1 if the current element doesn't exists, or is not an array
+	 */
+	public int getCurrentArraySize() {
+		int res = -1;
+
+		if ((_currentObject != null) && (_currentObject.isJsonArray()))
+			res = ((JsonArray) _currentObject).size();
+
+		resetRootElement();
+		return res;
+	}
+
+	/**
+	 * Every times that a value is returned, the current step is reset to the JSON root element.
+	 * This method allows to change the root node.
+	 *
+	 * @return true if the current element (the new base) exists.
+	 */
+	public boolean rebase() {
+		_rootObject = _currentObject;
+		return (_rootObject != null);
+	}
+
 	// </editor-fold desc="JsonElements">
 
 	// <editor-fold desc="Primitive types">
@@ -149,6 +176,20 @@ public class JsonExplorer {
 
 			if ((jsonElement != null) && (jsonElement.isJsonPrimitive() && (jsonElement.getAsJsonPrimitive().isBoolean())))
 				result = jsonElement.getAsJsonPrimitive().getAsBoolean();
+		}
+
+		resetRootElement();
+		return result;
+	}
+
+	public long optLong(@NonNull String fieldName, long defaultValue) {
+		long result = defaultValue;
+
+		if ((_currentObject != null) && (_currentObject.isJsonObject())) {
+			JsonElement jsonElement = ((JsonObject) _currentObject).get(fieldName);
+
+			if ((jsonElement != null) && (jsonElement.isJsonPrimitive() && (jsonElement.getAsJsonPrimitive().isNumber())))
+				result = jsonElement.getAsJsonPrimitive().getAsLong();
 		}
 
 		resetRootElement();

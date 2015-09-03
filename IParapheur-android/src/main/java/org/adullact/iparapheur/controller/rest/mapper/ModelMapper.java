@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.rest.mapper;
 
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import org.adullact.iparapheur.model.Action;
@@ -149,8 +150,8 @@ public class ModelMapper {
 		return dossiers;
 	}
 
-	public ArrayList<EtapeCircuit> getCircuit(RequestResponse response) {
-		ArrayList<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
+	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
+		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
 		if (response.getResponse() != null) {
 			JSONArray circuitArray = response.getResponse().optJSONArray("circuit");
 			if (circuitArray != null) {
