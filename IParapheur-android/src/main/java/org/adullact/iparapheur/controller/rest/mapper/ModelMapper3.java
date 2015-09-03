@@ -10,7 +10,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.JsonExplorer;
-import org.adullact.iparapheur.utils.TransformUtils;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -69,8 +69,8 @@ public class ModelMapper3 extends ModelMapper {
 				actions,
 				jsonObject.optString(DOSSIER_TYPE),
 				jsonObject.optString(DOSSIER_SUBTYPE),
-				TransformUtils.parseISO8601Date(jsonObject.optString(DOSSIER_EMISSION_DATE)),
-				TransformUtils.parseISO8601Date(jsonObject.optString(DOSSIER_DATE_LIMITE))
+				StringUtils.parseISO8601Date(jsonObject.optString(DOSSIER_EMISSION_DATE)),
+				StringUtils.parseISO8601Date(jsonObject.optString(DOSSIER_DATE_LIMITE))
 		);
 
 		JSONArray documents = jsonObject.optJSONArray(DOSSIER_DOCUMENTS);

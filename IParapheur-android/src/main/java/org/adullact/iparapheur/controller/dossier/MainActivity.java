@@ -250,7 +250,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Alignment in TopBar isn't working on XML, but works programmatically
 
-		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
+		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(
+				Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END
+		);
 		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
 		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
 
@@ -463,7 +465,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
+		transaction.setCustomAnimations(
+				animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center
+		);
 		transaction.replace(R.id.left_fragment, fragment, tag);
 
 		if (animated)
@@ -477,7 +481,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center);
+		transaction.setCustomAnimations(
+				animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center
+		);
 		transaction.replace(R.id.drawer_panel, fragment, tag);
 
 		if (animated)

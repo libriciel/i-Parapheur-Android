@@ -2,6 +2,7 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
@@ -22,6 +23,7 @@ public class Dossier implements Parcelable {
 			return new Dossier[size];
 		}
 	};
+
 	private final String id;
 	private final String name;
 	private final Action actionDemandee;
@@ -90,64 +92,7 @@ public class Dossier implements Parcelable {
 		in.readTypedList(circuit, EtapeCircuit.CREATOR);
 	}
 
-	public boolean isDetailsAvailable() {
-		return (!circuit.isEmpty() && !mainDocuments.isEmpty());
-	}
-
-	public boolean hasActions() {
-		return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	// Setters (only for documents and details)
-
-	// FIXME plus tard: pour le moment, il n'y a QU'UN SEUL DOCUMENT, les autres pieces sont necessairement des ANNEXES !
-
-	// Equals and hashCode overriding, so we can find dossier with its id.
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Dossier) {
-			Dossier toCompare = (Dossier) o;
-			return this.id.equals(toCompare.id);
-		}
-		else if (o instanceof String) {
-			return this.id.equals(o);
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	public void addDocument(@Nullable Document document) {
-
-		if (document == null)
-			return;
-
-		if (document.isMainDocument())
-			mainDocuments.add(document);
-		else
-			annexes.add(document);
-	}
-
-	// Getters
-
-	public void saveDetails(Dossier dossier) {
-		this.mainDocuments.addAll(dossier.getMainDocuments());
-		this.annexes.addAll(dossier.getAnnexes());
-	}
-
-	public void clearDetails() {
-		this.mainDocuments.clear();
-		this.annexes.clear();
-		this.circuit.clear();
-	}
+	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
 		return id;
@@ -185,17 +130,6 @@ public class Dossier implements Parcelable {
 		return annexes;
 	}
 
-	/**
-	 * Return all documents (main and annexes).
-	 *
-	 * @return main documents and annexes
-	 */
-	public List<Document> getDocuments() {
-		List<Document> documents = new ArrayList<Document>(mainDocuments);
-		documents.addAll(annexes);
-		return documents;
-	}
-
 	public List<EtapeCircuit> getCircuit() {
 		return circuit;
 	}
@@ -207,6 +141,51 @@ public class Dossier implements Parcelable {
 	public Action getActionDemandee() {
 		return actionDemandee;
 	}
+
+	// </editor-fold desc="Setters / Getters">
+
+	/**
+	 * Return all documents (main and annexes).
+	 *
+	 * @return main documents and annexes
+	 */
+	public @NonNull List<Document> getDocuments() {
+		List<Document> documents = new ArrayList<>(mainDocuments);
+		documents.addAll(annexes);
+		return documents;
+	}
+
+	public void addDocument(@Nullable Document document) {
+
+		if (document == null)
+			return;
+
+		if (document.isMainDocument())
+			mainDocuments.add(document);
+		else
+			annexes.add(document);
+	}
+
+	public void saveDetails(Dossier dossier) {
+		this.mainDocuments.addAll(dossier.getMainDocuments());
+		this.annexes.addAll(dossier.getAnnexes());
+	}
+
+	public void clearDetails() {
+		this.mainDocuments.clear();
+		this.annexes.clear();
+		this.circuit.clear();
+	}
+
+	public boolean isDetailsAvailable() {
+		return (!circuit.isEmpty() && !mainDocuments.isEmpty());
+	}
+
+	public boolean hasActions() {
+		return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
+	}
+
+	// <editor-fold desc="Parcelable">
 
 	@Override
 	public int describeContents() {
@@ -226,5 +205,32 @@ public class Dossier implements Parcelable {
 		dest.writeTypedList(mainDocuments);
 		dest.writeTypedList(annexes);
 		dest.writeTypedList(circuit);
+	}
+
+	// </editor-fold desc="Parcelable">
+
+	/**
+	 * Equals and hashCode overriding, so we can find dossier with its id.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Dossier) {
+			Dossier toCompare = (Dossier) o;
+			return this.id.equals(toCompare.id);
+		}
+		else if (o instanceof String) {
+			return this.id.equals(o);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
 	}
 }

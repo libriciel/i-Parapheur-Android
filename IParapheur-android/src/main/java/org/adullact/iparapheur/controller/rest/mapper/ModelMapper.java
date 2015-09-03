@@ -12,7 +12,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
-import org.adullact.iparapheur.utils.TransformUtils;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,8 +50,8 @@ public class ModelMapper {
 				actions,
 				jsonObject.optString("type"),
 				jsonObject.optString("sousType"),
-				TransformUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
-				TransformUtils.parseISO8601Date(jsonObject.optString("dateLimite"))
+				StringUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
+				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite"))
 		);
 
 		JSONArray documents = jsonObject.optJSONArray("documents");
@@ -159,7 +159,7 @@ public class ModelMapper {
 					JSONObject etapeObject = circuitArray.optJSONObject(i);
 					circuit.add(
 							new EtapeCircuit(
-									TransformUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
+									StringUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
 									etapeObject.optBoolean("approved"),
 									etapeObject.optBoolean("rejected", false),
 									etapeObject.optString("parapheurName"),

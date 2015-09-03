@@ -3,7 +3,7 @@ package org.adullact.iparapheur.model;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.TransformUtils;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +31,7 @@ public class RequestResponse {
 
 			if (this.code < HttpURLConnection.HTTP_BAD_REQUEST) { // if code < 400, response is in inputStream
 				if (!ignoreResponseData) {
-					data = TransformUtils.inputStreamToString(httpURLConnection.getInputStream());
+					data = StringUtils.inputStreamToString(httpURLConnection.getInputStream());
 					//Log.d("debug", "data : " + data);
 					Object json = new JSONTokener(data).nextValue();
 					//Log.d("debug", "json : " + json);
@@ -43,7 +43,7 @@ public class RequestResponse {
 				}
 			}
 			else { // if code >= 400, response is in errorStream
-				data = TransformUtils.inputStreamToString(httpURLConnection.getErrorStream());
+				data = StringUtils.inputStreamToString(httpURLConnection.getErrorStream());
 				//Log.d("debug", "data : " + data);
 				Object json = new JSONTokener(data).nextValue();
 				if (json instanceof JSONObject) {
