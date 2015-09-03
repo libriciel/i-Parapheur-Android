@@ -35,7 +35,7 @@ public class Document implements Parcelable {
 		mSize = size;
 		mPagesAnnotations = new SparseArray<>();
 		mIsLocked = isLocked;
-		mIsMainDocument = mIsMainDocument;
+		mIsMainDocument = isMainDocument;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -47,6 +47,8 @@ public class Document implements Parcelable {
 		mUrl = in.readString();
 		mSize = in.readInt();
 		mPath = in.readString();
+		mIsLocked = (in.readByte() != 0);
+		mIsMainDocument = (in.readByte() != 0);
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -123,13 +125,15 @@ public class Document implements Parcelable {
 		dest.writeString(mUrl);
 		dest.writeInt(mSize);
 		dest.writeString(mPath);
+		dest.writeByte((byte) (mIsLocked ? 1 : 0));
+		dest.writeByte((byte) (mIsMainDocument ? 1 : 0));
 	}
 
 	// </editor-fold desc="Parcelable">
 
 	@Override
 	public String toString() {
-		return "{Document id:" + mId + " name:" + mName + "}";
+		return "{Document id:" + mId + " name:" + mName + " isMainDoc:" + mIsMainDocument + "}";
 	}
 
 	@Override
