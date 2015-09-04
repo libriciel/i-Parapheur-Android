@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item android:id="@+id/action_details"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:iparapheur="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_document_selection"
+        android:icon="@drawable/ic_library_books_white_24dp"
+        android:title="@string/document_selection"
+        iparapheur:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/item1"
+                android:title="@string/abc_action_bar_home_description"/>
+            <item
+                android:id="@+id/item2"
+                android:title="@string/add_parapheur"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_details"
+        android:icon="@drawable/ic_info_white_24dp"
         android:title="@string/action_details"
-        android:showAsAction="ifRoom"  />
+        iparapheur:showAsAction="ifRoom"/>
 
 </menu>

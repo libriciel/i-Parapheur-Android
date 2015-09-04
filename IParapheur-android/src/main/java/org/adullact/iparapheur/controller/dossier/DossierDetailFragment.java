@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +33,7 @@ import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +49,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
+	private String mDocumentId;              // The Document this fragment is presenting.
 	private boolean isReaderEnabled;
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
@@ -103,6 +106,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					}
 				}
 		);
+
 		String state = Environment.getExternalStorageState();
 		if (!Environment.MEDIA_MOUNTED.equals(state)) {
 			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
@@ -157,8 +161,14 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	// </editor-fold desc="ActionBar">
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
+		update(dossier, bureauId, null);
+	}
+
+	public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
+
 		mBureauId = bureauId;
 		mDossier = dossier;
+		mDocumentId = documentId;
 
 		closeDetails();
 
@@ -173,6 +183,8 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		// To force reload dossier details, just delete its main document path (on local storage).
 		if (forceReload)
 			mDossier.clearDetails();
+
+		Log.v("Adrien", "before : " + mDossier.getMainDocuments().size() + " " + mDossier.getAnnexes().size());
 
 		// Download information only if details aren't already available
 		if (!mDossier.isDetailsAvailable())
@@ -268,6 +280,20 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		}
 	}
 
+	private @Nullable Document findCurrentDocument(@NonNull Dossier dossier, @Nullable String documentId) {
+
+		List<Document> documents = new ArrayList<>();
+		documents.addAll(dossier.getMainDocuments());
+		documents.addAll(dossier.getAnnexes());
+
+		if (!TextUtils.isEmpty(documentId))
+			for (Document document : documents)
+				if (TextUtils.equals(document.getId(), documentId))
+					return document;
+
+		return dossier.getMainDocuments().get(0);
+	}
+
 	public void showSpinner() {
 		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
 	}
@@ -309,13 +335,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 			//
 
-			if (!DeviceUtils.isDebugOffline()) {
-				Dossier d = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
-				mDossier.saveDetails(d);
-			}
-			else {
+			if (!DeviceUtils.isDebugOffline())
+				mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
+			else
 				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
-			}
 
 			if (isCancelled())
 				return;
@@ -326,16 +349,16 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			if (isCancelled())
 				return;
 
-			if (isReaderEnabled && (mDossier.getMainDocuments() != null) && (!mDossier.getMainDocuments().isEmpty())) {
-				Document document = mDossier.getMainDocuments().get(0);
+			Document currentDocument = findCurrentDocument(mDossier, mDocumentId);
+			if (isReaderEnabled && (currentDocument != null)) {
 
-				if ((document.getPath() == null) || !(new File(document.getPath()).exists())) {
-					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
+				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
+					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
 					String path = file.getAbsolutePath();
 
 					if (!DeviceUtils.isDebugOffline()) {
 						if (RESTClient.INSTANCE.downloadFile(mDossier.getMainDocuments().get(0).getUrl(), path)) {
-							document.setPath(path);
+							currentDocument.setPath(path);
 
 							List<Document> documents = mDossier.getMainDocuments();
 							String documentId = "";
@@ -343,11 +366,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 								documentId = mDossier.getMainDocuments().get(0).getId();
 
 							String dossierId = mDossier.getId();
-							document.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, documentId));
+							currentDocument.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, documentId));
 						}
 					}
 					else {
-						document.setPath(path);
+						currentDocument.setPath(path);
 						Log.d("debug", file.exists() ? "Document par defaut trouvé" : "Document par defaut non trouvé");
 					}
 				}

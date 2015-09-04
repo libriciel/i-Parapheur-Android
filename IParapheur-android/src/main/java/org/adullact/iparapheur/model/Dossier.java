@@ -2,7 +2,6 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.text.DateFormat;
@@ -61,7 +60,7 @@ public class Dossier implements Parcelable {
 		this.name = this.type = this.sousType = null;
 		this.dateCreation = this.dateLimite = null;
 		this.actionDemandee = null;
-		this.actions = new ArrayList<Action>();
+		this.actions = new ArrayList<>();
 	}
 
 	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
@@ -143,17 +142,6 @@ public class Dossier implements Parcelable {
 	}
 
 	// </editor-fold desc="Setters / Getters">
-
-	/**
-	 * Return all documents (main and annexes).
-	 *
-	 * @return main documents and annexes
-	 */
-	public @NonNull List<Document> getDocuments() {
-		List<Document> documents = new ArrayList<>(mainDocuments);
-		documents.addAll(annexes);
-		return documents;
-	}
 
 	public void addDocument(@Nullable Document document) {
 
