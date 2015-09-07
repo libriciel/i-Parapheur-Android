@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -140,8 +141,31 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
-		MenuItem item = menu.findItem(R.id.action_details);
-		item.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
+
+		// Info item
+
+		MenuItem infoItem = menu.findItem(R.id.action_details);
+		infoItem.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
+
+		// Document selector
+
+		MenuItem documentSelectorItem = menu.findItem(R.id.action_document_selection);
+		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getMainDocuments().size() > 1) || (!mDossier.getAnnexes().isEmpty()));
+		documentSelectorItem.setVisible(hasMultipleDoc);
+
+		if (hasMultipleDoc) {
+			SubMenu documentSelectorSubMenu = documentSelectorItem.getSubMenu();
+			documentSelectorSubMenu.clear();
+
+			for (Document mainDocument : mDossier.getMainDocuments())
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName());
+
+			for (Document annexe : mDossier.getAnnexes())
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName());
+		}
+
+		//
+
 		super.onPrepareOptionsMenu(menu);
 	}
 
@@ -149,10 +173,23 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		// Handle presses on the action bar items
+
 		switch (item.getItemId()) {
+
 			case R.id.action_details:
 				toggleDetails();
 				return true;
+
+			case R.id.action_document_selected:
+				String name = String.valueOf(item.getTitle());
+				String documentId = findDocumentId(mDossier, name);
+
+				if (!TextUtils.isEmpty(documentId))
+					if (!TextUtils.equals(mDocumentId, documentId))
+						update(mDossier, documentId);
+
+				return true;
+
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -191,6 +228,22 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			new DossierLoadingTask(getActivity(), this).execute();
 		else
 			onDataChanged();
+	}
+
+	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
+
+		if (dossier == null)
+			return null;
+
+		for (Document mainDocument : mDossier.getMainDocuments())
+			if (TextUtils.equals(documentName, mainDocument.getName()))
+				return mainDocument.getId();
+
+		for (Document annexes : mDossier.getAnnexes())
+			if (TextUtils.equals(documentName, annexes.getName()))
+				return annexes.getId();
+
+		return null;
 	}
 
 	@Override
@@ -350,6 +403,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				return;
 
 			Document currentDocument = findCurrentDocument(mDossier, mDocumentId);
+
 			if (isReaderEnabled && (currentDocument != null)) {
 
 				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
