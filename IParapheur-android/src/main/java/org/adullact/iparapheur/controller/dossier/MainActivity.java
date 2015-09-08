@@ -283,16 +283,20 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Pass the event to ActionBarDrawerToggle, if it returns
 		// true, then it has handled the app icon touch event
+
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
 		}
 
 		// TODO : handle dossier(s) actions
 		// Handle presses on the action bar items
+
 		switch (item.getItemId()) {
+
 			case R.id.action_settings:
 				startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
 				return true;
+
 			default:
 				return super.onOptionsItemSelected(item);
 		}

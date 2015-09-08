@@ -291,6 +291,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	private void toggleDetails() {
+
 		if (getView() == null)
 			return;
 
@@ -326,7 +327,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				if (TextUtils.equals(document.getId(), documentId))
 					return document;
 
-		return dossier.getMainDocuments().get(0);
+		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
 	}
 
 	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
