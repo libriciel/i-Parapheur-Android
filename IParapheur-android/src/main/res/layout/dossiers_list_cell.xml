@@ -11,14 +11,16 @@
         android:id="@+id/dossiers_list_item_checkable_layout"
         android:layout_gravity="center_vertical"
         android:layout_width="56dp"
-        android:layout_height="56dp">
+        android:layout_height="56dp"
+        android:duplicateParentState="true">
 
         <FrameLayout
             android:id="@+id/dossiers_list_item_image_main_container"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="center"
-            android:background="@drawable/icon_background_round">
+            android:background="@drawable/icon_background_round"
+            android:duplicateParentState="true">
 
             <ImageView
                 android:id="@+id/dossiers_list_item_image_main"
