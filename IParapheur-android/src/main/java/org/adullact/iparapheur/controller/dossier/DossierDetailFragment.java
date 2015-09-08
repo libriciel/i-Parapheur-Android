@@ -177,7 +177,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		switch (item.getItemId()) {
 
 			case R.id.action_details:
-				toggleDetails();
+				((DossierDetailsFragmentListener) getActivity()).toggleInfoDrawer();
 				return true;
 
 			case R.id.action_document_selected:
@@ -207,7 +207,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		mDossier = dossier;
 		mDocumentId = documentId;
 
-		closeDetails();
+		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
 
 		if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
 			getDossierDetails(false);
@@ -281,39 +281,26 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	private void updateDetails() {
-		if (getView() != null) {
-			((TextView) getView().findViewById(R.id.fragment_dossier_detail_title)).setText(mDossier.getName());
-			((TextView) getView().findViewById(R.id.fragment_dossier_detail_typologie)).setText(mDossier.getType() + " / " + mDossier.getSousType());
-			ListView circuitView = (ListView) getView().findViewById(R.id.fragment_dossier_detail_circuit);
-			circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit()));
-			getActivity().invalidateOptionsMenu();
-		}
-	}
 
-	private void toggleDetails() {
+		View infosLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
 
-		if (getView() == null)
+		// Default case (this should not happen !)
+
+		if (infosLayout == null)
 			return;
 
-		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
+		// Updating info
 
-		if (details.getVisibility() == View.VISIBLE) {
-			details.setVisibility(View.INVISIBLE);
-		}
-		else if ((mDossier != null) && mDossier.isDetailsAvailable()) {
-			details.setVisibility(View.VISIBLE);
-		}
-	}
+		ListView circuitView = (ListView) infosLayout.findViewById(R.id.fragment_dossier_detail_circuit);
+		TextView title = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_title);
+		TextView typologie = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_typologie);
 
-	private void closeDetails() {
-		if (getView() == null)
-			return;
+		title.setText(mDossier.getName());
+		typologie.setText(mDossier.getType() + " / " + mDossier.getSousType());
+		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit()));
 
-		View details = getView().findViewById(R.id.fragment_dossier_detail_details);
-
-		if ((details != null) && (details.getVisibility() == View.VISIBLE)) {
-			details.setVisibility(View.INVISIBLE);
-		}
+		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
+		getActivity().invalidateOptionsMenu();
 	}
 
 	private @Nullable Document findCurrentDocument(@NonNull Dossier dossier, @Nullable String documentId) {
@@ -367,6 +354,18 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	// </editor-fold desc="SeekBar Listener">
+
+	// <editor-fold desc="DossierDetailsFragmentListener">
+
+	public interface DossierDetailsFragmentListener {
+
+		public void toggleInfoDrawer();
+
+		public void lockInfoDrawer(boolean lock);
+
+	}
+
+	// </editor-fold desc="DossierDetailsFragmentListener">
 
 	private class DossierLoadingTask extends LoadingTask {
 

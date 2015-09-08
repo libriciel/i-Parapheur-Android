@@ -16,7 +16,7 @@
     <string name="network_unreachable">Aucune connexion disponible</string>
     <string name="at">à</string>
     <string name="le">le</string>
-    <string name="action_details">Détails</string>
+    <string name="action_details">Informations du dossier</string>
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
     <string name="document_selection">Sélection du document</string>

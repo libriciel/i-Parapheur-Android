@@ -17,7 +17,7 @@ import java.util.List;
 public class CircuitAdapter extends ArrayAdapter<EtapeCircuit> {
 
 	public CircuitAdapter(Context context, List<EtapeCircuit> circuit) {
-		super(context, R.layout.etape_circuit, R.id.etape_circuit_bureau, circuit);
+		super(context, R.layout.fragment_dossier_info_list_cell, R.id.etape_circuit_bureau, circuit);
 	}
 
 	@Override
