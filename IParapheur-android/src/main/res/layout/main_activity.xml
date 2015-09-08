@@ -82,7 +82,7 @@
                 android:layout_gravity="end">
 
                 <include
-                    layout="@layout/dossiers_infos"/>
+                    layout="@layout/dossiers_info"/>
 
             </FrameLayout>
 

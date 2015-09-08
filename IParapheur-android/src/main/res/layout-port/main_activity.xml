@@ -60,7 +60,7 @@
                     android:visibility="invisible"/>
 
             </FrameLayout>
-            
+
             <!-- The right drawer -->
             <!-- For some reason, you can't put it directly in the dossier_detail_fragment... -->
 
@@ -72,7 +72,7 @@
                 android:layout_gravity="end">
 
                 <include
-                    layout="@layout/dossiers_infos"/>
+                    layout="@layout/dossiers_info"/>
 
             </FrameLayout>
 

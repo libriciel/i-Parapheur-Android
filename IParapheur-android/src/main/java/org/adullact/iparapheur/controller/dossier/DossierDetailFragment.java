@@ -158,10 +158,14 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			documentSelectorSubMenu.clear();
 
 			for (Document mainDocument : mDossier.getMainDocuments())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName());
+				documentSelectorSubMenu.add(
+						Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()
+				).setIcon(R.drawable.ic_library_book_main_black_24dp);
 
 			for (Document annexe : mDossier.getAnnexes())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName());
+				documentSelectorSubMenu.add(
+						Menu.NONE, R.id.action_document_selected, 0, annexe.getName()
+				).setIcon(R.drawable.ic_library_book_annexe_black_24dp);
 		}
 
 		//
