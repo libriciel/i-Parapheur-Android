@@ -22,37 +22,61 @@
             android:id="@+id/home_toolbar"
             layout="@layout/activity_dossiers_toolbar"/>
 
-        <FrameLayout
-            android:orientation="vertical"
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/activity_dossiers_right_drawer_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:baselineAligned="false">
+            android:orientation="vertical"
+            android:divider="@android:drawable/divider_horizontal_bright">
 
-            <LinearLayout
-                android:orientation="horizontal"
+            <FrameLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:baselineAligned="false">
 
-                <fragment
-                    android:id="@+id/dossier_detail"
-                    android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
-                    android:tag="Dossier_details"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    tools:layout="@layout/fragment_dossier_detail"/>
-            </LinearLayout>
+                    android:baselineAligned="false">
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
-                android:max="100"
-                android:visibility="invisible"/>
+                    <fragment
+                        android:id="@+id/dossier_detail"
+                        android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
+                        android:tag="Dossier_details"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        tools:layout="@layout/fragment_dossier_detail"/>
+                </LinearLayout>
 
-        </FrameLayout>
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progressBar"
+                    android:max="100"
+                    android:visibility="invisible"/>
+
+            </FrameLayout>
+            
+            <!-- The right drawer -->
+            <!-- For some reason, you can't put it directly in the dossier_detail_fragment... -->
+
+            <FrameLayout
+                android:orientation="horizontal"
+                android:id="@+id/activity_dossiers_right_drawer"
+                android:layout_width="320dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end">
+
+                <include
+                    layout="@layout/dossiers_infos"/>
+
+            </FrameLayout>
+
+        </android.support.v4.widget.DrawerLayout>
     </LinearLayout>
 
     <!-- The navigation drawer -->
