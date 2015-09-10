@@ -15,6 +15,7 @@ import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,13 +40,13 @@ import java.util.Map;
  * et quelques action spécifiques qui ne suivent pas l'architecture CRUDL
  * (ex. mise à jour des classifications ACTES).
  */
-// TODO : JSONStringer, maybe ?
 public class RESTClientAPI3 extends RESTClientAPI {
 
 	/* Ressources principales */
 	private static final String RESOURCE_BUREAUX = "/parapheur/bureaux";
 	private static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
 	private static final String RESOURCE_DOSSIER_CIRCUIT = "/parapheur/dossiers/%s/circuit";
+	private static final String RESOURCE_SIGN_INFO = "/parapheur/dossiers/%s/getSignInfo";
 	private static final String RESOURCE_TYPES = "/parapheur/types";
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
@@ -78,19 +79,16 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	protected ModelMapper modelMapper = new ModelMapper3();
 
-	@Override
-	public List<Bureau> getBureaux() throws IParapheurException {
+	@Override public List<Bureau> getBureaux() throws IParapheurException {
 		return modelMapper.getBureaux(RESTUtils.get(buildUrl(RESOURCE_BUREAUX)));
 	}
 
-	@Override
-	public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
+	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
 		String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
 		return modelMapper.getDossier(RESTUtils.get(url));
 	}
 
-	@Override
-	public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
+	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 		if (filter == null) {
@@ -114,16 +112,19 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getDossiers(RESTUtils.get(url));
 	}
 
-	@Override
-	public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
 		String url = buildUrl(RESOURCE_TYPES);
 		return modelMapper.getTypologie(RESTUtils.get(url));
 	}
 
-	@Override
-	public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
 		return modelMapper.getCircuit(RESTUtils.get(url));
+	}
+
+	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
+		String url = buildUrl(String.format(Locale.US, RESOURCE_SIGN_INFO, dossierId), "bureauCourant=" + bureauId);
+		return modelMapper.getSignInfo(RESTUtils.get(url));
 	}
 
 	// <editor-fold desc="Annotations">
@@ -136,14 +137,12 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId);
 	}
 
-	@Override
-	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+	@Override public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
 		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
-	@Override
-	public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build json object
 
@@ -193,8 +192,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return null;
 	}
 
-	@Override
-	public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build Json object
 
@@ -240,8 +238,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			throw new IParapheurException(R.string.error_annotation_update, "");
 	}
 
-	@Override
-	public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
 		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
 		RESTUtils.delete(url, true);
 	}
@@ -250,8 +247,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	// <editor-fold desc="Actions">
 
-	@Override
-	public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_VISA, dossier.getId());
 		try {
 			JSONObject json = new JSONObject();
@@ -266,25 +262,27 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
+
+		JSONStringer jsonStringer = new JSONStringer();
 		try {
-			JSONObject json = new JSONObject();
-			json.put("bureauCourant", bureauId);
-			json.put("annotPub", annotPub);
-			json.put("annotPriv", annotPriv);
-			json.put("signature", signValue);
-			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
-			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
+			jsonStringer.object();
+			jsonStringer.key("bureauCourant").value(bureauId);
+			jsonStringer.key("annotPub").value(annotPub);
+			jsonStringer.key("annotPriv").value(annotPriv);
+			jsonStringer.key("signature").value(signValue);
+			jsonStringer.endObject();
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
 		}
+
+		RequestResponse response = RESTUtils.post(buildUrl(actionUrl), jsonStringer.toString());
+		return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 	}
 
-	@Override
-	public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
 		/** FIXME : weird copy/paste. Maybe it has no utility too.
 		 String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
 		 try {
@@ -301,8 +299,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return false;
 	}
 
-	@Override
-	public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_HELIOS, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -318,8 +315,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -340,8 +336,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
 
 		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
 		try {
@@ -364,8 +359,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override
-	public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_REJET, dossierId);
 		try {
 			JSONObject json = new JSONObject();

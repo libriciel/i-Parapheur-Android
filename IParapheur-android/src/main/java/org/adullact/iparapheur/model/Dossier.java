@@ -14,6 +14,7 @@ import java.util.UUID;
 public class Dossier implements Parcelable {
 
 	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
+
 		public Dossier createFromParcel(Parcel source) {
 			return new Dossier(source);
 		}
@@ -175,13 +176,11 @@ public class Dossier implements Parcelable {
 
 	// <editor-fold desc="Parcelable">
 
-	@Override
-	public int describeContents() {
+	@Override public int describeContents() {
 		return 0;
 	}
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+	@Override public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.id);
 		dest.writeString(this.name);
 		dest.writeInt(this.actionDemandee == null ? -1 : this.actionDemandee.ordinal());
@@ -200,8 +199,7 @@ public class Dossier implements Parcelable {
 	/**
 	 * Equals and hashCode overriding, so we can find dossier with its id.
 	 */
-	@Override
-	public boolean equals(Object o) {
+	@Override public boolean equals(Object o) {
 		if (o instanceof Dossier) {
 			Dossier toCompare = (Dossier) o;
 			return this.id.equals(toCompare.id);
@@ -212,13 +210,11 @@ public class Dossier implements Parcelable {
 		return false;
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return name;
 	}
 
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		return id.hashCode();
 	}
 }

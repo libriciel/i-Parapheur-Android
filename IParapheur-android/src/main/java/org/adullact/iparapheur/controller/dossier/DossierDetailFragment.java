@@ -62,8 +62,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
@@ -74,13 +73,11 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		mCurrentPage = 0;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
 		isReaderEnabled = true;
@@ -96,8 +93,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			mShouldReload = true;
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
 		mViewPager.post(
@@ -119,8 +115,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		setHasOptionsMenu(true);
 	}
 
-	@Override
-	public void onStart() {
+	@Override public void onStart() {
 		super.onStart();
 
 		if (mShouldReload) {
@@ -133,14 +128,12 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// <editor-fold desc="ActionBar">
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.dossier_details_menu, menu);
 	}
 
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
+	@Override public void onPrepareOptionsMenu(Menu menu) {
 
 		// Info item
 
@@ -173,8 +166,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		super.onPrepareOptionsMenu(menu);
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
 
 		// Handle presses on the action bar items
 
@@ -232,8 +224,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		new DossierLoadingTask(getActivity(), this).execute();
 	}
 
-	@Override
-	public void onDataChanged() {
+	@Override public void onDataChanged() {
 
 		if (!DeviceUtils.isDebugOffline())
 			updateDetails();
@@ -249,8 +240,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			if (isReaderEnabled && (document.getPath() != null)) {
 				mViewPager.post(
 						new Runnable() {
-							@Override
-							public void run() {
+							@Override public void run() {
 								try {
 									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
 									mViewPager.setCurrentItem(0, false);
@@ -268,8 +258,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		else {
 			mViewPager.post(
 					new Runnable() {
-						@Override
-						public void run() {
+						@Override public void run() {
 							try {
 								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
 								//mViewPager.setCurrentItem(0, false);
@@ -341,16 +330,13 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
 	}
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
+	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
 	// <editor-fold desc="SeekBar Listener">
 
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) { }
+	@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
+	@Override public void onStopTrackingTouch(SeekBar seekBar) {
 		if (mCurrentPage != seekBar.getProgress()) {
 			mCurrentPage = seekBar.getProgress();
 			//reader.setDisplayedViewIndex(mCurrentPage);
@@ -363,9 +349,9 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	public interface DossierDetailsFragmentListener {
 
-		public void toggleInfoDrawer();
+		void toggleInfoDrawer();
 
-		public void lockInfoDrawer(boolean lock);
+		void lockInfoDrawer(boolean lock);
 
 	}
 
@@ -377,8 +363,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			super(context, listener);
 		}
 
-		@Override
-		protected void load(String... params) throws IParapheurException {
+		@Override protected void load(String... params) throws IParapheurException {
 
 			// Default cases
 

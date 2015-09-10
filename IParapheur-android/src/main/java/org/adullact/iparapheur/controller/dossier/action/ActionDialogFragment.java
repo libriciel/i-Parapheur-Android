@@ -26,8 +26,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 
 	public ActionDialogFragment() {}
 
-	@Override
-	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getArguments() != null) {
 			this.dossiers = getArguments().getParcelableArrayList("dossiers");
 			this.bureauId = getArguments().getString("bureauId");
@@ -35,11 +34,13 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(createView())
 				// Set action button
-				.setPositiveButton(getTitle(), this).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				ActionDialogFragment.this.getDialog().cancel();
-			}
-		});
+				.setPositiveButton(getTitle(), this).setNegativeButton(
+				android.R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						ActionDialogFragment.this.getDialog().cancel();
+					}
+				}
+		);
 
 		return builder.create();
 	}
@@ -55,8 +56,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		return layout;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
+	@Override public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		// Activities containing this fragment must implement its callbacks.
 		if (!(activity instanceof LoadingTask.DataChangeListener)) {
@@ -65,8 +65,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		listener = (LoadingTask.DataChangeListener) activity;
 	}
 
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
+	@Override public void onClick(DialogInterface dialog, int which) {
 		executeTask();
 	}
 

@@ -9,6 +9,7 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 public interface IParapheurAPI {
 
-	public static final String BASE_PATH = "https://m.";
+	String BASE_PATH = "https://m.";
 
 	/**
 	 * Test si un compte est accessible.
@@ -36,41 +37,24 @@ public interface IParapheurAPI {
 	 */
 	String getTicket(Account account) throws IParapheurException;
 
-	/**
-	 * @return
-	 */
 	List<Bureau> getBureaux() throws IParapheurException;
 
-	/**
-	 * @param bureauId
-	 * @param dossierId
-	 * @return
-	 */
 	Dossier getDossier(String bureauId, String dossierId) throws IParapheurException;
 
-	/**
-	 * @param bureauId
-	 * @return
-	 */
 	List<Dossier> getDossiers(String bureauId) throws IParapheurException;
 
-	/**
-	 * @return
-	 */
 	Map<String, ArrayList<String>> getTypologie() throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @return
-	 */
 	List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException;
+
+	SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException;
 
 	/**
 	 * @param dossierId
 	 * @return les annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
-	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
+	SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
 
 	/**
 	 * @param dossierId
@@ -79,100 +63,23 @@ public interface IParapheurAPI {
 	 */
 	String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param annotation
-	 * @param page
-	 * @throws IParapheurException
-	 */
 	void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param annotationId
-	 * @throws IParapheurException
-	 */
 	void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException;
 
-	/**
-	 * @param url
-	 * @param path
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean downloadFile(String url, String path) throws IParapheurException;
 
-	/**
-	 * @param dossier
-	 * @param annotPub
-	 * @param annotPriv
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param signValue
-	 * @param annotPub
-	 * @param annotPriv
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param archiveTitle
-	 * @param withAnnexes
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param annotPub
-	 * @param annotPriv
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param classification
-	 * @param annotPub
-	 * @param annotPriv
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param destinataires
-	 * @param sujet
-	 * @param message
-	 * @param showPassword
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
 
-	/**
-	 * @param dossierId
-	 * @param annotPub
-	 * @param annotPriv
-	 * @param bureauId
-	 * @return
-	 * @throws IParapheurException
-	 */
 	boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 }

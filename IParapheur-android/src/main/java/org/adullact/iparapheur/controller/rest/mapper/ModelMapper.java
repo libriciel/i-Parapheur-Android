@@ -12,6 +12,8 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +28,35 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 public class ModelMapper {
+
+	protected static String DOSSIER_ID = "id";
+	protected static String DOSSIER_TITLE = "title";
+	protected static String DOSSIER_TYPE = "type";
+	protected static String DOSSIER_SUBTYPE = "sousType";
+	protected static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
+	protected static String DOSSIER_EMISSION_DATE = "dateEmission";
+	protected static String DOSSIER_DATE_LIMITE = "dateLimite";
+	protected static String DOSSIER_DOCUMENTS = "documents";
+	protected static String DOSSIER_CIRCUIT = "circuit";
+
+	protected static String DOCUMENT_ID = "id";
+	protected static String DOCUMENT_NAME = "name";
+	protected static String DOCUMENT_VISUEL_PDF = "visuelPdf";
+	protected static String DOCUMENT_SIZE = "size";
+	protected static String DOCUMENT_IS_LOCKED = "isLocked";
+	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
+
+	protected static String CIRCUIT_ETAPES = "etapes";
+	protected static String CIRCUIT_DATE_VALIDATION = "dateValidation";
+	protected static String CIRCUIT_APPROVED = "approved";
+	protected static String CIRCUIT_REJECTED = "rejected";
+	protected static String CIRCUIT_PARAPHEUR_NAME = "parapheurName";
+	protected static String CIRCUIT_SIGNATAIRE = "signataire";
+	protected static String CIRCUIT_ACTION_DEMANDEE = "actionDemandee";
+	protected static String CIRCUIT_PUBLIC_ANNOTATIONS = "annotPub";
+
+	protected static String SIGN_INFO_SIGNATURE_INFORMATIONS = "signatureInformations";
+	protected static String SIGN_INFO_HASH = "hash";
 
 	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
 		Dossier dossier = null;
@@ -193,6 +224,17 @@ public class ModelMapper {
 			}
 		}
 		return bureaux;
+	}
+
+	public @NonNull SignInfo getSignInfo(RequestResponse response) {
+		SignInfo result = new SignInfo();
+
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
+		String hash = jsonExplorer.findObject(SIGN_INFO_SIGNATURE_INFORMATIONS).optString(SIGN_INFO_HASH, null);
+
+		result.setHash(hash);
+
+		return result;
 	}
 
 	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {

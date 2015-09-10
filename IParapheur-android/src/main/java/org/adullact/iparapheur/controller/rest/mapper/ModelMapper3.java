@@ -20,34 +20,7 @@ import java.util.LinkedHashMap;
 
 public class ModelMapper3 extends ModelMapper {
 
-	public static String DOSSIER_ID = "id";
-	public static String DOSSIER_TITLE = "title";
-	public static String DOSSIER_TYPE = "type";
-	public static String DOSSIER_SUBTYPE = "sousType";
-	public static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
-	public static String DOSSIER_EMISSION_DATE = "dateEmission";
-	public static String DOSSIER_DATE_LIMITE = "dateLimite";
-	public static String DOSSIER_DOCUMENTS = "documents";
-	public static String DOSSIER_CIRCUIT = "circuit";
-
-	public static String DOCUMENT_ID = "id";
-	public static String DOCUMENT_NAME = "name";
-	public static String DOCUMENT_VISUEL_PDF = "visuelPdf";
-	public static String DOCUMENT_SIZE = "size";
-	public static String DOCUMENT_IS_LOCKED = "isLocked";
-	public static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
-
-	public static String CIRCUIT_ETAPES = "etapes";
-	public static String CIRCUIT_DATE_VALIDATION = "dateValidation";
-	public static String CIRCUIT_APPROVED = "approved";
-	public static String CIRCUIT_REJECTED = "rejected";
-	public static String CIRCUIT_PARAPHEUR_NAME = "parapheurName";
-	public static String CIRCUIT_SIGNATAIRE = "signataire";
-	public static String CIRCUIT_ACTION_DEMANDEE = "actionDemandee";
-	public static String CIRCUIT_PUBLIC_ANNOTATIONS = "annotPub";
-
-	@Override
-	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
+	@Override public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
 		Dossier dossier = null;
 
 		if (requestResponse.getResponse() != null)
@@ -56,8 +29,7 @@ public class ModelMapper3 extends ModelMapper {
 		return dossier;
 	}
 
-	@Override
-	protected Dossier getDossier(JSONObject jsonObject) {
+	@Override protected Dossier getDossier(JSONObject jsonObject) {
 
 		String dossierId = jsonObject.optString(DOSSIER_ID);
 		ArrayList<Action> actions = getActionsForDossier(jsonObject);
@@ -104,8 +76,7 @@ public class ModelMapper3 extends ModelMapper {
 		);
 	}
 
-	@Override
-	protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
+	@Override protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
 		ArrayList<Action> actions = new ArrayList<>();
 		JSONArray JSONActions = dossier.optJSONArray("actions");
 		if (JSONActions != null) {
@@ -119,8 +90,7 @@ public class ModelMapper3 extends ModelMapper {
 		return actions;
 	}
 
-	@Override
-	public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
+	@Override public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
 		ArrayList<Dossier> dossiers = new ArrayList<>();
 		JSONArray array = requestResponse.getResponseArray();
 		if (array != null) {
@@ -137,8 +107,7 @@ public class ModelMapper3 extends ModelMapper {
 		return dossiers;
 	}
 
-	@Override
-	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
+	@Override public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
 
 		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
@@ -169,8 +138,7 @@ public class ModelMapper3 extends ModelMapper {
 		return circuit;
 	}
 
-	@Override
-	public ArrayList<Bureau> getBureaux(RequestResponse response) {
+	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {
 		ArrayList<Bureau> bureaux = new ArrayList<>();
 
 		if (response.getResponseArray() == null)
@@ -191,8 +159,7 @@ public class ModelMapper3 extends ModelMapper {
 		return bureaux;
 	}
 
-	@Override
-	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
+	@Override public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
 
 		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
 		JSONArray JSONTypes = response.getResponseArray();

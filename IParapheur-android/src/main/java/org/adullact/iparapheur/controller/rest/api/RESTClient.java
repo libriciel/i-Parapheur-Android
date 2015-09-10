@@ -13,6 +13,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.json.JSONException;
 
@@ -90,18 +91,15 @@ public enum RESTClient implements IParapheurAPI {
 		return apiVersion;
 	}
 
-	@Override
-	public int test(Account account) throws IParapheurException {
+	@Override public int test(Account account) throws IParapheurException {
 		return getRESTClient(account).test(account);
 	}
 
-	@Override
-	public String getTicket(Account account) throws IParapheurException {
+	@Override public String getTicket(Account account) throws IParapheurException {
 		return null;
 	}
 
-	@Override
-	public List<Bureau> getBureaux() throws IParapheurException {
+	@Override public List<Bureau> getBureaux() throws IParapheurException {
 		return getRESTClient().getBureaux();
 	}
 
@@ -137,23 +135,19 @@ public enum RESTClient implements IParapheurAPI {
 		return apiClient;
 	}
 
-	@Override
-	public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
+	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
 		return getRESTClient().getDossier(bureauId, dossierId);
 	}
 
-	@Override
-	public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
+	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 		return getRESTClient().getDossiers(bureauId);
 	}
 
-	@Override
-	public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
 		return getRESTClient().getTypologie();
 	}
 
-	@Override
-	public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
 		return getRESTClient().getCircuit(dossierId);
 	}
 
@@ -163,59 +157,54 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 
-	@Override
-	public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override
-	public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
 		getRESTClient().updateAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override
-	public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
 		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
 	}
 
-	@Override
-	public boolean downloadFile(String url, String path) throws IParapheurException {
+	@Override public boolean downloadFile(String url, String path) throws IParapheurException {
 		return getRESTClient().downloadFile(url, path);
 	}
 
-	@Override
-	public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().viser(dossier, annotPub, annotPriv, bureauId);
 	}
 
-	@Override
-	public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().signer(dossierId, signValue, annotPub, annotPriv, bureauId);
 	}
 
-	@Override
-	public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
 		return getRESTClient().archiver(dossierId, archiveTitle, withAnnexes, bureauId);
 	}
 
-	@Override
-	public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().envoiTdtHelios(dossierId, annotPub, annotPriv, bureauId);
 	}
 
-	@Override
-	public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().envoiTdtActes(dossierId, nature, classification, numero, dateActes, objet, annotPub, annotPriv, bureauId);
 	}
 
-	@Override
-	public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
 		// TODO : manage annexes
-		return getRESTClient().envoiMailSec(dossierId, destinataires, destinatairesCC, destinatairesCCI, sujet, message, password, showPassword, annexesIncluded, bureauId);
+		return getRESTClient().envoiMailSec(
+				dossierId, destinataires, destinatairesCC, destinatairesCCI, sujet, message, password, showPassword, annexesIncluded, bureauId
+		);
 	}
 
-	@Override
-	public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().rejeter(dossierId, annotPub, annotPriv, bureauId);
+	}
+
+	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
+		return getRESTClient().getSignInfo(dossierId, bureauId);
 	}
 }
