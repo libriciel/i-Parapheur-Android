@@ -1,6 +1,8 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.security.KeyChain;
@@ -20,18 +22,36 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
+import org.spongycastle.cert.X509CertificateHolder;
+import org.spongycastle.cert.jcajce.JcaCertStore;
+import org.spongycastle.cms.CMSException;
+import org.spongycastle.cms.CMSProcessableByteArray;
+import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.cms.CMSSignedDataGenerator;
+import org.spongycastle.cms.CMSTypedData;
+import org.spongycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.spongycastle.operator.ContentSigner;
+import org.spongycastle.operator.OperatorCreationException;
+import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.spongycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.spongycastle.util.Store;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class SignatureDialogFragment extends ActionDialogFragment implements View.OnClickListener {
 
 	private static final String LOG_TAG = "SignatureDialogFragment";
+	private static final int RESULT_CODE_FILE_SELECT = 0;
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureauId";
 
@@ -90,6 +110,18 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 	}
 
+	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case RESULT_CODE_FILE_SELECT:
+				if (resultCode == Activity.RESULT_OK) {
+					Uri uri = data.getData();
+					Log.d(LOG_TAG, "File Uri: " + uri.toString());
+				}
+				break;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
 	// </editor-fold desc="LifeCycle">
 
 	@Override protected int getTitle() {
@@ -104,28 +136,54 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		new SignTask(getActivity()).execute();
 	}
 
-	// Cert chooser button click
 	@Override public void onClick(View v) {
 		KeyChain.choosePrivateKeyAlias(
 				getActivity(), new KeyChainAliasCallback() {
 					public void alias(final String alias) {
+
 						selectedCertAlias = alias;
-						getActivity().runOnUiThread(
-								new Runnable() {
-									public void run() {
-										certInfo.setText(alias);
-									}
-								}
-						);
+
+						try { addCertificateToKeyStore(alias); }
+						catch (KeyStoreException | InterruptedException | NoSuchAlgorithmException | CertificateException
+								| KeyChainException | IOException e) {e.printStackTrace();}
+
 					}
-				},
-				// FIXME :  only RSA?
-				new String[]{"RSA"}, // List of acceptable key types. null for any
+				}, new String[]{"RSA"}, // List of acceptable key types. null for any
 				null,                // issuer, null for any
 				null,                // host name of server requesting the cert, null if unavailable
 				-1,                  // port of server requesting the cert, -1 if unavailable
 				null
 		);               // alias to preselect, null if unavailable
+	}
+
+	private void addCertificateToKeyStore(@Nullable String alias) throws KeyStoreException, KeyChainException, InterruptedException, CertificateException, NoSuchAlgorithmException, IOException {
+
+		// Load app's KeyStore
+
+		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+		keyStore.load(null);
+
+		// Check if already imported, cancels the operation if any
+
+		boolean alreadyExists = false;
+		Enumeration<String> aliases = keyStore.aliases();
+
+		while (aliases.hasMoreElements())
+			if (TextUtils.equals(alias, aliases.nextElement()))
+				alreadyExists = true;
+
+		// Cancels if not valid data
+
+//		if (TextUtils.isEmpty(alias) || alreadyExists)
+//			return;
+
+		// Import
+
+		X509Certificate[] certificates = KeyChain.getCertificateChain(getActivity(), alias);
+		PrivateKey privateKey = KeyChain.getPrivateKey(getActivity(), alias);
+
+		if ((certificates != null) && (privateKey != null))
+			keyStore.setKeyEntry(alias, privateKey.getEncoded(), certificates);
 	}
 
 	private class SignTask extends LoadingWithProgressTask {
@@ -153,8 +211,9 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 				// Sign data
 
 				try { signValue = getSignature(signInfo); }
-				catch (NullPointerException | InterruptedException | KeyChainException | NoSuchAlgorithmException
-						| SignatureException | InvalidKeyException | UnsupportedEncodingException e) { e.printStackTrace(); }
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 
 				// Send result, if any
 
@@ -172,12 +231,13 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 					return;
 			}
 		}
+
 	}
 
 	/**
 	 * https://developer.android.com/training/articles/keystore.html#SigningAndVerifyingData
 	 */
-	private @NonNull String getSignature(@Nullable String textToSign) throws KeyChainException, InterruptedException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException {
+	private @NonNull String getSignature(@Nullable String textToSign) throws GeneralSecurityException, IOException, CMSException, OperatorCreationException {
 
 		// Default case
 
@@ -186,13 +246,64 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 		// Use a PrivateKey in the KeyStore to create a signature over some data.
 
-		PrivateKey privateKey = KeyChain.getPrivateKey(getActivity(), selectedCertAlias);
+		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+		keyStore.load(null);
 
-		Signature s = Signature.getInstance("SHA1withRSA");
-		s.initSign(privateKey);
-		s.update(textToSign.getBytes("UTF-8"));
-		byte[] signature = s.sign();
-
-		return Base64.encodeToString(signature, 0);
+		byte[] signedData = sign(keyStore, textToSign);
+		return Base64.encodeToString(signedData, 0);
 	}
+
+	private PrivateKey getPrivateKey(KeyStore keystore) throws GeneralSecurityException, IOException {
+
+		PrivateKey privateKey = (PrivateKey) keystore.getKey(selectedCertAlias, "123".toCharArray());
+		Log.e("Adrien", "privateKey " + keystore.size());
+
+		Enumeration<String> aliases = keystore.aliases();
+		while (aliases.hasMoreElements())
+			Log.i("Adrien", "alias... -" + aliases.nextElement() + "- | -" + selectedCertAlias + "-");
+
+		Log.e("Adrien", "privateKey " + privateKey);
+		return privateKey;
+	}
+
+	/**
+	 * Retrieve the X509 Certificate form the KeyStore
+	 *
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
+	private X509CertificateHolder getCert(KeyStore keyStore) throws GeneralSecurityException, IOException {
+		java.security.cert.Certificate c = keyStore.getCertificate(selectedCertAlias);
+		return new X509CertificateHolder(c.getEncoded());
+	}
+
+	public byte[] sign(KeyStore keystore, String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
+
+		List<X509CertificateHolder> certList = new ArrayList<>();
+		CMSTypedData msg = new CMSProcessableByteArray(data.getBytes()); //Data to sign
+
+		certList.add(getCert(keystore)); //Adding the X509 Certificate
+
+		Store certs = new JcaCertStore(certList);
+
+		CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
+		//Initializing the the BC's Signer
+		ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(getPrivateKey(keystore));
+
+		gen.addSignerInfoGenerator(
+				new JcaSignerInfoGeneratorBuilder(
+						new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()
+				).build(sha1Signer, getCert(keystore))
+		);
+
+		//adding the certificate
+
+		gen.addCertificates(certs);
+
+		//Getting the signed data
+
+		CMSSignedData sigData = gen.generate(msg, false);
+		return sigData.getEncoded();
+	}
+
 }
