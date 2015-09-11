@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.security.KeyChain;
-import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,15 +28,22 @@ import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSProcessableByteArray;
 import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.CMSSignedDataGenerator;
+import org.spongycastle.cms.CMSSignedDataParser;
 import org.spongycastle.cms.CMSTypedData;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationStore;
 import org.spongycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.spongycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.spongycastle.operator.ContentSigner;
 import org.spongycastle.operator.OperatorCreationException;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.spongycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.spongycastle.util.Store;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -45,7 +52,9 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 public class SignatureDialogFragment extends ActionDialogFragment implements View.OnClickListener {
@@ -58,6 +67,8 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
 
+	private PrivateKey mPrivateKey;
+	private X509CertificateHolder mCertificateHolder;
 	private TextView certInfo;
 	private String selectedCertAlias;
 	private String signInfo;
@@ -137,23 +148,34 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	}
 
 	@Override public void onClick(View v) {
-		KeyChain.choosePrivateKeyAlias(
-				getActivity(), new KeyChainAliasCallback() {
-					public void alias(final String alias) {
 
-						selectedCertAlias = alias;
+		File bks = getBksFromDownloadFolder();
 
-						try { addCertificateToKeyStore(alias); }
-						catch (KeyStoreException | InterruptedException | NoSuchAlgorithmException | CertificateException
-								| KeyChainException | IOException e) {e.printStackTrace();}
+		if (bks == null)
+			return;
 
-					}
-				}, new String[]{"RSA"}, // List of acceptable key types. null for any
-				null,                // issuer, null for any
-				null,                // host name of server requesting the cert, null if unavailable
-				-1,                  // port of server requesting the cert, -1 if unavailable
-				null
-		);               // alias to preselect, null if unavailable
+		KeyStore keystore = null;
+		try { keystore = getKeystore(bks, "bmabma".toCharArray()); }
+		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
+
+		Log.i("Adrien", "keystore : " + KeyStore.getDefaultType() + " " + (keystore != null));
+
+		if (keystore == null)
+			return;
+
+		PrivateKey privateKey = null;
+		try { privateKey = getPrivateKey(keystore); }
+		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
+
+		X509CertificateHolder certficateHolder = null;
+		try { certficateHolder = getCert(keystore); }
+		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
+
+		Log.i("Adrien", "privateKey : " + (privateKey != null));
+		Log.i("Adrien", "certficateHolder : " + (certficateHolder != null));
+
+		mPrivateKey = privateKey;
+		mCertificateHolder = certficateHolder;
 	}
 
 	private void addCertificateToKeyStore(@Nullable String alias) throws KeyStoreException, KeyChainException, InterruptedException, CertificateException, NoSuchAlgorithmException, IOException {
@@ -246,24 +268,10 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 		// Use a PrivateKey in the KeyStore to create a signature over some data.
 
-		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-		keyStore.load(null);
-
-		byte[] signedData = sign(keyStore, textToSign);
+		byte[] signedData = sign(textToSign);
+		Log.e("Adrien", "sign + " + new String(signedData));
+		checkSignature(signedData);
 		return Base64.encodeToString(signedData, 0);
-	}
-
-	private PrivateKey getPrivateKey(KeyStore keystore) throws GeneralSecurityException, IOException {
-
-		PrivateKey privateKey = (PrivateKey) keystore.getKey(selectedCertAlias, "123".toCharArray());
-		Log.e("Adrien", "privateKey " + keystore.size());
-
-		Enumeration<String> aliases = keystore.aliases();
-		while (aliases.hasMoreElements())
-			Log.i("Adrien", "alias... -" + aliases.nextElement() + "- | -" + selectedCertAlias + "-");
-
-		Log.e("Adrien", "privateKey " + privateKey);
-		return privateKey;
 	}
 
 	/**
@@ -273,27 +281,26 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	 * @throws IOException
 	 */
 	private X509CertificateHolder getCert(KeyStore keyStore) throws GeneralSecurityException, IOException {
-		java.security.cert.Certificate c = keyStore.getCertificate(selectedCertAlias);
+		java.security.cert.Certificate c = keyStore.getCertificate("bma");
 		return new X509CertificateHolder(c.getEncoded());
 	}
 
-	public byte[] sign(KeyStore keystore, String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
+	public byte[] sign(String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
 
 		List<X509CertificateHolder> certList = new ArrayList<>();
 		CMSTypedData msg = new CMSProcessableByteArray(data.getBytes()); //Data to sign
 
-		certList.add(getCert(keystore)); //Adding the X509 Certificate
-
+		certList.add(mCertificateHolder); //Adding the X509 Certificate
 		Store certs = new JcaCertStore(certList);
 
 		CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
 		//Initializing the the BC's Signer
-		ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(getPrivateKey(keystore));
+		ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(mPrivateKey);
 
 		gen.addSignerInfoGenerator(
 				new JcaSignerInfoGeneratorBuilder(
 						new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()
-				).build(sha1Signer, getCert(keystore))
+				).build(sha1Signer, mCertificateHolder)
 		);
 
 		//adding the certificate
@@ -306,4 +313,63 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		return sigData.getEncoded();
 	}
 
+	private @Nullable File getBksFromDownloadFolder() {
+
+		File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		File jks = null;
+
+		for (File file : folder.listFiles())
+			if (file.getName().endsWith("bks"))
+				jks = file;
+
+		return jks;
+	}
+
+	private @Nullable KeyStore getKeystore(@NonNull File bks, char[] password) throws GeneralSecurityException, IOException {
+
+		KeyStore keystore = KeyStore.getInstance("BKS");
+		InputStream input = new FileInputStream(bks);
+
+		try { keystore.load(input, password); }
+		catch (IOException e) { e.printStackTrace(); }
+		finally { input.close(); }
+
+		return keystore;
+	}
+
+	private @Nullable PrivateKey getPrivateKey(@NonNull KeyStore keystore) throws GeneralSecurityException, IOException {
+
+		PrivateKey privateKey = (PrivateKey) keystore.getKey("bma", "bma".toCharArray());
+		Log.e("Adrien", "privateKey " + keystore.size());
+
+		Enumeration<String> aliases = keystore.aliases();
+		while (aliases.hasMoreElements())
+			Log.i("Adrien", "alias... -" + aliases.nextElement() + "- | -" + selectedCertAlias + "-");
+
+		Log.e("Adrien", "privateKey " + privateKey);
+		return privateKey;
+	}
+
+	private void checkSignature(byte[] encapSigData) throws OperatorCreationException, CMSException, IOException, CertificateException {
+
+		CMSSignedDataParser sp = new CMSSignedDataParser(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build(), encapSigData);
+
+		sp.getSignedContent().drain();
+
+		Store certStore = sp.getCertificates();
+		SignerInformationStore signers = sp.getSignerInfos();
+
+		Collection c = signers.getSigners();
+		Iterator it = c.iterator();
+
+		while (it.hasNext()) {
+			SignerInformation signer = (SignerInformation) it.next();
+			Collection certCollection = certStore.getMatches(signer.getSID());
+
+			Iterator certIt = certCollection.iterator();
+			X509CertificateHolder cert = (X509CertificateHolder) certIt.next();
+
+			System.out.println("verify returns: " + signer.verify(new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(cert)));
+		}
+	}
 }
