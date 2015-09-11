@@ -84,8 +84,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// To have a transparent StatusBar, and a background color behind
@@ -117,15 +116,13 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 	}
 
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
+	@Override protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
 		mLeftDrawerToggle.syncState();
 	}
 
-	@Override
-	protected void onStart() {
+	@Override protected void onStart() {
 		super.onStart();
 
 		// Clear backStack (wrong backStack can stay after rotation)
@@ -153,8 +150,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts().get(0).getId());
 	}
 
-	@Override
-	public void onResume() {
+	@Override public void onResume() {
 		super.onResume();
 
 		// On first launch, we have to open the NavigationDrawer.
@@ -177,8 +173,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override
-	protected void onPause() {
+	@Override protected void onPause() {
 		super.onPause();
 
 		// Save accounts state for later use. In our case, the latest selected account
@@ -186,8 +181,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		MyAccounts.INSTANCE.saveState();
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		if (requestCode == EDIT_PREFERENCE_REQUEST) {
 			// Don't check if result is ok as the user can press back after modifying an Account
@@ -199,8 +193,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
+	@Override public void onBackPressed() {
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
@@ -246,8 +239,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="ActionBar">
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	@Override public boolean onCreateOptionsMenu(Menu menu) {
 
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.dossiers_menu, menu);
@@ -263,8 +255,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+	@Override public boolean onPrepareOptionsMenu(Menu menu) {
 
 		// Show or hide specific menu actions depending on displayed fragment
 
@@ -282,8 +273,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		return false;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
 
 		// Pass the event to ActionBarDrawerToggle, if it returns
 		// true, then it has handled the app icon touch event
@@ -306,8 +296,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+	@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
 		if (position < mFilterAdapter.getCount() - 1) {
 			Filter filter = mFilterAdapter.getItem(position);
@@ -325,8 +314,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override
-	public void onNothingSelected(AdapterView<?> parent) {
+	@Override public void onNothingSelected(AdapterView<?> parent) {
 
 	}
 
@@ -334,8 +322,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="ActionMode">
 
-	@Override
-	public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+	@Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 		actionMode.setTitleOptionalHint(true);
 		MenuInflater inflater = actionMode.getMenuInflater();
 		inflater.inflate(R.menu.dossiers_list_menu_actions, menu);
@@ -350,8 +337,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		return true;
 	}
 
-	@Override
-	public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 		if (fragment != null) {
 			HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
@@ -400,8 +386,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		return false;
 	}
 
-	@Override
-	public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 
 		if (fragment != null) {
@@ -442,8 +427,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		return false;
 	}
 
-	@Override
-	public void onDestroyActionMode(ActionMode actionMode) {
+	@Override public void onDestroyActionMode(ActionMode actionMode) {
 		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 
 		if (fragment != null)
@@ -502,8 +486,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="AccountFragmentListener">
 
-	@Override
-	public void onAccountSelected(@NonNull Account account) {
+	@Override public void onAccountSelected(@NonNull Account account) {
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			BureauxListFragment bureauxFragment = new BureauxListFragment();
@@ -530,8 +513,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			bureauxFragment.updateBureaux(true);
 	}
 
-	@Override
-	public void onCreateAccountInvoked() {
+	@Override public void onCreateAccountInvoked() {
 
 		Intent preferencesIntent = new Intent(this, SettingsActivity.class);
 		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
@@ -542,8 +524,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="BureauListFragmentListener">
 
-	@Override
-	public void onBureauListFragmentSelected(@Nullable String id) {
+	@Override public void onBureauListFragmentSelected(@Nullable String id) {
 		if (id != null) {
 			DossierListFragment fragment = DossierListFragment.newInstance(id);
 			replaceLeftFragment(fragment, DossierListFragment.TAG, true);
@@ -580,8 +561,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	 * Called when an action is done on a dossier. We have to force reload dossier list and
 	 * dismiss details.
 	 */
-	@Override
-	public void onDataChanged() {
+	@Override public void onDataChanged() {
 		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
 		if (listFragment != null) {
 			// this method will reload dossiers fragments
@@ -596,8 +576,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="DossierListFragmentListener">
 
-	@Override
-	public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
+	@Override public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
 
 		if (dossier != null)
 			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
@@ -610,16 +589,14 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override
-	public void onDossierCheckedChanged() {
+	@Override public void onDossierCheckedChanged() {
 		if (mActionMode == null)
 			mActionMode = startSupportActionMode(this);
 		else
 			mActionMode.invalidate();
 	}
 
-	@Override
-	public void onDossiersLoaded(int size) {
+	@Override public void onDossiersLoaded(int size) {
 		onDossierSelected(null, null);
 
 		if (mFilterAdapter == null)
@@ -629,8 +606,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		mFiltersSpinner.setVisibility(View.VISIBLE);
 	}
 
-	@Override
-	public void onDossiersNotLoaded() {
+	@Override public void onDossiersNotLoaded() {
 		mFiltersSpinner.setVisibility(View.INVISIBLE);
 	}
 
@@ -638,8 +614,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
-	@Override
-	public void toggleInfoDrawer() {
+	@Override public void toggleInfoDrawer() {
 
 		if (mRightDrawerLayout.isDrawerOpen(Gravity.END))
 			mRightDrawerLayout.closeDrawer(Gravity.END);
@@ -647,8 +622,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			mRightDrawerLayout.openDrawer(Gravity.END);
 	}
 
-	@Override
-	public void lockInfoDrawer(boolean lock) {
+	@Override public void lockInfoDrawer(boolean lock) {
 
 		if (lock) {
 			mRightDrawerLayout.closeDrawer(Gravity.END);
@@ -671,8 +645,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.home_toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 
-		@Override
-		public void onDrawerClosed(View view) {
+		@Override public void onDrawerClosed(View view) {
 			if ((getSupportActionBar() != null) && (MyAccounts.INSTANCE.getSelectedAccount() != null))
 				getSupportActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
 
@@ -680,8 +653,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			invalidateOptionsMenu();
 		}
 
-		@Override
-		public void onDrawerOpened(View drawerView) {
+		@Override public void onDrawerOpened(View drawerView) {
 			if (getSupportActionBar() != null)
 				getSupportActionBar().setTitle(R.string.app_name);
 

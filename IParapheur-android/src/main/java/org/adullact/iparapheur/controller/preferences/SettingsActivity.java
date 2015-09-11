@@ -29,8 +29,7 @@ public class SettingsActivity extends PreferenceActivity {
 	 * to reflect its new value.
 	 */
 	private static Preference.OnPreferenceChangeListener sBindPreferenceTitleToValueListener = new Preference.OnPreferenceChangeListener() {
-		@Override
-		public boolean onPreferenceChange(Preference preference, Object value) {
+		@Override public boolean onPreferenceChange(Preference preference, Object value) {
 			preference.setTitle(value.toString());
 			return true;
 		}
@@ -60,39 +59,33 @@ public class SettingsActivity extends PreferenceActivity {
 		preference.setOnPreferenceChangeListener(sBindPreferenceTitleToValueListener);
 	}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if (getActionBar() != null)
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
+	@Override protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 	}
 
-	@Override
-	protected void onResume() {
+	@Override protected void onResume() {
 		super.onResume();
 
 		PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
 	}
 
-	@Override
-	protected void onPause() {
+	@Override protected void onPause() {
 		super.onPause();
 		PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(MyAccounts.INSTANCE);
 	}
 
-	@Override
-	public void onBuildHeaders(List<Header> target) {
+	@Override public void onBuildHeaders(List<Header> target) {
 		loadHeadersFromResource(R.xml.pref_headers, target);
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
 			finish();
 			return true;
@@ -100,13 +93,11 @@ public class SettingsActivity extends PreferenceActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected boolean isValidFragment(String fragmentName) {
+	@Override protected boolean isValidFragment(String fragmentName) {
 
 		boolean isAccount = AccountsPreferenceFragment.class.getName().equals(fragmentName);
-		boolean isGeneral = GeneralPreferenceFragment.class.getName().equals(fragmentName);
 		boolean isAbout = AboutPreferenceFragment.class.getName().equals(fragmentName);
 
-		return (isAccount || isGeneral || isAbout);
+		return (isAccount || isAbout);
 	}
 }
