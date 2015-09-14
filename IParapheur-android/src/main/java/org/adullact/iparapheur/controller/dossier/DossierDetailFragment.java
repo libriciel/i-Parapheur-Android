@@ -296,7 +296,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		getActivity().invalidateOptionsMenu();
 	}
 
-	private @Nullable Document findCurrentDocument(@NonNull Dossier dossier, @Nullable String documentId) {
+	private @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
+
+		if (dossier == null)
+			return null;
 
 		List<Document> documents = new ArrayList<>();
 		documents.addAll(dossier.getMainDocuments());
