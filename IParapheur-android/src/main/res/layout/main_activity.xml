@@ -1,13 +1,13 @@
 <android.support.v4.widget.DrawerLayout
+    android:id="@+id/activity_dossiers_drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_dossiers_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:divider="@android:drawable/divider_horizontal_bright"
     android:background="@color/primary_700"
+    android:divider="@android:drawable/divider_horizontal_bright"
     android:elevation="7dp"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!-- The main content view -->
@@ -26,20 +26,20 @@
             android:id="@+id/activity_dossiers_right_drawer_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:divider="@android:drawable/divider_horizontal_bright">
+            android:divider="@android:drawable/divider_horizontal_bright"
+            android:orientation="vertical">
 
             <FrameLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:baselineAligned="false">
+                android:baselineAligned="false"
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:baselineAligned="false">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
                     <FrameLayout
                         android:id="@+id/left_fragment"
@@ -55,17 +55,17 @@
                     <fragment
                         android:id="@+id/dossier_detail"
                         android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
-                        android:tag="Dossier_details"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:tag="Dossier_details"
                         tools:layout="@layout/fragment_dossier_detail"/>
                 </LinearLayout>
 
                 <ProgressBar
+                    android:id="@+id/progressBar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/progressBar"
                     android:max="100"
                     android:visibility="invisible"/>
 
@@ -75,11 +75,11 @@
             <!-- For some reason, you can't put it directly in the dossier_detail_fragment... -->
 
             <FrameLayout
-                android:orientation="horizontal"
                 android:id="@+id/activity_dossiers_right_drawer"
                 android:layout_width="320dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="end">
+                android:layout_gravity="end"
+                android:orientation="horizontal">
 
                 <include
                     layout="@layout/dossiers_info"/>
@@ -92,14 +92,14 @@
     <!-- The left navigation drawer -->
 
     <FrameLayout
-        android:orientation="horizontal"
         android:id="@+id/activity_dossiers_left_drawer"
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:baselineAligned="false"
         android:background="@android:color/background_light"
-        android:fitsSystemWindows="false">
+        android:baselineAligned="false"
+        android:fitsSystemWindows="false"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -118,10 +118,10 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/parapheurs"
-                    android:textColor="@color/text_white"
                     android:layout_gravity="bottom"
                     android:padding="25dp"
+                    android:text="@string/parapheurs"
+                    android:textColor="@color/text_white"
                     android:textSize="14sp"/>
 
                 <View
@@ -138,8 +138,8 @@
                 android:layout_height="match_parent">
 
                 <fragment
-                    android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
                     android:id="@+id/activity_dossiers_bureaux_fragment"
+                    android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:tag="@string/account_fragment_tag"

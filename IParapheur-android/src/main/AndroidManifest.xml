@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-          package="org.adullact.iparapheur"
+    package="org.adullact.iparapheur"
     xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="9"
-          android:versionName="1.4.02">
+    android:versionCode="10"
+    android:versionName="1.4.03">
 
     <!-- Only supports Tablets -->
     <supports-screens
@@ -36,9 +36,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.preferences.SettingsActivity"
-            android:theme="@style/AppTheme.Settings"
-            android:label="@string/title_activity_settings">
+            android:name=".controller.preferences.PreferencesActivity"
+            android:label="@string/title_activity_test"
+            android:theme="@style/AppTheme.Settings">
         </activity>
     </application>
 
