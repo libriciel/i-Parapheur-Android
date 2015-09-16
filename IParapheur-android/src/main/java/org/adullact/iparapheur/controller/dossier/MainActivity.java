@@ -13,8 +13,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +43,7 @@ import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment;
-import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
+import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -290,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		switch (item.getItemId()) {
 
 			case R.id.action_settings:
-				startActivityForResult(new Intent(this, PreferencesActivity.class), EDIT_PREFERENCE_REQUEST);
+				startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
 				return true;
 
 			default:
@@ -333,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.contextual_700));
+			window.setStatusBarColor(getResources().getColor(R.color.contextual_700));
 		}
 
 		return true;
@@ -439,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+			window.setStatusBarColor(getResources().getColor(android.R.color.transparent));
 		}
 
 		mActionMode = null;
@@ -517,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public void onCreateAccountInvoked() {
 
-		Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
+		Intent preferencesIntent = new Intent(this, SettingsActivity.class);
 		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
 		startActivityForResult(preferencesIntent, EDIT_PREFERENCE_REQUEST);
 	}
@@ -618,16 +616,16 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public void toggleInfoDrawer() {
 
-		if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))
-			mRightDrawerLayout.closeDrawer(GravityCompat.END);
+		if (mRightDrawerLayout.isDrawerOpen(Gravity.END))
+			mRightDrawerLayout.closeDrawer(Gravity.END);
 		else
-			mRightDrawerLayout.openDrawer(GravityCompat.END);
+			mRightDrawerLayout.openDrawer(Gravity.END);
 	}
 
 	@Override public void lockInfoDrawer(boolean lock) {
 
 		if (lock) {
-			mRightDrawerLayout.closeDrawer(GravityCompat.END);
+			mRightDrawerLayout.closeDrawer(Gravity.END);
 			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		}
 		else {

@@ -15,8 +15,6 @@
     <color name="secondary_700">@color/brown_700</color>
     <color name="contextual_500">@color/grey_500</color>
     <color name="contextual_700">@color/grey_700</color>
-    <color name="settings_500">@color/blue_grey_900</color>
-    <color name="settings_700">@color/blue_grey_950</color>
 
     <!-- Text material color -->
 
@@ -57,10 +55,6 @@
     <color name="brown_400">#8d6e63</color>
     <color name="brown_500">#795548</color>
     <color name="brown_700">#5d4037</color>
-
-    <!-- BlueGrey material design colors -->
-    <color name="blue_grey_900">#263238</color>
-    <color name="blue_grey_950">#21272b</color>
 
     <!-- MuPDF -->
     <color name="canvas">@color/grey_800</color>
