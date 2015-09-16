@@ -1,7 +1,10 @@
 <resources>
-    <string name="title_activity_settings">Settings</string>
+
+    <string name="title_activity_settings">Paramètres</string>
 
     <!-- Strings related to Settings -->
+
+    <string name="preferences_label_general">Général</string>
 
     <string name="pref_header_accounts">Comptes</string>
     <string name="pref_header_about">À propos</string>
