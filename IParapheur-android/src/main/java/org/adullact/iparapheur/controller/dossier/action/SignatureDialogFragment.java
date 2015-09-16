@@ -22,18 +22,13 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.spongycastle.cert.X509CertificateHolder;
 import org.spongycastle.cert.jcajce.JcaCertStore;
-import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSProcessableByteArray;
 import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.CMSSignedDataGenerator;
-import org.spongycastle.cms.CMSSignedDataParser;
 import org.spongycastle.cms.CMSTypedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
 import org.spongycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.spongycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.operator.ContentSigner;
-import org.spongycastle.operator.OperatorCreationException;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.spongycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.spongycastle.util.Store;
@@ -45,11 +40,11 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
 public class SignatureDialogFragment extends ActionDialogFragment implements View.OnClickListener {
@@ -62,6 +57,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
 
+	private KeyStore mKeystore;
 	private PrivateKey mPrivateKey;
 	private X509CertificateHolder mCertificateHolder;
 	private TextView certInfo;
@@ -149,21 +145,20 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		if (bks == null)
 			return;
 
-		KeyStore keystore = null;
-		try { keystore = getKeystore(bks, "bmabma".toCharArray()); }
+		try { mKeystore = getKeystore(bks, "bmabma".toCharArray()); }
 		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
 
-		Log.i("Adrien", "keystore : " + KeyStore.getDefaultType() + " " + (keystore != null));
+		Log.i("Adrien", "keystore : " + KeyStore.getDefaultType() + " " + (mKeystore != null));
 
-		if (keystore == null)
+		if (mKeystore == null)
 			return;
 
 		PrivateKey privateKey = null;
-		try { privateKey = getPrivateKey(keystore); }
+		try { privateKey = getPrivateKey(mKeystore); }
 		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
 
 		X509CertificateHolder certficateHolder = null;
-		try { certficateHolder = getCert(keystore); }
+		try { certficateHolder = getCert(mKeystore); }
 		catch (GeneralSecurityException | IOException e) { e.printStackTrace(); }
 
 		Log.i("Adrien", "privateKey : " + (privateKey != null));
@@ -198,9 +193,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 				// Sign data
 
 				try { signValue = getSignature(signInfo); }
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+				catch (Exception e) { e.printStackTrace(); }
 
 				// Send result, if any
 
@@ -224,7 +217,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	/**
 	 * https://developer.android.com/training/articles/keystore.html#SigningAndVerifyingData
 	 */
-	private @NonNull String getSignature(@Nullable String textToSign) throws GeneralSecurityException, IOException, CMSException, OperatorCreationException {
+	private @NonNull String getSignature(@Nullable String textToSign) throws Exception {
 
 		// Default case
 
@@ -233,41 +226,14 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 		// Use a PrivateKey in the KeyStore to create a signature over some data.
 
-		byte[] signedData = sign(textToSign);
-		Log.e("Adrien", "sign + " + new String(signedData));
-		verif(signedData);
-		return Base64.encodeToString(signedData, 0);
+		CMSSignedDataGenerator signatureGenerator = setUpProvider(mKeystore);
+		byte[] signedBytes = signPkcs7(hexDecode(textToSign), signatureGenerator);
+		Log.e("Adrien", "sign + " + Base64.encodeToString(signedBytes, 0));
+
+		return Base64.encodeToString(signedBytes, 0);
 	}
 
 	// <editor-fold desc="Signature">
-
-	private byte[] sign(String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
-
-		List<X509CertificateHolder> certList = new ArrayList<>();
-		CMSTypedData msg = new CMSProcessableByteArray(hexDecode(data)); //Data to sign
-
-		certList.add(mCertificateHolder); //Adding the X509 Certificate
-		Store certs = new JcaCertStore(certList);
-
-		CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
-		//Initializing the the BC's Signer
-		ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(mPrivateKey);
-
-		gen.addSignerInfoGenerator(
-				new JcaSignerInfoGeneratorBuilder(
-						new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()
-				).build(sha1Signer, mCertificateHolder)
-		);
-
-		//adding the certificate
-
-		gen.addCertificates(certs);
-
-		//Getting the signed data
-
-		CMSSignedData sigData = gen.generate(msg, true);
-		return sigData.getEncoded();
-	}
 
 	private @Nullable File getBksFromDownloadFolder() {
 
@@ -344,26 +310,44 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		}
 	}
 
-	private void verif(byte[] signedData) throws OperatorCreationException, CMSException, IOException, CertificateException {
-		CMSSignedDataParser sp = new CMSSignedDataParser(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build(), signedData);
+	private CMSSignedDataGenerator setUpProvider(final KeyStore keystore) throws Exception {
 
-		sp.getSignedContent().drain();
+		Security.addProvider(new BouncyCastleProvider());
 
-		Store certStore = sp.getCertificates();
-		SignerInformationStore signers = sp.getSignerInfos();
+		Certificate[] certchain = keystore.getCertificateChain("bma");
 
-		Collection c = signers.getSigners();
-		Iterator it = c.iterator();
+		final List<Certificate> certlist = new ArrayList<>();
 
-		while (it.hasNext()) {
-			SignerInformation signer = (SignerInformation) it.next();
-			Collection certCollection = certStore.getMatches(signer.getSID());
-
-			Iterator certIt = certCollection.iterator();
-			X509CertificateHolder cert = (X509CertificateHolder) certIt.next();
-
-			Log.w("Adrien", "verify returns: " + signer.verify(new JcaSimpleSignerInfoVerifierBuilder().setProvider(" BC ").build(cert)));
+		for (int i = 0, length = certchain == null ? 0 : certchain.length; i < length; i++) {
+			certlist.add(certchain[i]);
 		}
+
+		Store certstore = new JcaCertStore(certlist);
+
+		Certificate cert = keystore.getCertificate("bma");
+
+		ContentSigner signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").
+				build((PrivateKey) (keystore.getKey("bma", "bma".toCharArray())));
+
+		CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+
+		generator.addSignerInfoGenerator(
+				new JcaSignerInfoGeneratorBuilder(
+						new JcaDigestCalculatorProviderBuilder().setProvider("BC").
+								build()
+				).build(signer, (X509Certificate) cert)
+		);
+
+		generator.addCertificates(certstore);
+
+		return generator;
+	}
+
+	private byte[] signPkcs7(final byte[] content, final CMSSignedDataGenerator generator) throws Exception {
+
+		CMSTypedData cmsdata = new CMSProcessableByteArray(content);
+		CMSSignedData signeddata = generator.generate(cmsdata, true);
+		return signeddata.getEncoded();
 	}
 
 	// </editor-fold desc="Signature">
