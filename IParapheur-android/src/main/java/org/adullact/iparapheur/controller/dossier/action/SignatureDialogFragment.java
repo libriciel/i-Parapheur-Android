@@ -6,8 +6,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.security.KeyChain;
-import android.security.KeyChainException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -46,11 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -178,36 +173,6 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		mCertificateHolder = certficateHolder;
 	}
 
-	private void addCertificateToKeyStore(@Nullable String alias) throws KeyStoreException, KeyChainException, InterruptedException, CertificateException, NoSuchAlgorithmException, IOException {
-
-		// Load app's KeyStore
-
-		KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-		keyStore.load(null);
-
-		// Check if already imported, cancels the operation if any
-
-		boolean alreadyExists = false;
-		Enumeration<String> aliases = keyStore.aliases();
-
-		while (aliases.hasMoreElements())
-			if (TextUtils.equals(alias, aliases.nextElement()))
-				alreadyExists = true;
-
-		// Cancels if not valid data
-
-//		if (TextUtils.isEmpty(alias) || alreadyExists)
-//			return;
-
-		// Import
-
-		X509Certificate[] certificates = KeyChain.getCertificateChain(getActivity(), alias);
-		PrivateKey privateKey = KeyChain.getPrivateKey(getActivity(), alias);
-
-		if ((certificates != null) && (privateKey != null))
-			keyStore.setKeyEntry(alias, privateKey.getEncoded(), certificates);
-	}
-
 	private class SignTask extends LoadingWithProgressTask {
 
 		public SignTask(Activity activity) {
@@ -270,25 +235,16 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 		byte[] signedData = sign(textToSign);
 		Log.e("Adrien", "sign + " + new String(signedData));
-		checkSignature(signedData);
+		verif(signedData);
 		return Base64.encodeToString(signedData, 0);
 	}
 
-	/**
-	 * Retrieve the X509 Certificate form the KeyStore
-	 *
-	 * @throws GeneralSecurityException
-	 * @throws IOException
-	 */
-	private X509CertificateHolder getCert(KeyStore keyStore) throws GeneralSecurityException, IOException {
-		java.security.cert.Certificate c = keyStore.getCertificate("bma");
-		return new X509CertificateHolder(c.getEncoded());
-	}
+	// <editor-fold desc="Signature">
 
-	public byte[] sign(String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
+	private byte[] sign(String data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
 
 		List<X509CertificateHolder> certList = new ArrayList<>();
-		CMSTypedData msg = new CMSProcessableByteArray(data.getBytes()); //Data to sign
+		CMSTypedData msg = new CMSProcessableByteArray(hexDecode(data)); //Data to sign
 
 		certList.add(mCertificateHolder); //Adding the X509 Certificate
 		Store certs = new JcaCertStore(certList);
@@ -309,7 +265,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 		//Getting the signed data
 
-		CMSSignedData sigData = gen.generate(msg, false);
+		CMSSignedData sigData = gen.generate(msg, true);
 		return sigData.getEncoded();
 	}
 
@@ -318,9 +274,10 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 		File jks = null;
 
-		for (File file : folder.listFiles())
-			if (file.getName().endsWith("bks"))
-				jks = file;
+		if (folder.listFiles() != null)
+			for (File file : folder.listFiles())
+				if (file.getName().endsWith("bks"))
+					jks = file;
 
 		return jks;
 	}
@@ -350,9 +307,45 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		return privateKey;
 	}
 
-	private void checkSignature(byte[] encapSigData) throws OperatorCreationException, CMSException, IOException, CertificateException {
+	/**
+	 * Retrieve the X509 Certificate form the KeyStore
+	 *
+	 * @throws GeneralSecurityException
+	 * @throws IOException
+	 */
+	private X509CertificateHolder getCert(KeyStore keyStore) throws GeneralSecurityException, IOException {
+		java.security.cert.Certificate c = keyStore.getCertificate("bma");
+		return new X509CertificateHolder(c.getEncoded());
+	}
 
-		CMSSignedDataParser sp = new CMSSignedDataParser(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build(), encapSigData);
+	/**
+	 * Decode the Hexadecimal char sequence (as string) into Byte Array.
+	 *
+	 * @param data The Hex encoded sequence to be decoded.
+	 * @return Decoded byte array.
+	 * @throws IllegalArgumentException <var>data</var> when wrong number of chars is given or invalid chars.
+	 */
+	private static byte[] hexDecode(String data) {
+
+		int length = data.length();
+		if ((length % 2) != 0)
+			throw new IllegalArgumentException("Odd number of characters.");
+
+		try {
+			byte[] bytes = new byte[length / 2];
+
+			for (int i = 0, j = 0; i < length; i = i + 2)
+				bytes[j++] = (byte) Integer.parseInt(data.substring(i, i + 2), 16);
+
+			return bytes;
+		}
+		catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Illegal hexadecimal character.", e);
+		}
+	}
+
+	private void verif(byte[] signedData) throws OperatorCreationException, CMSException, IOException, CertificateException {
+		CMSSignedDataParser sp = new CMSSignedDataParser(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build(), signedData);
 
 		sp.getSignedContent().drain();
 
@@ -369,7 +362,9 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 			Iterator certIt = certCollection.iterator();
 			X509CertificateHolder cert = (X509CertificateHolder) certIt.next();
 
-			System.out.println("verify returns: " + signer.verify(new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC").build(cert)));
+			Log.w("Adrien", "verify returns: " + signer.verify(new JcaSimpleSignerInfoVerifierBuilder().setProvider(" BC ").build(cert)));
 		}
 	}
+
+	// </editor-fold desc="Signature">
 }
