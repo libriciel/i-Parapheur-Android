@@ -1,7 +1,6 @@
 package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
-import android.util.Base64;
 
 import org.spongycastle.cert.jcajce.JcaCertStore;
 import org.spongycastle.cms.CMSProcessableByteArray;
@@ -80,15 +79,18 @@ public final class PKCS7Signer {
 	public byte[] signPkcs7(final byte[] content, final CMSSignedDataGenerator generator) throws Exception {
 
 		CMSTypedData cmsdata = new CMSProcessableByteArray(content);
-		CMSSignedData signeddata = generator.generate(cmsdata, true);
+		CMSSignedData signeddata = generator.generate(cmsdata, false);
+
 		return signeddata.getEncoded();
 	}
 
 	public String sign(byte[] dataToSign) throws Exception {
 
 		KeyStore keyStore = loadKeyStore(mCertificatePath);
+		String content = "some bytes to be signed";
+		dataToSign = content.getBytes("UTF-8");
 		CMSSignedDataGenerator signatureGenerator = setUpProvider(keyStore);
 		byte[] signedBytes = signPkcs7(dataToSign, signatureGenerator);
-		return Base64.encodeToString(signedBytes, Base64.DEFAULT);
+		return org.spongycastle.util.encoders.Base64.toBase64String(signedBytes);
 	}
 }

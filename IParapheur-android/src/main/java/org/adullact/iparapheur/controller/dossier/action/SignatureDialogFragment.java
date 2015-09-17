@@ -22,10 +22,7 @@ import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.utils.PKCS7Signer;
 import org.spongycastle.cert.X509CertificateHolder;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -161,14 +158,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 				Log.i("Adrien", "Signature... ");
 				Log.i("Adrien", "Data  : " + signInfo);
-
-				BufferedReader bufReader = new BufferedReader(new StringReader(signValue));
-				String line = null;
-				try {
-					while ((line = bufReader.readLine()) != null)
-						Log.i("Adrien", "Value : " + line);
-				}
-				catch (IOException e) { e.printStackTrace(); }
+				Log.i("Adrien", "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
 					return; // TODO : Throw back error message
