@@ -150,20 +150,25 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 				if (certif != null) {
 					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath());
-					try { signValue = signer.sign(hexDecode(signInfo)); }
+					try {
+						signer.loadKeyStore(certif.getAbsolutePath());
+						signer.loadPrivateKey();
+						signValue = signer.sign(hexDecode(signInfo));
+					}
 					catch (Exception e) { e.printStackTrace(); }
 				}
 
 				// Send result, if any
 
 				Log.i("Adrien", "Signature... ");
+				Log.i("Adrien", "BKS   ? " + (certif != null));
 				Log.i("Adrien", "Data  : " + signInfo);
 				Log.i("Adrien", "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
 					return; // TODO : Throw back error message
 
-				RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
+				// RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
 				publishProgress(i * 100 / total);
 
 				if (isCancelled())
