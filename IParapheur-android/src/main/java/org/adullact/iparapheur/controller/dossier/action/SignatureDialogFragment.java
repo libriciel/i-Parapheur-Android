@@ -20,11 +20,17 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.utils.PKCS7Signer;
-import org.spongycastle.cert.X509CertificateHolder;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
-import java.security.KeyStore;
-import java.security.PrivateKey;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 
 public class SignatureDialogFragment extends ActionDialogFragment implements View.OnClickListener {
@@ -36,12 +42,8 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
-
-	private KeyStore mKeystore;
-	private PrivateKey mPrivateKey;
-	private X509CertificateHolder mCertificateHolder;
 	private TextView certInfo;
-	private String selectedCertAlias;
+
 	private String signInfo;
 
 	public SignatureDialogFragment() {}
@@ -153,20 +155,49 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 					try {
 						signer.loadKeyStore(certif.getAbsolutePath());
 						signer.loadPrivateKey();
-						signValue = signer.sign(hexDecode(signInfo));
+						signValue = signer.sign(StringUtils.hexDecode(signInfo));
 					}
-					catch (Exception e) { e.printStackTrace(); }
+					catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					catch (CertificateException e) {
+						e.printStackTrace();
+					}
+					catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					catch (InvalidKeyException e) {
+						e.printStackTrace();
+					}
+					catch (NoSuchProviderException e) {
+						e.printStackTrace();
+					}
+					catch (SignatureException e) {
+						e.printStackTrace();
+					}
+					catch (KeyStoreException e) {
+						e.printStackTrace();
+					}
+					catch (UnrecoverableKeyException e) {
+						e.printStackTrace();
+					}
 				}
 
 				// Send result, if any
 
-				Log.i("Adrien", "Signature... ");
-				Log.i("Adrien", "BKS   ? " + (certif != null));
-				Log.i("Adrien", "Data  : " + signInfo);
-				Log.i("Adrien", "Value : " + signValue);
+				Log.d("Adrien", "Signature... ");
+				Log.d("Adrien", "BKS   ? " + (certif != null));
+				Log.d("Adrien", "Data  : " + signInfo);
+				Log.d("Adrien", "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
 					return; // TODO : Throw back error message
+
+				if (isCancelled())
+					return;
 
 				// RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
 				publishProgress(i * 100 / total);
@@ -191,32 +222,6 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 					jks = file;
 
 		return jks;
-	}
-
-	/**
-	 * Decode the Hexadecimal char sequence (as string) into Byte Array.
-	 *
-	 * @param data The Hex encoded sequence to be decoded.
-	 * @return Decoded byte array.
-	 * @throws IllegalArgumentException <var>data</var> when wrong number of chars is given or invalid chars.
-	 */
-	private static byte[] hexDecode(String data) {
-
-		int length = data.length();
-		if ((length % 2) != 0)
-			throw new IllegalArgumentException("Odd number of characters.");
-
-		try {
-			byte[] bytes = new byte[length / 2];
-
-			for (int i = 0, j = 0; i < length; i = i + 2)
-				bytes[j++] = (byte) Integer.parseInt(data.substring(i, i + 2), 16);
-
-			return bytes;
-		}
-		catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Illegal hexadecimal character.", e);
-		}
 	}
 
 	// </editor-fold desc="Signature">
