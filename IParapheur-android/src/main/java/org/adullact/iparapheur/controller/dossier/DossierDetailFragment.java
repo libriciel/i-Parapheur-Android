@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 /**
  * A fragment representing a single Dossier detail screen.
  * This fragment is contained in a {@link MainActivity}.
@@ -296,7 +297,14 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		getActivity().invalidateOptionsMenu();
 	}
 
-	private @Nullable Document findCurrentDocument(@NonNull Dossier dossier, @Nullable String documentId) {
+	private @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
+
+		// Default case
+
+		if (dossier == null)
+			return null;
+
+		// Finding doc
 
 		List<Document> documents = new ArrayList<>();
 		documents.addAll(dossier.getMainDocuments());
@@ -347,6 +355,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
+
 	public interface DossierDetailsFragmentListener {
 
 		void toggleInfoDrawer();
@@ -356,6 +365,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">
+
 
 	private class DossierLoadingTask extends LoadingTask {
 

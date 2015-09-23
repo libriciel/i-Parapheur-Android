@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Slightly darker black on selection (from Google Material Design guidelines) -->
+
+    <item android:color="@color/secondary_500"
+          android:state_activated="true"/>
+
+    <item android:color="@color/text_black_secondary"/>
+
+</selector>

@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
@@ -46,10 +47,11 @@ public class SignatureDialogFragment extends DialogFragment {
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureauId";
 
-	protected TextView publicAnnotationTextView;
-	protected TextView privateAnnotationTextView;
-	private TextView certInfo;
 	private TextView errorInfo;
+	protected EditText mPublicAnnotationEditText;
+	protected EditText mPrivateAnnotationEditText;
+	protected TextView mPublicAnnotationLabel;
+	protected TextView mPrivateAnnotationLabel;
 
 	private String mBureauId;
 	private ArrayList<Dossier> mDossierList;
@@ -85,17 +87,28 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_signature, null);
 
-		publicAnnotationTextView = (TextView) view.findViewById(R.id.action_dialog_annotation_publique);
-		privateAnnotationTextView = (TextView) view.findViewById(R.id.action_dialog_annotation_privee);
+		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_public_annotation);
+		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_private_annotation);
+		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_public_annotation_label);
+		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_private_annotation_label);
 
-		view.findViewById(R.id.action_dialog_signature_certificate_button).setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						onChooseCertificateButtonClicked();
+		// Set listeners
+
+		mPublicAnnotationEditText.setOnFocusChangeListener(
+				new View.OnFocusChangeListener() {
+					@Override public void onFocusChange(View v, boolean hasFocus) {
+						mPublicAnnotationLabel.setActivated(hasFocus);
 					}
 				}
 		);
-		certInfo = (TextView) view.findViewById(R.id.action_dialog_signature_cert_info);
+
+		mPrivateAnnotationEditText.setOnFocusChangeListener(
+				new View.OnFocusChangeListener() {
+					@Override public void onFocusChange(View v, boolean hasFocus) {
+						mPrivateAnnotationLabel.setActivated(hasFocus);
+					}
+				}
+		);
 
 		// Build Dialog
 
@@ -162,10 +175,6 @@ public class SignatureDialogFragment extends DialogFragment {
 		dismiss();
 	}
 
-	private void onChooseCertificateButtonClicked() {
-
-	}
-
 	private class SignTask extends LoadingWithProgressTask {
 
 		public SignTask(Activity activity) {
@@ -177,8 +186,8 @@ public class SignatureDialogFragment extends DialogFragment {
 			if (isCancelled())
 				return;
 
-			String annotPub = publicAnnotationTextView.getText().toString();
-			String annotPriv = privateAnnotationTextView.getText().toString();
+			String annotPub = mPublicAnnotationEditText.getText().toString();
+			String annotPriv = mPrivateAnnotationEditText.getText().toString();
 
 			publishProgress(0);
 

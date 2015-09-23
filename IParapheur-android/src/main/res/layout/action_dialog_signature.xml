@@ -5,61 +5,83 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/annotation_publique"
-        android:textColor="@color/text_black"
-        android:textSize="14sp"/>
 
-    <EditText
-        android:id="@+id/action_dialog_annotation_publique"
+        android:baselineAligned="true"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/action_dialog_public_annotation_label"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:labelFor="@id/action_dialog_public_annotation"
+            android:text="@string/annotation_publique"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp"/>
+
+        <EditText
+            android:id="@+id/action_dialog_public_annotation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:textColor="@color/text_black"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:lines="4"/>
+        android:baselineAligned="true"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/annotation_privee"
-        android:textColor="@color/text_black"
-        android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/action_dialog_private_annotation_label"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:labelFor="@id/action_dialog_private_annotation"
+            android:text="@string/annotation_privee"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp"/>
 
-    <EditText
-        android:id="@+id/action_dialog_annotation_privee"
+        <EditText
+            android:id="@+id/action_dialog_private_annotation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:textColor="@color/text_black"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:lines="4"/>
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/action_dialog_signature_cert_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_black"
-        android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/action_dialog_choose_certificate_label"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:labelFor="@id/action_dialog_private_annotation"
+            android:text="@string/select_certificate"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp"/>
 
-    <ListView
-        android:id="@+id/action_dialog_dossiers"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        <Spinner
+            android:id="@+id/action_dialog_certificates_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-    <Button
-        android:id="@+id/action_dialog_signature_certificate_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/select_certificate"/>
+    </LinearLayout>
+
 
 </LinearLayout>
