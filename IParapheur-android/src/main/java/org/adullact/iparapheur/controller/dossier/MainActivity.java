@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -616,16 +617,16 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public void toggleInfoDrawer() {
 
-		if (mRightDrawerLayout.isDrawerOpen(Gravity.END))
-			mRightDrawerLayout.closeDrawer(Gravity.END);
+		if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))
+			mRightDrawerLayout.closeDrawer(GravityCompat.END);
 		else
-			mRightDrawerLayout.openDrawer(Gravity.END);
+			mRightDrawerLayout.openDrawer(GravityCompat.END);
 	}
 
 	@Override public void lockInfoDrawer(boolean lock) {
 
 		if (lock) {
-			mRightDrawerLayout.closeDrawer(Gravity.END);
+			mRightDrawerLayout.closeDrawer(GravityCompat.END);
 			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		}
 		else {

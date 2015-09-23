@@ -1,22 +1,27 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.utils.PKCS7Signer;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -33,29 +38,31 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 
-public class SignatureDialogFragment extends ActionDialogFragment implements View.OnClickListener {
+
+public class SignatureDialogFragment extends DialogFragment {
 
 	private static final String LOG_TAG = "SignatureDialogFragment";
 	private static final int RESULT_CODE_FILE_SELECT = 0;
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureauId";
 
-	protected TextView annotationPublique;
-	protected TextView annotationPrivee;
+	protected TextView publicAnnotationTextView;
+	protected TextView privateAnnotationTextView;
 	private TextView certInfo;
 	private TextView errorInfo;
 
+	private String mBureauId;
+	private ArrayList<Dossier> mDossierList;
 	private String signInfo;
 
-	public SignatureDialogFragment() {}
+	public static SignatureDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
 
-	public static SignatureDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
 		SignatureDialogFragment fragment = new SignatureDialogFragment();
 
-		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
 		args.putParcelableArrayList(ARGUMENTS_DOSSIERS, dossiers);
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
+
 		fragment.setArguments(args);
 
 		return fragment;
@@ -63,17 +70,53 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override protected View createView() {
+	@Override public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		View layout = super.createView();
+		if (getArguments() != null) {
+			mDossierList = getArguments().getParcelableArrayList(ARGUMENTS_DOSSIERS);
+			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
+		}
+	}
 
-		annotationPublique = (TextView) layout.findViewById(R.id.action_dialog_annotation_publique);
-		annotationPrivee = (TextView) layout.findViewById(R.id.action_dialog_annotation_privee);
+	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		layout.findViewById(R.id.action_dialog_signature_certificate_button).setOnClickListener(this);
-		certInfo = (TextView) layout.findViewById(R.id.action_dialog_signature_cert_info);
+		// Create view
 
-		return layout;
+		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_signature, null);
+
+		publicAnnotationTextView = (TextView) view.findViewById(R.id.action_dialog_annotation_publique);
+		privateAnnotationTextView = (TextView) view.findViewById(R.id.action_dialog_annotation_privee);
+
+		view.findViewById(R.id.action_dialog_signature_certificate_button).setOnClickListener(
+				new View.OnClickListener() {
+					@Override public void onClick(View v) {
+						onChooseCertificateButtonClicked();
+					}
+				}
+		);
+		certInfo = (TextView) view.findViewById(R.id.action_dialog_signature_cert_info);
+
+		// Build Dialog
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
+		builder.setView(view);
+		builder.setPositiveButton(
+				R.string.action_signer, new DialogInterface.OnClickListener() {
+					@Override public void onClick(DialogInterface dialog, int which) {
+						onSignButtonClicked();
+					}
+				}
+		);
+		builder.setNegativeButton(
+				android.R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						onCancelButtonClicked();
+					}
+				}
+		);
+
+		return builder.create();
 	}
 
 	@Override public void onStart() {
@@ -82,10 +125,10 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... params) {
 
-				if ((dossiers != null) && (!dossiers.isEmpty())) {
+				if ((mDossierList != null) && (!mDossierList.isEmpty())) {
 
-					String dossierId = dossiers.get(0).getId();
-					try { signInfo = RESTClient.INSTANCE.getSignInfo(dossierId, bureauId).getHash(); }
+					String dossierId = mDossierList.get(0).getId();
+					try { signInfo = RESTClient.INSTANCE.getSignInfo(dossierId, mBureauId).getHash(); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}
 
@@ -96,6 +139,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
 		switch (requestCode) {
 			case RESULT_CODE_FILE_SELECT:
 				if (resultCode == Activity.RESULT_OK) {
@@ -104,31 +148,28 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 				}
 				break;
 		}
+
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	// </editor-fold desc="LifeCycle">
 
-	@Override protected int getTitle() {
-		return Action.SIGNATURE.getTitle();
-	}
-
-	@Override protected int getViewId() {
-		return R.layout.action_dialog_signature;
-	}
-
-	@Override protected void executeTask() {
+	private void onSignButtonClicked() {
 		new SignTask(getActivity()).execute();
 	}
 
-	@Override public void onClick(View v) {
+	private void onCancelButtonClicked() {
+		dismiss();
+	}
+
+	private void onChooseCertificateButtonClicked() {
 
 	}
 
 	private class SignTask extends LoadingWithProgressTask {
 
 		public SignTask(Activity activity) {
-			super(activity, listener);
+			super(activity, (LoadingTask.DataChangeListener) getActivity());
 		}
 
 		@Override protected void load(String... params) throws IParapheurException {
@@ -136,15 +177,15 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 			if (isCancelled())
 				return;
 
-			String annotPub = annotationPublique.getText().toString();
-			String annotPriv = annotationPrivee.getText().toString();
+			String annotPub = publicAnnotationTextView.getText().toString();
+			String annotPriv = privateAnnotationTextView.getText().toString();
 
 			publishProgress(0);
 
-			int total = dossiers.size();
+			int total = mDossierList.size();
 			for (int i = 0; i < total; i++) {
 
-				Dossier dossier = dossiers.get(i);
+				Dossier dossier = mDossierList.get(i);
 				String signValue = "";
 
 				// Sign data
