@@ -106,9 +106,9 @@ public class StringUtils {
 		//  	([A-Z]+)=				Catches "AC=", "O=", etc.
 		// 		(.*?)					Catches everything, "*?" makes it non-greedy
 		//		(?<!\\)(?:\\{2})*		Checks if not followed by a odd number of \ (to keep escaped commas)
-		// 		(?:,|$)					Ending with a comma, or the end of the string
+		// 		(?:,\s*|$)				Ending with a comma, or the end of the string
 
-		String regex = "([A-Z]+)=(.*?(?<!\\\\)(?:\\\\{2})*)(?:,|$)";
+		String regex = "([A-Z]+)=(.*?(?<!\\\\)(?:\\\\{2})*)(?:,\\s*|$)";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(issuerDnName);
 		Map<String, String> parsedData = new HashMap<>();

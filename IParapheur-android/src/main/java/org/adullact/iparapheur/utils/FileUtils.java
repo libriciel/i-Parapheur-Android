@@ -3,6 +3,7 @@ package org.adullact.iparapheur.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.controller.IParapheurApplication;
 
@@ -33,6 +34,19 @@ public class FileUtils {
 	public static boolean isStorageAvailable() {
 		String state = Environment.getExternalStorageState();
 		return Environment.MEDIA_MOUNTED.equals(state);
+	}
+
+	public static @Nullable File getBksFromDownloadFolder() {
+
+		File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		File jks = null;
+
+		if (folder.listFiles() != null)
+			for (File file : folder.listFiles())
+				if (file.getName().endsWith("bks"))
+					jks = file;
+
+		return jks;
 	}
 
 	/**
@@ -88,4 +102,5 @@ public class FileUtils {
 
 		return null;
 	}
+
 }

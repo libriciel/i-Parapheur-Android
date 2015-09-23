@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +15,14 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.utils.PKCS7Signer;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -43,6 +43,7 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
 	private TextView certInfo;
+	private TextView errorInfo;
 
 	private String signInfo;
 
@@ -148,50 +149,53 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 
 				// Sign data
 
-				File certif = getBksFromDownloadFolder();
+				File certif = FileUtils.getBksFromDownloadFolder();
 
 				if (certif != null) {
-					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath());
+					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath(), "bmabma", "bma", "bma");
+
 					try {
-						signer.loadKeyStore(certif.getAbsolutePath());
+						signer.loadKeyStore();
 						signer.loadPrivateKey();
+
 						signValue = signer.sign(StringUtils.hexDecode(signInfo));
 					}
-					catch (IllegalArgumentException e) {
+					catch (FileNotFoundException e) {
 						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_missing_bks_file);
 					}
-					catch (IOException e) {
+					catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
 						e.printStackTrace();
-					}
-					catch (CertificateException e) {
-						e.printStackTrace();
-					}
-					catch (NoSuchAlgorithmException e) {
-						e.printStackTrace();
-					}
-					catch (InvalidKeyException e) {
-						e.printStackTrace();
-					}
-					catch (NoSuchProviderException e) {
-						e.printStackTrace();
-					}
-					catch (SignatureException e) {
-						e.printStackTrace();
-					}
-					catch (KeyStoreException e) {
-						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_incompatible_device);
 					}
 					catch (UnrecoverableKeyException e) {
 						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_missing_alias);
+					}
+					catch (InvalidKeyException e) {
+						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_wrong_password);
+					}
+					catch (IllegalArgumentException e) {
+						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_no_data_to_sign);
+					}
+					catch (SignatureException | IllegalStateException e) {
+						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_unknown_error);
+					}
+					catch (CertificateException | IOException e) {
+						e.printStackTrace();
+						errorInfo.setText(R.string.signature_error_message_error_opening_bks_file);
 					}
 				}
 
 				// Send result, if any
 
-				Log.d("Adrien", "Signature... ");
-				Log.d("Adrien", "BKS   ? " + (certif != null));
-				Log.d("Adrien", "Data  : " + signInfo);
-				Log.d("Adrien", "Value : " + signValue);
+				Log.d(LOG_TAG, "Signature... ");
+				Log.d(LOG_TAG, "BKS   ? " + (certif != null));
+				Log.d(LOG_TAG, "Data  : " + signInfo);
+				Log.d(LOG_TAG, "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
 					return; // TODO : Throw back error message
@@ -208,21 +212,4 @@ public class SignatureDialogFragment extends ActionDialogFragment implements Vie
 		}
 
 	}
-
-	// <editor-fold desc="Signature">
-
-	private @Nullable File getBksFromDownloadFolder() {
-
-		File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-		File jks = null;
-
-		if (folder.listFiles() != null)
-			for (File file : folder.listFiles())
-				if (file.getName().endsWith("bks"))
-					jks = file;
-
-		return jks;
-	}
-
-	// </editor-fold desc="Signature">
 }

@@ -2,7 +2,6 @@ package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
 import android.util.Base64;
-import android.util.Log;
 
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 
@@ -34,25 +33,28 @@ import sun.security.x509.X500Name;
 
 public final class PKCS7Signer {
 
-	private String mCertificatePath;
-	static final String DIGEST_ALG = "SHA1";
-	private String mKeystorePassword = "bmabma";
-	private String mAlias = "bma";
-	private String mAliasPassword = "bma";
-	private PrivateKey mPrivateKey;
-	private KeyStore mKeystore;
+	private static final String DIGEST_ALG = "SHA1";
+	private static final String SIGN_ALGO = "SHA1WithRSA";
 
-	public PKCS7Signer(@NonNull String certificatePath) {
+	private KeyStore mKeystore;
+	private PrivateKey mPrivateKey;
+	private String mCertificatePath;
+	private String mKeystorePassword;
+	private String mAlias;
+	private String mAliasPassword;
+
+	public PKCS7Signer(@NonNull String certificatePath, @NonNull String keystorePassword, @NonNull String alias, @NonNull String aliasPassword) {
 		mCertificatePath = certificatePath;
+		mKeystorePassword = keystorePassword;
+		mAlias = alias;
+		mAliasPassword = aliasPassword;
 	}
 
-	public KeyStore loadKeyStore(@NonNull String path) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
+	public void loadKeyStore() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
 		mKeystore = KeyStore.getInstance("BKS");
-		InputStream is = new FileInputStream(path);
+		InputStream is = new FileInputStream(mCertificatePath);
 		mKeystore.load(is, mKeystorePassword.toCharArray());
-
-		return mKeystore;
 	}
 
 	public PrivateKey loadPrivateKey() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
@@ -61,53 +63,40 @@ public final class PKCS7Signer {
 		return mPrivateKey;
 	}
 
-	public String sign(byte[] dataToSign) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, NoSuchProviderException, InvalidKeyException, SignatureException {
+	public String sign(byte[] dataToSign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IllegalStateException, IllegalArgumentException, KeyStoreException, IOException {
 
-		Log.e("Adrien", "Here ? " + (mPrivateKey != null));
+		// Init checking
 
-		KeyStore keyStore = loadKeyStore(mCertificatePath);
-		X509Certificate certificate = (X509Certificate) keyStore.getCertificate(mAlias);
+		if (mKeystore == null)
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before signature");
 
-//		String content = "some bytes to be signed";
-//		dataToSign = content.getBytes("UTF-8");
-//		CMSSignedDataGenerator signatureGenerator = setUpProvider(keyStore);
-//		byte[] signedBytes = signPkcs7(dataToSign, signatureGenerator);
+		if (mPrivateKey == null)
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakPrivateKey() before signature");
 
-		//
+		if (dataToSign == null)
+			throw new IllegalArgumentException("PKCS7Signer exception : Data to sign cannot be null");
+
+		// Signed attributes computation
 
 		Security.addProvider(new BouncyCastleProvider());
-		AlgorithmId digestAlg = AlgorithmId.get(DIGEST_ALG);
 
-		// signature alg
-		Signature sig = Signature.getInstance("SHA1WithRSA", "BC");
-
-		// p9 attributes
 		PKCS9Attribute[] authenticatedAttributeList = {
 				new PKCS9Attribute(PKCS9Attribute.SIGNING_TIME_OID, new Date()),
 				new PKCS9Attribute(PKCS9Attribute.CONTENT_TYPE_OID, ContentInfo.DATA_OID),
 				new PKCS9Attribute(PKCS9Attribute.MESSAGE_DIGEST_OID, dataToSign)
 		};
-
 		PKCS9Attributes authenticatedAttributes = new PKCS9Attributes(authenticatedAttributeList);
 
-		// signed attributes computation
+		Signature sig = Signature.getInstance(SIGN_ALGO, "BC");
 		sig.initSign(mPrivateKey);
 		sig.update(authenticatedAttributes.getDerEncoding());
 		byte[] signedAttributes = sig.sign();
 
-		// detached signature
-		ContentInfo contentInfo = new ContentInfo(ContentInfo.DATA_OID, null);
+		// Signer serial info
 
-		// signer serial
+		X509Certificate certificate = (X509Certificate) mKeystore.getCertificate(mAlias);
 		java.math.BigInteger serial = certificate.getSerialNumber();
-
-//		Log.i("Adrien", ">> " + certificate.getIssuerDN().getName());
-		Log.i("Adrien", ">> " + certificate.getIssuerDN().getName());
-//		Log.i("Adrien", ">> " + serial);
-//		Log.i("Adrien", ">> " + digestAlg);
-//		Log.i("Adrien", ">> " + authenticatedAttributes);
-//		Log.i("Adrien", ">> " + new AlgorithmId(AlgorithmId.RSAEncryption_oid));
-//		Log.i("Adrien", ">> " + signedAttributes); "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR"
+		AlgorithmId digestAlg = AlgorithmId.get(DIGEST_ALG);
 
 		SignerInfo signerInfo = new SignerInfo(
 
@@ -122,12 +111,15 @@ public final class PKCS7Signer {
 
 		X509Certificate[] certificateList = {certificate};
 
+		// Signature
+
+		ContentInfo contentInfo = new ContentInfo(ContentInfo.DATA_OID, null);
 		AlgorithmId[] algs = {digestAlg};
 		SignerInfo[] infos = {signerInfo};
 		PKCS7 p7Signature = new PKCS7(algs, contentInfo, certificateList, infos);
-		ByteArrayOutputStream nbaos = new ByteArrayOutputStream();
-		p7Signature.encodeSignedData(nbaos);
+		ByteArrayOutputStream signedBytesStream = new ByteArrayOutputStream();
+		p7Signature.encodeSignedData(signedBytesStream);
 
-		return Base64.encodeToString(nbaos.toByteArray(), Base64.DEFAULT);
+		return Base64.encodeToString(signedBytesStream.toByteArray(), Base64.DEFAULT);
 	}
 }
