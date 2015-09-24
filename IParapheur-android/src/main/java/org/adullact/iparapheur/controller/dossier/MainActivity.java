@@ -75,7 +75,7 @@ import java.util.HashSet;
  */
 public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
-	private static final String SHARED_PREFERENCES = ":iparapheur:shared_preferences_main";
+	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
 	private static final int EDIT_PREFERENCE_REQUEST = 50;
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// It's in the Android guidelines, the user have to know it's here.
 		// (And we want to open it in portrait in any case, otherwise the user sees a weird grey panel)
 
-		SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES, 0);
+		SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES_MAIN, 0);
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 

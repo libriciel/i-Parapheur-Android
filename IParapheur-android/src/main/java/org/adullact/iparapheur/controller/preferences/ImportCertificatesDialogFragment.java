@@ -2,6 +2,7 @@ package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -113,7 +114,7 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 				new DialogInterface.OnShowListener() {
 					@Override public void onShow(DialogInterface dialog) {
 
-						final Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+						Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
 						positiveButton.setOnClickListener(
 								new View.OnClickListener() {
 									@Override public void onClick(View v) {
@@ -157,13 +158,18 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 		// Import to intern memory
 
 		boolean movedSuccessfully;
-		movedSuccessfully = new File(FileUtils.getInternalCertificateStoragePath(getContext())).mkdirs();
 
 		File from = mCertificateFile;
 		File to = new File(FileUtils.getInternalCertificateStoragePath(getContext()), mCertificateFile.getName());
-		movedSuccessfully = movedSuccessfully && from.renameTo(to);
+		movedSuccessfully = from.renameTo(to);
 
 		if (movedSuccessfully) {
+
+			SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(mCertificateFile.getName(), mPasswordEditText.getText().toString());
+			editor.apply();
+
 			Toast.makeText(getActivity(), R.string.import_successful, Toast.LENGTH_SHORT).show();
 			dismiss();
 		}

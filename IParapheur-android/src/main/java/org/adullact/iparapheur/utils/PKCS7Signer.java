@@ -31,6 +31,7 @@ import sun.security.pkcs.SignerInfo;
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.X500Name;
 
+
 public final class PKCS7Signer {
 
 	private static final String DIGEST_ALG = "SHA1";

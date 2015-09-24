@@ -17,34 +17,48 @@ import java.io.OutputStream;
 
 public class FileUtils {
 
-	public static File getDirectoryForDossier(String dossierId) {
+	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
+
+	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
 		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
-		directory.mkdirs();
+		boolean success = directory.mkdirs();
 
-		return directory;
+		return success ? directory : null;
 	}
 
-	public static File getFileForDocument(Context context, String dossierId, String documentId) {
-		if (!DeviceUtils.isDebugOffline()) {
+	public static @Nullable File getFileForDocument(@NonNull Context context, @NonNull String dossierId, @NonNull String documentId) {
+
+		if (!DeviceUtils.isDebugOffline())
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
-		}
-		else {
+		else
 			return createFileFromAsset(context, "offline_test_file.pdf");
+	}
+
+	public static @Nullable String getInternalCertificateStoragePath(@NonNull Context context) {
+
+		String path = null;
+		boolean accessible = false;
+		File rootFile = context.getExternalFilesDir(null);
+
+		if (rootFile != null) {
+			path = rootFile.getAbsolutePath() + File.separator + "certificates" + File.separator;
+			accessible = new File(path).mkdirs();
 		}
+
+		return accessible ? path : null;
 	}
 
-	public static boolean isStorageAvailable() {
-		String state = Environment.getExternalStorageState();
-		return Environment.MEDIA_MOUNTED.equals(state);
-	}
-
-	public static String getInternalCertificateStoragePath(@NonNull Context context) {
-		return context.getFilesDir().getAbsolutePath() + File.separator + "certificates" + File.separator;
+	public static @Nullable File getBksFromCertificateFolder(@NonNull Context context) {
+		String folder = getInternalCertificateStoragePath(context);
+		return (folder != null ? getBksFromFolder(new File(folder)) : null);
 	}
 
 	public static @Nullable File getBksFromDownloadFolder() {
+		return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+	}
 
-		File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+	public static @Nullable File getBksFromFolder(@NonNull File folder) {
+
 		File jks = null;
 
 		if (folder.listFiles() != null)
@@ -57,11 +71,8 @@ public class FileUtils {
 
 	/**
 	 * Creates a file form an Asset, through {@link #createFileFromInputStream}.
-	 *
-	 * @param context
-	 * @param assetFileName
 	 */
-	private static File createFileFromAsset(Context context, String assetFileName) {
+	private static @Nullable File createFileFromAsset(@NonNull Context context, @NonNull String assetFileName) {
 		AssetManager am = context.getAssets();
 
 		try {
@@ -82,7 +93,7 @@ public class FileUtils {
 	 * @param inputStream
 	 * @param fileName
 	 */
-	private static File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
+	private static @Nullable File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
 		File fileFolder = new File(context.getCacheDir().getAbsolutePath() + File.separator + "temp_files");
 		fileFolder.mkdirs();
 

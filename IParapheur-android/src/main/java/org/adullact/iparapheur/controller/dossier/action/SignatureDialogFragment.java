@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -47,7 +49,6 @@ public class SignatureDialogFragment extends DialogFragment {
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureauId";
 
-	private TextView errorInfo;
 	protected EditText mPublicAnnotationEditText;
 	protected EditText mPrivateAnnotationEditText;
 	protected TextView mPublicAnnotationLabel;
@@ -199,10 +200,15 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				// Sign data
 
-				File certif = FileUtils.getBksFromDownloadFolder();
+				File certif = FileUtils.getBksFromCertificateFolder(getActivity());
 
 				if (certif != null) {
-					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath(), "bmabma", "bma", "bma");
+
+					SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+					String certificatePassword = settings.getString(certif.getName(), "");
+					Log.i("Adrien", "certif found : " + certif.getAbsolutePath() + " " + certificatePassword);
+
+					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath(), certificatePassword, "bma", "bma");
 
 					try {
 						signer.loadKeyStore();
@@ -212,31 +218,31 @@ public class SignatureDialogFragment extends DialogFragment {
 					}
 					catch (FileNotFoundException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_missing_bks_file);
+						Toast.makeText(getActivity(), R.string.signature_error_message_missing_bks_file, Toast.LENGTH_SHORT).show();
 					}
 					catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_incompatible_device);
+						Toast.makeText(getActivity(), R.string.signature_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
 					}
 					catch (UnrecoverableKeyException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_missing_alias);
+						Toast.makeText(getActivity(), R.string.signature_error_message_missing_alias, Toast.LENGTH_SHORT).show();
 					}
 					catch (InvalidKeyException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_wrong_password);
+						Toast.makeText(getActivity(), R.string.signature_error_message_wrong_password, Toast.LENGTH_SHORT).show();
 					}
 					catch (IllegalArgumentException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_no_data_to_sign);
+						Toast.makeText(getActivity(), R.string.signature_error_message_no_data_to_sign, Toast.LENGTH_SHORT).show();
 					}
 					catch (SignatureException | IllegalStateException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_unknown_error);
+						Toast.makeText(getActivity(), R.string.signature_error_message_unknown_error, Toast.LENGTH_SHORT).show();
 					}
 					catch (CertificateException | IOException e) {
 						e.printStackTrace();
-						errorInfo.setText(R.string.signature_error_message_error_opening_bks_file);
+						Toast.makeText(getActivity(), R.string.signature_error_message_error_opening_bks_file, Toast.LENGTH_SHORT).show();
 					}
 				}
 
