@@ -42,6 +42,9 @@
             android:theme="@style/AppTheme.Settings"
             android:label="@string/title_activity_settings">
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="8d196637605d7788e177040d8c582b4b2059f79f" />
     </application>
 
 </manifest>
