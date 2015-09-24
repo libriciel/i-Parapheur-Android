@@ -13,6 +13,14 @@
     <string name="about_library_license_mupdf_copyright">Copyright 2006–2013 Artifex Software, Inc.</string>
     <string name="about_library_license_mupdf_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
 
+    <string name="about_library_license_spongy_title">SpongyCastle</string>
+    <string name="about_library_license_spongy_copyright">Copyright © 2000–2015 The Legion of the Bouncy Castle Inc.</string>
+    <string name="about_library_license_spongy_license">Licensed under the terms of the MIT Licence (the "Software").</string>
+
+    <string name="about_library_license_sun_title">Zip-Signer / Android-sun-jarsign-support</string>
+    <string name="about_library_license_sun_copyright">https://code.google.com/p/zip-signer/</string>
+    <string name="about_library_license_sun_license">Licensed under the terms of the General Public License (GPL), version 2.</string>
+
     <string name="about_library_license_android_support_title">Android Support Libraries</string>
     <string name="about_library_license_android_support_copyright">Copyright © 2011 The Android Open Source Project</string>
     <string name="about_library_license_android_support_license">Licensed under the Apache License, Version 2.0 (the "License")</string>

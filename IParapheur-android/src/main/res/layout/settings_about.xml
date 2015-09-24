@@ -7,46 +7,46 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="@dimen/about_margin_vertical"
-        android:paddingBottom="@dimen/about_margin_vertical"
         android:clipToPadding="false"
+        android:paddingBottom="@dimen/about_margin_vertical"
+        android:paddingTop="@dimen/about_margin_vertical"
         android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingLeft="@dimen/about_margin_horizontal"
-            android:paddingRight="@dimen/about_margin_horizontal"
-            android:orientation="vertical">
+            android:paddingRight="@dimen/about_margin_horizontal">
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Large"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:textStyle="bold"
+                android:text="@string/about_main_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_main_title"/>
+                android:textStyle="bold"/>
 
             <!-- About -->
 
             <TextView
-                style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:id="@+id/about_version_number_textview"
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
-                android:textStyle="bold"
+                android:text="@string/about_version_number"
                 android:textColor="@color/text_black"
-                android:text="@string/about_version_number"/>
+                android:textStyle="bold"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_copyright"/>
+                android:text="@string/about_copyright"
+                android:textColor="@color/text_black"/>
 
             <!-- Legal -->
 
@@ -55,25 +55,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
-                android:textStyle="bold"
+                android:text="@string/about_legal_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_legal_title"/>
+                android:textStyle="bold"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_legal_content_part1"/>
+                android:text="@string/about_legal_content_part1"
+                android:textColor="@color/text_black"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_legal_content_part2"/>
+                android:text="@string/about_legal_content_part2"
+                android:textColor="@color/text_black"/>
 
             <!-- Licenses -->
 
@@ -83,9 +83,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_xlarge"
                 android:gravity="center_horizontal"
-                android:textStyle="bold"
+                android:text="@string/about_library_licenses_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_library_licenses_title"/>
+                android:textStyle="bold"/>
 
             <!-- MuPDF license -->
 
@@ -94,25 +94,79 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
-                android:textStyle="bold"
+                android:text="@string/about_library_license_mupdf_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_library_license_mupdf_title"/>
+                android:textStyle="bold"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_library_license_mupdf_copyright"/>
+                android:text="@string/about_library_license_mupdf_copyright"
+                android:textColor="@color/text_black"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_mupdf_license"
+                android:textColor="@color/text_black"/>
+
+            <!-- Spongy license -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:text="@string/about_library_license_spongy_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_library_license_mupdf_license"/>
+                android:textStyle="bold"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_spongy_copyright"
+                android:textColor="@color/text_black"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_spongy_license"
+                android:textColor="@color/text_black"/>
+
+            <!-- Sun Security support license -->
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_large"
+                android:text="@string/about_library_license_sun_title"
+                android:textColor="@color/text_black"
+                android:textStyle="bold"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_sun_copyright"
+                android:textColor="@color/text_black"/>
+
+            <TextView
+                style="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/about_text_margin_medium"
+                android:text="@string/about_library_license_sun_license"
+                android:textColor="@color/text_black"/>
 
             <!-- Android support license -->
 
@@ -121,25 +175,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
-                android:textStyle="bold"
+                android:text="@string/about_library_license_android_support_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_library_license_android_support_title"/>
+                android:textStyle="bold"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_library_license_android_support_copyright"/>
+                android:text="@string/about_library_license_android_support_copyright"
+                android:textColor="@color/text_black"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_library_license_android_support_license"/>
+                android:text="@string/about_library_license_android_support_license"
+                android:textColor="@color/text_black"/>
 
             <!-- Gson license -->
 
@@ -148,25 +202,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_large"
-                android:textStyle="bold"
+                android:text="@string/about_library_license_gson_title"
                 android:textColor="@color/text_black"
-                android:text="@string/about_library_license_gson_title"/>
+                android:textStyle="bold"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_library_license_gson_copyright"/>
+                android:text="@string/about_library_license_gson_copyright"
+                android:textColor="@color/text_black"/>
 
             <TextView
                 style="@android:style/TextAppearance.DeviceDefault.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/about_text_margin_medium"
-                android:textColor="@color/text_black"
-                android:text="@string/about_library_license_gson_license"/>
+                android:text="@string/about_library_license_gson_license"
+                android:textColor="@color/text_black"/>
 
         </LinearLayout>
     </ScrollView>
