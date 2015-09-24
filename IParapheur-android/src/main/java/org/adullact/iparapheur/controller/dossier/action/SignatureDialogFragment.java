@@ -87,7 +87,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_signature, null);
 
-		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_public_annotation);
+		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_import_password);
 		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_private_annotation);
 		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_public_annotation_label);
 		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_private_annotation_label);

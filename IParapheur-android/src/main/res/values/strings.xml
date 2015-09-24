@@ -20,6 +20,7 @@
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
     <string name="document_selection">Sélection du document</string>
+    <string name="password">Mot de passe</string>
 
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
@@ -60,6 +61,14 @@
     <string name="etape_courante">Étape courante</string>
 
     <!-- Errors -->
+
+    <string name="import_title">Importer un certificat BKS</string>
+    <string name="import_certificate">Importer</string>
+    <string name="import_successful">Le certificat a été importé avec succès.</string>
+    <string name="import_error_message_error_opening_bks_file">Le mot de passe est invalide, ou le certificat est corrompu.</string>
+    <string name="import_error_cant_copy_certificate">Impossible de copier le certificat sur la mémoire interne.</string>
+    <string name="import_error_message_incompatible_device">Cet appareil ne semble pas compatible avec les outils de cryptage utilisés.</string>
+
     <string name="signature_error_label">Erreur à la signature : </string>
     <string name="signature_error_message_unknown_error">Une erreur inconnue à la signature.</string>
     <string name="signature_error_message_incompatible_device">Cet appareil ne semble pas compatible avec les outils de signature utilisés.</string>

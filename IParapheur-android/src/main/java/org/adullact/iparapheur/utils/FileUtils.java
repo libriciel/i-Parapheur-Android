@@ -3,6 +3,7 @@ package org.adullact.iparapheur.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.controller.IParapheurApplication;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 
 public class FileUtils {
 
@@ -34,6 +36,10 @@ public class FileUtils {
 	public static boolean isStorageAvailable() {
 		String state = Environment.getExternalStorageState();
 		return Environment.MEDIA_MOUNTED.equals(state);
+	}
+
+	public static String getInternalCertificateStoragePath(@NonNull Context context) {
+		return context.getFilesDir().getAbsolutePath() + File.separator + "certificates" + File.separator;
 	}
 
 	public static @Nullable File getBksFromDownloadFolder() {

@@ -41,7 +41,7 @@ public class VisaDialogFragment extends ActionDialogFragment implements DialogIn
     protected View createView() {
         View layout = super.createView();
 
-        annotationPublique = (TextView) layout.findViewById(R.id.action_dialog_public_annotation);
+        annotationPublique = (TextView) layout.findViewById(R.id.action_import_password);
         annotationPrivee = (TextView) layout.findViewById(R.id.action_dialog_private_annotation);
 
         return layout;

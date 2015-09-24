@@ -44,17 +44,21 @@ import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment;
+import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFragment;
 import org.adullact.iparapheur.controller.preferences.SettingsActivity;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.DeviceUtils;
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.LoadingTask;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+
 
 /**
  * An activity representing a list of Dossiers.
@@ -125,6 +129,14 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override protected void onStart() {
 		super.onStart();
+
+		// Starting checks
+
+		File certificateFound = FileUtils.getBksFromDownloadFolder();
+		if (certificateFound != null) {
+			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
+			actionDialog.show(getSupportFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+		}
 
 		// Clear backStack (wrong backStack can stay after rotation)
 
