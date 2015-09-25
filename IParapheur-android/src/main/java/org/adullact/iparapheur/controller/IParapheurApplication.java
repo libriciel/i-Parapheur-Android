@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.controller.account.MyAccounts;
+
+import io.fabric.sdk.android.Fabric;
+
 
 public class IParapheurApplication extends Application {
 
@@ -15,9 +20,11 @@ public class IParapheurApplication extends Application {
 		return context;
 	}
 
-	@Override
-	public void onCreate() {
+	@Override public void onCreate() {
 		super.onCreate();
+
+		Fabric.with(this, new Crashlytics());
+
 		context = this;
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

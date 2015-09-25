@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="org.adullact.iparapheur"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="9"
-    android:versionName="1.4.02">
+<manifest package="org.adullact.iparapheur"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:versionCode="10"
+          android:versionName="1.4.03">
 
     <!-- Only supports Tablets -->
     <supports-screens
@@ -39,6 +38,10 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.Settings">
         </activity>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="8d196637605d7788e177040d8c582b4b2059f79f"/>
     </application>
 
 </manifest>

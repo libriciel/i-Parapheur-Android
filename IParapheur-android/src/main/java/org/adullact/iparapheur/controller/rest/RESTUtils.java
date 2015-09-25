@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.controller.rest;
 
+import android.util.Log;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -22,7 +24,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+
 public class RESTUtils {
+
+	private static final String LOG_TAG = "RestUtils";
 
 	private static final String certAcAdullact = "-----BEGIN CERTIFICATE-----\n" +
 			"MIIHyTCCBbGgAwIBAgIUbyl4BzfA+DWwMPJHFgkdXxI7UGwwDQYJKoZIhvcNAQEF\n" +
@@ -70,8 +75,8 @@ public class RESTUtils {
 			"-----END CERTIFICATE-----";
 
 	public static RequestResponse post(String url, String body) throws IParapheurException {
-		//Log.d("debug", "POST request on : " + url);
-		//Log.d("debug", "with body : " + body);
+		Log.d(LOG_TAG, "POST request on : " + url);
+		Log.d(LOG_TAG, "with body : " + body);
 		RequestResponse res;
 		OutputStream output;
 
@@ -102,8 +107,8 @@ public class RESTUtils {
 	}
 
 	public static RequestResponse put(String url, String body, boolean ignoreResponseData) throws IParapheurException {
-		//Log.d("debug", "POST request on : " + url);
-		//Log.d("debug", "with body : " + body);
+		Log.d(LOG_TAG, "POST request on : " + url);
+		Log.d(LOG_TAG, "with body : " + body);
 		RequestResponse res;
 		OutputStream output;
 
@@ -130,7 +135,7 @@ public class RESTUtils {
 	}
 
 	public static RequestResponse get(String url) throws IParapheurException {
-		//Log.d("debug", "GET request on : " + url);
+		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
 		String urlStr = url;
 
@@ -163,7 +168,7 @@ public class RESTUtils {
 	}
 
 	public static RequestResponse delete(String url, boolean ignoreResponseData) throws IParapheurException {
-		//Log.d("debug", "GET request on : " + url);
+		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
 		String urlStr = url;
 		try {
@@ -199,7 +204,7 @@ public class RESTUtils {
 	}
 
 	public static InputStream downloadFile(String url) throws IParapheurException {
-		//Log.d("debug", "GET (download file) request on : " + url);
+		Log.d(LOG_TAG, "GET (download file) request on : " + url);
 		InputStream fileStream;
 		HttpURLConnection connection;
 		try {
@@ -235,6 +240,7 @@ public class RESTUtils {
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {
+		Log.d(LOG_TAG, "getExceptionForError : " + code + " " + message);
 		if (message != null) {
 			return new IParapheurException(R.string.http_error_explicit, message);
 		}
