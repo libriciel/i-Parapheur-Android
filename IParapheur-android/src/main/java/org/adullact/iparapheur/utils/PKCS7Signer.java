@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import org.spongycastle.jce.provider.BouncyCastleProvider;
@@ -51,14 +52,16 @@ public final class PKCS7Signer {
 		mAliasPassword = aliasPassword;
 	}
 
-	public void loadKeyStore() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+	public @Nullable KeyStore loadKeyStore() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
 
 		mKeystore = KeyStore.getInstance("BKS");
 		InputStream is = new FileInputStream(mCertificatePath);
 		mKeystore.load(is, mKeystorePassword.toCharArray());
+
+		return mKeystore;
 	}
 
-	public PrivateKey loadPrivateKey() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
+	public @Nullable PrivateKey loadPrivateKey() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException {
 
 		mPrivateKey = (PrivateKey) mKeystore.getKey(mAlias, mAliasPassword.toCharArray());
 		return mPrivateKey;
@@ -123,4 +126,5 @@ public final class PKCS7Signer {
 
 		return Base64.encodeToString(signedBytesStream.toByteArray(), Base64.DEFAULT);
 	}
+
 }

@@ -15,7 +15,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -40,6 +43,8 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class SignatureDialogFragment extends DialogFragment {
@@ -53,7 +58,11 @@ public class SignatureDialogFragment extends DialogFragment {
 	protected EditText mPrivateAnnotationEditText;
 	protected TextView mPublicAnnotationLabel;
 	protected TextView mPrivateAnnotationLabel;
+	protected Spinner mAliasesSpinner;
 
+	private File mCertificateFile;
+	private String mCertificatePassword;
+	private List<String> mAliasList;
 	private String mBureauId;
 	private ArrayList<Dossier> mDossierList;
 	private String signInfo;
@@ -80,6 +89,14 @@ public class SignatureDialogFragment extends DialogFragment {
 			mDossierList = getArguments().getParcelableArrayList(ARGUMENTS_DOSSIERS);
 			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
 		}
+
+		// Init values
+
+		SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+		mCertificateFile = FileUtils.getBksFromCertificateFolder(getActivity());
+		mCertificatePassword = (mCertificateFile != null ? settings.getString(mCertificateFile.getName(), "") : null);
+
+		mAliasList = new ArrayList<>();
 	}
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -92,6 +109,13 @@ public class SignatureDialogFragment extends DialogFragment {
 		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_private_annotation);
 		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_public_annotation_label);
 		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_private_annotation_label);
+		mAliasesSpinner = (Spinner) view.findViewById(R.id.action_dialog_certificates_spinner);
+
+		// Set Spinner adapter
+
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, mAliasList);
+		arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mAliasesSpinner.setAdapter(arrayAdapter);
 
 		// Set listeners
 
@@ -136,6 +160,8 @@ public class SignatureDialogFragment extends DialogFragment {
 	@Override public void onStart() {
 		super.onStart();
 
+		// Loading SignData
+
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... params) {
 
@@ -147,6 +173,41 @@ public class SignatureDialogFragment extends DialogFragment {
 				}
 
 				return null;
+			}
+		}.execute();
+
+		// Inflating Aliases
+
+		new AsyncTask<Void, Void, Void>() {
+			@Override protected Void doInBackground(Void... params) {
+
+				if (mCertificateFile == null)
+					return null;
+
+				// Retrieving aliases from Certificate file.
+
+				PKCS7Signer signer = new PKCS7Signer(mCertificateFile.getAbsolutePath(), mCertificatePassword, "", "");
+				ArrayList<String> aliasList = new ArrayList<>();
+
+				try {
+					KeyStore keystore = signer.loadKeyStore();
+
+					if (keystore != null)
+						aliasList.addAll(Collections.list(keystore.aliases()));
+				}
+				catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) { e.printStackTrace(); }
+
+				// Inflate spinner
+
+				mAliasList.clear();
+				mAliasList.addAll(aliasList);
+
+				return null;
+			}
+
+			@SuppressWarnings("unchecked") @Override protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+				((ArrayAdapter<String>) mAliasesSpinner.getAdapter()).notifyDataSetChanged();
 			}
 		}.execute();
 
@@ -200,15 +261,11 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				// Sign data
 
-				File certif = FileUtils.getBksFromCertificateFolder(getActivity());
+				if (mCertificateFile != null) {
 
-				if (certif != null) {
+					Log.i("Adrien", "certif found : " + mCertificateFile.getAbsolutePath() + " " + mCertificatePassword);
 
-					SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
-					String certificatePassword = settings.getString(certif.getName(), "");
-					Log.i("Adrien", "certif found : " + certif.getAbsolutePath() + " " + certificatePassword);
-
-					PKCS7Signer signer = new PKCS7Signer(certif.getAbsolutePath(), certificatePassword, "bma", "bma");
+					PKCS7Signer signer = new PKCS7Signer(mCertificateFile.getAbsolutePath(), mCertificatePassword, "bma", "bma");
 
 					try {
 						signer.loadKeyStore();
@@ -249,12 +306,11 @@ public class SignatureDialogFragment extends DialogFragment {
 				// Send result, if any
 
 				Log.d(LOG_TAG, "Signature... ");
-				Log.d(LOG_TAG, "BKS   ? " + (certif != null));
 				Log.d(LOG_TAG, "Data  : " + signInfo);
 				Log.d(LOG_TAG, "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
-					return; // TODO : Throw back error message
+					return;
 
 				if (isCancelled())
 					return;

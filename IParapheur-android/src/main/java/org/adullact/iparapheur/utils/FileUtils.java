@@ -19,6 +19,8 @@ public class FileUtils {
 
 	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
+	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
+
 	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
 		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
 		boolean success = directory.mkdirs();
@@ -31,26 +33,27 @@ public class FileUtils {
 		if (!DeviceUtils.isDebugOffline())
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
 		else
-			return createFileFromAsset(context, "offline_test_file.pdf");
+			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}
 
-	public static @Nullable String getInternalCertificateStoragePath(@NonNull Context context) {
+	public static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
 
-		String path = null;
 		boolean accessible = false;
-		File rootFile = context.getExternalFilesDir(null);
+		File rootFolder = context.getExternalFilesDir(null);
+		File certificateFolder = null;
 
-		if (rootFile != null) {
-			path = rootFile.getAbsolutePath() + File.separator + "certificates" + File.separator;
-			accessible = new File(path).mkdirs();
+		if (rootFolder != null) {
+			String certificatePath = rootFolder.getAbsolutePath() + File.separator + "certificates" + File.separator;
+			certificateFolder = new File(certificatePath);
+			accessible = certificateFolder.exists() || certificateFolder.mkdirs();
 		}
 
-		return accessible ? path : null;
+		return accessible ? certificateFolder : null;
 	}
 
 	public static @Nullable File getBksFromCertificateFolder(@NonNull Context context) {
-		String folder = getInternalCertificateStoragePath(context);
-		return (folder != null ? getBksFromFolder(new File(folder)) : null);
+		File folder = getInternalCertificateStoragePath(context);
+		return (folder != null ? getBksFromFolder(folder) : null);
 	}
 
 	public static @Nullable File getBksFromDownloadFolder() {
@@ -88,14 +91,18 @@ public class FileUtils {
 
 	/**
 	 * Creates a file from a steam in the intern cacheDir/temp_files/ directory.
-	 *
-	 * @param context
-	 * @param inputStream
-	 * @param fileName
 	 */
 	private static @Nullable File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
+
 		File fileFolder = new File(context.getCacheDir().getAbsolutePath() + File.separator + "temp_files");
-		fileFolder.mkdirs();
+
+		// Default case
+
+		boolean accessible = fileFolder.exists() || fileFolder.mkdirs();
+		if (!accessible)
+			return null;
+
+		//
 
 		try {
 			File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
