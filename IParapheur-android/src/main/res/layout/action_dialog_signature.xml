@@ -67,6 +67,7 @@
             android:id="@+id/action_signature_choose_certificate_label"
             android:layout_width="170dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             android:text="@string/select_certificate"
             android:textColor="@color/edittext_label_activable"
             android:textSize="12sp"/>
@@ -88,6 +89,7 @@
             android:id="@+id/action_signature_choose_alias_label"
             android:layout_width="170dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             android:text="@string/select_alias"
             android:textColor="@color/edittext_label_activable"
             android:textSize="12sp"/>

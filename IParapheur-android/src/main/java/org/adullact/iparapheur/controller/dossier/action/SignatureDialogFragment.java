@@ -22,13 +22,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import org.adullact.iparapheur.utils.PKCS7Signer;
 import org.adullact.iparapheur.utils.StringUtils;
 
@@ -146,9 +146,13 @@ public class SignatureDialogFragment extends DialogFragment {
 				}
 		);
 
-		mCertificateSpinner.setOnItemClickListener(
-				new AdapterView.OnItemClickListener() {
-					@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		mCertificateSpinner.setOnItemSelectedListener(
+				new AdapterView.OnItemSelectedListener() {
+					@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+						refreshAliasesSpinner();
+					}
+
+					@Override public void onNothingSelected(AdapterView<?> parent) {
 						refreshAliasesSpinner();
 					}
 				}
@@ -309,28 +313,33 @@ public class SignatureDialogFragment extends DialogFragment {
 	}
 
 	private void onSignButtonClicked() {
-		new SignTask(getActivity()).execute();
+		new SignTask().execute();
 	}
 
 	private void onCancelButtonClicked() {
 		dismiss();
 	}
 
-	private class SignTask extends LoadingWithProgressTask {
+	private class SignTask extends AsyncTask<Void, Void, Void> {
 
-		public SignTask(Activity activity) {
-			super(activity, (LoadingTask.DataChangeListener) getActivity());
+		private String mAnnotPub;
+		private String mAnnotPriv;
+		private String mSelectedAlias;
+		private int mErrorMessage;
+
+		@Override protected void onPreExecute() {
+			super.onPreExecute();
+
+			mAnnotPub = mPublicAnnotationEditText.getText().toString();
+			mAnnotPriv = mPrivateAnnotationEditText.getText().toString();
+			mSelectedAlias = mAliasesSpinner.getSelectedItem().toString();
+			mErrorMessage = -1;
 		}
 
-		@Override protected void load(String... params) throws IParapheurException {
+		@Override protected Void doInBackground(Void... params) {
 
 			if (isCancelled())
-				return;
-
-			String annotPub = mPublicAnnotationEditText.getText().toString();
-			String annotPriv = mPrivateAnnotationEditText.getText().toString();
-
-			publishProgress(0);
+				return null;
 
 			int total = mDossierList.size();
 			for (int i = 0; i < total; i++) {
@@ -344,41 +353,47 @@ public class SignatureDialogFragment extends DialogFragment {
 
 					Log.i("Adrien", "certif found : " + mSelectedCertificateFile.getAbsolutePath() + " " + mSelectedCertificatePassword);
 
-					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, "bma", "bma");
+					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, mSelectedAlias, "bma");
 
 					try {
 						signer.loadKeyStore();
 						signer.loadPrivateKey();
-
 						signValue = signer.sign(StringUtils.hexDecode(signInfo));
 					}
 					catch (FileNotFoundException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_missing_bks_file, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_missing_bks_file;
 					}
 					catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_incompatible_device;
 					}
 					catch (UnrecoverableKeyException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_missing_alias, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_missing_alias;
 					}
 					catch (InvalidKeyException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_wrong_password, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_wrong_password;
 					}
 					catch (IllegalArgumentException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_no_data_to_sign, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_no_data_to_sign;
 					}
 					catch (SignatureException | IllegalStateException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_unknown_error, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_unknown_error;
 					}
 					catch (CertificateException | IOException e) {
 						e.printStackTrace();
-						Toast.makeText(getActivity(), R.string.signature_error_message_error_opening_bks_file, Toast.LENGTH_SHORT).show();
+						Crashlytics.logException(e);
+						mErrorMessage = R.string.signature_error_message_error_opening_bks_file;
 					}
 				}
 
@@ -389,18 +404,26 @@ public class SignatureDialogFragment extends DialogFragment {
 				Log.d(LOG_TAG, "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
-					return;
+					return null;
 
 				if (isCancelled())
-					return;
+					return null;
 
 				// RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
-				publishProgress(i * 100 / total);
 
 				if (isCancelled())
-					return;
+					return null;
 			}
+
+			return null;
 		}
 
+		@Override protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			if (mErrorMessage != -1)
+				if (getActivity() != null)
+					Toast.makeText(getActivity(), mErrorMessage, Toast.LENGTH_SHORT).show();
+		}
 	}
 }
