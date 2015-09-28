@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -58,14 +59,20 @@ public class SignatureDialogFragment extends DialogFragment {
 	protected EditText mPrivateAnnotationEditText;
 	protected TextView mPublicAnnotationLabel;
 	protected TextView mPrivateAnnotationLabel;
+	protected Spinner mCertificateSpinner;
 	protected Spinner mAliasesSpinner;
+	protected TextView mCertificateLabel;
+	protected TextView mAliasesLabel;
 
-	private File mCertificateFile;
-	private String mCertificatePassword;
+	private List<File> mCertificateFileList;
+	private List<String> mCertificateNameList;
 	private List<String> mAliasList;
 	private String mBureauId;
 	private ArrayList<Dossier> mDossierList;
 	private String signInfo;
+
+	private File mSelectedCertificateFile;
+	private String mSelectedCertificatePassword;
 
 	public static SignatureDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
 
@@ -92,10 +99,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		// Init values
 
-		SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
-		mCertificateFile = FileUtils.getBksFromCertificateFolder(getActivity());
-		mCertificatePassword = (mCertificateFile != null ? settings.getString(mCertificateFile.getName(), "") : null);
-
+		mCertificateNameList = new ArrayList<>();
 		mAliasList = new ArrayList<>();
 	}
 
@@ -105,17 +109,24 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_signature, null);
 
-		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_import_password);
-		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_dialog_private_annotation);
-		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_public_annotation_label);
-		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_dialog_private_annotation_label);
-		mAliasesSpinner = (Spinner) view.findViewById(R.id.action_dialog_certificates_spinner);
+		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_public_annotation);
+		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_private_annotation);
+		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_signature_public_annotation_label);
+		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_signature_private_annotation_label);
+		mCertificateSpinner = (Spinner) view.findViewById(R.id.action_signature_choose_certificate_spinner);
+		mCertificateLabel = (TextView) view.findViewById(R.id.action_signature_choose_certificate_label);
+		mAliasesSpinner = (Spinner) view.findViewById(R.id.action_signature_choose_alias_spinner);
+		mAliasesLabel = (TextView) view.findViewById(R.id.action_signature_choose_alias_label);
 
-		// Set Spinner adapter
+		// Set Spinner adapters
 
-		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, mAliasList);
-		arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mAliasesSpinner.setAdapter(arrayAdapter);
+		ArrayAdapter<String> certificatesArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, mCertificateNameList);
+		certificatesArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mCertificateSpinner.setAdapter(certificatesArrayAdapter);
+
+		ArrayAdapter<String> aliasesArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, mAliasList);
+		aliasesArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mAliasesSpinner.setAdapter(aliasesArrayAdapter);
 
 		// Set listeners
 
@@ -131,6 +142,14 @@ public class SignatureDialogFragment extends DialogFragment {
 				new View.OnFocusChangeListener() {
 					@Override public void onFocusChange(View v, boolean hasFocus) {
 						mPrivateAnnotationLabel.setActivated(hasFocus);
+					}
+				}
+		);
+
+		mCertificateSpinner.setOnItemClickListener(
+				new AdapterView.OnItemClickListener() {
+					@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						refreshAliasesSpinner();
 					}
 				}
 		);
@@ -160,7 +179,27 @@ public class SignatureDialogFragment extends DialogFragment {
 	@Override public void onStart() {
 		super.onStart();
 
-		// Loading SignData
+		retrieveSignData();
+		refreshCertificatesSpinner();
+	}
+
+	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		switch (requestCode) {
+			case RESULT_CODE_FILE_SELECT:
+				if (resultCode == Activity.RESULT_OK) {
+					Uri uri = data.getData();
+					Log.d(LOG_TAG, "File Uri: " + uri.toString());
+				}
+				break;
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	// </editor-fold desc="LifeCycle">
+
+	private void retrieveSignData() {
 
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... params) {
@@ -169,24 +208,80 @@ public class SignatureDialogFragment extends DialogFragment {
 
 					String dossierId = mDossierList.get(0).getId();
 					try { signInfo = RESTClient.INSTANCE.getSignInfo(dossierId, mBureauId).getHash(); }
-					catch (IParapheurException e) { e.printStackTrace(); }
+					catch (IParapheurException e) {
+
+						e.printStackTrace();
+					}
 				}
 
 				return null;
 			}
 		}.execute();
+	}
 
-		// Inflating Aliases
+	private void refreshCertificatesSpinner() {
 
 		new AsyncTask<Void, Void, Void>() {
 			@Override protected Void doInBackground(Void... params) {
 
-				if (mCertificateFile == null)
+				// Generate String List
+
+				List<File> certificateList = FileUtils.getBksFromCertificateFolder(getActivity());
+				mCertificateNameList.clear();
+
+				for (File certificateFile : certificateList)
+					mCertificateNameList.add(certificateFile.getName());
+
+				return null;
+			}
+
+			@SuppressWarnings("unchecked") @Override protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+				((ArrayAdapter<String>) mCertificateSpinner.getAdapter()).notifyDataSetChanged();
+
+				refreshAliasesSpinner();
+			}
+		}.execute();
+
+	}
+
+	private void refreshAliasesSpinner() {
+
+		// Default case
+
+		Log.d("Adrien", "refreshAliases " + mCertificateSpinner.getSelectedItem());
+		if (mCertificateSpinner.getSelectedItem() == null)
+			return;
+
+		// Inflate aliases
+
+		final String selectedCertificateName = mCertificateSpinner.getSelectedItem().toString();
+
+		new AsyncTask<Void, Void, Void>() {
+			@Override protected Void doInBackground(Void... params) {
+
+				// Default cases
+
+				mCertificateFileList = FileUtils.getBksFromCertificateFolder(getActivity());
+				if (mCertificateFileList.isEmpty())
 					return null;
+
+				mSelectedCertificateFile = null;
+				for (File certificateFile : mCertificateFileList)
+					if (TextUtils.equals(certificateFile.getName(), selectedCertificateName))
+						mSelectedCertificateFile = certificateFile;
+
+				if (mSelectedCertificateFile == null)
+					return null;
+
+				// Retrieving Certificate password.
+
+				SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+				mSelectedCertificatePassword = settings.getString(mSelectedCertificateFile.getName(), "");
 
 				// Retrieving aliases from Certificate file.
 
-				PKCS7Signer signer = new PKCS7Signer(mCertificateFile.getAbsolutePath(), mCertificatePassword, "", "");
+				PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, "", "");
 				ArrayList<String> aliasList = new ArrayList<>();
 
 				try {
@@ -212,22 +307,6 @@ public class SignatureDialogFragment extends DialogFragment {
 		}.execute();
 
 	}
-
-	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		switch (requestCode) {
-			case RESULT_CODE_FILE_SELECT:
-				if (resultCode == Activity.RESULT_OK) {
-					Uri uri = data.getData();
-					Log.d(LOG_TAG, "File Uri: " + uri.toString());
-				}
-				break;
-		}
-
-		super.onActivityResult(requestCode, resultCode, data);
-	}
-
-	// </editor-fold desc="LifeCycle">
 
 	private void onSignButtonClicked() {
 		new SignTask(getActivity()).execute();
@@ -261,11 +340,11 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				// Sign data
 
-				if (mCertificateFile != null) {
+				if (mSelectedCertificateFile != null) {
 
-					Log.i("Adrien", "certif found : " + mCertificateFile.getAbsolutePath() + " " + mCertificatePassword);
+					Log.i("Adrien", "certif found : " + mSelectedCertificateFile.getAbsolutePath() + " " + mSelectedCertificatePassword);
 
-					PKCS7Signer signer = new PKCS7Signer(mCertificateFile.getAbsolutePath(), mCertificatePassword, "bma", "bma");
+					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, "bma", "bma");
 
 					try {
 						signer.loadKeyStore();

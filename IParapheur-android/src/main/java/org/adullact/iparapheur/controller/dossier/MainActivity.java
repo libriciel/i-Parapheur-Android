@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -58,6 +59,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -132,8 +134,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Starting checks
 
-		File certificateFound = FileUtils.getBksFromDownloadFolder();
-		if (certificateFound != null) {
+		List<File> certificatesFoundList = FileUtils.getBksFromDownloadFolder();
+		if (!certificatesFoundList.isEmpty()) {
+			File certificateFound = certificatesFoundList.get(0);
 			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
 			actionDialog.show(getSupportFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
 		}
@@ -344,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(getResources().getColor(R.color.contextual_700));
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.contextual_700));
 		}
 
 		return true;
@@ -450,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(getResources().getColor(android.R.color.transparent));
+			window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
 		}
 
 		mActionMode = null;

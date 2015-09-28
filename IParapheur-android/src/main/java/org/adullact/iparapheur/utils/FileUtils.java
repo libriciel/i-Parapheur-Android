@@ -13,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FileUtils {
@@ -51,23 +53,23 @@ public class FileUtils {
 		return accessible ? certificateFolder : null;
 	}
 
-	public static @Nullable File getBksFromCertificateFolder(@NonNull Context context) {
+	public static @NonNull List<File> getBksFromCertificateFolder(@NonNull Context context) {
 		File folder = getInternalCertificateStoragePath(context);
-		return (folder != null ? getBksFromFolder(folder) : null);
+		return (folder != null ? getBksFromFolder(folder) : new ArrayList<File>());
 	}
 
-	public static @Nullable File getBksFromDownloadFolder() {
+	public static @NonNull List<File> getBksFromDownloadFolder() {
 		return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
 	}
 
-	public static @Nullable File getBksFromFolder(@NonNull File folder) {
+	public static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
 
-		File jks = null;
+		List<File> jks = new ArrayList<>();
 
 		if (folder.listFiles() != null)
 			for (File file : folder.listFiles())
 				if (file.getName().endsWith("bks"))
-					jks = file;
+					jks.add(file);
 
 		return jks;
 	}

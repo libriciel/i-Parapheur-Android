@@ -56,6 +56,7 @@
 
     <string name="selected_certificate">Certificat sélectionné</string>
     <string name="select_certificate">Choisir un certificat</string>
+    <string name="select_alias">Choisir un alias</string>
     <string name="please_select_certificate">Veuillez selectionner un certificat</string>
     <string name="justify_reject">Merci de saisir votre motif de rejet</string>
     <string name="etape_courante">Étape courante</string>
