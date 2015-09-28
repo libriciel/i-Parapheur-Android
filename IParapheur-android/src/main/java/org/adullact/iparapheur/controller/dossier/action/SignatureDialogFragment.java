@@ -12,7 +12,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -106,7 +105,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		// Create view
 
-		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_signature, null);
+		View view = View.inflate(getActivity(), R.layout.action_dialog_signature, null);
 
 		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_public_annotation);
 		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_private_annotation);
@@ -387,7 +386,7 @@ public class SignatureDialogFragment extends DialogFragment {
 					catch (UnrecoverableKeyException e) {
 						e.printStackTrace();
 						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_missing_alias;
+						mErrorMessage = R.string.signature_error_message_missing_alias_or_wrong_password;
 					}
 					catch (InvalidKeyException e) {
 						e.printStackTrace();
@@ -423,7 +422,12 @@ public class SignatureDialogFragment extends DialogFragment {
 				if (isCancelled())
 					return false;
 
-				// RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
+				try { RESTClient.INSTANCE.signer(mDossierList.get(i).getId(), signValue, mAnnotPub, mAnnotPriv, mBureauId); }
+				catch (IParapheurException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_not_sent_to_server;
+				}
 
 				if (isCancelled())
 					return false;
@@ -439,9 +443,8 @@ public class SignatureDialogFragment extends DialogFragment {
 			if (success) {
 				dismiss();
 			}
-			else {
-				if (getActivity() != null)
-					Toast.makeText(getActivity(), mErrorMessage, Toast.LENGTH_SHORT).show();
+			else if (getActivity() != null) {
+				Toast.makeText(getActivity(), mErrorMessage, Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

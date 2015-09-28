@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -55,7 +54,7 @@ public class AskPasswordDialogFragment extends DialogFragment {
 
 		// Create view
 
-		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_dialog_ask_password, null);
+		View view = View.inflate(getActivity(), R.layout.action_dialog_ask_password, null);
 
 		mPasswordEditText = (EditText) view.findViewById(R.id.action_ask_password_edittext);
 		mPasswordLabel = (TextView) view.findViewById(R.id.action_ask_password_label);
