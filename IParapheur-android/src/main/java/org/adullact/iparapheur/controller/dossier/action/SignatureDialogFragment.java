@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -51,9 +51,8 @@ import java.util.List;
 public class SignatureDialogFragment extends DialogFragment {
 
 	private static final String LOG_TAG = "SignatureDialogFragment";
-	private static final int RESULT_CODE_FILE_SELECT = 0;
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
-	private static final String ARGUMENTS_BUREAU_ID = "bureauId";
+	private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
 
 	protected EditText mPublicAnnotationEditText;
 	protected EditText mPrivateAnnotationEditText;
@@ -74,7 +73,7 @@ public class SignatureDialogFragment extends DialogFragment {
 	private File mSelectedCertificateFile;
 	private String mSelectedCertificatePassword;
 
-	public static SignatureDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+	public static @NonNull SignatureDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
 
 		SignatureDialogFragment fragment = new SignatureDialogFragment();
 
@@ -165,7 +164,9 @@ public class SignatureDialogFragment extends DialogFragment {
 		builder.setPositiveButton(
 				R.string.action_signer, new DialogInterface.OnClickListener() {
 					@Override public void onClick(DialogInterface dialog, int which) {
-						onSignButtonClicked();
+						// Do nothing here because we override this button in the onStart() to change the close behaviour.
+						// However, we still need this because on older versions of Android :
+						// unless we pass a handler the button doesn't get instantiated
 					}
 				}
 		);
@@ -183,25 +184,49 @@ public class SignatureDialogFragment extends DialogFragment {
 	@Override public void onStart() {
 		super.onStart();
 
+		AlertDialog dialog = (AlertDialog) getDialog();
+		if (dialog != null) {
+			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+			positiveButton.setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View v) {
+							onSignButtonClicked();
+						}
+					}
+			);
+		}
+
 		retrieveSignData();
 		refreshCertificatesSpinner();
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		switch (requestCode) {
-			case RESULT_CODE_FILE_SELECT:
-				if (resultCode == Activity.RESULT_OK) {
-					Uri uri = data.getData();
-					Log.d(LOG_TAG, "File Uri: " + uri.toString());
-				}
-				break;
+		if ((requestCode == AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD) && (resultCode == Activity.RESULT_OK)) {
+
+			String password = data.getStringExtra(AskPasswordDialogFragment.RESULT_BUNDLE_EXTRA_PASSWORD);
+			new SignTask().execute(password);
+
+			return;
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	// </editor-fold desc="LifeCycle">
+
+	private void onSignButtonClicked() {
+
+		AskPasswordDialogFragment askFragment = AskPasswordDialogFragment.newInstance(mAliasesSpinner.getSelectedItem().toString());
+		askFragment.setTargetFragment(this, AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD);
+		askFragment.show(getActivity().getSupportFragmentManager(), AskPasswordDialogFragment.FRAGMENT_TAG);
+
+		// See #onActivityResult() for password retrieve and signature launch.
+	}
+
+	private void onCancelButtonClicked() {
+		dismiss();
+	}
 
 	private void retrieveSignData() {
 
@@ -253,7 +278,6 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		// Default case
 
-		Log.d("Adrien", "refreshAliases " + mCertificateSpinner.getSelectedItem());
 		if (mCertificateSpinner.getSelectedItem() == null)
 			return;
 
@@ -312,15 +336,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 	}
 
-	private void onSignButtonClicked() {
-		new SignTask().execute();
-	}
-
-	private void onCancelButtonClicked() {
-		dismiss();
-	}
-
-	private class SignTask extends AsyncTask<Void, Void, Void> {
+	private class SignTask extends AsyncTask<String, Void, Boolean> {
 
 		private String mAnnotPub;
 		private String mAnnotPriv;
@@ -336,24 +352,22 @@ public class SignatureDialogFragment extends DialogFragment {
 			mErrorMessage = -1;
 		}
 
-		@Override protected Void doInBackground(Void... params) {
+		@Override protected Boolean doInBackground(String... passwordArg) {
 
 			if (isCancelled())
-				return null;
+				return false;
 
+			String password = passwordArg[0];
 			int total = mDossierList.size();
 			for (int i = 0; i < total; i++) {
 
-				Dossier dossier = mDossierList.get(i);
 				String signValue = "";
 
 				// Sign data
 
 				if (mSelectedCertificateFile != null) {
 
-					Log.i("Adrien", "certif found : " + mSelectedCertificateFile.getAbsolutePath() + " " + mSelectedCertificatePassword);
-
-					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, mSelectedAlias, "bma");
+					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, mSelectedAlias, password);
 
 					try {
 						signer.loadKeyStore();
@@ -404,26 +418,31 @@ public class SignatureDialogFragment extends DialogFragment {
 				Log.d(LOG_TAG, "Value : " + signValue);
 
 				if (TextUtils.isEmpty(signValue))
-					return null;
+					return false;
 
 				if (isCancelled())
-					return null;
+					return false;
 
 				// RESTClient.INSTANCE.signer(dossier.getId(), signValue, annotPub, annotPriv, bureauId);
 
 				if (isCancelled())
-					return null;
+					return false;
 			}
 
-			return null;
+			// If no error message, then the signature is successful.
+			return (mErrorMessage == -1);
 		}
 
-		@Override protected void onPostExecute(Void aVoid) {
-			super.onPostExecute(aVoid);
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
 
-			if (mErrorMessage != -1)
+			if (success) {
+				dismiss();
+			}
+			else {
 				if (getActivity() != null)
 					Toast.makeText(getActivity(), mErrorMessage, Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 }

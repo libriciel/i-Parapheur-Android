@@ -61,7 +61,7 @@
     <string name="justify_reject">Merci de saisir votre motif de rejet</string>
     <string name="etape_courante">Étape courante</string>
 
-    <!-- Errors -->
+    <!-- Dialogs -->
 
     <string name="import_title">Importer un certificat BKS</string>
     <string name="import_certificate">Importer</string>
