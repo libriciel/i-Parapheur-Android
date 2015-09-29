@@ -79,6 +79,7 @@
     <string name="signature_error_message_missing_bks_file">Le certificat BKS est introuvable.</string>
     <string name="signature_error_message_no_data_to_sign">Le contenu à signer n\'a pu être récupéré.</string>
     <string name="signature_error_message_not_sent_to_server">Un problème est survenu à l\'envoi de la signature au serveur.</string>
+    <string name="signature_error_message_not_get_from_server">Un problème réseau est survenu à la récupération des données à signer.</string>
 
     <!-- MuPDF strings -->
     <string name="cannot_open_file_Path">Impossible d\'ouvrir le fichier : %1$s</string>

@@ -43,6 +43,7 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,7 +68,6 @@ public class SignatureDialogFragment extends DialogFragment {
 	private List<String> mAliasList;
 	private String mBureauId;
 	private ArrayList<Dossier> mDossierList;
-	private String signInfo;
 
 	private File mSelectedCertificateFile;
 	private String mSelectedCertificatePassword;
@@ -183,6 +183,11 @@ public class SignatureDialogFragment extends DialogFragment {
 	@Override public void onStart() {
 		super.onStart();
 
+		refreshCertificatesSpinner();
+
+		// Overriding the AlertDialog.Builder#setPositiveButton
+		// To be able to manage a click without dismissing the popup.
+
 		AlertDialog dialog = (AlertDialog) getDialog();
 		if (dialog != null) {
 			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
@@ -194,9 +199,6 @@ public class SignatureDialogFragment extends DialogFragment {
 					}
 			);
 		}
-
-		retrieveSignData();
-		refreshCertificatesSpinner();
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -225,26 +227,6 @@ public class SignatureDialogFragment extends DialogFragment {
 
 	private void onCancelButtonClicked() {
 		dismiss();
-	}
-
-	private void retrieveSignData() {
-
-		new AsyncTask<Void, Void, Void>() {
-			@Override protected Void doInBackground(Void... params) {
-
-				if ((mDossierList != null) && (!mDossierList.isEmpty())) {
-
-					String dossierId = mDossierList.get(0).getId();
-					try { signInfo = RESTClient.INSTANCE.getSignInfo(dossierId, mBureauId).getHash(); }
-					catch (IParapheurException e) {
-
-						e.printStackTrace();
-					}
-				}
-
-				return null;
-			}
-		}.execute();
 	}
 
 	private void refreshCertificatesSpinner() {
@@ -353,76 +335,101 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		@Override protected Boolean doInBackground(String... passwordArg) {
 
+			// Default cases
+
 			if (isCancelled())
 				return false;
 
+			if (mSelectedCertificateFile == null)
+				return false;
+
+			//
+
 			String password = passwordArg[0];
 			int total = mDossierList.size();
-			for (int i = 0; i < total; i++) {
+			for (int docIndex = 0; docIndex < total; docIndex++) {
 
-				String signValue = "";
+				// Retrieve data to sign
+
+				String retrievedSignInfo = null;
+
+				try { retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(mDossierList.get(docIndex).getId(), mBureauId).getHash(); }
+				catch (IParapheurException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_not_get_from_server;
+				}
+
+				if (TextUtils.isEmpty(retrievedSignInfo))
+					return false;
 
 				// Sign data
 
-				if (mSelectedCertificateFile != null) {
+				List<String> signInfoList = Arrays.asList(retrievedSignInfo.split(","));
+				List<String> signValueList = new ArrayList<>();
+				PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, mSelectedAlias, password);
 
-					PKCS7Signer signer = new PKCS7Signer(mSelectedCertificateFile.getAbsolutePath(), mSelectedCertificatePassword, mSelectedAlias, password);
+				try {
+					signer.loadKeyStore();
+					signer.loadPrivateKey();
 
-					try {
-						signer.loadKeyStore();
-						signer.loadPrivateKey();
-						signValue = signer.sign(StringUtils.hexDecode(signInfo));
+					for (int signInfoIndex = 0; signInfoIndex < signInfoList.size(); signInfoIndex++) {
+						String signInfo = signInfoList.get(signInfoIndex);
+						String signValue = signer.sign(StringUtils.hexDecode(signInfo));
+						signValueList.add(signValue);
 					}
-					catch (FileNotFoundException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_missing_bks_file;
-					}
-					catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_incompatible_device;
-					}
-					catch (UnrecoverableKeyException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_missing_alias_or_wrong_password;
-					}
-					catch (InvalidKeyException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_wrong_password;
-					}
-					catch (IllegalArgumentException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_no_data_to_sign;
-					}
-					catch (SignatureException | IllegalStateException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_unknown_error;
-					}
-					catch (CertificateException | IOException e) {
-						e.printStackTrace();
-						Crashlytics.logException(e);
-						mErrorMessage = R.string.signature_error_message_error_opening_bks_file;
-					}
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_missing_bks_file;
+				}
+				catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_incompatible_device;
+				}
+				catch (UnrecoverableKeyException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_missing_alias_or_wrong_password;
+				}
+				catch (InvalidKeyException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_wrong_password;
+				}
+				catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_no_data_to_sign;
+				}
+				catch (SignatureException | IllegalStateException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_unknown_error;
+				}
+				catch (CertificateException | IOException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_error_opening_bks_file;
 				}
 
 				// Send result, if any
 
-				Log.d(LOG_TAG, "Signature... ");
-				Log.d(LOG_TAG, "Data  : " + signInfo);
-				Log.d(LOG_TAG, "Value : " + signValue);
+				String signature = TextUtils.join(",", signValueList);
 
-				if (TextUtils.isEmpty(signValue))
+				Log.d(LOG_TAG, "Signature... ");
+				Log.d(LOG_TAG, "Data  : " + retrievedSignInfo);
+				Log.d(LOG_TAG, "Value : " + signature);
+
+				if (TextUtils.isEmpty(signature))
 					return false;
 
 				if (isCancelled())
 					return false;
 
-				try { RESTClient.INSTANCE.signer(mDossierList.get(i).getId(), signValue, mAnnotPub, mAnnotPriv, mBureauId); }
+				try { RESTClient.INSTANCE.signer(mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId); }
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
@@ -444,7 +451,9 @@ public class SignatureDialogFragment extends DialogFragment {
 				dismiss();
 			}
 			else if (getActivity() != null) {
-				Toast.makeText(getActivity(), mErrorMessage, Toast.LENGTH_SHORT).show();
+				Toast.makeText(
+						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_error_message_unknown_error), Toast.LENGTH_SHORT
+				).show();
 			}
 		}
 	}
