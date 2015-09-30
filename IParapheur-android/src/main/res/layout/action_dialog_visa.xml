@@ -25,9 +25,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"
+            android:hint="@string/optional"
             android:inputType="textMultiLine"
             android:lines="4"
             android:textColor="@color/text_black"
+            android:textColorHint="@color/text_black_disabled"
             android:textSize="16sp"/>
     </LinearLayout>
 
@@ -51,9 +53,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"
+            android:hint="@string/optional"
             android:inputType="textMultiLine"
             android:lines="4"
             android:textColor="@color/text_black"
+            android:textColorHint="@color/text_black_disabled"
             android:textSize="16sp"/>
     </LinearLayout>
 

@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -142,6 +143,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
 			case VisaDialogFragment.REQUEST_CODE_VISA:
+			case RejectDialogFragment.REQUEST_CODE_REJECT:
 
 				if (resultCode == Activity.RESULT_OK) {
 

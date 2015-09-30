@@ -19,13 +19,13 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Date;
 
+
 public abstract class RESTClientAPI implements IParapheurAPI {
 
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";
 	private static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
 
-	@Override
-	public int test(Account account) throws IParapheurException {
+	@Override public int test(Account account) throws IParapheurException {
 		int messageRes = R.string.test_unreachable;
 		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
 		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
@@ -52,8 +52,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		return messageRes;
 	}
 
-	@Override
-	public String getTicket(Account account) throws IParapheurException {
+	@Override public String getTicket(Account account) throws IParapheurException {
 
 		String ticket = account.getTicket();
 		Long time = new Date().getTime();
@@ -105,8 +104,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		return stringBuilder.toString();
 	}
 
-	@Override
-	public boolean downloadFile(String url, String path) throws IParapheurException {
+	@Override public boolean downloadFile(String url, String path) throws IParapheurException {
 
 		String state = Environment.getExternalStorageState();
 
@@ -120,7 +118,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		try {
 			InputStream response = RESTUtils.downloadFile(fullUrl);
-
 			fileOutput = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int bufferLength;
@@ -129,7 +126,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			}
 			//close the output stream when done
 			fileOutput.close();
-
 		}
 		catch (FileNotFoundException e) {
 			throw new IParapheurException(R.string.error_file_not_found, null);

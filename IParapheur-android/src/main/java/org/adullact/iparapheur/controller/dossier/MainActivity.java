@@ -37,7 +37,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
-import org.adullact.iparapheur.controller.dossier.action.RejetDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.TdtHeliosDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
@@ -434,8 +434,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 					actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
 					return true;
 				case R.id.action_rejet:
-					actionDialog = RejetDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "RejetDialogFragment");
+					actionDialog = RejectDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
+					actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
+					actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
 					return true;
 				default:
 					return false;
