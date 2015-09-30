@@ -141,6 +141,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 					new Runnable() {
 						public void run() {
 							reload();
+							mListener.onDossierCheckedChanged();
 						}
 					}, 1500l
 			);
