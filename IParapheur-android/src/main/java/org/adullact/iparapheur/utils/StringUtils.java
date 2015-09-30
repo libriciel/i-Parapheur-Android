@@ -1,10 +1,10 @@
 package org.adullact.iparapheur.utils;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,9 +23,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class StringUtils {
 
-	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
+	@SuppressWarnings("unused") public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)
 			return "(Bundle null)";
 
@@ -43,7 +45,7 @@ public class StringUtils {
 		return stringBuilder.toString();
 	}
 
-	@SuppressLint("NewApi") public static @Nullable String urlEncode(@Nullable String string) {
+	public static @Nullable String urlEncode(@Nullable String string) {
 
 		// Default value
 
@@ -55,7 +57,7 @@ public class StringUtils {
 		String result;
 
 		try {
-			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT)
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
 				result = URLEncoder.encode(string, StandardCharsets.UTF_8.name());
 			else
 				result = URLEncoder.encode(string, "UTF-8");
@@ -91,6 +93,33 @@ public class StringUtils {
 		}
 	}
 
+	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
+
+		// Default value
+
+		if (utf8String == null)
+			return null;
+
+		// Wrapping result
+
+		String temp = "-----BEGIN PKCS7-----\n";
+		temp += utf8String + "\n";
+		temp += "-----END PKCS7-----";
+
+		byte[] bytes = Base64.encode(temp.getBytes(), Base64.NO_WRAP);
+
+		// Building ASCII String
+
+		Charset asciiCharset;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+			asciiCharset = StandardCharsets.US_ASCII;
+		else
+			asciiCharset = Charset.forName("US-ASCII");
+
+		return new String(bytes, asciiCharset);
+	}
+
 	/**
 	 * Force the DN name, to pass the OpenSSL validation.
 	 * OpenSSL validation crashes if the attributes are not in this exact name/order :
@@ -101,7 +130,7 @@ public class StringUtils {
 	 */
 	public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 
-		// Regex, without anti-slash escape : ([A-Z]+)=(.*?(?<!\\)(?:\\{2})*)(?:,|$)
+		// Regex, without anti-slash escapes : ([A-Z]+)=(.*?(?<!\\)(?:\\{2})*)(?:,|$)
 		//
 		//  	([A-Z]+)=				Catches "AC=", "O=", etc.
 		// 		(.*?)					Catches everything, "*?" makes it non-greedy
@@ -109,6 +138,7 @@ public class StringUtils {
 		// 		(?:,\s*|$)				Ending with a comma, or the end of the string
 
 		String regex = "([A-Z]+)=(.*?(?<!\\\\)(?:\\\\{2})*)(?:,\\s*|$)";
+
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(issuerDnName);
 		Map<String, String> parsedData = new HashMap<>();

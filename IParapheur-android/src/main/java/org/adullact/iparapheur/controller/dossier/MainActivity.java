@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		if (requestCode == EDIT_PREFERENCE_REQUEST) {
 			// Don't check if result is ok as the user can press back after modifying an Account
 			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.account_fragment_tag));
+			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
 			if (accountListFragment != null)
 				accountListFragment.accountsChanged();
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Show or hide specific menu actions depending on displayed fragment
 
-		Fragment dossierFragment = getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		Fragment dossierFragment = getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 		mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
 
 		// Show or hide specific menu actions depending on Drawer state.
@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 		if (fragment != null) {
 			HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
 			if ((checkedDossiers != null) && (!checkedDossiers.isEmpty())) {
@@ -403,36 +403,37 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
-		if (fragment != null) {
-			String bureauId = fragment.getBureauId();
+		if (dossierListFragment != null) {
+			String bureauId = dossierListFragment.getBureauId();
 
 			DialogFragment actionDialog;
 			switch (menuItem.getItemId()) {
 				case R.id.action_visa:
-					actionDialog = VisaDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
+					actionDialog = VisaDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
 					actionDialog.show(getSupportFragmentManager(), "VisaDialogFragment");
 					return true;
 				case R.id.action_signature:
-					actionDialog = SignatureDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "SignatureDialogFragment");
+					actionDialog = SignatureDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
+					actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
+					actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
 					return true;
 				case R.id.action_mailsec:
-					actionDialog = MailSecDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
+					actionDialog = MailSecDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
 					actionDialog.show(getSupportFragmentManager(), "MailSecDialogFragment");
 					return true;
 				case R.id.action_tdt_actes:
 				case R.id.action_tdt_helios:
-					actionDialog = TdtHeliosDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
+					actionDialog = TdtHeliosDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
 					actionDialog.show(getSupportFragmentManager(), "TdtHeliosDialogFragment");
 					return true;
 				case R.id.action_archivage:
-					actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
+					actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
 					actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
 					return true;
 				case R.id.action_rejet:
-					actionDialog = RejetDialogFragment.newInstance(new ArrayList<>(fragment.getCheckedDossiers()), bureauId);
+					actionDialog = RejetDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
 					actionDialog.show(getSupportFragmentManager(), "RejetDialogFragment");
 					return true;
 				default:
@@ -444,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public void onDestroyActionMode(ActionMode actionMode) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
 		if (fragment != null)
 			fragment.clearSelection();
@@ -517,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// If we selected a new account, and we are on the DossierFragment displayed
 		// We'll want to pop the BackStack to get on the BureauFragment
 
-		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 		if (dossierListFragment != null)
 			if (getSupportFragmentManager().getBackStackEntryCount() > 0)
 				getSupportFragmentManager().popBackStack();
@@ -543,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	@Override public void onBureauListFragmentSelected(@Nullable String id) {
 		if (id != null) {
 			DossierListFragment fragment = DossierListFragment.newInstance(id);
-			replaceLeftFragment(fragment, DossierListFragment.TAG, true);
+			replaceLeftFragment(fragment, DossierListFragment.FRAGMENT_TAG, true);
 		}
 	}
 
@@ -578,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	 * dismiss details.
 	 */
 	@Override public void onDataChanged() {
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.TAG);
+		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 		if (listFragment != null) {
 			// this method will reload dossiers fragments
 			listFragment.reload();

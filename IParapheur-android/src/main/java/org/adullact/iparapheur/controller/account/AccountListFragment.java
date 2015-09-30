@@ -18,15 +18,17 @@ import org.adullact.iparapheur.model.Account;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class AccountListFragment extends Fragment implements AdapterView.OnItemClickListener {
+
+	public static final String FRAGMENT_TAG = "AccountListFragment";
 
 	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account
 	private AccountListAdapter mAccountListAdapter;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Called only once as retainInstance is set to true.
@@ -35,8 +37,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mAccounts = new ArrayList<>();
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
+	@Override public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
 		// Activities containing this fragment must implement its callbacks.
@@ -46,8 +47,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mListener = (AccountFragmentListener) activity;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View content = inflater.inflate(R.layout.account_list_fragment, container, false);
 		mListView = (ListView) content.findViewById(R.id.account_list);
 
@@ -57,26 +57,26 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mListView.addFooterView(separatorView, null, false);
 
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
-		footerView.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				if (mListener != null)
-					mListener.onCreateAccountInvoked();
-			}
-		});
+		footerView.setOnClickListener(
+				new View.OnClickListener() {
+					@Override public void onClick(View v) {
+						if (mListener != null)
+							mListener.onCreateAccountInvoked();
+					}
+				}
+		);
 		mListView.addFooterView(footerView, null, false);
 
 		return content;
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		mListView.setOnItemClickListener(this);
 		mListView.setEmptyView(view.findViewById(android.R.id.empty));
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
 		mAccountListAdapter = new AccountListAdapter(getActivity());
@@ -111,8 +111,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	// <editor-fold desc="OnItemClickListener">
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		mListener.onAccountSelected(mAccounts.get(position));
 	}
 
@@ -136,23 +135,19 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 			super(context, R.layout.account_list_fragment_cell, android.R.id.text1);
 		}
 
-		@Override
-		public int getCount() {
+		@Override public int getCount() {
 			return (mAccounts == null) ? 0 : mAccounts.size();
 		}
 
-		@Override
-		public Account getItem(int position) {
+		@Override public Account getItem(int position) {
 			return mAccounts.get(position);
 		}
 
-		@Override
-		public int getPosition(Account item) {
+		@Override public int getPosition(Account item) {
 			return mAccounts.indexOf(item);
 		}
 
-		@Override
-		public boolean isEmpty() {
+		@Override public boolean isEmpty() {
 			return (mAccounts == null) || mAccounts.isEmpty();
 		}
 	}

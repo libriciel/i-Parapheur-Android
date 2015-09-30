@@ -50,6 +50,9 @@ import java.util.List;
 
 public class SignatureDialogFragment extends DialogFragment {
 
+	public static final String FRAGMENT_TAG = "SignatureDialogFragment";
+	public static final int REQUEST_CODE_SIGNATURE = 199714;
+
 	private static final String LOG_TAG = "SignatureDialogFragment";
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
@@ -226,6 +229,7 @@ public class SignatureDialogFragment extends DialogFragment {
 	}
 
 	private void onCancelButtonClicked() {
+		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
 		dismiss();
 	}
 
@@ -375,7 +379,10 @@ public class SignatureDialogFragment extends DialogFragment {
 
 					for (int signInfoIndex = 0; signInfoIndex < signInfoList.size(); signInfoIndex++) {
 						String signInfo = signInfoList.get(signInfoIndex);
+
 						String signValue = signer.sign(StringUtils.hexDecode(signInfo));
+						signValue = StringUtils.utf8SignatureToBase64Ascii(signValue);
+
 						signValueList.add(signValue);
 					}
 				}
@@ -448,6 +455,7 @@ public class SignatureDialogFragment extends DialogFragment {
 			super.onPostExecute(success);
 
 			if (success) {
+				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
 				dismiss();
 			}
 			else if (getActivity() != null) {

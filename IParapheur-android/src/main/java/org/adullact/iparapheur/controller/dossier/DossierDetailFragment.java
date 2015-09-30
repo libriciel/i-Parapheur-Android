@@ -355,7 +355,6 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
-
 	public interface DossierDetailsFragmentListener {
 
 		void toggleInfoDrawer();
@@ -365,7 +364,6 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">
-
 
 	private class DossierLoadingTask extends LoadingTask {
 

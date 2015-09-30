@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -65,6 +66,16 @@ public class AskPasswordDialogFragment extends DialogFragment {
 				new View.OnFocusChangeListener() {
 					@Override public void onFocusChange(View v, boolean hasFocus) {
 						mPasswordLabel.setActivated(hasFocus);
+					}
+				}
+		);
+
+		mPasswordEditText.setOnEditorActionListener(
+				new TextView.OnEditorActionListener() {
+					@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+						onValidButtonClicked();
+						dismiss();
+						return true;
 					}
 				}
 		);
