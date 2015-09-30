@@ -25,9 +25,9 @@ public class FileUtils {
 
 	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
 		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
-		boolean success = directory.mkdirs();
+		directory.mkdirs();
 
-		return success ? directory : null;
+		return directory;
 	}
 
 	public static @Nullable File getFileForDocument(@NonNull Context context, @NonNull String dossierId, @NonNull String documentId) {

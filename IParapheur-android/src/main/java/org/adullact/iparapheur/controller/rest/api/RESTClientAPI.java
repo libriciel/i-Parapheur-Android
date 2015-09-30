@@ -2,6 +2,8 @@ package org.adullact.iparapheur.controller.rest.api;
 
 import android.os.Environment;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
@@ -128,9 +130,11 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			fileOutput.close();
 		}
 		catch (FileNotFoundException e) {
+			Crashlytics.logException(e);
 			throw new IParapheurException(R.string.error_file_not_found, null);
 		}
 		catch (IOException e) {
+			Crashlytics.logException(e);
 			throw new IParapheurException(R.string.error_parse, null);
 		}
 		finally {
