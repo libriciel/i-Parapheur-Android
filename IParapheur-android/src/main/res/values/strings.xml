@@ -51,8 +51,8 @@
     <string name="action_enregistrer">Enregistrer le dossier</string>
     <string name="action_supprimer">Supprimer le dossier</string>
     <string name="action_archiver">Archiver</string>
-    <string name="annotation_publique">Annotation publique</string>
-    <string name="annotation_privee">Annotation privée</string>
+    <string name="public_annotation">Annotation publique</string>
+    <string name="private_annotation">Annotation privée</string>
 
     <string name="selected_certificate">Certificat sélectionné</string>
     <string name="select_certificate">Choisir un certificat</string>
@@ -70,8 +70,11 @@
     <string name="import_error_cant_copy_certificate">Impossible de copier le certificat sur la mémoire interne.</string>
     <string name="import_error_message_incompatible_device">Cet appareil ne semble pas compatible avec les outils de cryptage utilisés.</string>
 
+    <string name="visa_error_message_not_sent_to_server">Un problème est survenu à l\'envoi du visa au serveur.</string>
+    <string name="visa_error_message_unknown_error">Erreur inconnue lors du visa.</string>
+
     <string name="signature_error_label">Erreur à la signature : </string>
-    <string name="signature_error_message_unknown_error">Une erreur inconnue à la signature.</string>
+    <string name="signature_error_message_unknown_error">Erreur inconnue lors de la signature.</string>
     <string name="signature_error_message_incompatible_device">Cet appareil ne semble pas compatible avec les outils de signature utilisés.</string>
     <string name="signature_error_message_error_opening_bks_file">Le mot de passe du certificat n\'est pas valide, ou le certificat est corrompu.</string>
     <string name="signature_error_message_wrong_password">Le mot de passe n\'est pas valide.</string>

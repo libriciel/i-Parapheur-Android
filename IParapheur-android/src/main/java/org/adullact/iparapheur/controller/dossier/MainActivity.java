@@ -412,7 +412,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			switch (menuItem.getItemId()) {
 				case R.id.action_visa:
 					actionDialog = VisaDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "VisaDialogFragment");
+					actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
+					actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
 					return true;
 				case R.id.action_signature:
 					actionDialog = SignatureDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
@@ -607,6 +608,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public void onDossierCheckedChanged() {
+
 		if (mActionMode == null)
 			mActionMode = startSupportActionMode(this);
 		else

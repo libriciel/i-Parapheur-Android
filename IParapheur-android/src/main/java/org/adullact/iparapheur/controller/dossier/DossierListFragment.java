@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -134,17 +135,27 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		// In case of signature, let's give a few seconds to the server
+		// In case of signature/visa/etc, let's give a few seconds to the server
 		// and refresh the content.
-		if ((requestCode == SignatureDialogFragment.REQUEST_CODE_SIGNATURE) && (resultCode == Activity.RESULT_OK)) {
-			new Handler(Looper.getMainLooper()).postDelayed(
-					new Runnable() {
-						public void run() {
-							reload();
-							mListener.onDossierCheckedChanged();
-						}
-					}, 1500l
-			);
+
+		switch (requestCode) {
+
+			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
+			case VisaDialogFragment.REQUEST_CODE_VISA:
+
+				if (resultCode == Activity.RESULT_OK) {
+
+					new Handler(Looper.getMainLooper()).postDelayed(
+							new Runnable() {
+								public void run() {
+									reload();
+									mListener.onDossierCheckedChanged();
+								}
+							}, 1500l
+					);
+				}
+
+				break;
 		}
 
 		super.onActivityResult(requestCode, resultCode, data);

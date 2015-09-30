@@ -225,7 +225,8 @@ public class SignatureDialogFragment extends DialogFragment {
 		askFragment.setTargetFragment(this, AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD);
 		askFragment.show(getActivity().getSupportFragmentManager(), AskPasswordDialogFragment.FRAGMENT_TAG);
 
-		// See #onActivityResult() for password retrieve and signature launch.
+		// See #onActivityResult() for password retrieval
+		// and SignTask#onPostExecute for popup dismiss.
 	}
 
 	private void onCancelButtonClicked() {
