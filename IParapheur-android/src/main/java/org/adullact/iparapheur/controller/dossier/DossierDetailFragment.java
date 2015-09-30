@@ -45,7 +45,7 @@ import java.util.UUID;
  */
 public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static final String TAG = "Dossier_details";
+	public static final String TAG = "dossier_details_fragment";
 	public static final String DOSSIER = "dossier";
 	public static final String BUREAU_ID = "bureau_id";
 

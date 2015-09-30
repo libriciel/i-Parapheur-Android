@@ -28,7 +28,7 @@ import java.security.cert.CertificateException;
 
 public class ImportCertificatesDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "ImportCertificatesDialogFragment";
+	public static final String FRAGMENT_TAG = "import_certificates_dialog_fragment";
 
 	private static final String ARGUMENT_CERTIFICATE_PATH = "certificatePath";
 	private static final String LOG_TAG = "ImportCertificatesDialogFragment";

@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		//
 
-		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
+		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.FRAGMENT_TAG);
 
 		if (fragmentToDisplay == null)
 			fragmentToDisplay = new BureauxListFragment();
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		fragmentToDisplay.setRetainInstance(true);
 		if (findViewById(R.id.left_fragment) != null)
-			replaceLeftFragment(fragmentToDisplay, BureauxListFragment.TAG, false);
+			replaceLeftFragment(fragmentToDisplay, BureauxListFragment.FRAGMENT_TAG, false);
 
 		// Selecting the first account by default, the demo one
 
@@ -507,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			BureauxListFragment bureauxFragment = new BureauxListFragment();
-			replaceDrawerFragment(bureauxFragment, BureauxListFragment.TAG, true);
+			replaceDrawerFragment(bureauxFragment, BureauxListFragment.FRAGMENT_TAG, true);
 		}
 		else {
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
@@ -525,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Then , we just update the BureauFragment to the accurate Account
 
-		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.TAG);
+		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.FRAGMENT_TAG);
 		if (bureauxFragment != null)
 			bureauxFragment.updateBureaux(true);
 	}

@@ -28,9 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
-	public static final String TAG = "bureaux_list_fragment";
+	public static final String FRAGMENT_TAG = "bureaux_list_fragment";
 	private BureauListFragmentListener listener;
 
 	private List<Bureau> mBureaux;                                // List of mBureaux currently displayed in this Fragment
@@ -39,8 +40,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	private SwipeRefreshLayout swipeRefreshLayout;                // Swipe refresh layout on top of the list view
 	private View mSpinnerProgressView;
 
-	@Override
-	public void onAttach(Activity activity) {
+	@Override public void onAttach(Activity activity) {
 		super.onAttach(activity);
 
 		// Activities containing this fragment must implement its callbacks.
@@ -50,13 +50,11 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		listener = (BureauListFragmentListener) activity;
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.bureaux_list_fragment, container, false);
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
 		listView = (ListView) view.findViewById(R.id.bureaux_list);
@@ -69,15 +67,13 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		mSpinnerProgressView = view.findViewById(android.R.id.progress);
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		listView.setAdapter(new BureauListAdapter(getActivity()));
 		swipeRefreshLayout.setOnRefreshListener(this);
 	}
 
-	@Override
-	public void onStart() {
+	@Override public void onStart() {
 		super.onStart();
 
 		swipeRefreshLayout.setVisibility(View.INVISIBLE);
@@ -100,8 +96,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 	// <editor-fold desc="OnItemClickListener">
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (position != selectedBureau)
 			listener.onBureauListFragmentSelected(mBureaux.get(position).getId());
 	}
@@ -109,8 +104,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	// </editor-fold desc="OnItemClickListener">
 
 	// <editor-fold desc="DataChangeListener">
-	@Override
-	public void onDataChanged() {
+	@Override public void onDataChanged() {
 		((BureauListAdapter) listView.getAdapter()).notifyDataSetChanged();
 
 		// if a bureau was previously selected, we have to notify the parent
@@ -122,8 +116,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	// </editor-fold desc="DataChangeListener">
 
 	// <editor-fold desc="SwipeRefreshLayout">
-	@Override
-	public void onRefresh() {
+	@Override public void onRefresh() {
 		new BureauxLoadingTask(getActivity(), this).execute();
 	}
 
@@ -150,8 +143,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			super(activity, listener);
 		}
 
-		@Override
-		protected void load(String... params) throws IParapheurException {
+		@Override protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
 			if (isCancelled())
 				return;
@@ -161,12 +153,14 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 					mBureaux = RESTClient.INSTANCE.getBureaux();
 				}
 				catch (final IParapheurException exception) {
-					activity.runOnUiThread(new Runnable() {
-						public void run() {
-							String message = activity.getString(exception.getResId());
-							Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-						}
-					});
+					activity.runOnUiThread(
+							new Runnable() {
+								public void run() {
+									String message = activity.getString(exception.getResId());
+									Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+								}
+							}
+					);
 				}
 			}
 			else {
@@ -175,15 +169,13 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			}
 		}
 
-		@Override
-		protected void showProgress() {
+		@Override protected void showProgress() {
 			if (isAdded())
 				if (mSpinnerProgressView.getVisibility() != View.VISIBLE)
 					swipeRefreshLayout.setRefreshing(true);
 		}
 
-		@Override
-		protected void hideProgress() {
+		@Override protected void hideProgress() {
 			if (isAdded()) {
 
 				if (mSpinnerProgressView.getVisibility() == View.VISIBLE)
@@ -201,8 +193,7 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			super(context, R.layout.bureaux_list_cell, R.id.bureau_list_cell_title);
 		}
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Override public View getView(int position, View convertView, ViewGroup parent) {
 
 			View cell = super.getView(position, convertView, parent);
 
@@ -233,23 +224,19 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 			return cell;
 		}
 
-		@Override
-		public int getCount() {
+		@Override public int getCount() {
 			return (mBureaux == null) ? 0 : mBureaux.size();
 		}
 
-		@Override
-		public Bureau getItem(int position) {
+		@Override public Bureau getItem(int position) {
 			return mBureaux.get(position);
 		}
 
-		@Override
-		public int getPosition(Bureau item) {
+		@Override public int getPosition(Bureau item) {
 			return mBureaux.indexOf(item);
 		}
 
-		@Override
-		public boolean isEmpty() {
+		@Override public boolean isEmpty() {
 			return (mBureaux == null) || mBureaux.isEmpty();
 		}
 	}

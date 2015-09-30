@@ -21,7 +21,7 @@ import java.util.List;
 
 public class AccountListFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-	public static final String FRAGMENT_TAG = "AccountListFragment";
+	public static final String FRAGMENT_TAG = "account_list_fragment";
 
 	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner

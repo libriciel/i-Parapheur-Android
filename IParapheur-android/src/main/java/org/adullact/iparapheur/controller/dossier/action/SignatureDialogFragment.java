@@ -50,7 +50,7 @@ import java.util.List;
 
 public class SignatureDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "SignatureDialogFragment";
+	public static final String FRAGMENT_TAG = "signature_dialog_fragment";
 	public static final int REQUEST_CODE_SIGNATURE = 199714;
 
 	private static final String LOG_TAG = "SignatureDialogFragment";

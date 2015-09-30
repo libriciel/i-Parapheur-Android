@@ -18,7 +18,7 @@ import org.adullact.iparapheur.R;
 
 public class AskPasswordDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "AskPasswordDialogFragment";
+	public static final String FRAGMENT_TAG = "ask_password_dialog_fragment";
 	public static final int REQUEST_CODE_ASK_PASSWORD = 11911;
 	public static final String RESULT_BUNDLE_EXTRA_PASSWORD = "password";
 
