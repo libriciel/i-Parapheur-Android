@@ -51,7 +51,7 @@ import java.util.List;
 public class SignatureDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "signature_dialog_fragment";
-	public static final int REQUEST_CODE_SIGNATURE = 199714;
+	public static final int REQUEST_CODE_SIGNATURE = 19090714;    // Because S-I-G-N = 19-09-07-14
 
 	private static final String LOG_TAG = "SignatureDialogFragment";
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";

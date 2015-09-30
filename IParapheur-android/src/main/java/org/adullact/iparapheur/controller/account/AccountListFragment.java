@@ -1,10 +1,11 @@
 package org.adullact.iparapheur.controller.account;
 
-import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account
 	private AccountListAdapter mAccountListAdapter;
 
+	// <editor-fold desc="LifeCycle">
+
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -37,19 +40,26 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mAccounts = new ArrayList<>();
 	}
 
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	@Override public void onAttach(Context context) {
+		super.onAttach(context);
 
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof AccountFragmentListener))
+		if (!(context instanceof AccountFragmentListener))
 			throw new IllegalStateException("Activity must implement AccountFragmentListener.");
 
-		mListener = (AccountFragmentListener) activity;
+		mListener = (AccountFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View content = inflater.inflate(R.layout.account_list_fragment, container, false);
+
 		mListView = (ListView) content.findViewById(R.id.account_list);
+
+		// UI tuning
+
+		mListView.setDivider(new ColorDrawable(ContextCompat.getColor(getActivity(), android.R.color.background_light)));
+		mListView.setDividerHeight(1);
+		mListView.setBackgroundColor(ContextCompat.getColor(getActivity(), android.R.color.background_light));
 
 		// Adding footers
 
@@ -94,6 +104,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 				mListView.setItemChecked(i, true);
 	}
 
+	// </editor-fold desc="LifeCycle">
+
 	private void updateAccounts() {
 		mAccounts.clear();
 
@@ -121,9 +133,9 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	public interface AccountFragmentListener {
 
-		public void onAccountSelected(@NonNull Account account);
+		void onAccountSelected(@NonNull Account account);
 
-		public void onCreateAccountInvoked();
+		void onCreateAccountInvoked();
 
 	}
 

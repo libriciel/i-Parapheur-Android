@@ -139,7 +139,7 @@
 
                 <fragment
                     android:id="@+id/activity_dossiers_bureaux_fragment"
-                    android:name="org.adullact.iparapheur.controller.account.account_list_fragment"
+                    android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:tag="AccountListFragment"

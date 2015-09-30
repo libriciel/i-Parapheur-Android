@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -60,6 +62,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	private String mBureauId;                                   // Bureau id where the dossiers belongs
 	private List<Dossier> mDossiersList;                        // List of dossiers displayed in this fragment
 	private int selectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
+
 	private View mSpinnerProgress;
 	private View mContentView;
 
@@ -131,8 +134,17 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		if ((requestCode == SignatureDialogFragment.REQUEST_CODE_SIGNATURE) && (resultCode == Activity.RESULT_OK))
-			onRefresh();
+		// In case of signature, let's give a few seconds to the server
+		// and refresh the content.
+		if ((requestCode == SignatureDialogFragment.REQUEST_CODE_SIGNATURE) && (resultCode == Activity.RESULT_OK)) {
+			new Handler(Looper.getMainLooper()).postDelayed(
+					new Runnable() {
+						public void run() {
+							reload();
+						}
+					}, 1500l
+			);
+		}
 
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -148,7 +160,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			mBureauId = bureauId;
 
 			if (bureauId == null)
-				this.mDossiersList = null;
+				mDossiersList = null;
 
 			mSpinnerProgress.setVisibility(View.VISIBLE);
 			mContentView.setVisibility(View.INVISIBLE);
@@ -157,21 +169,20 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	}
 
 	private void getDossiers(boolean forceReload) {
-		if (mBureauId == null) {
+
+		if (mBureauId == null)
 			onDataChanged();
-		}
-		else if ((mDossiersList == null) || forceReload) {
+		else if ((mDossiersList == null) || forceReload)
 			new DossiersLoadingTask(getActivity(), this).execute(mBureauId);
-		}
 	}
 
 	private void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
+
+		if (position == ListView.INVALID_POSITION)
 			getListView().clearChoices();
-		}
-		else {
+		else
 			getListView().setItemChecked(position, true);
-		}
+
 		selectedDossier = position;
 	}
 
@@ -187,14 +198,16 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	 * called by the parent Activity to reload the list
 	 */
 	public void reload() {
-		/* if a dossier was previously selected, we have to notify the parent
-		 * activity that the data has changed, so the activity remove the previously selected
-         * dossier details
-         */
+
+		// If a dossier was previously selected, we have to notify the parent
+		// activity that the data has changed, so the activity remove the previously selected
+		// dossier details
+
 		if (selectedDossier != ListView.INVALID_POSITION) {
 			selectedDossier = ListView.INVALID_POSITION;
 			setActivatedPosition(ListView.INVALID_POSITION);
 		}
+
 		((DossierListAdapter) getListView().getAdapter()).clearSelection();
 		getDossiers(true);
 	}
@@ -207,7 +220,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			((DossierListAdapter) getListView().getAdapter()).clearSelection();
 
 			if (mBureauId != null)
-				mListener.onDossiersLoaded(this.mDossiersList.size());
+				mListener.onDossiersLoaded(mDossiersList.size());
 			else
 				mListener.onDossiersNotLoaded();
 
@@ -228,7 +241,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 	// <editor-fold desc="OnRefreshListener">
 
 	@Override public void onRefresh() {
-		if (this.mBureauId != null) {
+		if (mBureauId != null) {
 			new DossiersLoadingTask(getActivity(), this).execute(mBureauId);
 		}
 		else {
