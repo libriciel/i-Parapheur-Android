@@ -106,10 +106,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		return view;
 	}
 
-	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
 	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
