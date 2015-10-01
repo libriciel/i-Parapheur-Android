@@ -36,6 +36,13 @@
 
     <style name="AppTheme.Settings" parent="AppTheme.Settings.Base"/>
 
+    <style name="AppTheme.Main.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/secondary_500</item>
+        <item name="android:textColorPrimary">@color/text_black</item>
+        <item name="android:textColorSecondary">@color/text_black_secondary</item>
+        <item name="android:background">@android:color/background_light</item>
+    </style>
+
     <!-- Toolbars -->
 
     <style name="AppTheme.Main.Toolbar" parent="Widget.AppCompat.Light.ActionBar.Solid">

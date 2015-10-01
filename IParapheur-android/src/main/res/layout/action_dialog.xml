@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/annotation_publique"
+        android:text="@string/public_annotation"
         android:id="@+id/textView" />
 
     <EditText
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/action_dialog_annotation_publique"
+        android:id="@+id/action_import_password"
         android:lines="4"
         android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
@@ -26,8 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/annotation_privee"
-        android:layout_below="@+id/action_dialog_annotation_publique"
+        android:text="@string/private_annotation"
+        android:layout_below="@+id/action_import_password"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/textView2" />
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:id="@+id/action_dialog_annotation_privee"
+        android:id="@+id/action_dialog_private_annotation"
         android:lines="4"
         android:layout_below="@+id/textView2"
         android:layout_alignParentLeft="true"
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/action_dialog_dossiers"
-        android:layout_below="@+id/action_dialog_annotation_privee"
+        android:layout_below="@+id/action_dialog_private_annotation"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

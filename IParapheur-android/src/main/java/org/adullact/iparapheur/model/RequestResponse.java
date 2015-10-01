@@ -1,5 +1,7 @@
 package org.adullact.iparapheur.model;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -49,16 +51,20 @@ public class RequestResponse {
 				if (json instanceof JSONObject) {
 					this.error = ((JSONObject) json).optString("message", "");
 				}
+				Crashlytics.logException(new Exception(error));
 				throw RESTUtils.getExceptionForError(this.code, error);
 			}
 		}
 		catch (JSONException e) {
-			throw new IParapheurException(R.string.error_parse, null);
+			Crashlytics.logException(e);
+			throw new IParapheurException(R.string.error_parse, e.getStackTrace().toString());
 		}
 		catch (UnknownHostException e) {
+			Crashlytics.logException(e);
 			throw new IParapheurException(R.string.http_error_malformed_url, httpURLConnection.getURL().getHost());
 		}
 		catch (IOException e) {
+			Crashlytics.logException(e);
 			throw new IParapheurException(R.string.error_parse, null);
 		}
 	}

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+
 /**
  * Created by jmaire on 09/06/2014.
  * API i-Parapheur version 3
@@ -50,19 +51,17 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	private static final String RESOURCE_TYPES = "/parapheur/types";
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
-	private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
+	// private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
 
 	/* Ressources secondaires */
-	private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
-	private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
-	private static final String RESOURCE_JOURNAL_EVENEMENT = "/parapheur/dossiers/%s/evenements";
+	// private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
+	// private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
+	// private static final String RESOURCE_JOURNAL_EVENEMENT = "/parapheur/dossiers/%s/evenements";
 
-    /* Resources sur la lecture des documents */
-	/**
-	 * Le premier argument est l'id du dossier, le second l'id du document, le dernier le numéro de page
-	 */
-	private static final String RESOURCE_DOCUMENT_PAGE = "/parapheur/dossiers/%s/%s/%d";
-	private static final String RESOURCE_XEMELIOS_VIEWER = "/parapheur/dossiers/%s/%s/xemelios";
+	/* Resources sur la lecture des documents */
+	/* Le premier argument est l'id du dossier, le second l'id du document, le dernier le numéro de page */
+	// private static final String RESOURCE_DOCUMENT_PAGE = "/parapheur/dossiers/%s/%s/%d";
+	// private static final String RESOURCE_XEMELIOS_VIEWER = "/parapheur/dossiers/%s/%s/xemelios";
 
 	/* Actions de validation principales les dossiers */
 	private static final String ACTION_VISA = "/parapheur/dossiers/%s/visa";
@@ -70,12 +69,12 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	private static final String ACTION_TDT_ACTES = "/parapheur/dossiers/%s/tdtActes";
 	private static final String ACTION_TDT_HELIOS = "/parapheur/dossiers/%s/tdtHelios";
 	private static final String ACTION_MAILSEC = "/parapheur/dossiers/%s/mailsec";
-	private static final String ACTION_ARCHIVAGE = "/parapheur/dossiers/%s/archive";
+	// private static final String ACTION_ARCHIVAGE = "/parapheur/dossiers/%s/archive";
 	private static final String ACTION_REJET = "/parapheur/dossiers/%s/rejet";
 
 	/* Autres actions possibles sur les dossiers */
-	private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
-	private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
+	// private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
+	// private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
 
 	protected ModelMapper modelMapper = new ModelMapper3();
 
@@ -150,27 +149,29 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		try {
 			annotationJson.object();
-			annotationJson.key("rect").object();
 			{
-				annotationJson.key("topLeft");
-				annotationJson.object();
-				annotationJson.key("x").value(annotation.getRect().left);
-				annotationJson.key("y").value(annotation.getRect().top);
+				annotationJson.key("rect").object();
+				{
+					annotationJson.key("topLeft");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().left);
+					annotationJson.key("y").value(annotation.getRect().top);
+					annotationJson.endObject();
+
+					annotationJson.key("bottomRight");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().right);
+					annotationJson.key("y").value(annotation.getRect().bottom);
+					annotationJson.endObject();
+				}
 				annotationJson.endObject();
 
-				annotationJson.key("bottomRight");
-				annotationJson.object();
-				annotationJson.key("x").value(annotation.getRect().right);
-				annotationJson.key("y").value(annotation.getRect().bottom);
-				annotationJson.endObject();
+				annotationJson.key("author").value(annotation.getAuthor());
+				annotationJson.key("date").value(annotation.getDate());
+				annotationJson.key("page").value(page);
+				annotationJson.key("text").value(annotation.getText());
+				annotationJson.key("type").value("rect");
 			}
-			annotationJson.endObject();
-
-			annotationJson.key("author").value(annotation.getAuthor());
-			annotationJson.key("date").value(annotation.getDate());
-			annotationJson.key("page").value(page);
-			annotationJson.key("text").value(annotation.getText());
-			annotationJson.key("type").value("rect");
 			annotationJson.endObject();
 		}
 		catch (JSONException e) {
@@ -200,29 +201,31 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		try {
 			annotationJson.object();
-			annotationJson.key("rect").object();
 			{
-				annotationJson.key("topLeft");
-				annotationJson.object();
-				annotationJson.key("x").value(annotation.getRect().left);
-				annotationJson.key("y").value(annotation.getRect().top);
+				annotationJson.key("rect").object();
+				{
+					annotationJson.key("topLeft");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().left);
+					annotationJson.key("y").value(annotation.getRect().top);
+					annotationJson.endObject();
+
+					annotationJson.key("bottomRight");
+					annotationJson.object();
+					annotationJson.key("x").value(annotation.getRect().right);
+					annotationJson.key("y").value(annotation.getRect().bottom);
+					annotationJson.endObject();
+				}
 				annotationJson.endObject();
 
-				annotationJson.key("bottomRight");
-				annotationJson.object();
-				annotationJson.key("x").value(annotation.getRect().right);
-				annotationJson.key("y").value(annotation.getRect().bottom);
-				annotationJson.endObject();
+				annotationJson.key("author").value(annotation.getAuthor());
+				annotationJson.key("date").value(annotation.getDate());
+				annotationJson.key("page").value(page);
+				annotationJson.key("text").value(annotation.getText());
+				annotationJson.key("type").value("rect");
+				annotationJson.key("id").value(annotation.getUuid());
+				annotationJson.key("uuid").value(annotation.getUuid());
 			}
-			annotationJson.endObject();
-
-			annotationJson.key("author").value(annotation.getAuthor());
-			annotationJson.key("date").value(annotation.getDate());
-			annotationJson.key("page").value(page);
-			annotationJson.key("text").value(annotation.getText());
-			annotationJson.key("type").value("rect");
-			annotationJson.key("id").value(annotation.getUuid());
-			annotationJson.key("uuid").value(annotation.getUuid());
 			annotationJson.endObject();
 		}
 		catch (JSONException e) {
@@ -268,10 +271,12 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		JSONStringer jsonStringer = new JSONStringer();
 		try {
 			jsonStringer.object();
-			jsonStringer.key("bureauCourant").value(bureauId);
-			jsonStringer.key("annotPub").value(annotPub);
-			jsonStringer.key("annotPriv").value(annotPriv);
-			jsonStringer.key("signature").value(signValue);
+			{
+				jsonStringer.key("bureauCourant").value(bureauId);
+				jsonStringer.key("annotPub").value(annotPub);
+				jsonStringer.key("annotPriv").value(annotPriv);
+				jsonStringer.key("signature").value(signValue);
+			}
 			jsonStringer.endObject();
 		}
 		catch (JSONException e) {

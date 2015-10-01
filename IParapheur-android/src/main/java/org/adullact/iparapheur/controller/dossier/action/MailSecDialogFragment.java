@@ -41,8 +41,8 @@ public class MailSecDialogFragment extends ActionDialogFragment {
     protected View createView() {
         View layout = super.createView();
 
-        annotationPublique = (TextView) layout.findViewById(R.id.action_dialog_annotation_publique);
-        annotationPrivee = (TextView) layout.findViewById(R.id.action_dialog_annotation_privee);
+        annotationPublique = (TextView) layout.findViewById(R.id.action_import_password);
+        annotationPrivee = (TextView) layout.findViewById(R.id.action_dialog_private_annotation);
 
         return layout;
     }

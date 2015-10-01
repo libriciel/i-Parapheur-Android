@@ -7,7 +7,10 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
+
 
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
@@ -56,6 +59,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 		}
 		catch (IParapheurException e) {
 			error = activity.getResources().getString(e.getResId(), e.getComplement());
+			Crashlytics.logException(e);
 		}
 		return error;
 	}

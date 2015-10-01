@@ -2,8 +2,8 @@
 <manifest
     package="org.adullact.iparapheur"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="10"
-    android:versionName="1.4.03">
+    android:versionCode="11"
+    android:versionName="1.4.04">
 
     <!-- Only supports Tablets -->
     <supports-screens
@@ -31,7 +31,6 @@
             android:theme="@style/AppTheme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -40,6 +39,10 @@
             android:label="@string/title_activity_test"
             android:theme="@style/AppTheme.Settings">
         </activity>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="372ad1c3ac173988c7d1af50a81bfa764585744e"/>
     </application>
 
 </manifest>

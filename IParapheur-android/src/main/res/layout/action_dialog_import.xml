@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/dialog_import_password_label"
+        android:layout_width="170dp"
+        android:layout_height="match_parent"
+        android:labelFor="@id/action_import_password"
+        android:text="@string/password"
+        android:textColor="@color/edittext_label_activable"
+        android:textSize="12sp"/>
+
+    <EditText
+        android:id="@+id/dialog_import_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:imeActionLabel="@string/import_certificate"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:textColor="@color/text_black"
+        android:textSize="16sp"/>
+
+</LinearLayout>

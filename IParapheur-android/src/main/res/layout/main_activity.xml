@@ -57,7 +57,7 @@
                         android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:tag="Dossier_details"
+                        android:tag="dossier_details_fragment"
                         tools:layout="@layout/fragment_dossier_detail"/>
                 </LinearLayout>
 
@@ -142,7 +142,7 @@
                     android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:tag="@string/account_fragment_tag"
+                    android:tag="AccountListFragment"
                     tools:layout="@layout/account_list_fragment"/>
 
             </FrameLayout>

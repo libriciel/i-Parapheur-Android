@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,12 +26,12 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import java.util.ArrayList;
 
 
-public class VisaDialogFragment extends DialogFragment {
+public class RejectDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "visa_dialog_fragment";
-	public static final int REQUEST_CODE_VISA = 22091901;    // Because V-I-S-A = 22-09-19-01
+	public static final String FRAGMENT_TAG = "reject_dialog_fragment";
+	public static final int REQUEST_CODE_REJECT = 180510;    // Because R-E-J = 18-05-10
 
-	private static final String LOG_TAG = "VisaDialogFragment";
+	private static final String LOG_TAG = "RejectDialogFragment";
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 	private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
 
@@ -42,9 +43,9 @@ public class VisaDialogFragment extends DialogFragment {
 	private String mBureauId;
 	private ArrayList<Dossier> mDossierList;
 
-	public static @NonNull VisaDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
+	public static @NonNull RejectDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
 
-		VisaDialogFragment fragment = new VisaDialogFragment();
+		RejectDialogFragment fragment = new RejectDialogFragment();
 
 		Bundle args = new Bundle();
 		args.putParcelableArrayList(ARGUMENTS_DOSSIERS, dossiers);
@@ -70,12 +71,12 @@ public class VisaDialogFragment extends DialogFragment {
 
 		// Create view
 
-		View view = View.inflate(getActivity(), R.layout.action_dialog_visa, null);
+		View view = View.inflate(getActivity(), R.layout.action_dialog_reject, null);
 
-		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_visa_public_annotation);
-		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_visa_private_annotation);
-		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_visa_public_annotation_label);
-		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_visa_private_annotation_label);
+		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_reject_public_annotation);
+		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_reject_private_annotation);
+		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_reject_public_annotation_label);
+		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_reject_private_annotation_label);
 
 		// Set listeners
 
@@ -100,7 +101,7 @@ public class VisaDialogFragment extends DialogFragment {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
 		builder.setPositiveButton(
-				R.string.action_viser, new DialogInterface.OnClickListener() {
+				R.string.action_rejeter, new DialogInterface.OnClickListener() {
 					@Override public void onClick(DialogInterface dialog, int which) {
 
 						// Do nothing here because we override this button in the onStart() to change the close behaviour.
@@ -132,7 +133,7 @@ public class VisaDialogFragment extends DialogFragment {
 			positiveButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View v) {
-							onVisaButtonClicked();
+							onRejectButtonClicked();
 						}
 					}
 			);
@@ -141,17 +142,22 @@ public class VisaDialogFragment extends DialogFragment {
 
 	// </editor-fold desc="LifeCycle">
 
-	private void onVisaButtonClicked() {
+	private void onRejectButtonClicked() {
 
-		new VisaTask().execute();
-		// See VisaTask#onPostExecute for popup dismiss.
+		if (TextUtils.isEmpty(mPublicAnnotationEditText.getText().toString())) {
+			Toast.makeText(getActivity(), R.string.reject_error_missing_annotation_error, Toast.LENGTH_SHORT).show();
+		}
+		else {
+			new RejectTask().execute();
+			// See RejectTask#onPostExecute for popup dismiss.
+		}
 	}
 
 	private void onCancelButtonClicked() {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
 	}
 
-	private class VisaTask extends AsyncTask<Void, Void, Boolean> {
+	private class RejectTask extends AsyncTask<Void, Void, Boolean> {
 
 		private String mAnnotPub;
 		private String mAnnotPriv;
@@ -173,13 +179,13 @@ public class VisaDialogFragment extends DialogFragment {
 			for (Dossier dossier : mDossierList) {
 
 				try {
-					RESTClient.INSTANCE.viser(dossier, mAnnotPub, mAnnotPriv, mBureauId);
-					Log.d(LOG_TAG, "VISA on : " + dossier.getName());
+					RESTClient.INSTANCE.rejeter(dossier.getId(), mAnnotPub, mAnnotPriv, mBureauId);
+					Log.d(LOG_TAG, "REJECT on : " + dossier.getName());
 				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
-					mErrorMessage = R.string.visa_error_message_not_sent_to_server;
+					mErrorMessage = R.string.reject_error_message_not_sent_to_server;
 				}
 
 				if (isCancelled())
@@ -199,7 +205,7 @@ public class VisaDialogFragment extends DialogFragment {
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(
-						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.visa_error_message_unknown_error), Toast.LENGTH_SHORT
+						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.reject_error_message_unknown_error), Toast.LENGTH_SHORT
 				).show();
 			}
 		}

@@ -14,26 +14,23 @@ import org.adullact.iparapheur.R;
  */
 public abstract class LoadingWithProgressTask extends LoadingTask {
 
-    private ProgressBar progressBar;
+	private ProgressBar progressBar;
 
-    public LoadingWithProgressTask(Activity activity, LoadingTask.DataChangeListener listener) {
-        super(activity, listener);
-        progressBar = (ProgressBar)activity.findViewById(R.id.progressBar);
-    }
+	public LoadingWithProgressTask(Activity activity, LoadingTask.DataChangeListener listener) {
+		super(activity, listener);
+		progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
+	}
 
-    @Override
-    protected void showProgress() {
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setProgress(0);
-    }
+	@Override protected void showProgress() {
+		progressBar.setVisibility(View.VISIBLE);
+		progressBar.setProgress(0);
+	}
 
-    @Override
-    protected void hideProgress() {
-        progressBar.setVisibility(View.INVISIBLE);
-    }
+	@Override protected void hideProgress() {
+		progressBar.setVisibility(View.INVISIBLE);
+	}
 
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        progressBar.setProgress(values[0]);
-    }
+	@Override protected void onProgressUpdate(Integer... values) {
+		progressBar.setProgress(values[0]);
+	}
 }
