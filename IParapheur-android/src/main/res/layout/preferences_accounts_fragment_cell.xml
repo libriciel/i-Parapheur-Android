@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="360dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="8dp"
+    android:elevation="2dp"
+    card_view:cardCornerRadius="4dp"
+    tools:ignore="UnusedAttribute">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/preferences_accounts_fragment_title_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="top"
+            android:hint="@string/pref_account_title"
+            android:inputType="textNoSuggestions"
+            android:lines="1"
+            android:textColor="@color/text_black"
+            android:textColorHint="@color/text_black_disabled"
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/preferences_accounts_fragment_url_label"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/pref_account_url"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp"/>
+
+        <EditText
+            android:id="@+id/preferences_accounts_fragment_url_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:hint="@string/mandatory"
+            android:inputType="textUri"
+            android:lines="1"
+            android:textColor="@color/text_black"
+            android:textColorHint="@color/text_black_disabled"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

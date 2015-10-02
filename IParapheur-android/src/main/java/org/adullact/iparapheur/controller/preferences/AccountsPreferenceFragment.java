@@ -11,7 +11,6 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
@@ -34,17 +33,17 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.settings_accounts, null);
-		Button b = (Button) v.findViewById(R.id.settings_accounts_button);
-		b.setText(getActivity().getResources().getString(R.string.account_new));
-		b.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View view) {
-						Account account = MyAccounts.INSTANCE.addAccount();
-						buildAccountPrefScreen(accountsScreen, account);
-					}
-				}
-		);
+		View v = inflater.inflate(R.layout.preferences_accounts_fragment, null);
+//		Button b = (Button) v.findViewById(R.id.settings_accounts_button);
+//		b.setText(getActivity().getResources().getString(R.string.account_new));
+//		b.setOnClickListener(
+//				new View.OnClickListener() {
+//					@Override public void onClick(View view) {
+//						Account account = MyAccounts.INSTANCE.addAccount();
+//						buildAccountPrefScreen(accountsScreen, account);
+//					}
+//				}
+//		);
 
 		accountsScreen = getPreferenceManager().createPreferenceScreen(getActivity());
 		String title = getResources().getString(R.string.pref_header_accounts) + " " + getResources().getString(R.string.app_name);

@@ -84,8 +84,8 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 
 		switch (v.getId()) {
 			case R.id.preferences_account:
-				clickedFragment = PreferencesLicencesFragment.newInstance();
-				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
+				clickedFragment = PreferencesAccountFragment.newInstance();
+				clickedFragmentTag = PreferencesAccountFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_certificates:
 				clickedFragment = PreferencesLicencesFragment.newInstance();
