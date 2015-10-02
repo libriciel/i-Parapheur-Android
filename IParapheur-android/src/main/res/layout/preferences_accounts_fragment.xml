@@ -84,6 +84,10 @@
                         android:textSize="16sp"/>
                 </android.support.design.widget.TextInputLayout>
 
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="match_parent"/>
+
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -105,6 +109,20 @@
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/preferences_accounts_fragment_add_parapheur_floatingactionbutton"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:contentDescription="@string/add_parapheur"
+        android:src="@drawable/ic_add_white_24dp"
+        app:backgroundTint="@color/settings_primary_500"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        app:fabSize="normal"/>
 
     <!--</ListView>-->
 

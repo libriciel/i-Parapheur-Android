@@ -23,7 +23,7 @@
     <!-- Settings -->
 
     <style name="AppTheme.Settings" parent="AppTheme.Settings.Base">
-        <item name="colorAccent">@color/secondary_500</item>
+        <item name="colorAccent">@color/settings_primary_500</item>
         <item name="android:textColorPrimary">@color/text_white</item>
         <item name="android:textColorSecondary">@color/text_black_secondary</item>
     </style>
