@@ -21,28 +21,30 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 
+
 public class AccountsPreferenceFragment extends PreferenceFragment implements ActionsAccountPreference.ActionsAccountPreferenceListener, Preference.OnPreferenceChangeListener, LoadingTask.DataChangeListener {
+
+	public static final String FRAGMENT_TAG = "AccountsPreferenceFragment";
 
 	private PreferenceScreen accountsScreen;
 	private String testResponse;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.settings_accounts, null);
 		Button b = (Button) v.findViewById(R.id.settings_accounts_button);
 		b.setText(getActivity().getResources().getString(R.string.account_new));
-		b.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Account account = MyAccounts.INSTANCE.addAccount();
-				buildAccountPrefScreen(accountsScreen, account);
-			}
-		});
+		b.setOnClickListener(
+				new View.OnClickListener() {
+					@Override public void onClick(View view) {
+						Account account = MyAccounts.INSTANCE.addAccount();
+						buildAccountPrefScreen(accountsScreen, account);
+					}
+				}
+		);
 
 		accountsScreen = getPreferenceManager().createPreferenceScreen(getActivity());
 		String title = getResources().getString(R.string.pref_header_accounts) + " " + getResources().getString(R.string.app_name);
@@ -134,23 +136,20 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 		}
 	}
 
-	@Override
-	public void onAccountDeleted(Account deleted) {
+	@Override public void onAccountDeleted(Account deleted) {
 		PreferenceCategory accountPreferenceScreen = (PreferenceCategory) getPreferenceScreen().findPreference(deleted.getId());
 		accountsScreen.removePreference(accountPreferenceScreen);
 		MyAccounts.INSTANCE.delete(deleted);
 	}
 
-	@Override
-	public void onAccountTested(Account toTest) {
+	@Override public void onAccountTested(Account toTest) {
 		new TestTask(this, toTest).execute();
 	}
 
 	/**
 	 * Applelé quand le test du compte est terminé (LoadinkTask)
 	 */
-	@Override
-	public void onDataChanged() {
+	@Override public void onDataChanged() {
 		Toast.makeText(getActivity(), this.testResponse, Toast.LENGTH_LONG).show();
 		this.testResponse = null;
 	}
@@ -163,8 +162,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 	 * @param o          the value that has been modified
 	 * @return true
 	 */
-	@Override
-	public boolean onPreferenceChange(Preference preference, Object o) {
+	@Override public boolean onPreferenceChange(Preference preference, Object o) {
 		String key = MyAccounts.INSTANCE.getAccountIdFromPreferenceKey(preference.getKey());
 		// We have to modify the account manually as the preference will change only after this
 		//methods returns...
@@ -198,8 +196,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 			this.account = account;
 		}
 
-		@Override
-		protected void load(String... params) throws IParapheurException {
+		@Override protected void load(String... params) throws IParapheurException {
 			testResponse = getActivity().getResources().getString(RESTClient.INSTANCE.test(MyAccounts.INSTANCE.getAccount(this.account.getId())));
 		}
 	}

@@ -2,8 +2,8 @@ package org.adullact.iparapheur.controller.preferences;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +14,35 @@ import com.crashlytics.android.Crashlytics;
 import org.adullact.iparapheur.R;
 
 
-public class AboutPreferenceFragment extends PreferenceFragment {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link PreferencesAboutFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class PreferencesAboutFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "AboutPreferenceFragment";
+	public static final String FRAGMENT_TAG = "PreferencesAboutFragment";
+
+	/**
+	 * Use this factory method to create a new instance of
+	 * this fragment using the provided parameters.
+	 *
+	 * @return A new instance of fragment PreferencesMenuFragment.
+	 */
+	public static PreferencesAboutFragment newInstance() {
+		return new PreferencesAboutFragment();
+	}
+
+	public PreferencesAboutFragment() {
+		// Required empty public constructor
+	}
 
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.preferences_licences_fragment, container, false);
+		View v = inflater.inflate(R.layout.preferences_about_fragment, container, false);
 
 		// Retrieve current version name
 
-		String currentVersion = "1.3";
+		String currentVersion = "1.4";
 		try { currentVersion = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName; }
 		catch (PackageManager.NameNotFoundException e) {
 			Crashlytics.logException(e);

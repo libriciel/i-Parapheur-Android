@@ -26,11 +26,11 @@
             android:theme="@style/AppTheme.Settings.Toolbar"/>
 
         <fragment
-            android:id="@android:id/content"
+            android:id="@+id/preferences_activity_content"
             android:name="org.adullact.iparapheur.controller.preferences.PreferencesMenuFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:layout="@layout/fragment_preferences_menu"/>
+            tools:layout="@layout/preferences_menu_fragment"/>
 
     </LinearLayout>
 </LinearLayout>

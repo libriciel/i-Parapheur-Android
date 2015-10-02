@@ -1,6 +1,9 @@
 package org.adullact.iparapheur.controller.preferences;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -8,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import org.adullact.iparapheur.R;
+
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener {
 
@@ -40,10 +44,18 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	// </editor-fold desc="ActionBar">
 
+	private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag) {
+
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.preferences_activity_content, fragment, tag);
+		transaction.addToBackStack(tag);
+		transaction.commit();
+	}
+
 	// <editor-fold desc="PreferenceMenuFragmentListener">
 
-	@Override public void onMenuElementClicked(String element) {
-		Log.i("Adrien", "Click");
+	@Override public void onMenuElementClicked(@NonNull Fragment fragment, @NonNull String fragmentTag) {
+		replaceMainFragment(fragment, fragmentTag);
 	}
 
 	// </editor-fold desc="PreferenceMenuFragmentListener">

@@ -1,9 +1,9 @@
 package org.adullact.iparapheur.controller.preferences;
 
-import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +19,7 @@ import org.adullact.iparapheur.R;
  * Use the {@link PreferencesMenuFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PreferencesMenuFragment extends Fragment {
+public class PreferencesMenuFragment extends Fragment implements View.OnClickListener {
 
 	private PreferenceMenuFragmentListener mListener;
 
@@ -30,10 +30,7 @@ public class PreferencesMenuFragment extends Fragment {
 	 * @return A new instance of fragment PreferencesMenuFragment.
 	 */
 	public static PreferencesMenuFragment newInstance() {
-		PreferencesMenuFragment fragment = new PreferencesMenuFragment();
-		Bundle args = new Bundle();
-		fragment.setArguments(args);
-		return fragment;
+		return new PreferencesMenuFragment();
 	}
 
 	public PreferencesMenuFragment() {
@@ -42,14 +39,16 @@ public class PreferencesMenuFragment extends Fragment {
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
-		View view = inflater.inflate(R.layout.fragment_preferences_menu, container, false);
-		return view;
+
+		View v = inflater.inflate(R.layout.preferences_menu_fragment, container, false);
+
+		v.findViewById(R.id.preferences_account).setOnClickListener(this);
+		v.findViewById(R.id.preferences_certificates).setOnClickListener(this);
+		v.findViewById(R.id.preferences_about).setOnClickListener(this);
+		v.findViewById(R.id.preferences_licenses).setOnClickListener(this);
+
+		return v;
 	}
 
 	@Override public void onAttach(Context context) {
@@ -71,11 +70,44 @@ public class PreferencesMenuFragment extends Fragment {
 
 	// </editor-fold desc="LifeCycle">
 
-	public void onMenuElementClicked(Uri uri) {
+	// <editor-fold desc="OnClickListener">
 
-		if (mListener != null)
-			mListener.onMenuElementClicked("" + uri);
+	@Override public void onClick(View v) {
+
+		if (mListener == null)
+			return;
+
+		// Determine which Fragment was clicked
+
+		Fragment clickedFragment = null;
+		String clickedFragmentTag = null;
+
+		switch (v.getId()) {
+			case R.id.preferences_account:
+				clickedFragment = PreferencesLicencesFragment.newInstance();
+				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
+				break;
+			case R.id.preferences_certificates:
+				clickedFragment = PreferencesLicencesFragment.newInstance();
+				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
+				break;
+			case R.id.preferences_about:
+				clickedFragment = PreferencesAboutFragment.newInstance();
+				clickedFragmentTag = PreferencesAboutFragment.FRAGMENT_TAG;
+				break;
+			case R.id.preferences_licenses:
+				clickedFragment = PreferencesLicencesFragment.newInstance();
+				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
+				break;
+		}
+
+		// throw exception to parent activity
+
+		if (clickedFragment != null)
+			mListener.onMenuElementClicked(clickedFragment, clickedFragmentTag);
 	}
+
+	// </editor-fold desc="OnClickListener">
 
 	/**
 	 * This interface must be implemented by activities that contain this
@@ -90,7 +122,7 @@ public class PreferencesMenuFragment extends Fragment {
 	public interface PreferenceMenuFragmentListener {
 
 		// TODO: Update argument type and name
-		void onMenuElementClicked(String element);
+		void onMenuElementClicked(@NonNull Fragment fragment, @NonNull String tag);
 	}
 
 }
