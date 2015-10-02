@@ -7,8 +7,8 @@
         <selector>
 
             <item
-                android:state_activated="true"
-                android:drawable="@color/secondary_100"/>
+                android:drawable="@color/secondary_100"
+                android:state_activated="true"/>
 
             <item
                 android:drawable="@android:color/background_light"/>

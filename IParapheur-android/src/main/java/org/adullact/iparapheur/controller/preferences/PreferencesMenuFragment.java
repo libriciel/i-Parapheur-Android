@@ -1,15 +1,15 @@
 package org.adullact.iparapheur.controller.preferences;
 
-import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import org.adullact.iparapheur.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,7 +21,6 @@ import org.adullact.iparapheur.R;
  */
 public class PreferencesMenuFragment extends Fragment {
 
-	private ListView mListView;
 	private PreferenceMenuFragmentListener mListener;
 
 	/**
@@ -50,18 +49,17 @@ public class PreferencesMenuFragment extends Fragment {
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_preferences_menu, container, false);
-		mListView = (ListView) view.findViewById(R.id.preferences_activity_general_list);
 		return view;
 	}
 
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	@Override public void onAttach(Context context) {
+		super.onAttach(context);
 		try {
-			mListener = (PreferenceMenuFragmentListener) activity;
+			mListener = (PreferenceMenuFragmentListener) context;
 		}
 		catch (ClassCastException e) {
 			throw new ClassCastException(
-					activity.toString() + " must implement OnFragmentInteractionListener"
+					context.toString() + " must implement OnFragmentInteractionListener"
 			);
 		}
 	}
