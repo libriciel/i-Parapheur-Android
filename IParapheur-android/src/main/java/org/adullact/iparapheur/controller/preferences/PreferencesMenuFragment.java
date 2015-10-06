@@ -21,6 +21,7 @@ import org.adullact.iparapheur.R;
  */
 public class PreferencesMenuFragment extends Fragment implements View.OnClickListener {
 
+	public static final String FRAGMENT_TAG = "preferences_menu_fragment";
 	private PreferenceMenuFragmentListener mListener;
 
 	/**

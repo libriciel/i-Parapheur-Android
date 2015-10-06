@@ -33,7 +33,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.preferences_accounts_fragment, null);
+		View v = inflater.inflate(R.layout.preferences_accounts_fragment, container, false);
 //		Button b = (Button) v.findViewById(R.id.settings_accounts_button);
 //		b.setText(getActivity().getResources().getString(R.string.account_new));
 //		b.setOnClickListener(
@@ -61,8 +61,7 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 	/**
 	 * Add a preferenceCategory related to the account passed as parameter.
 	 *
-	 * @param parent  the preference screen where to add the category
-	 * @param account
+	 * @param parent the preference screen where to add the category
 	 */
 	private void buildAccountPrefScreen(PreferenceScreen parent, Account account) {
 		final PreferenceCategory accountPref = new PreferenceCategory(getActivity());
@@ -122,7 +121,6 @@ public class AccountsPreferenceFragment extends PreferenceFragment implements Ac
 	/**
 	 * Used to indicate if the account is complete in the title of the account's preference category
 	 *
-	 * @param account
 	 * @return The title of the account's preference category
 	 */
 	private String buildAccountHeader(Account account) {

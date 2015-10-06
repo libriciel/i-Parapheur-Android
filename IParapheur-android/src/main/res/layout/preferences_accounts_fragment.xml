@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_200">
@@ -10,8 +11,12 @@
         android:id="@+id/preferences_accounts_fragment_main_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:divider="@color/grey_200"
-        android:dividerHeight="8dp"/>
+        android:dividerHeight="8dp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        tools:listitem="@layout/preferences_accounts_fragment_cell"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/preferences_accounts_fragment_add_parapheur_floatingactionbutton"

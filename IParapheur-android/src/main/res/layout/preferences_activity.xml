@@ -17,7 +17,6 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/preferences_activity_toolbar"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/settings_500"
@@ -30,6 +29,7 @@
             android:name="org.adullact.iparapheur.controller.preferences.PreferencesMenuFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:tag="preferences_menu_fragment"
             tools:layout="@layout/preferences_menu_fragment"/>
 
     </LinearLayout>
