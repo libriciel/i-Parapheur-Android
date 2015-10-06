@@ -1,12 +1,11 @@
 package org.adullact.iparapheur.model;
 
-import android.text.TextUtils;
+import android.webkit.URLUtil;
 
-import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
+
 
 public class Account implements Serializable {
 
@@ -33,24 +32,10 @@ public class Account implements Serializable {
 	}
 
 	public static boolean validateAccount(String title, String url, String login, String password) {
-		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
+		return StringUtils.areNotEmpty(title, url, login, password) && URLUtil.isValidUrl(url);
 	}
 
-	private static boolean isURLValid(String url) {
-		if (url == null || url.isEmpty()) {
-			return false;
-		}
-		try {
-			new URL(IParapheurAPI.BASE_PATH + url);
-			return true;
-		}
-		catch (MalformedURLException ignored) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean equals(Object o) {
+	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;
 			return this.id.equals(toCompare.id);
@@ -58,18 +43,16 @@ public class Account implements Serializable {
 		return false;
 	}
 
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		return id.hashCode();
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return title;
 	}
 
 	public boolean isValid() {
-		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
+		return validateAccount(title, url, login, password);
 	}
 
 	// <editor-fold desc="Getters / Setters">

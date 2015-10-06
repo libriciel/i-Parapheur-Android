@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.BufferedReader;
@@ -91,6 +92,18 @@ public class StringUtils {
 		catch (ParseException ex) {
 			return null;
 		}
+	}
+
+	public static boolean areNotEmpty(@Nullable String... strings) {
+
+		if ((strings == null) || (strings.length == 0))
+			return false;
+
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return false;
+
+		return true;
 	}
 
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
