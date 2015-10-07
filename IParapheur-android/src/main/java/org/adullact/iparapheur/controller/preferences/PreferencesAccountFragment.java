@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +21,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,11 +115,19 @@ public class PreferencesAccountFragment extends Fragment {
 						new View.OnClickListener() {
 							@Override public void onClick(View arg0) {
 
-								String url = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext)).getText().toString();
 								String login = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext)).getText().toString();
 								String password = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext)).getText().toString();
 
-								onTestButtonClicked(url, login, password);
+								// Apply regex on entered URL
+
+								EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
+								String entryUrl = urlEditText.getText().toString();
+								String fixedUrl = StringUtils.fixUrl(entryUrl);
+								urlEditText.setText(fixedUrl);
+
+								//
+
+								onTestButtonClicked(fixedUrl, login, password);
 							}
 						}
 				);
@@ -143,7 +151,20 @@ public class PreferencesAccountFragment extends Fragment {
 	}
 
 	private void onTestButtonClicked(@Nullable String url, @Nullable String login, @Nullable String password) {
+
 		new TestTask().execute(url, login, password);
+	}
+
+	private void onAddFloatingButtonClicked() {
+
+		Map<String, String> accountData = new HashMap<>();
+		accountData.put(LIST_FIELD_TITLE, "");
+		accountData.put(LIST_FIELD_URL, "");
+		accountData.put(LIST_FIELD_LOGIN, "");
+		accountData.put(LIST_FIELD_PASSWORD, "");
+
+		mAccountData.add(accountData);
+		mAccountList.getAdapter();
 	}
 
 	private void buildAccountDataMap() {
@@ -162,21 +183,9 @@ public class PreferencesAccountFragment extends Fragment {
 		}
 	}
 
-	private void onAddFloatingButtonClicked() {
-
-		Map<String, String> accountData = new HashMap<>();
-		accountData.put(LIST_FIELD_TITLE, "");
-		accountData.put(LIST_FIELD_URL, "");
-		accountData.put(LIST_FIELD_LOGIN, "");
-		accountData.put(LIST_FIELD_PASSWORD, "");
-
-		mAccountData.add(accountData);
-		mAccountList.getAdapter();
-	}
-
 	private class TestTask extends AsyncTask<String, Void, Void> {
 
-		private String errorMessage;
+		private int mResultMessageRes;
 
 		@Override protected Void doInBackground(String... params) {
 
@@ -186,12 +195,11 @@ public class PreferencesAccountFragment extends Fragment {
 			testAccount.setPassword(params[2]);
 
 			try {
-				int result = RESTClient.INSTANCE.test(testAccount);
-				errorMessage = getString(result);
+				mResultMessageRes = RESTClient.INSTANCE.test(testAccount);
 			}
 			catch (IParapheurException e) {
 				Crashlytics.logException(e);
-				errorMessage = e.getLocalizedMessage();
+				mResultMessageRes = e.getResId();
 				e.printStackTrace();
 			}
 
@@ -200,13 +208,8 @@ public class PreferencesAccountFragment extends Fragment {
 
 		@Override protected void onPostExecute(Void aVoid) {
 
-			if (getActivity() != null) {
-
-				if (TextUtils.isEmpty(errorMessage))
-					Toast.makeText(getActivity(), R.string.test_ok, Toast.LENGTH_SHORT).show();
-				else
-					Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
-			}
+			if (getActivity() != null)
+				Toast.makeText(getActivity(), mResultMessageRes, Toast.LENGTH_SHORT).show();
 
 			super.onPostExecute(aVoid);
 		}

@@ -106,6 +106,18 @@ public class StringUtils {
 		return true;
 	}
 
+	public static String firstNotEmpty(@Nullable String... strings) {
+
+		if ((strings == null) || (strings.length == 0))
+			return null;
+
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return string;
+
+		return null;
+	}
+
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
 
 		// Default value
@@ -197,5 +209,23 @@ public class StringUtils {
 		catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Illegal hexadecimal character.", e);
 		}
+	}
+
+	public static @NonNull String fixUrl(@NonNull String url) {
+
+		// Getting the server name
+		// Regex :	- ignore everything before "://" (if exists)					^(?:.*://)*
+		//			- then ignore following "m." (if exists)						(?:m\.)?
+		//			- then catch every char but "/"	(not geedy)						(.*?)
+		//			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
+		String regex = "^(?:.*://)*(?:m\\.)?(.*?)(?:/.*)*$";
+		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(url);
+
+		String result = url;
+		if (matcher.find() && !TextUtils.isEmpty(matcher.group(1)))
+			result = matcher.group(1);
+
+		return result;
 	}
 }
