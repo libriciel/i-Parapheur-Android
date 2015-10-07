@@ -127,10 +127,20 @@
                     android:textColor="@color/settings_primary_500"/>
 
                 <Button
+                    android:id="@+id/preferences_accounts_fragment_cell_delete_button"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_account_delete"
+                    android:textColor="@color/settings_primary_500"/>
+
+                <Button
                     android:id="@+id/preferences_accounts_fragment_cell_save_button"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     android:text="@string/enregistrer_filtre"
                     android:textColor="@color/settings_primary_500"/>
             </LinearLayout>

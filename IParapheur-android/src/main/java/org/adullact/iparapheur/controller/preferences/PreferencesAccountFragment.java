@@ -111,6 +111,14 @@ public class PreferencesAccountFragment extends Fragment {
 						}
 				);
 
+				v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
+						new View.OnClickListener() {
+							@Override public void onClick(View arg0) {
+								onDeleteButtonClicked(position);
+							}
+						}
+				);
+
 				v.findViewById(R.id.preferences_accounts_fragment_cell_test_button).setOnClickListener(
 						new View.OnClickListener() {
 							@Override public void onClick(View arg0) {
@@ -150,6 +158,10 @@ public class PreferencesAccountFragment extends Fragment {
 		Log.e("Adrien", "Save " + position);
 	}
 
+	private void onDeleteButtonClicked(int position) {
+		Log.e("Adrien", "Delete " + position);
+	}
+
 	private void onTestButtonClicked(@Nullable String url, @Nullable String login, @Nullable String password) {
 
 		new TestTask().execute(url, login, password);
@@ -164,7 +176,7 @@ public class PreferencesAccountFragment extends Fragment {
 		accountData.put(LIST_FIELD_PASSWORD, "");
 
 		mAccountData.add(accountData);
-		mAccountList.getAdapter();
+		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 	}
 
 	private void buildAccountDataMap() {

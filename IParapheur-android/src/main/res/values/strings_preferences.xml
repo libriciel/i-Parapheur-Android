@@ -22,7 +22,7 @@
     <string name="pref_account_url">URL du serveur</string>
     <string name="pref_account_login">Nom d\'utilisateur</string>
     <string name="pref_account_password">Mot de passe</string>
-    <string name="pref_account_delete">Supprimer le compte</string>
+    <string name="pref_account_delete">Supprimer</string>
     <string name="pref_account_incomplete">Compte incomplet</string>
 
 </resources>
