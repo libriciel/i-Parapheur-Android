@@ -52,6 +52,7 @@
                         android:hint="@string/pref_account_url"
                         android:inputType="textUri"
                         android:lines="1"
+                        android:nextFocusDown="@+id/preferences_accounts_fragment_cell_login_edittext"
                         android:textColor="@color/text_black"
                         android:textColorHint="@color/text_black_disabled"
                         android:textSize="16sp"/>
@@ -77,6 +78,7 @@
                             android:hint="@string/pref_account_login"
                             android:inputType="textNoSuggestions"
                             android:lines="1"
+                            android:nextFocusDown="@+id/preferences_accounts_fragment_cell_password_edittext"
                             android:textColor="@color/text_black"
                             android:textColorHint="@color/text_black_disabled"
                             android:textSize="16sp"/>
@@ -99,6 +101,7 @@
                             android:hint="@string/pref_account_password"
                             android:inputType="textPassword"
                             android:lines="1"
+                            android:nextFocusDown="@+id/preferences_accounts_fragment_cell_test_button"
                             android:textColor="@color/text_black"
                             android:textColorHint="@color/text_black_disabled"
                             android:textSize="16sp"/>
