@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.preferences;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -95,56 +96,9 @@ public class PreferencesAccountFragment extends Fragment {
 				R.id.preferences_accounts_fragment_cell_password_edittext
 		};
 
-		SimpleAdapter accountAdapter = new SimpleAdapter(
+		SimpleAdapter accountAdapter = new AccountSimpleAdapter(
 				getActivity(), mAccountData, R.layout.preferences_accounts_fragment_cell, orderedFieldNames, orderedFieldIds
-		) {
-			@Override public View getView(final int position, View convertView, ViewGroup parent) {
-				final View v = super.getView(position, convertView, parent);
-
-				// Cell buttons listener
-
-				v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
-						new View.OnClickListener() {
-							@Override public void onClick(View arg0) {
-								onSaveButtonClicked(position);
-							}
-						}
-				);
-
-				v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
-						new View.OnClickListener() {
-							@Override public void onClick(View arg0) {
-								onDeleteButtonClicked(position);
-							}
-						}
-				);
-
-				v.findViewById(R.id.preferences_accounts_fragment_cell_test_button).setOnClickListener(
-						new View.OnClickListener() {
-							@Override public void onClick(View arg0) {
-
-								String login = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext)).getText().toString();
-								String password = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext)).getText().toString();
-
-								// Apply regex on entered URL
-
-								EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
-								String entryUrl = urlEditText.getText().toString();
-								String fixedUrl = StringUtils.fixUrl(entryUrl);
-								urlEditText.setText(fixedUrl);
-
-								//
-
-								onTestButtonClicked(fixedUrl, login, password);
-							}
-						}
-				);
-
-				//
-
-				return v;
-			}
-		};
+		);
 		mAccountList.setAdapter(accountAdapter);
 
 		//
@@ -156,10 +110,14 @@ public class PreferencesAccountFragment extends Fragment {
 
 	private void onSaveButtonClicked(int position) {
 		Log.e("Adrien", "Save " + position);
+		//TODO save in shared preferences
 	}
 
 	private void onDeleteButtonClicked(int position) {
-		Log.e("Adrien", "Delete " + position);
+
+		mAccountData.remove(position);
+		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
+		//TODO save in shared preferences
 	}
 
 	private void onTestButtonClicked(@Nullable String url, @Nullable String login, @Nullable String password) {
@@ -192,6 +150,74 @@ public class PreferencesAccountFragment extends Fragment {
 			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
 			mAccountData.add(accountData);
+		}
+	}
+
+	private class AccountSimpleAdapter extends SimpleAdapter {
+
+		/**
+		 * Constructor
+		 *
+		 * @param context  The context where the View associated with this SimpleAdapter is running
+		 * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
+		 *                 Maps contain the data for each row, and should include all the entries specified in
+		 *                 "from"
+		 * @param resource Resource identifier of a view layout that defines the views for this list
+		 *                 item. The layout file should include at least those named views defined in "to"
+		 * @param from     A list of column names that will be added to the Map associated with each
+		 *                 item.
+		 * @param to       The views that should display column in the "from" parameter. These should all be
+		 *                 TextViews. The first N views in this list are given the values of the first N columns
+		 */
+		public AccountSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+			super(context, data, resource, from, to);
+		}
+
+		@Override public View getView(final int position, View convertView, ViewGroup parent) {
+			final View v = super.getView(position, convertView, parent);
+
+			// Cell buttons listener
+
+			v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View arg0) {
+							onSaveButtonClicked(position);
+						}
+					}
+			);
+
+			v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View arg0) {
+							onDeleteButtonClicked(position);
+						}
+					}
+			);
+
+			v.findViewById(R.id.preferences_accounts_fragment_cell_test_button).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View arg0) {
+
+							String login = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext)).getText().toString();
+							String password = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext)).getText().toString();
+
+							// Apply regex on entered URL
+
+							EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
+							String entryUrl = urlEditText.getText().toString();
+							String fixedUrl = StringUtils.fixUrl(entryUrl);
+							urlEditText.setText(fixedUrl);
+
+							//
+
+							onTestButtonClicked(fixedUrl, login, password);
+						}
+					}
+			);
+
+			//
+
+			return v;
 		}
 	}
 
