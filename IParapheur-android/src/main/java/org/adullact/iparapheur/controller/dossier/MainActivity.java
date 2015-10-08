@@ -44,9 +44,9 @@ import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
-import org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment;
-import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFragment;
+import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
+import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -535,7 +535,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	@Override public void onCreateAccountInvoked() {
 
 		Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
-		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
+		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, PreferencesAccountFragment.class.getName());
 		startActivityForResult(preferencesIntent, EDIT_PREFERENCE_REQUEST);
 	}
 

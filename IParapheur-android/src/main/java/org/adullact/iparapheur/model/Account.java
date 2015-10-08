@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.model;
 
+import android.text.TextUtils;
 import android.webkit.URLUtil;
 
 import org.adullact.iparapheur.utils.StringUtils;
@@ -9,123 +10,127 @@ import java.io.Serializable;
 
 public class Account implements Serializable {
 
-	public static final long _serialVersionUID = 1L;
+	@SuppressWarnings("unused") public static final long _serialVersionUID = 1L;
 
-	private final String id;
-	private String title;
-	private String url;
-	private String login;
-	private String tenant;
-	private String password;
-	private String ticket;
-	private Integer apiVersion;
-	private Long lastRequest;
+	private final String mId;
+	private String mTitle;
+	private String mUrl;
+	private String mLogin;
+	private String mTenant;
+	private String mPassword;
+	private String mTicket;
+	private Integer mApiVersion;
+	private Long mLastRequest;
 
 	public Account(String id) {
-		this.id = id;
-		this.title = "";
-		this.url = "";
-		this.login = "";
-		this.password = "";
-		this.tenant = null;
-		this.lastRequest = 0L;
-	}
-
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return StringUtils.areNotEmpty(title, url, login, password) && URLUtil.isValidUrl(url);
-	}
-
-	@Override public boolean equals(Object o) {
-		if (o instanceof Account) {
-			Account toCompare = (Account) o;
-			return this.id.equals(toCompare.id);
-		}
-		return false;
-	}
-
-	@Override public int hashCode() {
-		return id.hashCode();
-	}
-
-	@Override public String toString() {
-		return title;
-	}
-
-	public boolean isValid() {
-		return validateAccount(title, url, login, password);
+		mId = id;
+		mTitle = "";
+		mUrl = "";
+		mLogin = "";
+		mPassword = "";
+		mTenant = null;
+		mLastRequest = 0L;
 	}
 
 	// <editor-fold desc="Getters / Setters">
 
 	public String getId() {
-		return id;
+		return mId;
 	}
 
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		mTitle = title;
 	}
 
 	public String getUrl() {
-		return url;
+		return mUrl;
 	}
 
 	public void setUrl(String url) {
-		this.url = url;
+		mUrl = url;
 	}
 
 	public String getLogin() {
-		return login;
+		return mLogin;
 	}
 
 	public void setLogin(String login) {
-		this.login = login;
+
+		mLogin = login;
+
 		if (login != null) {
 			int separatorIndex = login.indexOf("@");
-			if (separatorIndex != -1) {
-				this.tenant = login.substring(separatorIndex + 1);
-			}
+
+			if (separatorIndex != -1)
+				mTenant = login.substring(separatorIndex + 1);
 		}
 	}
 
 	public String getTenant() {
-		return tenant;
+		return mTenant;
 	}
 
 	public String getPassword() {
-		return password;
+		return mPassword;
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		mPassword = password;
 	}
 
 	public String getTicket() {
-		return ticket;
+		return mTicket;
 	}
 
 	public void setTicket(String ticket) {
-		this.ticket = ticket;
+		mTicket = ticket;
 	}
 
 	public Integer getApiVersion() {
-		return apiVersion;
+		return mApiVersion;
 	}
 
 	public void setApiVersion(Integer apiVersion) {
-		this.apiVersion = apiVersion;
+		mApiVersion = apiVersion;
 	}
 
 	public Long getLastRequest() {
-		return lastRequest;
+		return mLastRequest;
 	}
 
 	public void setLastRequest(Long lastRequest) {
-		this.lastRequest = lastRequest;
+		mLastRequest = lastRequest;
 	}
 
 	// </editor-fold desc="Getters / Setters">
+
+	public static boolean validateAccount(String title, String url, String login, String password) {
+		return StringUtils.areNotEmpty(title, url, login, password) && URLUtil.isValidUrl(url);
+	}
+
+	public boolean isValid() {
+		return validateAccount(mTitle, mUrl, mLogin, mPassword);
+	}
+
+	@Override public boolean equals(Object o) {
+
+		if (o instanceof Account) {
+			Account toCompare = (Account) o;
+			return TextUtils.equals(mId, toCompare.getId());
+		}
+
+		return false;
+	}
+
+	@Override public int hashCode() {
+		return mId.hashCode();
+	}
+
+	@Override public String toString() {
+		return "{Account title:" + mTitle + " id:" + mId + "}";
+	}
 }

@@ -220,7 +220,7 @@ public class StringUtils {
 		//			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
 		String regex = "^(?:.*://)*(?:m\\.)?(.*?)(?:/.*)*$";
 		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(url);
+		Matcher matcher = pattern.matcher(url.trim());
 
 		String result = url;
 		if (matcher.find() && !TextUtils.isEmpty(matcher.group(1)))

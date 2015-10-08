@@ -12,7 +12,6 @@
     <string name="pref_header_licenses">Licenses</string>
     <string name="pref_header_certificates">Certificats</string>
 
-
     <!-- Account -->
 
     <string name="pref_accounts">Mes Comptes</string>
@@ -23,6 +22,9 @@
     <string name="pref_account_login">Nom d\'utilisateur</string>
     <string name="pref_account_password">Mot de passe</string>
     <string name="pref_account_delete">Supprimer</string>
-    <string name="pref_account_incomplete">Compte incomplet</string>
+
+    <string name="pref_account_message_save_success">Compte enregistré</string>
+    <string name="pref_account_message_delete_success">Compte supprimé</string>
+
 
 </resources>

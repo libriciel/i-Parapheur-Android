@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,9 +40,11 @@ import java.util.Map;
  */
 public class PreferencesAccountFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "PreferencesAccountFragment";
+	public static final String FRAGMENT_TAG = "preferences_account_fragment";
+	public static final String LOG_TAG = "PreferencesAccountFrag";
 
 	private static final String LIST_FIELD_TITLE = "list_field_title";
+	private static final String LIST_FIELD_ID = "list_field_id";
 	private static final String LIST_FIELD_URL = "list_field_url";
 	private static final String LIST_FIELD_LOGIN = "list_field_login";
 	private static final String LIST_FIELD_PASSWORD = "list_field_password";
@@ -111,22 +114,59 @@ public class PreferencesAccountFragment extends Fragment {
 
 	// </editor-fold desc="LifeCycle">
 
-	private void onSaveButtonClicked(int position) {
-		Log.e("Adrien", "Save " + position);
-		//TODO save in shared preferences
+	private void onSaveButtonClicked(@NonNull EditText urlEditText, int position) {
+
+		cleanupUrlEditText(urlEditText);
+
+		// Retrieve existing account, or create it
+
+		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
+		Account currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
+
+		if (currentAccount == null)
+			currentAccount = MyAccounts.INSTANCE.addAccount();
+
+		// Edit
+
+		currentAccount.setUrl(urlEditText.getText().toString());
+		currentAccount.setTitle(mAccountData.get(position).get(LIST_FIELD_TITLE));
+		currentAccount.setLogin(mAccountData.get(position).get(LIST_FIELD_LOGIN));
+		currentAccount.setPassword(mAccountData.get(position).get(LIST_FIELD_PASSWORD));
+
+		// Save
+
+		Log.i(LOG_TAG, "Save account " + currentAccount);
+		MyAccounts.INSTANCE.save(currentAccount);
+
+		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
 	}
 
 	private void onDeleteButtonClicked(int position) {
 
+		// Retrieve existing account
+
+		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
+		Account currentAccount;
+
+		if (TextUtils.isEmpty(currentId))
+			currentAccount = MyAccounts.INSTANCE.addAccount();
+		else
+			currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
+
+		// Delete
+
 		mAccountData.remove(position);
+		Log.i(LOG_TAG, "Delete account " + currentAccount);
+		MyAccounts.INSTANCE.delete(currentAccount);
+
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
-		//TODO save in shared preferences
+		Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();
 	}
 
-	private void onTestButtonClicked(@Nullable String url, @Nullable String login, @Nullable String password) {
+	private void onTestButtonClicked(@NonNull EditText urlEditText, @Nullable String login, @Nullable String password) {
 
-		Log.e("Adrien", "" + mAccountData);
-		new TestTask().execute(url, login, password);
+		cleanupUrlEditText(urlEditText);
+		new TestTask().execute(urlEditText.getText().toString(), login, password);
 	}
 
 	private void onAddFloatingButtonClicked() {
@@ -150,11 +190,20 @@ public class PreferencesAccountFragment extends Fragment {
 
 			Map<String, String> accountData = new HashMap<>();
 			accountData.put(LIST_FIELD_TITLE, account.getTitle());
+			accountData.put(LIST_FIELD_ID, account.getId());
 			accountData.put(LIST_FIELD_URL, account.getUrl());
 			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
 			mAccountData.add(accountData);
 		}
+	}
+
+	private void cleanupUrlEditText(@NonNull EditText urlEditText) {
+
+		String entryUrl = urlEditText.getText().toString();
+		String fixedUrl = StringUtils.fixUrl(entryUrl);
+
+		urlEditText.setText(fixedUrl);
 	}
 
 	private class AccountSimpleAdapter extends SimpleAdapter {
@@ -178,68 +227,34 @@ public class PreferencesAccountFragment extends Fragment {
 		}
 
 		@Override public View getView(final int position, View convertView, ViewGroup parent) {
+
+			// We reset the Tag before recycling the view, with super, then reassign it
+			// because we don't want to trigger the EditText TextChangedListeners
+			// when the system recycles the views.
+
+			if (convertView != null)
+				convertView.setTag(LIST_CELL_TAG_POSITION, -1);
+
 			final View v = super.getView(position, convertView, parent);
 
+			v.setTag(LIST_CELL_TAG_POSITION, position);
+
+			// Retrieve entries (a Holder might be overkill for 7 subviews...)
+
+			final EditText titleEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext));
 			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
 			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
 			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
 
-			// TextChangedListeners
-
 			// Since we can't easily remove lambda functions with TextView's TextChangeListeners,
 			// We have to store a tag to know if the EditText already have a listener
-			// (otherwise it will be called multiple times on every view recycle)
-			// And store the cell position in his tag, to get a safe non-final value in the TextWatcher.
+			// (otherwise it will be called one more times every time the view is recycled)
 
-			v.setTag(LIST_CELL_TAG_POSITION, position);
-
-			if (convertView != null) {
-
-				urlEditText.addTextChangedListener(
-						new TextWatcher() {
-							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-							}
-
-							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-							}
-
-							@Override public void afterTextChanged(Editable s) {
-								Log.d("Adrien", "url on " + v.getTag(LIST_CELL_TAG_POSITION) + " : " + urlEditText.getText().toString());
-								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_URL, urlEditText.getText().toString());
-							}
-						}
-				);
-
-				loginEditText.addTextChangedListener(
-						new TextWatcher() {
-							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-							}
-
-							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_LOGIN, s.toString());
-							}
-
-							@Override public void afterTextChanged(Editable s) {
-							}
-						}
-				);
-
-				passwordEditText.addTextChangedListener(
-						new TextWatcher() {
-							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-							}
-
-							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_PASSWORD, s.toString());
-							}
-
-							@Override public void afterTextChanged(Editable s) {
-							}
-						}
-				);
+			if (convertView == null) {
+				setEditTextListenerToDataMap(v, titleEditText, LIST_FIELD_TITLE);
+				setEditTextListenerToDataMap(v, urlEditText, LIST_FIELD_URL);
+				setEditTextListenerToDataMap(v, loginEditText, LIST_FIELD_LOGIN);
+				setEditTextListenerToDataMap(v, passwordEditText, LIST_FIELD_PASSWORD);
 			}
 
 			// Cell buttons listener
@@ -247,7 +262,7 @@ public class PreferencesAccountFragment extends Fragment {
 			v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
-							onSaveButtonClicked(position);
+							onSaveButtonClicked(urlEditText, position);
 						}
 					}
 			);
@@ -263,15 +278,10 @@ public class PreferencesAccountFragment extends Fragment {
 			v.findViewById(R.id.preferences_accounts_fragment_cell_test_button).setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
-
-							String entryUrl = urlEditText.getText().toString();
 							String login = loginEditText.getText().toString();
 							String password = passwordEditText.getText().toString();
 
-							String fixedUrl = StringUtils.fixUrl(entryUrl);
-							urlEditText.setText(fixedUrl);
-
-							onTestButtonClicked(fixedUrl, login, password);
+							onTestButtonClicked(urlEditText, login, password);
 						}
 					}
 			);
@@ -280,6 +290,27 @@ public class PreferencesAccountFragment extends Fragment {
 
 			return v;
 		}
+
+		private void setEditTextListenerToDataMap(@NonNull final View parentView, @NonNull final EditText editText, @NonNull final String dataMapField) {
+
+			editText.addTextChangedListener(
+
+					new TextWatcher() {
+
+						@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+						@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+						@Override public void afterTextChanged(Editable s) {
+
+							int currentPosition = (Integer) parentView.getTag(LIST_CELL_TAG_POSITION);
+							if (currentPosition != -1)
+								mAccountData.get(currentPosition).put(dataMapField, editText.getText().toString());
+						}
+					}
+			);
+		}
+
 	}
 
 	private class TestTask extends AsyncTask<String, Void, Void> {
