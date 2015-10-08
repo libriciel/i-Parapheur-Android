@@ -1,136 +1,148 @@
 package org.adullact.iparapheur.model;
 
 import android.text.TextUtils;
-import android.webkit.URLUtil;
 
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 
 import java.io.Serializable;
-
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Account implements Serializable {
 
-	@SuppressWarnings("unused") public static final long _serialVersionUID = 1L;
+	public static final long _serialVersionUID = 1L;
 
-	private final String mId;
-	private String mTitle;
-	private String mUrl;
-	private String mLogin;
-	private String mTenant;
-	private String mPassword;
-	private String mTicket;
-	private Integer mApiVersion;
-	private Long mLastRequest;
+	private final String id;
+	private String title;
+	private String url;
+	private String login;
+	private String tenant;
+	private String password;
+	private String ticket;
+	private Integer apiVersion;
+	private Long lastRequest;
 
 	public Account(String id) {
-		mId = id;
-		mTitle = "";
-		mUrl = "";
-		mLogin = "";
-		mPassword = "";
-		mTenant = null;
-		mLastRequest = 0L;
+		this.id = id;
+		this.title = "";
+		this.url = "";
+		this.login = "";
+		this.password = "";
+		this.tenant = null;
+		this.lastRequest = 0L;
+	}
+
+	public static boolean validateAccount(String title, String url, String login, String password) {
+		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
+	}
+
+	private static boolean isURLValid(String url) {
+		if (url == null || url.isEmpty()) {
+			return false;
+		}
+		try {
+			new URL(IParapheurAPI.BASE_PATH + url);
+			return true;
+		}
+		catch (MalformedURLException ignored) {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Account) {
+			Account toCompare = (Account) o;
+			return this.id.equals(toCompare.id);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return title;
+	}
+
+	public boolean isValid() {
+		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
 	}
 
 	// <editor-fold desc="Getters / Setters">
 
 	public String getId() {
-		return mId;
+		return id;
 	}
 
 	public String getTitle() {
-		return mTitle;
+		return title;
 	}
 
 	public void setTitle(String title) {
-		mTitle = title;
+		this.title = title;
 	}
 
 	public String getUrl() {
-		return mUrl;
+		return url;
 	}
 
 	public void setUrl(String url) {
-		mUrl = url;
+		this.url = url;
 	}
 
 	public String getLogin() {
-		return mLogin;
+		return login;
 	}
 
 	public void setLogin(String login) {
-
-		mLogin = login;
-
+		this.login = login;
 		if (login != null) {
 			int separatorIndex = login.indexOf("@");
-
-			if (separatorIndex != -1)
-				mTenant = login.substring(separatorIndex + 1);
+			if (separatorIndex != -1) {
+				this.tenant = login.substring(separatorIndex + 1);
+			}
 		}
 	}
 
 	public String getTenant() {
-		return mTenant;
+		return tenant;
 	}
 
 	public String getPassword() {
-		return mPassword;
+		return password;
 	}
 
 	public void setPassword(String password) {
-		mPassword = password;
+		this.password = password;
 	}
 
 	public String getTicket() {
-		return mTicket;
+		return ticket;
 	}
 
 	public void setTicket(String ticket) {
-		mTicket = ticket;
+		this.ticket = ticket;
 	}
 
 	public Integer getApiVersion() {
-		return mApiVersion;
+		return apiVersion;
 	}
 
 	public void setApiVersion(Integer apiVersion) {
-		mApiVersion = apiVersion;
+		this.apiVersion = apiVersion;
 	}
 
 	public Long getLastRequest() {
-		return mLastRequest;
+		return lastRequest;
 	}
 
 	public void setLastRequest(Long lastRequest) {
-		mLastRequest = lastRequest;
+		this.lastRequest = lastRequest;
 	}
 
 	// </editor-fold desc="Getters / Setters">
-
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return StringUtils.areNotEmpty(title, url, login, password) && URLUtil.isValidUrl(url);
-	}
-
-	public boolean isValid() {
-		return validateAccount(mTitle, mUrl, mLogin, mPassword);
-	}
-
-	@Override public boolean equals(Object o) {
-
-		if (o instanceof Account) {
-			Account toCompare = (Account) o;
-			return TextUtils.equals(mId, toCompare.getId());
-		}
-
-		return false;
-	}
-
-	@Override public int hashCode() {
-		return mId.hashCode();
-	}
-
-	@Override public String toString() {
-		return "{Account title:" + mTitle + " id:" + mId + "}";
-	}
 }
