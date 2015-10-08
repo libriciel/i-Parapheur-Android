@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +45,7 @@ public class PreferencesAccountFragment extends Fragment {
 	private static final String LIST_FIELD_URL = "list_field_url";
 	private static final String LIST_FIELD_LOGIN = "list_field_login";
 	private static final String LIST_FIELD_PASSWORD = "list_field_password";
+	private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
 
 	private ListView mAccountList;
 	private ArrayList<Map<String, String>> mAccountData;
@@ -122,6 +125,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 	private void onTestButtonClicked(@Nullable String url, @Nullable String login, @Nullable String password) {
 
+		Log.e("Adrien", "" + mAccountData);
 		new TestTask().execute(url, login, password);
 	}
 
@@ -176,6 +180,68 @@ public class PreferencesAccountFragment extends Fragment {
 		@Override public View getView(final int position, View convertView, ViewGroup parent) {
 			final View v = super.getView(position, convertView, parent);
 
+			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
+			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
+			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
+
+			// TextChangedListeners
+
+			// Since we can't easily remove lambda functions with TextView's TextChangeListeners,
+			// We have to store a tag to know if the EditText already have a listener
+			// (otherwise it will be called multiple times on every view recycle)
+			// And store the cell position in his tag, to get a safe non-final value in the TextWatcher.
+
+			v.setTag(LIST_CELL_TAG_POSITION, position);
+
+			if (convertView != null) {
+
+				urlEditText.addTextChangedListener(
+						new TextWatcher() {
+							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+							}
+
+							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+							}
+
+							@Override public void afterTextChanged(Editable s) {
+								Log.d("Adrien", "url on " + v.getTag(LIST_CELL_TAG_POSITION) + " : " + urlEditText.getText().toString());
+								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_URL, urlEditText.getText().toString());
+							}
+						}
+				);
+
+				loginEditText.addTextChangedListener(
+						new TextWatcher() {
+							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+							}
+
+							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_LOGIN, s.toString());
+							}
+
+							@Override public void afterTextChanged(Editable s) {
+							}
+						}
+				);
+
+				passwordEditText.addTextChangedListener(
+						new TextWatcher() {
+							@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+							}
+
+							@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+								mAccountData.get((Integer) v.getTag(LIST_CELL_TAG_POSITION)).put(LIST_FIELD_PASSWORD, s.toString());
+							}
+
+							@Override public void afterTextChanged(Editable s) {
+							}
+						}
+				);
+			}
+
 			// Cell buttons listener
 
 			v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
@@ -198,17 +264,12 @@ public class PreferencesAccountFragment extends Fragment {
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
 
-							String login = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext)).getText().toString();
-							String password = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext)).getText().toString();
-
-							// Apply regex on entered URL
-
-							EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
 							String entryUrl = urlEditText.getText().toString();
+							String login = loginEditText.getText().toString();
+							String password = passwordEditText.getText().toString();
+
 							String fixedUrl = StringUtils.fixUrl(entryUrl);
 							urlEditText.setText(fixedUrl);
-
-							//
 
 							onTestButtonClicked(fixedUrl, login, password);
 						}
