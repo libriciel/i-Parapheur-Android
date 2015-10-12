@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class Account implements Serializable {
 
 	public static final long _serialVersionUID = 1L;
@@ -49,8 +50,7 @@ public class Account implements Serializable {
 		}
 	}
 
-	@Override
-	public boolean equals(Object o) {
+	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;
 			return this.id.equals(toCompare.id);
@@ -58,13 +58,11 @@ public class Account implements Serializable {
 		return false;
 	}
 
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		return id.hashCode();
 	}
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return title;
 	}
 

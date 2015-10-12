@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -148,10 +147,10 @@ public class PreferencesAccountFragment extends Fragment {
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
 		Account currentAccount;
 
-		if (TextUtils.isEmpty(currentId))
+		currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
+
+		if (currentAccount == null)
 			currentAccount = MyAccounts.INSTANCE.addAccount();
-		else
-			currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
 
 		// Delete
 

@@ -14,6 +14,9 @@ import org.adullact.iparapheur.R;
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener {
 
+	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
+	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
+
 	// <editor-fold desc="LifeCycle">
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,17 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 		if (getSupportActionBar() != null)
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	@Override protected void onStart() {
+		super.onStart();
+
+		if (getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT) != null) {
+
+			String fragmentName = getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT);
+
+			getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
+		}
 	}
 
 	// </editor-fold desc="LifeCycle">
