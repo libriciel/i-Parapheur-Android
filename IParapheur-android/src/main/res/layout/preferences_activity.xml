@@ -26,13 +26,10 @@
             android:theme="@style/AppTheme.Settings.Toolbar"
             tools:ignore="UnusedAttribute"/>
 
-        <fragment
-            android:id="@+id/preferences_activity_content"
-            android:name="org.adullact.iparapheur.controller.preferences.PreferencesMenuFragment"
+        <FrameLayout
+            android:id="@+id/preferences_activity_main_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:tag="preferences_menu_fragment"
-            tools:layout="@layout/preferences_menu_fragment"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 </LinearLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,15 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 
 	// <editor-fold desc="LifeCycle">
 
+	@Override public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		Log.d("Adrien", "PreferencesMenuFragment onCreate");
+	}
+
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		Log.d("Adrien", "PreferencesMenuFragment onCreateView");
 
 		View v = inflater.inflate(R.layout.preferences_menu_fragment, container, false);
 
@@ -54,14 +63,21 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 
 	@Override public void onAttach(Context context) {
 		super.onAttach(context);
-		try {
-			mListener = (PreferenceMenuFragmentListener) context;
-		}
+
+		Log.d("Adrien", "PreferencesMenuFragment onAttach");
+
+		try { mListener = (PreferenceMenuFragmentListener) context; }
 		catch (ClassCastException e) {
 			throw new ClassCastException(
 					context.toString() + " must implement OnFragmentInteractionListener"
 			);
 		}
+	}
+
+	@Override public void onStart() {
+		super.onStart();
+
+		Log.d("Adrien", "PreferencesMenuFragment onStart");
 	}
 
 	@Override public void onDetach() {
