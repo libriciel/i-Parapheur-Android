@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -531,9 +530,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public void onCreateAccountInvoked() {
-
 		Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
-		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, PreferencesAccountFragment.class.getName());
+		preferencesIntent.putExtra(PreferencesActivity.ARGUMENT_GO_TO_FRAGMENT, PreferencesAccountFragment.class.getSimpleName());
 		startActivityForResult(preferencesIntent, PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
 	}
 
@@ -665,9 +663,11 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		@Override public void onDrawerClosed(View view) {
 
-			if (getSupportActionBar() != null)
-				if (MyAccounts.INSTANCE.getSelectedAccount() != null)
-					getSupportActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			if (getSupportActionBar() != null) {
+				Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				if (selectedAccount != null)
+					getSupportActionBar().setTitle(selectedAccount.getTitle());
+			}
 
 			// calls onPrepareOptionMenu to show context specific actions
 			invalidateOptionsMenu();
