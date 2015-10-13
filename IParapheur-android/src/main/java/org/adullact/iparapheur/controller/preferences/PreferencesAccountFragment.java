@@ -71,16 +71,11 @@ public class PreferencesAccountFragment extends Fragment {
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.d("Adrien", "PreferencesAccountFragment onCreate");
-
 		mAccountData = new ArrayList<>();
 		buildAccountDataMap();
 	}
 
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		Log.d("Adrien", "PreferencesAccountFragment onCreateView");
-
 		View v = inflater.inflate(R.layout.preferences_accounts_fragment, container, false);
 
 		mAccountList = (ListView) v.findViewById(R.id.preferences_accounts_fragment_main_list);
@@ -114,11 +109,6 @@ public class PreferencesAccountFragment extends Fragment {
 		//
 
 		return v;
-	}
-
-	@Override public void onStart() {
-		super.onStart();
-		Log.d("Adrien", "PreferencesAccountFragment onStart");
 	}
 
 	// </editor-fold desc="LifeCycle">

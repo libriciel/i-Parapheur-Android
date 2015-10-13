@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -55,11 +56,18 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 		// Quick access
 
-		// TODO
-//		if (getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT) != null) {
-//			String fragmentName = getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT);
-//			getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
-//		}
+		if (getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT) != null) {
+			String fragmentName = getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT);
+
+			if (TextUtils.equals(fragmentName, PreferencesAccountFragment.class.getSimpleName()))
+				replaceMainFragment(PreferencesAccountFragment.newInstance(), PreferencesAccountFragment.FRAGMENT_TAG, true);
+			else if (TextUtils.equals(fragmentName, PreferencesAboutFragment.class.getSimpleName()))
+				replaceMainFragment(PreferencesAboutFragment.newInstance(), PreferencesAboutFragment.FRAGMENT_TAG, true);
+			else if (TextUtils.equals(fragmentName, PreferencesLicencesFragment.class.getSimpleName()))
+				replaceMainFragment(PreferencesLicencesFragment.newInstance(), PreferencesLicencesFragment.FRAGMENT_TAG, true);
+
+			getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
+		}
 	}
 
 	// </editor-fold desc="LifeCycle">
