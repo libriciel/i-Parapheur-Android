@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,7 +95,7 @@ public class StringUtils {
 		}
 	}
 
-	public static boolean areNotEmpty(@Nullable String... strings) {
+	@SuppressWarnings("unused") public static boolean areNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return false;
@@ -106,7 +107,7 @@ public class StringUtils {
 		return true;
 	}
 
-	public static String firstNotEmpty(@Nullable String... strings) {
+	@SuppressWarnings("unused") public static String firstNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return null;
@@ -227,5 +228,10 @@ public class StringUtils {
 			result = matcher.group(1);
 
 		return result;
+	}
+
+	public static @NonNull String getLocalizedSmallDate(Date date) {
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+		return dateFormat.format(date);
 	}
 }

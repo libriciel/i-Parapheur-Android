@@ -1,6 +1,7 @@
 package org.adullact.iparapheur.controller.preferences;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,8 +16,17 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.utils.FileUtils;
+import org.adullact.iparapheur.utils.PKCS7Signer;
+import org.adullact.iparapheur.utils.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,13 +121,28 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 		mCertificatesData.clear();
 
-//		List<File> certificatesList = //TODO : list files;
-//		for (File certificate : certificatesList) {
-		Map<String, String> certificateData = new HashMap<>();
-		certificateData.put(LIST_FIELD_TITLE, "Test.bks");
-		certificateData.put(LIST_FIELD_EXPIRATION_DATE, "exp. 12/05/60");
-		mCertificatesData.add(certificateData);
-//		}
+		List<File> certificatesList = FileUtils.getBksFromCertificateFolder(getActivity());
+		for (File certificate : certificatesList) {
+
+			// Retrieving Certificate expiration date.
+
+			SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+			String certificatePassword = settings.getString(certificate.getName(), "");
+			PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
+			try { signer.loadKeyStore(); }
+			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) { e.printStackTrace(); }
+
+			Date certificateExpirationDate = signer.getCertificateExpirationDate();
+			String expirationDateString = getString(R.string.pref_certificates_expiration_date);
+			expirationDateString = expirationDateString.replaceAll("-date-", StringUtils.getLocalizedSmallDate(certificateExpirationDate));
+
+			// Mapping results
+
+			Map<String, String> certificateData = new HashMap<>();
+			certificateData.put(LIST_FIELD_TITLE, certificate.getName());
+			certificateData.put(LIST_FIELD_EXPIRATION_DATE, expirationDateString);
+			mCertificatesData.add(certificateData);
+		}
 	}
 
 	private class CertificateSimpleAdapter extends SimpleAdapter {
