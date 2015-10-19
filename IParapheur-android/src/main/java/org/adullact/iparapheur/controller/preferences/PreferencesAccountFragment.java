@@ -54,7 +54,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 	private PreferencesAccountFragmentListener mListener;
 	private ListView mAccountList;
-	private ArrayList<Map<String, String>> mAccountData;
+	private List<Map<String, String>> mAccountData;
 
 	/**
 	 * Use this factory method to create a new instance of
