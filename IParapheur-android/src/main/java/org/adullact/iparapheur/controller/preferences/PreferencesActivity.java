@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.preferences;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,6 +15,8 @@ import android.view.View;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Account;
+
+import java.util.ArrayList;
 
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener, PreferencesAccountFragment.PreferencesAccountFragmentListener {
@@ -31,30 +34,35 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 		setContentView(R.layout.preferences_activity);
 
+		// ActionBar
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.preferences_activity_toolbar);
 		setSupportActionBar(toolbar);
 
 		if (getSupportActionBar() != null)
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		// Existing Fragment restoration handling, the Google way
+		// http://developer.android.com/guide/topics/resources/runtime-changes.html
+
+		Fragment retainedFragment = getRetainedFragmentInstance();
+		if (retainedFragment != null) {
+
+			// Clear BackStack before restoring existing fragment (everything over the Menu),
+			// because a wrong BackStack can stay after rotation.
+			getSupportFragmentManager().popBackStackImmediate(retainedFragment.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+			// Rebuild stack
+			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
+			replaceMainFragment(retainedFragment, retainedFragment.getTag(), true);
+		}
+		else {
+			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
+		}
 	}
 
 	@Override protected void onStart() {
 		super.onStart();
-
-		// Clear backStack (wrong backStack can stay after rotation)
-
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-		// Rebuild stack
-
-		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(PreferencesAccountFragment.FRAGMENT_TAG);
-		replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
-
-		if (fragmentToDisplay != null) {
-			fragmentToDisplay = new PreferencesMenuFragment();
-			replaceMainFragment(fragmentToDisplay, PreferencesMenuFragment.FRAGMENT_TAG, true);
-		}
 
 		// Quick access
 
@@ -83,8 +91,22 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	// </editor-fold desc="ActionBar">
 
+	private @Nullable Fragment getRetainedFragmentInstance() {
+
+		ArrayList<String> fragmentTagList = new ArrayList<>();
+		fragmentTagList.add(PreferencesAccountFragment.FRAGMENT_TAG);
+		fragmentTagList.add(PreferencesAboutFragment.FRAGMENT_TAG);
+		fragmentTagList.add(PreferencesLicencesFragment.FRAGMENT_TAG);
+
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		for (String fragmentTag : fragmentTagList)
+			if ((fragmentManager.findFragmentByTag(fragmentTag)) != null)
+				return fragmentManager.findFragmentByTag(fragmentTag);
+
+		return null;
+	}
+
 	private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag, boolean addToBackStack) {
-		fragment.setRetainInstance(true);
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.replace(R.id.preferences_activity_main_layout, fragment, tag);

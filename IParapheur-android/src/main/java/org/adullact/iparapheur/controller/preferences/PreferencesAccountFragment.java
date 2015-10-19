@@ -84,6 +84,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 
 		mAccountData = new ArrayList<>();
 		buildAccountDataMap();
@@ -105,7 +106,7 @@ public class PreferencesAccountFragment extends Fragment {
 				}
 		);
 
-		// Building List adapter
+		// Building ListAdapter
 
 		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_URL, LIST_FIELD_LOGIN, LIST_FIELD_PASSWORD};
 		int[] orderedFieldIds = new int[]{
@@ -212,7 +213,15 @@ public class PreferencesAccountFragment extends Fragment {
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 	}
 
-	private void buildAccountDataMap() {
+	private void cleanupUrlEditText(@NonNull EditText urlEditText) {
+
+		String entryUrl = urlEditText.getText().toString();
+		String fixedUrl = StringUtils.fixUrl(entryUrl);
+
+		urlEditText.setText(fixedUrl);
+	}
+
+	public void buildAccountDataMap() {
 
 		mAccountData.clear();
 
@@ -227,14 +236,6 @@ public class PreferencesAccountFragment extends Fragment {
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
 			mAccountData.add(accountData);
 		}
-	}
-
-	private void cleanupUrlEditText(@NonNull EditText urlEditText) {
-
-		String entryUrl = urlEditText.getText().toString();
-		String fixedUrl = StringUtils.fixUrl(entryUrl);
-
-		urlEditText.setText(fixedUrl);
 	}
 
 	// <editor-fold desc="PreferencesAccountFragmentListener">

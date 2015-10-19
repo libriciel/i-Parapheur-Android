@@ -36,6 +36,11 @@ public class PreferencesLicencesFragment extends Fragment {
 
 	// <editor-fold desc="LifeCycle">
 
+	@Override public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
+	}
+
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.preferences_licences_fragment, container, false);
 	}
