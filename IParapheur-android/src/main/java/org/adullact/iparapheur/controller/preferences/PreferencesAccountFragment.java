@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -122,6 +123,16 @@ public class PreferencesAccountFragment extends Fragment {
 		//
 
 		return v;
+	}
+
+	@Override public void onResume() {
+		super.onResume();
+
+		if (getActivity() instanceof AppCompatActivity) {
+			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+			if (parentActivity.getSupportActionBar() != null)
+				parentActivity.getSupportActionBar().setTitle(R.string.pref_header_accounts);
+		}
 	}
 
 	@Override public void onDetach() {

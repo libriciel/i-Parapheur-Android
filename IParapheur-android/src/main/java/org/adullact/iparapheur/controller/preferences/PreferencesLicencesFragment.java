@@ -3,6 +3,7 @@ package org.adullact.iparapheur.controller.preferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,16 @@ public class PreferencesLicencesFragment extends Fragment {
 
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.preferences_licences_fragment, container, false);
+	}
+
+	@Override public void onResume() {
+		super.onResume();
+
+		if (getActivity() instanceof AppCompatActivity) {
+			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+			if (parentActivity.getSupportActionBar() != null)
+				parentActivity.getSupportActionBar().setTitle(R.string.pref_header_licenses);
+		}
 	}
 
 	// </editor-fold desc="LifeCycle">

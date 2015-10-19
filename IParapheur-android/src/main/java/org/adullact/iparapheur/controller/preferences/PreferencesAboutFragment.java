@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,4 +60,13 @@ public class PreferencesAboutFragment extends Fragment {
 		return v;
 	}
 
+	@Override public void onResume() {
+		super.onResume();
+
+		if (getActivity() instanceof AppCompatActivity) {
+			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+			if (parentActivity.getSupportActionBar() != null)
+				parentActivity.getSupportActionBar().setTitle(R.string.preferences_header_about);
+		}
+	}
 }
