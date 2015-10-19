@@ -18,6 +18,7 @@ import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.util.ArrayList;
 
+
 public abstract class ActionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
 	protected LoadingTask.DataChangeListener listener;
@@ -25,6 +26,8 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 	protected String bureauId;
 
 	public ActionDialogFragment() {}
+
+	// <editor-fold desc="LifeCycle">
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getArguments() != null) {
@@ -45,6 +48,28 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		return builder.create();
 	}
 
+	@Override public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		// Activities containing this fragment must implement its callbacks.
+		if (!(activity instanceof LoadingTask.DataChangeListener))
+			throw new IllegalStateException("Activity must implement DataChangeListener.");
+
+		listener = (LoadingTask.DataChangeListener) activity;
+	}
+
+	@Override public void onDetach() {
+		super.onDetach();
+
+		// Reset the active callbacks interface.
+		listener = null;
+	}
+
+	// </editor-fold desc="LifeCycle">
+
+	@Override public void onClick(DialogInterface dialog, int which) {
+		executeTask();
+	}
+
 	protected View createView() {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		// Pass null as the parent view because its going in the dialog layout
@@ -54,19 +79,6 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		dossiersView.setAdapter(new ArrayAdapter<Dossier>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
 		dossiersView.setItemsCanFocus(false);
 		return layout;
-	}
-
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof LoadingTask.DataChangeListener)) {
-			throw new IllegalStateException("Activity must implement DataChangeListener.");
-		}
-		listener = (LoadingTask.DataChangeListener) activity;
-	}
-
-	@Override public void onClick(DialogInterface dialog, int which) {
-		executeTask();
 	}
 
 	/**

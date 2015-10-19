@@ -198,12 +198,14 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
-			// Don't check if result is ok as the user can press back after modifying an Account
-			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
-			if (accountListFragment != null)
-				accountListFragment.accountsChanged();
+			if (resultCode == Activity.RESULT_OK) {
+				// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
+				AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+
+				if (accountListFragment != null)
+					accountListFragment.accountsChanged();
+			}
 		}
 	}
 

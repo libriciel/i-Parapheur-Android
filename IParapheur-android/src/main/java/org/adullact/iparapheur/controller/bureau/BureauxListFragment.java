@@ -40,14 +40,16 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 	private SwipeRefreshLayout swipeRefreshLayout;                // Swipe refresh layout on top of the list view
 	private View mSpinnerProgressView;
 
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	// <editor-fold desc="LifeCycle">
+
+	@Override public void onAttach(Context context) {
+		super.onAttach(context);
 
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof BureauListFragmentListener))
+		if (!(context instanceof BureauListFragmentListener))
 			throw new IllegalStateException("Activity must implement BureauSelectedListener.");
 
-		listener = (BureauListFragmentListener) activity;
+		listener = (BureauListFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +82,15 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		mSpinnerProgressView.setVisibility(View.VISIBLE);
 		updateBureaux(true);
 	}
+
+	@Override public void onDetach() {
+		super.onDetach();
+
+		// Reset the active callbacks interface.
+		listener = null;
+	}
+
+	// </editor-fold desc="LifeCycle">
 
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload)

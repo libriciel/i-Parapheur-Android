@@ -51,6 +51,7 @@ public class PreferencesAccountFragment extends Fragment {
 	private static final String LIST_FIELD_PASSWORD = "list_field_password";
 	private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
 
+	private PreferencesAccountFragmentListener mListener;
 	private ListView mAccountList;
 	private ArrayList<Map<String, String>> mAccountData;
 
@@ -69,6 +70,16 @@ public class PreferencesAccountFragment extends Fragment {
 	}
 
 	// <editor-fold desc="LifeCycle">
+
+	@Override public void onAttach(Context context) {
+		super.onAttach(context);
+
+		// Activities containing this fragment must implement its callbacks.
+		if (!(context instanceof PreferencesAccountFragmentListener))
+			throw new IllegalStateException("Activity must implement PreferencesAccountFragmentListener.");
+
+		mListener = (PreferencesAccountFragmentListener) context;
+	}
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -113,6 +124,13 @@ public class PreferencesAccountFragment extends Fragment {
 		return v;
 	}
 
+	@Override public void onDetach() {
+		super.onDetach();
+
+		// Reset the active callbacks interface.
+		mListener = null;
+	}
+
 	// </editor-fold desc="LifeCycle">
 
 	private void onSaveButtonClicked(@NonNull EditText urlEditText, int position) {
@@ -140,6 +158,7 @@ public class PreferencesAccountFragment extends Fragment {
 		MyAccounts.INSTANCE.save(currentAccount);
 
 		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
+		mListener.onAccountModified(currentAccount);
 	}
 
 	private void onDeleteButtonClicked(int position) {
@@ -206,6 +225,15 @@ public class PreferencesAccountFragment extends Fragment {
 
 		urlEditText.setText(fixedUrl);
 	}
+
+	// <editor-fold desc="PreferencesAccountFragmentListener">
+
+	public interface PreferencesAccountFragmentListener {
+
+		void onAccountModified(@NonNull Account account);
+	}
+
+	// </editor-fold desc="PreferencesAccountFragmentListener">
 
 	private class AccountSimpleAdapter extends SimpleAdapter {
 

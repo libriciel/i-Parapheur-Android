@@ -126,7 +126,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override public void onDetach() {
 		super.onDetach();
-		// Reset the active callbacks interface .
+
+		// Reset the active callbacks interface.
 		mListener = null;
 	}
 

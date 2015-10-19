@@ -1,5 +1,6 @@
 package org.adullact.iparapheur.controller.preferences;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,9 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.model.Account;
 
 
-public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener {
+public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener, PreferencesAccountFragment.PreferencesAccountFragmentListener {
 
 	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
 	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
@@ -101,4 +103,11 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	// </editor-fold desc="PreferenceMenuFragmentListener">
 
+	// <editor-fold desc="PreferencesAccountFragmentListener">
+
+	@Override public void onAccountModified(@NonNull Account account) {
+		setResult(Activity.RESULT_OK);
+	}
+
+	// </editor-fold desc="PreferencesAccountFragmentListener">
 }
