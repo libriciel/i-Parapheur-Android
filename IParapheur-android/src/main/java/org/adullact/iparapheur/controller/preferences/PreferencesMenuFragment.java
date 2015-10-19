@@ -98,8 +98,8 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 				clickedFragmentTag = PreferencesAccountFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_certificates:
-				clickedFragment = PreferencesLicencesFragment.newInstance();
-				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
+				clickedFragment = PreferencesCertificatesFragment.newInstance();
+				clickedFragmentTag = PreferencesCertificatesFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_about:
 				clickedFragment = PreferencesAboutFragment.newInstance();

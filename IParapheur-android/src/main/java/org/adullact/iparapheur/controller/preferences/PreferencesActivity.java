@@ -16,13 +16,18 @@ import android.view.View;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Account;
 
-import java.util.ArrayList;
-
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener, PreferencesAccountFragment.PreferencesAccountFragmentListener {
 
 	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
 	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
+
+	public final String[] availableSubFragmentsTagList = {
+			PreferencesAccountFragment.FRAGMENT_TAG,
+			PreferencesCertificatesFragment.FRAGMENT_TAG,
+			PreferencesAboutFragment.FRAGMENT_TAG,
+			PreferencesLicencesFragment.FRAGMENT_TAG
+	};
 
 	// <editor-fold desc="LifeCycle">
 
@@ -71,10 +76,6 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 			if (TextUtils.equals(fragmentName, PreferencesAccountFragment.class.getSimpleName()))
 				replaceMainFragment(PreferencesAccountFragment.newInstance(), PreferencesAccountFragment.FRAGMENT_TAG, true);
-			else if (TextUtils.equals(fragmentName, PreferencesAboutFragment.class.getSimpleName()))
-				replaceMainFragment(PreferencesAboutFragment.newInstance(), PreferencesAboutFragment.FRAGMENT_TAG, true);
-			else if (TextUtils.equals(fragmentName, PreferencesLicencesFragment.class.getSimpleName()))
-				replaceMainFragment(PreferencesLicencesFragment.newInstance(), PreferencesLicencesFragment.FRAGMENT_TAG, true);
 
 			getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
 		}
@@ -93,13 +94,8 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	private @Nullable Fragment getRetainedFragmentInstance() {
 
-		ArrayList<String> fragmentTagList = new ArrayList<>();
-		fragmentTagList.add(PreferencesAccountFragment.FRAGMENT_TAG);
-		fragmentTagList.add(PreferencesAboutFragment.FRAGMENT_TAG);
-		fragmentTagList.add(PreferencesLicencesFragment.FRAGMENT_TAG);
-
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		for (String fragmentTag : fragmentTagList)
+		for (String fragmentTag : availableSubFragmentsTagList)
 			if ((fragmentManager.findFragmentByTag(fragmentTag)) != null)
 				return fragmentManager.findFragmentByTag(fragmentTag);
 
