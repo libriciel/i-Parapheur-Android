@@ -506,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			BureauxListFragment bureauxFragment = new BureauxListFragment();
-			replaceDrawerFragment(new BureauxListFragment(), BureauxListFragment.FRAGMENT_TAG, true);
+			replaceDrawerFragment(bureauxFragment, BureauxListFragment.FRAGMENT_TAG, true);
 		}
 		else {
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);

@@ -33,14 +33,11 @@ public class Account implements Serializable {
 		this.lastRequest = 0L;
 	}
 
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
-	}
-
 	private static boolean isURLValid(String url) {
-		if (url == null || url.isEmpty()) {
+
+		if (TextUtils.isEmpty(url))
 			return false;
-		}
+
 		try {
 			new URL(IParapheurAPI.BASE_PATH + url);
 			return true;
@@ -53,7 +50,7 @@ public class Account implements Serializable {
 	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;
-			return this.id.equals(toCompare.id);
+			return TextUtils.equals(id, toCompare.id);
 		}
 		return false;
 	}
@@ -68,6 +65,10 @@ public class Account implements Serializable {
 
 	public boolean isValid() {
 		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
+	}
+
+	public static boolean validateAccount(String title, String url, String login, String password) {
+		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
 	}
 
 	// <editor-fold desc="Getters / Setters">
