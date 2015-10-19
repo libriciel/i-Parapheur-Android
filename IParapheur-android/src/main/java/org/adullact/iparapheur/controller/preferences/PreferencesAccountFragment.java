@@ -7,11 +7,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -245,6 +247,10 @@ public class PreferencesAccountFragment extends Fragment {
 			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
 			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
 
+			final Button saveButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
+			final Button deleteButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
+			final Button testButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
+
 			// Since we can't easily remove lambda functions with TextView's TextChangeListeners,
 			// We have to store a tag to know if the EditText already have a listener
 			// (otherwise it will be called one more times every time the view is recycled)
@@ -258,7 +264,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 			// Cell buttons listener
 
-			v.findViewById(R.id.preferences_accounts_fragment_cell_save_button).setOnClickListener(
+			saveButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
 							onSaveButtonClicked(urlEditText, position);
@@ -266,7 +272,7 @@ public class PreferencesAccountFragment extends Fragment {
 					}
 			);
 
-			v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button).setOnClickListener(
+			deleteButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
 							onDeleteButtonClicked(position);
@@ -274,7 +280,7 @@ public class PreferencesAccountFragment extends Fragment {
 					}
 			);
 
-			v.findViewById(R.id.preferences_accounts_fragment_cell_test_button).setOnClickListener(
+			testButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
 							String login = loginEditText.getText().toString();
@@ -285,9 +291,26 @@ public class PreferencesAccountFragment extends Fragment {
 					}
 			);
 
+			// Lock what should be locked
+
+			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_TITLE), getString(R.string.demo_account_title));
+
+			lockEditText(titleEditText, !isDemoAccount);
+			lockEditText(urlEditText, !isDemoAccount);
+			lockEditText(loginEditText, !isDemoAccount);
+			lockEditText(passwordEditText, !isDemoAccount);
+
+			deleteButton.setVisibility(isDemoAccount ? View.INVISIBLE : View.VISIBLE);
+			saveButton.setVisibility(isDemoAccount ? View.INVISIBLE : View.VISIBLE);
+
 			//
 
 			return v;
+		}
+
+		private void lockEditText(EditText editText, boolean lock) {
+			editText.setFocusable(lock);
+			editText.setFocusableInTouchMode(lock);
 		}
 
 		private void setEditTextListenerToDataMap(@NonNull final View parentView, @NonNull final EditText editText, @NonNull final String dataMapField) {

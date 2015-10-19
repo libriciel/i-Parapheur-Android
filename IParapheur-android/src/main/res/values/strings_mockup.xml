@@ -6,4 +6,9 @@
     <string name="mockup_bureau_content">526</string>
     <string name="mockup_bureau_late">6</string>
 
+    <string name="demo_account_title">iParapheur demo</string>
+    <string name="demo_account_url">parapheur.demonstrations.adullact.org</string>
+    <string name="demo_account_login">bma</string>
+    <string name="demo_account_password">secret</string>
+
 </resources>
