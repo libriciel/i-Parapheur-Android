@@ -50,9 +50,9 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 	@Override public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof FilterDialogListener)) {
+		if (!(activity instanceof FilterDialogListener))
 			throw new IllegalStateException("Activity must implement FilterDialogListener.");
-		}
+
 		listener = (FilterDialogListener) activity;
 	}
 

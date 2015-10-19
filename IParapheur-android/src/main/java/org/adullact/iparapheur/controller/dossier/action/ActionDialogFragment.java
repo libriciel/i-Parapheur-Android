@@ -76,7 +76,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		View layout = inflater.inflate(getViewId(), null);
 
 		ListView dossiersView = (ListView) layout.findViewById(R.id.action_dialog_dossiers);
-		dossiersView.setAdapter(new ArrayAdapter<Dossier>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
+		dossiersView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
 		dossiersView.setItemsCanFocus(false);
 		return layout;
 	}
