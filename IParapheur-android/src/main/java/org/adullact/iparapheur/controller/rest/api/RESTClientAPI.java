@@ -91,9 +91,9 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		String ticket = getTicket(account);
 		String tenant = account.getTenant();
 
-		if (ticket == null) {
+		if (ticket == null)
 			throw new IParapheurException(R.string.error_no_ticket, null);
-		}
+
 		account.setLastRequest(new Date().getTime());
 
 		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
