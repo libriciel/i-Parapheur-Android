@@ -16,18 +16,24 @@ import android.view.View;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Account;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener, PreferencesAccountFragment.PreferencesAccountFragmentListener {
 
 	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
 	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
 
-	public final String[] availableSubFragmentsTagList = {
-			PreferencesAccountFragment.FRAGMENT_TAG,
-			PreferencesCertificatesFragment.FRAGMENT_TAG,
-			PreferencesAboutFragment.FRAGMENT_TAG,
-			PreferencesLicencesFragment.FRAGMENT_TAG
-	};
+	private static Map<Class<? extends Fragment>, String> fragmentsTagsMap;
+
+	static {
+		fragmentsTagsMap = new HashMap<>();
+		fragmentsTagsMap.put(PreferencesAccountFragment.class, PreferencesAccountFragment.FRAGMENT_TAG);
+		fragmentsTagsMap.put(PreferencesCertificatesFragment.class, PreferencesCertificatesFragment.FRAGMENT_TAG);
+		fragmentsTagsMap.put(PreferencesAboutFragment.class, PreferencesAboutFragment.FRAGMENT_TAG);
+		fragmentsTagsMap.put(PreferencesLicencesFragment.class, PreferencesLicencesFragment.FRAGMENT_TAG);
+	}
 
 	// <editor-fold desc="LifeCycle">
 
@@ -55,11 +61,12 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 			// Clear BackStack before restoring existing fragment (everything over the Menu),
 			// because a wrong BackStack can stay after rotation.
-			getSupportFragmentManager().popBackStackImmediate(retainedFragment.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			String retainedFragmentTag = fragmentsTagsMap.get(retainedFragment.getClass());
+			getSupportFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
 			// Rebuild stack
 			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
-			replaceMainFragment(retainedFragment, retainedFragment.getTag(), true);
+			replaceMainFragment(retainedFragment, retainedFragmentTag, true);
 		}
 		else {
 			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
@@ -95,9 +102,9 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 	private @Nullable Fragment getRetainedFragmentInstance() {
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		for (String fragmentTag : availableSubFragmentsTagList)
-			if ((fragmentManager.findFragmentByTag(fragmentTag)) != null)
-				return fragmentManager.findFragmentByTag(fragmentTag);
+		for (Map.Entry<Class<? extends Fragment>, String> fragmentTagEntry : fragmentsTagsMap.entrySet())
+			if ((fragmentManager.findFragmentByTag(fragmentTagEntry.getValue())) != null)
+				return fragmentManager.findFragmentByTag(fragmentTagEntry.getValue());
 
 		return null;
 	}
@@ -115,7 +122,8 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	// <editor-fold desc="PreferenceMenuFragmentListener">
 
-	@Override public void onMenuElementClicked(@NonNull Fragment fragment, @NonNull String fragmentTag) {
+	@Override public void onMenuElementClicked(@NonNull Fragment fragment) {
+		String fragmentTag = fragmentsTagsMap.get(fragment.getClass());
 		replaceMainFragment(fragment, fragmentTag, true);
 	}
 

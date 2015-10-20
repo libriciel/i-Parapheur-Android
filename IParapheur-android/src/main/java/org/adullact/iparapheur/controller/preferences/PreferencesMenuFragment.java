@@ -90,31 +90,26 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		// Determine which Fragment was clicked
 
 		Fragment clickedFragment = null;
-		String clickedFragmentTag = null;
 
 		switch (v.getId()) {
 			case R.id.preferences_account:
 				clickedFragment = PreferencesAccountFragment.newInstance();
-				clickedFragmentTag = PreferencesAccountFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_certificates:
 				clickedFragment = PreferencesCertificatesFragment.newInstance();
-				clickedFragmentTag = PreferencesCertificatesFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_about:
 				clickedFragment = PreferencesAboutFragment.newInstance();
-				clickedFragmentTag = PreferencesAboutFragment.FRAGMENT_TAG;
 				break;
 			case R.id.preferences_licenses:
 				clickedFragment = PreferencesLicencesFragment.newInstance();
-				clickedFragmentTag = PreferencesLicencesFragment.FRAGMENT_TAG;
 				break;
 		}
 
 		// throw exception to parent activity
 
 		if (clickedFragment != null)
-			mListener.onMenuElementClicked(clickedFragment, clickedFragmentTag);
+			mListener.onMenuElementClicked(clickedFragment);
 	}
 
 	// </editor-fold desc="OnClickListener">
@@ -131,8 +126,7 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 	 */
 	public interface PreferenceMenuFragmentListener {
 
-		// TODO: Update argument type and name
-		void onMenuElementClicked(@NonNull Fragment fragment, @NonNull String tag);
+		void onMenuElementClicked(@NonNull Fragment fragment);
 	}
 
 }

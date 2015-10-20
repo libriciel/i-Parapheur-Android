@@ -22,7 +22,7 @@ import org.adullact.iparapheur.R;
  */
 public class PreferencesAboutFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "PreferencesAboutFragment";
+	public static final String FRAGMENT_TAG = "preferences_about_fragment";
 
 	/**
 	 * Use this factory method to create a new instance of

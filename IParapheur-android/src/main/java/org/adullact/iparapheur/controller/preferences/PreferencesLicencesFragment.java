@@ -18,7 +18,7 @@ import org.adullact.iparapheur.R;
  */
 public class PreferencesLicencesFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "PreferencesLicencesFragment";
+	public static final String FRAGMENT_TAG = "preferences_licences_fragment";
 
 	/**
 	 * Use this factory method to create a new instance of
