@@ -14,6 +14,8 @@ import org.json.JSONTokener;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+
 
 public class RequestResponse {
 
@@ -57,7 +59,7 @@ public class RequestResponse {
 		}
 		catch (JSONException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_parse, e.getStackTrace().toString());
+			throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
 		}
 		catch (UnknownHostException e) {
 			Crashlytics.logException(e);
