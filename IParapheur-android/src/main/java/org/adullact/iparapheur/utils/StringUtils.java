@@ -230,7 +230,11 @@ public class StringUtils {
 		return result;
 	}
 
-	public static @NonNull String getLocalizedSmallDate(Date date) {
+	public static @NonNull String getLocalizedSmallDate(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
 		return dateFormat.format(date);
 	}

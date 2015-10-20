@@ -27,7 +27,7 @@
     <string name="pref_account_message_delete_success">Compte supprimé</string>
 
     <string name="pref_certificates_message_delete_success">Certificat supprimé</string>
+    <string name="pref_certificates_message_delete_failed">Le certificat n\'a pas pu être supprimé</string>
     <string name="pref_certificates_expiration_date">exp. -date-</string>
-
 
 </resources>

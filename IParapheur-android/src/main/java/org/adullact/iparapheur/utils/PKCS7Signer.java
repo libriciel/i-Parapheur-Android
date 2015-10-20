@@ -73,7 +73,7 @@ public final class PKCS7Signer {
 		// Init checking
 
 		if (mKeystore == null)
-			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before signature");
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before");
 
 		//
 
@@ -101,10 +101,10 @@ public final class PKCS7Signer {
 		// Init checking
 
 		if (mKeystore == null)
-			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before signature");
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before");
 
 		if (mPrivateKey == null)
-			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakPrivateKey() before signature");
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakPrivateKey() before");
 
 		if (dataToSign == null)
 			throw new IllegalArgumentException("PKCS7Signer exception : Data to sign cannot be null");

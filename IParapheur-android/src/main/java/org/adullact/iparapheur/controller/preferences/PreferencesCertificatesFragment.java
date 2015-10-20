@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.utils.FileUtils;
@@ -43,10 +48,11 @@ public class PreferencesCertificatesFragment extends Fragment {
 	public static final String LOG_TAG = "PrefsCertificatesFrag";
 
 	private static final String LIST_FIELD_TITLE = "list_field_title";
-	private static final String LIST_FIELD_EXPIRATION_DATE = "list_field_expiration_date";
+	private static final String LIST_FIELD_IS_EXPIRED = "list_field_is_expired";
+	private static final String LIST_FIELD_EXPIRATION_DATE_STRING = "list_field_expiration_date_string";
 
 	private ListView mCertificatesList;
-	private List<Map<String, String>> mCertificatesData;
+	private List<Map<String, Object>> mCertificatesData;
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -79,7 +85,7 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 		// Building ListAdapter
 
-		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_EXPIRATION_DATE};
+		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_EXPIRATION_DATE_STRING};
 		int[] orderedFieldIds = new int[]{
 				R.id.preferences_certificates_fragment_cell_title_textview, R.id.preferences_certificates_fragment_cell_expiration_textview
 		};
@@ -108,13 +114,27 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 	private void onDeleteButtonClicked(int position) {
 
-		String currentFile = mCertificatesData.get(position).get(LIST_FIELD_TITLE);
-		// TODO Delete and check
-		Log.i(LOG_TAG, "Delete certificate " + currentFile);
-		mCertificatesData.remove(position);
+		// Delete certificate file
 
-		((SimpleAdapter) mCertificatesList.getAdapter()).notifyDataSetChanged();
-		Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_success, Toast.LENGTH_SHORT).show();
+		String currentFileName = mCertificatesData.get(position).get(LIST_FIELD_TITLE).toString();
+		List<File> certificateList = FileUtils.getBksFromCertificateFolder(getActivity());
+
+		boolean success = false;
+		for (File certificate : certificateList)
+			if (TextUtils.equals(certificate.getName(), currentFileName))
+				success = success || certificate.delete();
+
+		// Refresh UI
+
+		if (success) {
+			Log.i(LOG_TAG, "Delete certificate " + currentFileName);
+			mCertificatesData.remove(position);
+			((SimpleAdapter) mCertificatesList.getAdapter()).notifyDataSetChanged();
+			Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_success, Toast.LENGTH_SHORT).show();
+		}
+		else {
+			Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_failed, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	public void buildCertificatesDataMap() {
@@ -125,27 +145,40 @@ public class PreferencesCertificatesFragment extends Fragment {
 		for (File certificate : certificatesList) {
 
 			// Retrieving Certificate expiration date.
+			// And computing every other operation, better here than at runtime in the Adapter.
 
 			SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
 			String certificatePassword = settings.getString(certificate.getName(), "");
 			PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
-			try { signer.loadKeyStore(); }
-			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) { e.printStackTrace(); }
 
-			Date certificateExpirationDate = signer.getCertificateExpirationDate();
+			Date certificateExpirationDate = null;
+			try {
+				signer.loadKeyStore();
+				certificateExpirationDate = signer.getCertificateExpirationDate();
+			}
+			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
+				Crashlytics.logException(e);
+				e.printStackTrace();
+			}
+
 			String expirationDateString = getString(R.string.pref_certificates_expiration_date);
 			expirationDateString = expirationDateString.replaceAll("-date-", StringUtils.getLocalizedSmallDate(certificateExpirationDate));
+			Boolean isExpired = (certificateExpirationDate == null) || (certificateExpirationDate.before(new Date()));
 
 			// Mapping results
 
-			Map<String, String> certificateData = new HashMap<>();
+			Map<String, Object> certificateData = new HashMap<>();
 			certificateData.put(LIST_FIELD_TITLE, certificate.getName());
-			certificateData.put(LIST_FIELD_EXPIRATION_DATE, expirationDateString);
+			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expirationDateString);
+			certificateData.put(LIST_FIELD_IS_EXPIRED, isExpired);
 			mCertificatesData.add(certificateData);
 		}
 	}
 
 	private class CertificateSimpleAdapter extends SimpleAdapter {
+
+		private int mRegularColor;
+		private int mErrorColor;
 
 		/**
 		 * Constructor
@@ -163,6 +196,8 @@ public class PreferencesCertificatesFragment extends Fragment {
 		 */
 		public CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
 			super(context, data, resource, from, to);
+			mErrorColor = ContextCompat.getColor(context, R.color.red_500);
+			mRegularColor = ContextCompat.getColor(context, R.color.text_black_secondary);
 		}
 
 		@Override public View getView(final int position, View convertView, ViewGroup parent) {
@@ -173,9 +208,11 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 			final View v = super.getView(position, convertView, parent);
 
+			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_button);
+			final TextView expirationTextView = (TextView) v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
+
 			// Cell buttons listener
 
-			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_button);
 			deleteButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View arg0) {
@@ -186,7 +223,8 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 			// Warns expiration date
 
-			// TODO : set expirationDate color to red
+			Boolean isExpired = (Boolean) mCertificatesData.get(position).get(LIST_FIELD_IS_EXPIRED);
+			expirationTextView.setTextColor(isExpired ? mErrorColor : mRegularColor);
 
 			//
 
