@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -91,6 +93,30 @@ public class StringUtils {
 		catch (ParseException ex) {
 			return null;
 		}
+	}
+
+	@SuppressWarnings("unused") public static boolean areNotEmpty(@Nullable String... strings) {
+
+		if ((strings == null) || (strings.length == 0))
+			return false;
+
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return false;
+
+		return true;
+	}
+
+	@SuppressWarnings("unused") public static String firstNotEmpty(@Nullable String... strings) {
+
+		if ((strings == null) || (strings.length == 0))
+			return null;
+
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return string;
+
+		return null;
 	}
 
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
@@ -184,5 +210,32 @@ public class StringUtils {
 		catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Illegal hexadecimal character.", e);
 		}
+	}
+
+	public static @NonNull String fixUrl(@NonNull String url) {
+
+		// Getting the server name
+		// Regex :	- ignore everything before "://" (if exists)					^(?:.*://)*
+		//			- then ignore following "m." (if exists)						(?:m\.)?
+		//			- then catch every char but "/"	(not geedy)						(.*?)
+		//			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
+		String regex = "^(?:.*://)*(?:m\\.)?(.*?)(?:/.*)*$";
+		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(url.trim());
+
+		String result = url;
+		if (matcher.find() && !TextUtils.isEmpty(matcher.group(1)))
+			result = matcher.group(1);
+
+		return result;
+	}
+
+	public static @NonNull String getLocalizedSmallDate(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+		return dateFormat.format(date);
 	}
 }

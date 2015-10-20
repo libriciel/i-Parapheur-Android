@@ -23,9 +23,18 @@
         <item name="android:actionModeBackground">@color/contextual_500</item>
     </style>
 
+    <style name="AppTheme.Settings.Base" parent="AppTheme">
+        <item name="colorPrimary">@color/settings_500</item>
+        <item name="colorPrimaryDark">@color/settings_700</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:actionModeBackground">@color/contextual_500</item>
+    </style>
+
     <style name="AppTheme.Main" parent="AppTheme.Main.Base">
         <item name="actionModeStyle">@style/AppTheme.Main.CAB</item>
     </style>
+
+    <style name="AppTheme.Settings" parent="AppTheme.Settings.Base"/>
 
     <style name="AppTheme.Main.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/secondary_500</item>
@@ -40,13 +49,13 @@
         <item name="android:textColorSecondary">@color/text_white</item>
     </style>
 
+    <style name="AppTheme.Settings.Toolbar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:textColorSecondary">@color/text_white</item>
+    </style>
+
     <style name="AppTheme.Main.CAB" parent="Widget.AppCompat.Light.ActionBar.Solid">
         <item name="background">@color/contextual_500</item>
         <item name="backgroundSplit">@color/contextual_500</item>
     </style>
-
-    <!-- Settings -->
-
-    <style name="AppTheme.Settings" parent="android:Theme.Holo.Light"/>
 
 </resources>

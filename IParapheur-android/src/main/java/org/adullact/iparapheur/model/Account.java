@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class Account implements Serializable {
 
 	public static final long _serialVersionUID = 1L;
@@ -30,46 +31,6 @@ public class Account implements Serializable {
 		this.password = "";
 		this.tenant = null;
 		this.lastRequest = 0L;
-	}
-
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
-	}
-
-	private static boolean isURLValid(String url) {
-		if (url == null || url.isEmpty()) {
-			return false;
-		}
-		try {
-			new URL(IParapheurAPI.BASE_PATH + url);
-			return true;
-		}
-		catch (MalformedURLException ignored) {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Account) {
-			Account toCompare = (Account) o;
-			return this.id.equals(toCompare.id);
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return title;
-	}
-
-	public boolean isValid() {
-		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
 	}
 
 	// <editor-fold desc="Getters / Setters">
@@ -100,12 +61,10 @@ public class Account implements Serializable {
 
 	public void setLogin(String login) {
 		this.login = login;
-		if (login != null) {
-			int separatorIndex = login.indexOf("@");
-			if (separatorIndex != -1) {
-				this.tenant = login.substring(separatorIndex + 1);
-			}
-		}
+
+		if (login != null)
+			if (login.contains("@"))
+				this.tenant = login.substring(login.indexOf("@") + 1);
 	}
 
 	public String getTenant() {
@@ -145,4 +104,42 @@ public class Account implements Serializable {
 	}
 
 	// </editor-fold desc="Getters / Setters">
+
+	private static boolean isURLValid(String url) {
+
+		if (TextUtils.isEmpty(url))
+			return false;
+
+		try {
+			new URL(IParapheurAPI.BASE_PATH + url);
+			return true;
+		}
+		catch (MalformedURLException ignored) {
+			return false;
+		}
+	}
+
+	public boolean isValid() {
+		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
+	}
+
+	public static boolean validateAccount(String title, String url, String login, String password) {
+		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
+	}
+
+	@Override public boolean equals(Object o) {
+		if (o instanceof Account) {
+			Account toCompare = (Account) o;
+			return TextUtils.equals(id, toCompare.id);
+		}
+		return false;
+	}
+
+	@Override public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override public String toString() {
+		return title;
+	}
 }

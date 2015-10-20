@@ -20,6 +20,7 @@ import org.adullact.iparapheur.model.Filter;
 
 import java.util.ArrayList;
 
+
 public class FilterDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
 	public static final String TAG = "filter_dialog";
@@ -44,18 +45,18 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 		return f;
 	}
 
-	@Override
-	public void onAttach(Activity activity) {
+	// <editor-fold desc="LifeCycle">
+
+	@Override public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof FilterDialogListener)) {
+		if (!(activity instanceof FilterDialogListener))
 			throw new IllegalStateException("Activity must implement FilterDialogListener.");
-		}
+
 		listener = (FilterDialogListener) activity;
 	}
 
-	@Override
-	public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		this.originalFilter = getArguments().getParcelable("filter");
 		this.filter = new Filter(originalFilter);
 
@@ -89,15 +90,22 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 		return builder.create();
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		this.typologieListAdapter = new TypologieListAdapter(getActivity(), originalFilter);
 		this.typologieList.setAdapter(this.typologieListAdapter);
 	}
 
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
+	@Override public void onDetach() {
+		super.onDetach();
+
+		// Reset the active callbacks interface.
+		listener = null;
+	}
+
+	// </editor-fold desc="LifeCycle">
+
+	@Override public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 			case DialogInterface.BUTTON_NEGATIVE:
 				listener.onFilterCancel();
@@ -131,18 +139,19 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 		builder.setView(content);
 
 		// Enregistrer
-		builder.setNeutralButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if (content.getText().toString().trim().isEmpty()) {
-					filter.setName(content.getHint().toString());
+		builder.setNeutralButton(
+				R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
+					@Override public void onClick(DialogInterface dialog, int which) {
+						if (content.getText().toString().trim().isEmpty()) {
+							filter.setName(content.getHint().toString());
+						}
+						else {
+							filter.setName(content.getText().toString().trim());
+						}
+						listener.onFilterSave(filter);
+					}
 				}
-				else {
-					filter.setName(content.getText().toString().trim());
-				}
-				listener.onFilterSave(filter);
-			}
-		});
+		);
 
 		builder.create().show();
 	}
@@ -170,18 +179,15 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 			super(context, R.layout.filter_state_spinner, R.id.filter_state_spinner_text);
 		}
 
-		@Override
-		public int getCount() {
+		@Override public int getCount() {
 			return Filter.states.size();
 		}
 
-		@Override
-		public String getItem(int position) {
+		@Override public String getItem(int position) {
 			return Filter.statesTitles.get(Filter.states.get(position));
 		}
 
-		@Override
-		public int getPosition(String item) {
+		@Override public int getPosition(String item) {
 			ArrayList<String> values = new ArrayList<>(Filter.statesTitles.values());
 			return values.indexOf(item);
 		}

@@ -6,6 +6,6 @@
 
     <header
         android:fragment="org.adullact.iparapheur.controller.preferences.AboutPreferenceFragment"
-        android:title="@string/pref_header_about"/>
+        android:title="@string/pref_header_legal"/>
 
 </preference-headers>

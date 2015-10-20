@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -44,9 +43,9 @@ import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
-import org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment;
 import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFragment;
-import org.adullact.iparapheur.controller.preferences.SettingsActivity;
+import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
+import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
@@ -79,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
-	private static final int EDIT_PREFERENCE_REQUEST = 50;
 
 	private DrawerLayout mLeftDrawerLayout;
 	private DrawerLayout mRightDrawerLayout;
@@ -199,13 +197,15 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		if (requestCode == EDIT_PREFERENCE_REQUEST) {
-			// Don't check if result is ok as the user can press back after modifying an Account
-			// only notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
-			if (accountListFragment != null)
-				accountListFragment.accountsChanged();
+			if (resultCode == Activity.RESULT_OK) {
+				// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
+				AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+
+				if (accountListFragment != null)
+					accountListFragment.accountsChanged();
+			}
 		}
 	}
 
@@ -294,9 +294,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Pass the event to ActionBarDrawerToggle, if it returns
 		// true, then it has handled the app icon touch event
 
-		if (mLeftDrawerToggle.onOptionsItemSelected(item)) {
+		if (mLeftDrawerToggle.onOptionsItemSelected(item))
 			return true;
-		}
 
 		// TODO : handle dossier(s) actions
 		// Handle presses on the action bar items
@@ -304,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		switch (item.getItemId()) {
 
 			case R.id.action_settings:
-				startActivityForResult(new Intent(this, SettingsActivity.class), EDIT_PREFERENCE_REQUEST);
+				startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
 				return true;
 
 			default:
@@ -533,10 +532,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public void onCreateAccountInvoked() {
-
-		Intent preferencesIntent = new Intent(this, SettingsActivity.class);
-		preferencesIntent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, AccountsPreferenceFragment.class.getName());
-		startActivityForResult(preferencesIntent, EDIT_PREFERENCE_REQUEST);
+		Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
+		preferencesIntent.putExtra(PreferencesActivity.ARGUMENT_GO_TO_FRAGMENT, PreferencesAccountFragment.class.getSimpleName());
+		startActivityForResult(preferencesIntent, PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
 	}
 
 	// </editor-fold desc="AccountFragmentListener">
@@ -666,8 +664,12 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 
 		@Override public void onDrawerClosed(View view) {
-			if ((getSupportActionBar() != null) && (MyAccounts.INSTANCE.getSelectedAccount() != null))
-				getSupportActionBar().setTitle(MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+
+			if (getSupportActionBar() != null) {
+				Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				if (selectedAccount != null)
+					getSupportActionBar().setTitle(selectedAccount.getTitle());
+			}
 
 			// calls onPrepareOptionMenu to show context specific actions
 			invalidateOptionsMenu();

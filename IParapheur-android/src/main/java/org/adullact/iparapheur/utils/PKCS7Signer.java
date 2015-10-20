@@ -23,6 +23,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
 
 import sun.security.pkcs.ContentInfo;
 import sun.security.pkcs.PKCS7;
@@ -67,15 +68,43 @@ public final class PKCS7Signer {
 		return mPrivateKey;
 	}
 
+	public @Nullable Date getCertificateExpirationDate() {
+
+		// Init checking
+
+		if (mKeystore == null)
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before");
+
+		//
+
+		Date result = null;
+
+		try {
+			Enumeration<String> aliases = mKeystore.aliases();
+			while (aliases.hasMoreElements()) {
+				String alias = aliases.nextElement();
+				Date currentDate = ((X509Certificate) mKeystore.getCertificate(alias)).getNotAfter();
+				if ((result == null) || ((currentDate != null) && result.after(currentDate)))
+					result = currentDate;
+			}
+		}
+		catch (KeyStoreException e) {
+			e.printStackTrace();
+			result = null;
+		}
+
+		return result;
+	}
+
 	public String sign(byte[] dataToSign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IllegalStateException, IllegalArgumentException, KeyStoreException, IOException {
 
 		// Init checking
 
 		if (mKeystore == null)
-			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before signature");
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakKeystore() before");
 
 		if (mPrivateKey == null)
-			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakPrivateKey() before signature");
+			throw new IllegalStateException("PKCS7Signer not properly initialized, call PKCS7Signer#loakPrivateKey() before");
 
 		if (dataToSign == null)
 			throw new IllegalArgumentException("PKCS7Signer exception : Data to sign cannot be null");

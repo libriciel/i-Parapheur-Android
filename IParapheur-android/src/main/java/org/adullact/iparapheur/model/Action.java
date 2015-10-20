@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.adullact.iparapheur.R;
 
+
 public enum Action implements Parcelable {
 	// TODO : all possible actions (secretariat, supprimer, ...)
 	VISA(R.string.action_viser, R.id.action_visa, R.drawable.iw_visa, R.drawable.ip_visa),
@@ -24,19 +25,18 @@ public enum Action implements Parcelable {
 	ENREGISTRER(R.string.action_enregistrer, R.id.action_enregistrer, -1, -1),
 	SUPPRESSION(R.string.action_supprimer, R.id.action_supprimer, -1, -1),
 	JOURNAL(R.string.action_journal, R.id.action_journal, -1, -1),
+	GET_ATTEST(-1, -1, -1, -1), // TODO : WTF
 
 	//non implementées :
 	RAZ,
 	EDITION,
 	ENCHAINER_CIRCUIT;
 	public static final Creator<Action> CREATOR = new Creator<Action>() {
-		@Override
-		public Action createFromParcel(final Parcel source) {
+		@Override public Action createFromParcel(final Parcel source) {
 			return Action.values()[source.readInt()];
 		}
 
-		@Override
-		public Action[] newArray(final int size) {
+		@Override public Action[] newArray(final int size) {
 			return new Action[size];
 		}
 	};
@@ -71,13 +71,11 @@ public enum Action implements Parcelable {
 		return menuItemId;
 	}
 
-	@Override
-	public int describeContents() {
+	@Override public int describeContents() {
 		return 0;
 	}
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+	@Override public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(ordinal());
 	}
 

@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 
 import org.adullact.iparapheur.BuildConfig;
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 
 import io.fabric.sdk.android.Fabric;
@@ -34,10 +35,10 @@ public class IParapheurApplication extends Application {
 		if (!sharedPreferences.contains(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX)) {
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 
-			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX, "iParapheur demo");
-			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, "parapheur.demonstrations.adullact.org");
-			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_LOGIN_SUFFIX, "bma");
-			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, "secret");
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_TITLE_SUFFIX, getString(R.string.demo_account_title));
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_URL_SUFFIX, getString(R.string.demo_account_url));
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_LOGIN_SUFFIX, getString(R.string.demo_account_login));
+			editor.putString(MyAccounts.PREFS_ACCOUNT_PREFIX + "AccountTest0" + MyAccounts.PREFS_PASSWORD_SUFFIX, getString(R.string.demo_account_password));
 
 			editor.apply();
 		}

@@ -33,8 +33,6 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Called only once as retainInstance is set to true.
 		setRetainInstance(true);
 
 		mAccounts = new ArrayList<>();

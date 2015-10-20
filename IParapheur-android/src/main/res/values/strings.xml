@@ -99,7 +99,7 @@
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
     <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string>
-    <string name="pref_account_test">Tester la connexion</string>
+    <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
     <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
@@ -135,5 +135,7 @@
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
     <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
+    <string name="action_settings">Settings</string>
+    <string name="Settings">Réglages</string>
 
 </resources>
