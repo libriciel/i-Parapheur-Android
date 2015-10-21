@@ -39,7 +39,7 @@
             android:name=".controller.preferences.PreferencesActivity"
             android:label="@string/Settings"
             android:theme="@style/AppTheme.Settings"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustResize">
         </activity>
 
         <meta-data

@@ -114,7 +114,7 @@
     <string name="http_error_400">Erreur lors de l\'envoi de la requête (HTTP 400)</string>
     <string name="http_error_401">Authentification obligatoire</string>
     <string name="http_error_403">Votre compte ne permet pas d\'effectuer cette action</string>
-    <string name="http_error_404">Ressource non trouvée</string>
+    <string name="http_error_404">Page non trouvée (HTTP 404)</string>
     <string name="http_error_405">Méthode de requête non autorisée</string>
     <string name="http_error_503">Le service est actuellement indisponible</string>
 

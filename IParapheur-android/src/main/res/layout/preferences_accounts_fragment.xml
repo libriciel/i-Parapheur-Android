@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:descendantFocusability="afterDescendants"
         android:divider="@color/grey_200"
         android:paddingTop="8dp"
         tools:listitem="@layout/preferences_accounts_fragment_cell"/>
