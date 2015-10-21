@@ -135,18 +135,15 @@ public class RESTUtils {
 	public static RequestResponse get(String url) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
-		String urlStr = url;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
+			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("GET");
-			connection.setDoOutput(false); // Don't trigger POST.
+			connection.setDoOutput(false);
 			connection.setChunkedStreamingMode(0);
-			//connection.setReadTimeout(10000);
 			connection.setConnectTimeout(10000);
-			//connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
 
 			res = new RequestResponse(connection);
@@ -230,10 +227,11 @@ public class RESTUtils {
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {
+
 		Log.d(LOG_TAG, "getExceptionForError : " + code + " " + message);
-		if (message != null) {
+		if (message != null)
 			return new IParapheurException(R.string.http_error_explicit, message);
-		}
+
 		IParapheurException exception;
 		switch (code) {
 			case 400:

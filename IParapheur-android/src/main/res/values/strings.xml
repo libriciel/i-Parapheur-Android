@@ -64,7 +64,6 @@
     <string name="etape_courante">Étape courante</string>
 
     <!-- Dialogs -->
-
     <string name="import_title">Importer un certificat BKS</string>
     <string name="import_certificate">Importer</string>
     <string name="import_successful">Le certificat a été importé avec succès.</string>

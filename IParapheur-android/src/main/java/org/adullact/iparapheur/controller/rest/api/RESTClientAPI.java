@@ -32,30 +32,38 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 	private static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
 
 	@Override public int test(Account account) throws IParapheurException {
-		int messageRes = R.string.test_unreachable;
-		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
 
-		RequestResponse response = RESTUtils.post(BASE_PATH + account.getServerBaseUrl() + ACTION_LOGIN, request);
-		if (response != null) {
-			if (response.getCode() == HttpURLConnection.HTTP_OK) {
-				messageRes = R.string.test_ok;
-			}
-			else {
-				switch (response.getCode()) {
-					case HttpURLConnection.HTTP_FORBIDDEN:
-						messageRes = R.string.test_forbidden;
-						break;
-					case HttpURLConnection.HTTP_NOT_FOUND:
-						messageRes = R.string.test_not_found;
-						break;
-					case HttpURLConnection.HTTP_INTERNAL_ERROR:
-						if (response.getError().contains("Tenant does not exist")) {
-							messageRes = R.string.test_tenant_not_exist;
-						}
-						break;
-				}
-			}
+		// Build request
+
+		String requestContent = null;
+
+		try {
+			JSONStringer requestStringer = new JSONStringer();
+			requestStringer.object();
+			requestStringer.key("username").value(account.getLogin());
+			requestStringer.key("password").value(account.getPassword());
+			requestStringer.endObject();
+			requestContent = requestStringer.toString();
 		}
+		catch (JSONException e) { e.printStackTrace(); }
+
+		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+
+		// Parse response
+
+		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
+		int messageRes = R.string.http_error_undefined;
+
+		if (response == null)
+			messageRes = R.string.http_error_undefined;
+		else if (response.getCode() == HttpURLConnection.HTTP_OK)
+			messageRes = R.string.test_ok;
+		else if (response.getCode() == HttpURLConnection.HTTP_FORBIDDEN)
+			messageRes = R.string.test_forbidden;
+		else if (response.getCode() == HttpURLConnection.HTTP_NOT_FOUND)
+			messageRes = R.string.test_not_found;
+		else if ((response.getCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) && response.getError().contains("Tenant does not exist"))
+			messageRes = R.string.test_tenant_not_exist;
 
 		return messageRes;
 	}
@@ -79,7 +87,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			requestStringer.key("username").value(account.getLogin());
 			requestStringer.key("password").value(account.getPassword());
 			requestStringer.endObject();
-
 			request = requestStringer.toString();
 		}
 		catch (JSONException ex) { throw new IParapheurException(R.string.error_parse, null); }
