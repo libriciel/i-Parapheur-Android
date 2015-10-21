@@ -4,7 +4,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -138,7 +137,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		//
 
-		Log.e("Adrien", "URL generated : " + stringBuilder.toString());
 		return stringBuilder.toString();
 	}
 

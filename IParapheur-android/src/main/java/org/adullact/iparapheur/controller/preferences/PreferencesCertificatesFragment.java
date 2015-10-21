@@ -208,7 +208,7 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 			final View v = super.getView(position, convertView, parent);
 
-			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_button);
+			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_imagebutton);
 			final TextView expirationTextView = (TextView) v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
 
 			// Cell buttons listener
