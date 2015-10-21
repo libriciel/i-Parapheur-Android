@@ -14,8 +14,6 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
-import org.json.JSONException;
-import org.json.JSONStringer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,23 +33,13 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Build request
 
-		String requestContent = null;
-
-		try {
-			JSONStringer requestStringer = new JSONStringer();
-			requestStringer.object();
-			requestStringer.key("username").value(account.getLogin());
-			requestStringer.key("password").value(account.getPassword());
-			requestStringer.endObject();
-			requestContent = requestStringer.toString();
-		}
-		catch (JSONException e) { e.printStackTrace(); }
-
+		String requestContent = RESTUtils.getAccountAuthenticationJsonData(account);
 		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+
+		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
 
 		// Parse response
 
-		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
 		int messageRes = R.string.http_error_undefined;
 
 		if (response == null)
@@ -80,20 +68,13 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Building request
 
-		String request;
-		try {
-			JSONStringer requestStringer = new JSONStringer();
-			requestStringer.object();
-			requestStringer.key("username").value(account.getLogin());
-			requestStringer.key("password").value(account.getPassword());
-			requestStringer.endObject();
-			request = requestStringer.toString();
-		}
-		catch (JSONException ex) { throw new IParapheurException(R.string.error_parse, null); }
+		String requestContent = RESTUtils.getAccountAuthenticationJsonData(account);
+		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+
+		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
 
 		// Parsing response
 
-		RequestResponse response = RESTUtils.post(BASE_PATH + account.getServerBaseUrl() + ACTION_LOGIN, request);
 		if (response != null) {
 
 			String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
@@ -121,7 +102,10 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		if (account == null)
 			throw new IParapheurException(R.string.error_no_account, null);
 
-		String ticket = getTicket(account);
+		String ticket = null;
+		if (withTicket)
+			ticket = getTicket(account);
+
 		if (withTicket && TextUtils.isEmpty(ticket))
 			throw new IParapheurException(R.string.error_no_ticket, null);
 

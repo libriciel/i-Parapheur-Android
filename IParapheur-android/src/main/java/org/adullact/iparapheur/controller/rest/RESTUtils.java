@@ -1,10 +1,17 @@
 package org.adullact.iparapheur.controller.rest;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.json.JSONException;
+import org.json.JSONStringer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,11 +98,22 @@ public class RESTUtils {
 			output.write(body.getBytes());
 			res = new RequestResponse(connection);
 		}
-		catch (IParapheurException e) { throw e; }
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
-		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
-		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
-		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
+		catch (ProtocolException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_405, null);
+		}
+		catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_400, null);
+		}
 
 		return res;
 	}
@@ -124,7 +142,10 @@ public class RESTUtils {
 			output.write(body.getBytes());
 			res = new RequestResponse(connection, ignoreResponseData);
 		}
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
 		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
 		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
 		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
@@ -149,11 +170,22 @@ public class RESTUtils {
 			res = new RequestResponse(connection);
 
 		}
-		catch (IParapheurException e) { throw e; }
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
-		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
-		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
-		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
+		catch (ProtocolException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_405, null);
+		}
+		catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_400, null);
+		}
 
 		return res;
 	}
@@ -224,6 +256,27 @@ public class RESTUtils {
 		SSLContext context = SSLContext.getInstance("SSL");
 		context.init(null, tmf.getTrustManagers(), null);
 		return context.getSocketFactory();
+	}
+
+	public static @Nullable String getAccountAuthenticationJsonData(@NonNull Account account) {
+
+		String requestContent = null;
+
+		try {
+			JSONStringer requestStringer = new JSONStringer();
+			requestStringer.object();
+			requestStringer.key("username").value(account.getLogin());
+			requestStringer.key("password").value(account.getPassword());
+			requestStringer.endObject();
+
+			requestContent = requestStringer.toString();
+		}
+		catch (JSONException e) {
+			Crashlytics.logException(e);
+			e.printStackTrace();
+		}
+
+		return requestContent;
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {

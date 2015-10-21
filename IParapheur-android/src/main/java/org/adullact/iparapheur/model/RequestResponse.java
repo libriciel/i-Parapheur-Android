@@ -61,7 +61,8 @@ public class RequestResponse {
 		}
 		catch (UnknownHostException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.http_error_malformed_url, httpURLConnection.getURL().getHost());
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_404, httpURLConnection.getURL().getHost());
 		}
 		catch (IOException e) {
 			Crashlytics.logException(e);
