@@ -159,7 +159,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 		// Edit
 
-		currentAccount.setUrl(urlEditText.getText().toString());
+		currentAccount.setServerBaseUrl(urlEditText.getText().toString());
 		currentAccount.setTitle(mAccountData.get(position).get(LIST_FIELD_TITLE));
 		currentAccount.setLogin(mAccountData.get(position).get(LIST_FIELD_LOGIN));
 		currentAccount.setPassword(mAccountData.get(position).get(LIST_FIELD_PASSWORD));
@@ -231,7 +231,7 @@ public class PreferencesAccountFragment extends Fragment {
 			Map<String, String> accountData = new HashMap<>();
 			accountData.put(LIST_FIELD_TITLE, account.getTitle());
 			accountData.put(LIST_FIELD_ID, account.getId());
-			accountData.put(LIST_FIELD_URL, account.getUrl());
+			accountData.put(LIST_FIELD_URL, account.getServerBaseUrl());
 			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
 			mAccountData.add(accountData);
@@ -382,7 +382,7 @@ public class PreferencesAccountFragment extends Fragment {
 		@Override protected Void doInBackground(String... params) {
 
 			Account testAccount = new Account("test");
-			testAccount.setUrl(params[0]);
+			testAccount.setServerBaseUrl(params[0]);
 			testAccount.setLogin(params[1]);
 			testAccount.setPassword(params[2]);
 

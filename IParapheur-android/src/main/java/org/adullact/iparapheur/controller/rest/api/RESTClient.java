@@ -41,7 +41,7 @@ public enum RESTClient implements IParapheurAPI {
 	 * @param account le compte pour lequel on veur récupérer la version de l'API
 	 * @return in entier représentant la version de l'API.
 	 */
-	private int getAPIVersion(Account account) throws IParapheurException {
+	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
 		Integer apiVersion = account.getApiVersion();
 
 		if (apiVersion == null) {

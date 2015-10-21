@@ -35,7 +35,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		int messageRes = R.string.test_unreachable;
 		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
 
-		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
+		RequestResponse response = RESTUtils.post(BASE_PATH + account.getServerBaseUrl() + ACTION_LOGIN, request);
 		if (response != null) {
 			if (response.getCode() == HttpURLConnection.HTTP_OK) {
 				messageRes = R.string.test_ok;
@@ -86,7 +86,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Parsing response
 
-		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
+		RequestResponse response = RESTUtils.post(BASE_PATH + account.getServerBaseUrl() + ACTION_LOGIN, request);
 		if (response != null) {
 
 			String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
@@ -126,7 +126,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		if (!TextUtils.isEmpty(account.getTenant()))
 			stringBuilder.append(account.getTenant()).append(".");
 
-		stringBuilder.append(account.getUrl());
+		stringBuilder.append(account.getServerBaseUrl());
 		stringBuilder.append(action);
 
 		if (withTicket)

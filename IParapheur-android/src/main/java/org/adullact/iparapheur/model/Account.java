@@ -18,7 +18,7 @@ public class Account implements Serializable {
 
 	private final String mId;
 	private String mTitle;
-	private String mUrl;
+	private String mServerBaseUrl;
 	private String mLogin;
 	private String mTenant;
 	private String mPassword;
@@ -29,7 +29,7 @@ public class Account implements Serializable {
 	public Account(String id) {
 		mId = id;
 		mTitle = "";
-		mUrl = "";
+		mServerBaseUrl = "";
 		mLogin = "";
 		mPassword = "";
 		mTenant = null;
@@ -50,12 +50,12 @@ public class Account implements Serializable {
 		mTitle = title;
 	}
 
-	public @NonNull String getUrl() {
-		return mUrl;
+	public @NonNull String getServerBaseUrl() {
+		return mServerBaseUrl;
 	}
 
-	public void setUrl(@NonNull String url) {
-		mUrl = url;
+	public void setServerBaseUrl(@NonNull String url) {
+		mServerBaseUrl = url;
 	}
 
 	public @NonNull String getLogin() {
@@ -123,7 +123,7 @@ public class Account implements Serializable {
 	}
 
 	public boolean isValid() {
-		return validateAccount(mTitle, mLogin, mPassword, mUrl);
+		return validateAccount(mTitle, mLogin, mPassword, mServerBaseUrl);
 	}
 
 	public static boolean validateAccount(String title, String url, String login, String password) {

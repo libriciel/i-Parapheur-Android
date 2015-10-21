@@ -168,9 +168,9 @@ public class RESTUtils {
 	public static RequestResponse delete(String url, boolean ignoreResponseData) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
-		String urlStr = url;
+
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
+			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("DELETE");
@@ -183,21 +183,13 @@ public class RESTUtils {
 
 			res = new RequestResponse(connection, ignoreResponseData);
 		}
-		catch (IParapheurException e) {
-			throw e;
-		}
 		catch (MalformedURLException e) {
+			e.printStackTrace();
 			throw new IParapheurException(R.string.http_error_malformed_url, url);
 		}
-		catch (ProtocolException e) {
-			throw new IParapheurException(R.string.http_error_405, null);
-		}
-		catch (GeneralSecurityException e) {
-			throw new IParapheurException(R.string.http_error_ssl_failed, null);
-		}
-		catch (IOException e) {
-			throw new IParapheurException(R.string.http_error_400, null);
-		}
+		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
+		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
+		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
 		return res;
 	}
 
