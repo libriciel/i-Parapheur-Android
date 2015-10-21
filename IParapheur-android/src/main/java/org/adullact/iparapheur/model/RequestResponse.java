@@ -36,9 +36,7 @@ public class RequestResponse {
 			if (this.code < HttpURLConnection.HTTP_BAD_REQUEST) { // if code < 400, response is in inputStream
 				if (!ignoreResponseData) {
 					data = StringUtils.inputStreamToString(httpURLConnection.getInputStream());
-					//Log.d("debug", "data : " + data);
 					Object json = new JSONTokener(data).nextValue();
-					//Log.d("debug", "json : " + json);
 
 					if (json instanceof JSONObject)
 						this.response = (JSONObject) json;

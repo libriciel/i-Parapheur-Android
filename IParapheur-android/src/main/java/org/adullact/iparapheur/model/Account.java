@@ -1,8 +1,11 @@
 package org.adullact.iparapheur.model;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -13,99 +16,99 @@ public class Account implements Serializable {
 
 	public static final long _serialVersionUID = 1L;
 
-	private final String id;
-	private String title;
-	private String url;
-	private String login;
-	private String tenant;
-	private String password;
-	private String ticket;
-	private Integer apiVersion;
-	private Long lastRequest;
+	private final String mId;
+	private String mTitle;
+	private String mUrl;
+	private String mLogin;
+	private String mTenant;
+	private String mPassword;
+	private String mTicket;
+	private Integer mApiVersion;
+	private Long mLastRequest;
 
 	public Account(String id) {
-		this.id = id;
-		this.title = "";
-		this.url = "";
-		this.login = "";
-		this.password = "";
-		this.tenant = null;
-		this.lastRequest = 0L;
+		mId = id;
+		mTitle = "";
+		mUrl = "";
+		mLogin = "";
+		mPassword = "";
+		mTenant = null;
+		mLastRequest = 0L;
 	}
 
 	// <editor-fold desc="Getters / Setters">
 
-	public String getId() {
-		return id;
+	public @NonNull String getId() {
+		return mId;
 	}
 
-	public String getTitle() {
-		return title;
+	public @NonNull String getTitle() {
+		return mTitle;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(@NonNull String title) {
+		mTitle = title;
 	}
 
-	public String getUrl() {
-		return url;
+	public @NonNull String getUrl() {
+		return mUrl;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setUrl(@NonNull String url) {
+		mUrl = url;
 	}
 
-	public String getLogin() {
-		return login;
+	public @NonNull String getLogin() {
+		return mLogin;
 	}
 
-	public void setLogin(String login) {
-		this.login = login;
+	public void setLogin(@NonNull String login) {
 
-		if (login != null)
-			if (login.contains("@"))
-				this.tenant = login.substring(login.indexOf("@") + 1);
+		mLogin = login;
+
+		if (login.contains("@"))
+			mTenant = login.substring(login.indexOf("@") + 1);
 	}
 
-	public String getTenant() {
-		return tenant;
+	public @Nullable String getTenant() {
+		return mTenant;
 	}
 
-	public String getPassword() {
-		return password;
+	public @NonNull String getPassword() {
+		return mPassword;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPassword(@NonNull String password) {
+		mPassword = password;
 	}
 
 	public String getTicket() {
-		return ticket;
+		return mTicket;
 	}
 
 	public void setTicket(String ticket) {
-		this.ticket = ticket;
+		mTicket = ticket;
 	}
 
 	public Integer getApiVersion() {
-		return apiVersion;
+		return mApiVersion;
 	}
 
 	public void setApiVersion(Integer apiVersion) {
-		this.apiVersion = apiVersion;
+		mApiVersion = apiVersion;
 	}
 
 	public Long getLastRequest() {
-		return lastRequest;
+		return mLastRequest;
 	}
 
 	public void setLastRequest(Long lastRequest) {
-		this.lastRequest = lastRequest;
+		mLastRequest = lastRequest;
 	}
 
 	// </editor-fold desc="Getters / Setters">
 
-	private static boolean isURLValid(String url) {
+	private static boolean isURLValid(@Nullable String url) {
 
 		if (TextUtils.isEmpty(url))
 			return false;
@@ -120,26 +123,26 @@ public class Account implements Serializable {
 	}
 
 	public boolean isValid() {
-		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
+		return validateAccount(mTitle, mLogin, mPassword, mUrl);
 	}
 
 	public static boolean validateAccount(String title, String url, String login, String password) {
-		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
+		return StringUtils.areNotEmpty(title, login, password) && isURLValid(url);
 	}
 
 	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;
-			return TextUtils.equals(id, toCompare.id);
+			return TextUtils.equals(mId, toCompare.mId);
 		}
 		return false;
 	}
 
 	@Override public int hashCode() {
-		return id.hashCode();
+		return mId.hashCode();
 	}
 
 	@Override public String toString() {
-		return title;
+		return mTitle;
 	}
 }

@@ -111,7 +111,7 @@ public class PreferencesAccountFragment extends Fragment {
 		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_URL, LIST_FIELD_LOGIN, LIST_FIELD_PASSWORD};
 		int[] orderedFieldIds = new int[]{
 				R.id.preferences_accounts_fragment_cell_title_edittext,
-				R.id.preferences_accounts_fragment_cell_url_edittext,
+				R.id.preferences_accounts_fragment_cell_server_edittext,
 				R.id.preferences_accounts_fragment_cell_login_edittext,
 				R.id.preferences_accounts_fragment_cell_password_edittext
 		};
@@ -283,7 +283,7 @@ public class PreferencesAccountFragment extends Fragment {
 			// Retrieve entries (a Holder might be overkill for 7 subviews...)
 
 			final EditText titleEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext));
-			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_url_edittext));
+			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext));
 			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
 			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
 

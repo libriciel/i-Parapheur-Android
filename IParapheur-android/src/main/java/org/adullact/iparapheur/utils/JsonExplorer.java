@@ -14,6 +14,7 @@ import com.google.gson.JsonSyntaxException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 /**
  * Allows to fetch a value for any given {@link JsonObject} or {@link String}, in a single line.
  * <p/>
@@ -38,12 +39,8 @@ public class JsonExplorer {
 
 	public JsonExplorer(String jsonString) {
 		if (!TextUtils.isEmpty(jsonString)) {
-			try {
-				_currentObject = new JsonParser().parse(jsonString);
-			}
-			catch (JsonSyntaxException exception) {
-				_currentObject = null;
-			}
+			try { _currentObject = new JsonParser().parse(jsonString); }
+			catch (JsonSyntaxException exception) { _currentObject = null; }
 		}
 		else {
 			_currentObject = null;
@@ -53,12 +50,20 @@ public class JsonExplorer {
 	}
 
 	public JsonExplorer(JSONObject jsonObject) {
-		_currentObject = sGson.fromJson(jsonObject.toString(), JsonElement.class);
+		if (jsonObject != null)
+			_currentObject = sGson.fromJson(jsonObject.toString(), JsonElement.class);
+		else
+			_currentObject = null;
+
 		_rootObject = _currentObject;
 	}
 
 	public JsonExplorer(JSONArray jsonArray) {
-		_currentObject = sGson.fromJson(jsonArray.toString(), JsonElement.class);
+		if (jsonArray != null)
+			_currentObject = sGson.fromJson(jsonArray.toString(), JsonElement.class);
+		else
+			_currentObject = null;
+
 		_rootObject = _currentObject;
 	}
 
@@ -198,8 +203,7 @@ public class JsonExplorer {
 
 	// </editor-fold desc="Primitive types">
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return (_currentObject != null ? _currentObject.toString() : null);
 	}
 }

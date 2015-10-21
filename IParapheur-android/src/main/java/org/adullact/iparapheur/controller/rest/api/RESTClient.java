@@ -15,11 +15,12 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.json.JSONException;
+import org.adullact.iparapheur.utils.JsonExplorer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 public enum RESTClient implements IParapheurAPI {
 
@@ -41,46 +42,22 @@ public enum RESTClient implements IParapheurAPI {
 	 * @return in entier représentant la version de l'API.
 	 */
 	private int getAPIVersion(Account account) throws IParapheurException {
-
 		Integer apiVersion = account.getApiVersion();
 
 		if (apiVersion == null) {
-			String tenant = account.getTenant();
-
-			String url = BASE_PATH +
-					((tenant != null) ? tenant + "." : "") +
-					account.getUrl() +
-					RESOURCE_API_VERSION +
-					(account.getTicket() != null ? "?alf_ticket=" + account.getTicket() : "");
+			String url = restClientAPI4.buildUrl(account, RESOURCE_API_VERSION, null, false);
 
 			try {
 				RequestResponse response = RESTUtils.get(url);
-				apiVersion = response.getResponse().getInt("level");
-				account.setApiVersion(apiVersion);
-			}
-			catch (JSONException e) {
-				throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
+				apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
 			}
 			catch (IParapheurException e) {
-				// Pour apiVersion < 3, authentification obligatoire...
-				if (e.getResId() == R.string.http_error_401) {
+
+				if (e.getResId() == R.string.http_error_401) {  // Mandatory authentication on API < 3
 					restClientAPI1.getTicket(account);
-					url = BASE_PATH +
-							((tenant != null) ? tenant + "." : "") +
-							account.getUrl() +
-							RESOURCE_API_VERSION +
-							"?alf_ticket=" + account.getTicket();
-
+					url = restClientAPI1.buildUrl(account, RESOURCE_API_VERSION, null, true);
 					RequestResponse response = RESTUtils.get(url);
-
-					try {
-						apiVersion = response.getResponse().getInt("level");
-					}
-					catch (JSONException e1) {
-						throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
-					}
-
-					account.setApiVersion(apiVersion);
+					apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
 				}
 				else {
 					throw e;
@@ -88,6 +65,10 @@ public enum RESTClient implements IParapheurAPI {
 			}
 		}
 
+		if (apiVersion == -1)
+			throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
+
+		account.setApiVersion(apiVersion);
 		return apiVersion;
 	}
 

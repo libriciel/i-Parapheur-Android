@@ -1,6 +1,10 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -10,8 +14,9 @@ import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.JsonExplorer;
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +35,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 	@Override public int test(Account account) throws IParapheurException {
 		int messageRes = R.string.test_unreachable;
 		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
+
 		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
 		if (response != null) {
 			if (response.getCode() == HttpURLConnection.HTTP_OK) {
@@ -51,58 +57,88 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 				}
 			}
 		}
+
 		return messageRes;
 	}
 
 	@Override public String getTicket(Account account) throws IParapheurException {
 
+		// Default case
+
 		String ticket = account.getTicket();
 		Long time = new Date().getTime();
 
-		if ((ticket == null) || ((time - account.getLastRequest()) > SESSION_TIMEOUT)) {
-			try {
-				String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
-				RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
-				if (response != null) {
-					JSONObject json = response.getResponse();
-					if (json != null) {
-						json = json.getJSONObject("data");
-						if (json != null) {
-							ticket = json.getString("ticket");
-							account.setTicket(ticket);
-						}
-					}
-				}
-			}
-			catch (JSONException ex) {
+		if ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < SESSION_TIMEOUT))
+			return ticket;
+
+		// Building request
+
+		String request;
+		try {
+			JSONStringer requestStringer = new JSONStringer();
+			requestStringer.object();
+			requestStringer.key("username").value(account.getLogin());
+			requestStringer.key("password").value(account.getPassword());
+			requestStringer.endObject();
+
+			request = requestStringer.toString();
+		}
+		catch (JSONException ex) { throw new IParapheurException(R.string.error_parse, null); }
+
+		// Parsing response
+
+		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
+		if (response != null) {
+
+			String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
+			if (TextUtils.isEmpty(responseTicket))
 				throw new IParapheurException(R.string.error_parse, null);
-			}
+
+			account.setTicket(responseTicket);
 		}
 
 		return ticket;
 	}
 
-	public String buildUrl(String action) throws IParapheurException {
+	public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
 		return buildUrl(action, null);
 	}
 
-	public String buildUrl(String action, String params) throws IParapheurException {
-		Account account = MyAccounts.INSTANCE.getSelectedAccount();
-		String ticket = getTicket(account);
-		String tenant = account.getTenant();
+	public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
+		return buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), action, params, true);
+	}
 
-		if (ticket == null)
+	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
+
+		// Default checks
+
+		if (account == null)
+			throw new IParapheurException(R.string.error_no_account, null);
+
+		String ticket = getTicket(account);
+		if (withTicket && TextUtils.isEmpty(ticket))
 			throw new IParapheurException(R.string.error_no_ticket, null);
 
 		account.setLastRequest(new Date().getTime());
 
-		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
-		stringBuilder.append((tenant != null) ? tenant + "." : "");
-		stringBuilder.append(MyAccounts.INSTANCE.getSelectedAccount().getUrl());
-		stringBuilder.append(action);
-		stringBuilder.append("?alf_ticket=").append(ticket);
-		stringBuilder.append(((params != null) ? "&" + params : ""));
+		// Build URL
 
+		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
+		if (!TextUtils.isEmpty(account.getTenant()))
+			stringBuilder.append(account.getTenant()).append(".");
+
+		stringBuilder.append(account.getUrl());
+		stringBuilder.append(action);
+
+		if (withTicket)
+			stringBuilder.append("?alf_ticket=").append(ticket);
+
+		if (!TextUtils.isEmpty(params))
+			stringBuilder.append("&").append(params);
+
+		//
+
+		Log.e("Adrien", "URL generated : " + stringBuilder.toString());
 		return stringBuilder.toString();
 	}
 
@@ -115,7 +151,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		File file = new File(path);
 		String fullUrl = buildUrl(url);
-
 		FileOutputStream fileOutput = null;
 
 		try {
@@ -123,9 +158,10 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			fileOutput = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int bufferLength;
-			while ((bufferLength = response.read(buffer)) > 0) {
+
+			while ((bufferLength = response.read(buffer)) > 0)
 				fileOutput.write(buffer, 0, bufferLength);
-			}
+
 			//close the output stream when done
 			fileOutput.close();
 		}
@@ -139,12 +175,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		}
 		finally {
 			if (fileOutput != null) {
-				try {
-					fileOutput.close();
-				}
-				catch (IOException logOrIgnore) {
-					logOrIgnore.printStackTrace();
-				}
+				try { fileOutput.close(); }
+				catch (IOException logOrIgnore) { logOrIgnore.printStackTrace(); }
 			}
 		}
 

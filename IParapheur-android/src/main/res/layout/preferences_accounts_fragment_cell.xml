@@ -33,7 +33,7 @@
                     android:layout_marginTop="8dp"
                     android:gravity="top"
                     android:hint="@string/pref_account_title"
-                    android:inputType="textNoSuggestions"
+                    android:inputType="textNoSuggestions|textVisiblePassword"
                     android:lines="1"
                     android:textColor="@color/text_black"
                     android:textColorHint="@color/text_black_disabled"
@@ -45,12 +45,12 @@
                     android:layout_marginTop="@dimen/about_card_margin_medium">
 
                     <EditText
-                        android:id="@+id/preferences_accounts_fragment_cell_url_edittext"
+                        android:id="@+id/preferences_accounts_fragment_cell_server_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="top"
                         android:hint="@string/pref_account_url"
-                        android:inputType="textUri"
+                        android:inputType="textNoSuggestions|textVisiblePassword"
                         android:lines="1"
                         android:nextFocusDown="@+id/preferences_accounts_fragment_cell_login_edittext"
                         android:textColor="@color/text_black"
@@ -76,7 +76,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="top"
                             android:hint="@string/pref_account_login"
-                            android:inputType="textNoSuggestions"
+                            android:inputType="textNoSuggestions|textVisiblePassword"
                             android:lines="1"
                             android:nextFocusDown="@+id/preferences_accounts_fragment_cell_password_edittext"
                             android:textColor="@color/text_black"

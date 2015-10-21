@@ -28,7 +28,6 @@ import javax.net.ssl.TrustManagerFactory;
 public class RESTUtils {
 
 	private static final String LOG_TAG = "RestUtils";
-
 	private static final String certAcAdullact = "-----BEGIN CERTIFICATE-----\n" +
 			"MIIHyTCCBbGgAwIBAgIUbyl4BzfA+DWwMPJHFgkdXxI7UGwwDQYJKoZIhvcNAQEF\n" +
 			"BQAwgbUxCzAJBgNVBAYTAkZSMRAwDgYDVQQIDAdIZXJhdWx0MRQwEgYDVQQHDAtN\n" +
@@ -85,7 +84,6 @@ public class RESTUtils {
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 			connection.setDoOutput(true); // Triggers POST.
 			connection.setChunkedStreamingMode(0);
-			//connection.setReadTimeout(10000);
 			connection.setConnectTimeout(10000);
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Charset", "UTF-8");

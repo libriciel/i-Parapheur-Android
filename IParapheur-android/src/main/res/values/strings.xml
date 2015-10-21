@@ -112,7 +112,7 @@
     <string name="http_error_ssl_failed">Erreur lors de la mise en place de la connexion sécurisée</string>
     <string name="http_error_explicit">%s</string>
 
-    <string name="http_error_400">Erreur lors de l\'envoi de la requête</string>
+    <string name="http_error_400">Erreur lors de l\'envoi de la requête (HTTP 400)</string>
     <string name="http_error_401">Authentification obligatoire</string>
     <string name="http_error_403">Votre compte ne permet pas d\'effectuer cette action</string>
     <string name="http_error_404">Ressource non trouvée</string>
@@ -123,6 +123,7 @@
     <string name="error_send_request">Erreur à l\'envoi de la requête</string>
     <string name="error_parse">Erreur lors du traitement de la réponse</string>
     <string name="error_no_ticket">Impossible de se connecter, veuillez vérifier vos comptes</string>
+    <string name="error_no_account">Impossible de se connecter, veuillez vérifier vos comptes</string>
     <string name="error_no_storage">Stockage inaccessible</string>
     <string name="error_file_not_found">Impossible d\'enregistrer le fichier.</string>
     <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application</string>
