@@ -2,11 +2,13 @@ package org.adullact.iparapheur.controller.rest;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.rest.api.RESTClientAPI;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -25,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -168,7 +171,6 @@ public class RESTUtils {
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
 
 			res = new RequestResponse(connection);
-
 		}
 		catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -277,6 +279,14 @@ public class RESTUtils {
 		}
 
 		return requestContent;
+	}
+
+	public static boolean hasValidTicket(@NonNull Account account) {
+
+		String ticket = account.getTicket();
+		Long time = new Date().getTime();
+
+		return ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < RESTClientAPI.SESSION_TIMEOUT));
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {

@@ -26,8 +26,9 @@ import java.util.Date;
 
 public abstract class RESTClientAPI implements IParapheurAPI {
 
+	public static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
+
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";
-	private static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
 
 	@Override public int test(Account account) throws IParapheurException {
 
@@ -60,11 +61,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Default case
 
-		String ticket = account.getTicket();
-		Long time = new Date().getTime();
-
-		if ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < SESSION_TIMEOUT))
-			return ticket;
+		if (RESTUtils.hasValidTicket(account))
+			return account.getTicket();
 
 		// Building request
 
@@ -84,7 +82,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			account.setTicket(responseTicket);
 		}
 
-		return ticket;
+		return account.getTicket();
 	}
 
 	public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
@@ -96,6 +94,10 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 	}
 
 	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
+		return buildUrl(account, action, params, withTicket, true);
+	}
+
+	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket, boolean withTenant) throws IParapheurException {
 
 		// Default checks
 
@@ -114,7 +116,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		// Build URL
 
 		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
-		if (!TextUtils.isEmpty(account.getTenant()))
+
+		if (withTenant && (!TextUtils.isEmpty(account.getTenant())))
 			stringBuilder.append(account.getTenant()).append(".");
 
 		stringBuilder.append(account.getServerBaseUrl());

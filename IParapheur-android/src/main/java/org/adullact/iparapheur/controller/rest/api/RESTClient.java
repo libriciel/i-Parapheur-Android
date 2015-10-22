@@ -33,6 +33,10 @@ public enum RESTClient implements IParapheurAPI {
 	private final RESTClientAPI3 restClientAPI3 = new RESTClientAPI3();
 	private final RESTClientAPI3 restClientAPI4 = new RESTClientAPI4();
 
+	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
+		return getAPIVersion(account, true, false);
+	}
+
 	/**
 	 * Renvoie la version d'API du serveur i-Parapheur associé à ce compte.
 	 * Cette méthode peut faire une requête au serveur, il faut donc l'appeler dans
@@ -41,27 +45,48 @@ public enum RESTClient implements IParapheurAPI {
 	 * @param account le compte pour lequel on veur récupérer la version de l'API
 	 * @return in entier représentant la version de l'API.
 	 */
-	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
+	private int getAPIVersion(@NonNull Account account, boolean withTenant, boolean withAuthentication) throws IParapheurException {
+
+		// Default check
+
 		Integer apiVersion = account.getApiVersion();
+		if ((apiVersion != null))
+			return apiVersion;
 
-		if (apiVersion == null) {
-			String url = restClientAPI4.buildUrl(account, RESOURCE_API_VERSION, null, false);
+		// Request
 
-			try {
-				RequestResponse response = RESTUtils.get(url);
-				apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
+		String url = restClientAPI4.buildUrl(account, RESOURCE_API_VERSION, null, withAuthentication, withTenant);
+
+		try {
+			RequestResponse response = RESTUtils.get(url);
+			apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
+		}
+		catch (IParapheurException e) {
+
+			// 404 errors may be Tenant unavailability
+			// So we check for non-tenant reachability with a recursive call
+			if ((e.getResId() == R.string.http_error_404) && withTenant) {
+
+				boolean isReachableWithoutTenant = true;
+				try { getAPIVersion(account, false, withAuthentication); }
+				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.http_error_404); }
+
+				if (isReachableWithoutTenant)
+					throw new IParapheurException(R.string.test_tenant_not_exist, null);
+
+				throw e;
 			}
-			catch (IParapheurException e) {
 
-				if (e.getResId() == R.string.http_error_401) {  // Mandatory authentication on API < 3
-					restClientAPI1.getTicket(account);
-					url = restClientAPI1.buildUrl(account, RESOURCE_API_VERSION, null, true);
-					RequestResponse response = RESTUtils.get(url);
-					apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
-				}
-				else {
-					throw e;
-				}
+			// Authentication is mandatory on (API < 3)
+			// So we have to retrieve a ticket, and recursive call the method
+			else if ((e.getResId() == R.string.http_error_401) && !withAuthentication) {
+
+				restClientAPI1.getTicket(account);
+				apiVersion = getAPIVersion(account, withTenant, true);
+			}
+
+			else {
+				throw e;
 			}
 		}
 
