@@ -246,12 +246,15 @@ public class RESTUtils {
 	}
 
 	private static SSLSocketFactory getSSLSocketFactory() throws GeneralSecurityException, IOException {
+
 		InputStream in = new ByteArrayInputStream(certAcAdullact.getBytes());
 		CertificateFactory factory = CertificateFactory.getInstance("X.509");
 		Certificate certif = factory.generateCertificate(in);
+
 		final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		trustStore.load(null, null);
 		trustStore.setCertificateEntry("trust", certif);
+
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
 		tmf.init(trustStore);
 
@@ -260,7 +263,7 @@ public class RESTUtils {
 		return context.getSocketFactory();
 	}
 
-	public static @Nullable String getAccountAuthenticationJsonData(@NonNull Account account) {
+	public static @Nullable String getAuthenticationJsonData(@NonNull Account account) {
 
 		String requestContent = null;
 

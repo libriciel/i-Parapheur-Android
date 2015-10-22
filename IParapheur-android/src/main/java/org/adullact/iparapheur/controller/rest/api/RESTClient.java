@@ -73,6 +73,20 @@ public enum RESTClient implements IParapheurAPI {
 
 				if (isReachableWithoutTenant)
 					throw new IParapheurException(R.string.test_tenant_not_exist, null);
+				else
+					throw new IParapheurException(R.string.test_unreachable, null);
+			}
+
+			// Certificate errors may be Tenant wrong parameter
+			// So we check for non-tenant reachability with a recursive call
+			if ((e.getResId() == R.string.error_server_not_configured) && withTenant) {
+
+				boolean isReachableWithoutTenant = true;
+				try { getAPIVersion(account, false, withAuthentication); }
+				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.error_server_not_configured); }
+
+				if (isReachableWithoutTenant)
+					throw new IParapheurException(R.string.error_server_not_configured_for_tenant, null);
 
 				throw e;
 			}

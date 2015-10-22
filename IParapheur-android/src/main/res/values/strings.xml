@@ -97,7 +97,7 @@
     <string name="test_forbidden">Nom d\'utilisateur ou mot de passe incorrect</string>
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
-    <string name="test_tenant_not_exist">La collectivité est inaccessible,\nimpossible d\'accéder au tenant.</string>
+    <string name="test_tenant_not_exist">La collectivité est inaccessible.</string>
     <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
@@ -125,7 +125,8 @@
     <string name="error_no_account">Impossible de se connecter, veuillez vérifier vos comptes</string>
     <string name="error_no_storage">Stockage inaccessible</string>
     <string name="error_file_not_found">Impossible d\'enregistrer le fichier.</string>
-    <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application</string>
+    <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application mobile.</string>
+    <string name="error_server_not_configured_for_tenant">Le serveur ne permet pas l\'accès à cette collectivité.</string>
     <string name="action_non_implementee">non implémenté</string>
     <string name="action_journal">Journal d\'événements</string>
     <string name="no_content">Pas de contenu</string>

@@ -44,19 +44,21 @@ public class RequestResponse {
 						this.responseArray = (JSONArray) json;
 				}
 			}
-			else { // if code >= 400, response is in errorStream
+			else {
+				// if code >= 400, response is in errorStream
 				data = StringUtils.inputStreamToString(httpURLConnection.getErrorStream());
-				//Log.d("debug", "data : " + data);
+
 				Object json = new JSONTokener(data).nextValue();
-				if (json instanceof JSONObject) {
+				if (json instanceof JSONObject)
 					this.error = ((JSONObject) json).optString("message", "");
-				}
+
 				Crashlytics.logException(new Exception(error));
 				throw RESTUtils.getExceptionForError(this.code, error);
 			}
 		}
 		catch (JSONException e) {
 			Crashlytics.logException(e);
+			e.printStackTrace();
 			throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
 		}
 		catch (UnknownHostException e) {
@@ -66,7 +68,8 @@ public class RequestResponse {
 		}
 		catch (IOException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_parse, null);
+			e.printStackTrace();
+			throw new IParapheurException(R.string.error_server_not_configured, null);
 		}
 	}
 

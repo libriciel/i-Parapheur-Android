@@ -34,7 +34,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Build request
 
-		String requestContent = RESTUtils.getAccountAuthenticationJsonData(account);
+		String requestContent = RESTUtils.getAuthenticationJsonData(account);
 		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
 
 		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
@@ -66,7 +66,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		// Building request
 
-		String requestContent = RESTUtils.getAccountAuthenticationJsonData(account);
+		String requestContent = RESTUtils.getAuthenticationJsonData(account);
 		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
 
 		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
