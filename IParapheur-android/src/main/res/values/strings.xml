@@ -97,7 +97,7 @@
     <string name="test_forbidden">Nom d\'utilisateur ou mot de passe incorrect</string>
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
-    <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string>
+    <string name="test_tenant_not_exist">La collectivité est inaccessible,\nimpossible d\'accéder au tenant.</string>
     <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>

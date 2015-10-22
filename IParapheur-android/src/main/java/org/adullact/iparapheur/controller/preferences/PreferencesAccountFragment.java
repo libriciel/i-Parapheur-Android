@@ -30,6 +30,7 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -211,6 +212,9 @@ public class PreferencesAccountFragment extends Fragment {
 
 		mAccountData.add(accountData);
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
+
+		// Scroll down to the last element programmatically, to make it visible
+		mAccountList.setSelection(mAccountList.getCount() - 1);
 	}
 
 	private void cleanupUrlEditText(@NonNull EditText urlEditText) {
@@ -225,7 +229,13 @@ public class PreferencesAccountFragment extends Fragment {
 
 		mAccountData.clear();
 
+		// Retrieve and sort Account list (by titles, alphabetically)
+
 		List<Account> accountList = MyAccounts.INSTANCE.getAccounts();
+		Collections.sort(accountList, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
+
+		// Build map
+
 		for (Account account : accountList) {
 
 			Map<String, String> accountData = new HashMap<>();
@@ -234,6 +244,7 @@ public class PreferencesAccountFragment extends Fragment {
 			accountData.put(LIST_FIELD_URL, account.getServerBaseUrl());
 			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
+
 			mAccountData.add(accountData);
 		}
 	}
@@ -333,7 +344,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 			// Lock what should be locked
 
-			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_TITLE), getString(R.string.demo_account_title));
+			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), getString(R.string.demo_account_id));
 
 			lockEditText(titleEditText, !isDemoAccount);
 			lockEditText(urlEditText, !isDemoAccount);

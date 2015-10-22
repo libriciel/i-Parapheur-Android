@@ -1,11 +1,15 @@
 package org.adullact.iparapheur.utils;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
+
+import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.model.Account;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -27,6 +32,22 @@ import java.util.regex.Pattern;
 
 
 public class StringUtils {
+
+	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
+
+		return new Comparator<Account>() {
+			@Override public int compare(Account lhs, Account rhs) {
+
+				if (TextUtils.equals(lhs.getId(), context.getString(R.string.demo_account_id)))
+					return 1;
+
+				if (TextUtils.equals(rhs.getId(), context.getString(R.string.demo_account_id)))
+					return -1;
+
+				return lhs.getTitle().compareTo(rhs.getTitle());
+			}
+		};
+	}
 
 	@SuppressWarnings("unused") public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)
