@@ -155,8 +155,10 @@ public class PreferencesAccountFragment extends Fragment {
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
 		Account currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
 
-		if (currentAccount == null)
+		if (currentAccount == null) {
 			currentAccount = MyAccounts.INSTANCE.addAccount();
+			mAccountData.get(position).put(LIST_FIELD_ID, currentAccount.getId());
+		}
 
 		// Edit
 
