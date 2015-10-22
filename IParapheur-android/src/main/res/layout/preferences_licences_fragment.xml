@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_200"
+    android:clickable="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="false"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="8dp"
+                android:elevation="2dp"
+                card_view:cardCornerRadius="4dp"
+                tools:ignore="UnusedAttribute">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- MuPDF license -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/about_library_license_mupdf_title"
+                        android:textColor="@color/text_black"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_mupdf_copyright"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_mupdf_license"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <!-- Spongy license -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_medium"
+                        android:text="@string/about_library_license_spongy_title"
+                        android:textColor="@color/text_black"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_spongy_copyright"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_spongy_license"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <!-- Sun Security support license -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_medium"
+                        android:text="@string/about_library_license_sun_title"
+                        android:textColor="@color/text_black"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_sun_copyright"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_sun_license"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <!-- Android support license -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_medium"
+                        android:text="@string/about_library_license_android_support_title"
+                        android:textColor="@color/text_black"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_android_support_copyright"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_android_support_license"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <!-- Gson license -->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_medium"
+                        android:text="@string/about_library_license_gson_title"
+                        android:textColor="@color/text_black"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_gson_copyright"
+                        android:textColor="@color/text_black_secondary"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/about_card_margin_small"
+                        android:text="@string/about_library_license_gson_license"
+                        android:textColor="@color/text_black_secondary"/>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

@@ -14,6 +14,8 @@ import org.json.JSONTokener;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+
 
 public class RequestResponse {
 
@@ -34,9 +36,7 @@ public class RequestResponse {
 			if (this.code < HttpURLConnection.HTTP_BAD_REQUEST) { // if code < 400, response is in inputStream
 				if (!ignoreResponseData) {
 					data = StringUtils.inputStreamToString(httpURLConnection.getInputStream());
-					//Log.d("debug", "data : " + data);
 					Object json = new JSONTokener(data).nextValue();
-					//Log.d("debug", "json : " + json);
 
 					if (json instanceof JSONObject)
 						this.response = (JSONObject) json;
@@ -44,28 +44,32 @@ public class RequestResponse {
 						this.responseArray = (JSONArray) json;
 				}
 			}
-			else { // if code >= 400, response is in errorStream
+			else {
+				// if code >= 400, response is in errorStream
 				data = StringUtils.inputStreamToString(httpURLConnection.getErrorStream());
-				//Log.d("debug", "data : " + data);
+
 				Object json = new JSONTokener(data).nextValue();
-				if (json instanceof JSONObject) {
+				if (json instanceof JSONObject)
 					this.error = ((JSONObject) json).optString("message", "");
-				}
+
 				Crashlytics.logException(new Exception(error));
 				throw RESTUtils.getExceptionForError(this.code, error);
 			}
 		}
 		catch (JSONException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_parse, e.getStackTrace().toString());
+			e.printStackTrace();
+			throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
 		}
 		catch (UnknownHostException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.http_error_malformed_url, httpURLConnection.getURL().getHost());
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_404, httpURLConnection.getURL().getHost());
 		}
 		catch (IOException e) {
 			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_parse, null);
+			e.printStackTrace();
+			throw new IParapheurException(R.string.error_server_not_configured, null);
 		}
 	}
 

@@ -1,10 +1,19 @@
 package org.adullact.iparapheur.controller.rest;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.rest.api.RESTClientAPI;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.json.JSONException;
+import org.json.JSONStringer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -28,7 +38,6 @@ import javax.net.ssl.TrustManagerFactory;
 public class RESTUtils {
 
 	private static final String LOG_TAG = "RestUtils";
-
 	private static final String certAcAdullact = "-----BEGIN CERTIFICATE-----\n" +
 			"MIIHyTCCBbGgAwIBAgIUbyl4BzfA+DWwMPJHFgkdXxI7UGwwDQYJKoZIhvcNAQEF\n" +
 			"BQAwgbUxCzAJBgNVBAYTAkZSMRAwDgYDVQQIDAdIZXJhdWx0MRQwEgYDVQQHDAtN\n" +
@@ -85,7 +94,6 @@ public class RESTUtils {
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 			connection.setDoOutput(true); // Triggers POST.
 			connection.setChunkedStreamingMode(0);
-			//connection.setReadTimeout(10000);
 			connection.setConnectTimeout(10000);
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
@@ -93,11 +101,22 @@ public class RESTUtils {
 			output.write(body.getBytes());
 			res = new RequestResponse(connection);
 		}
-		catch (IParapheurException e) { throw e; }
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
-		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
-		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
-		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
+		catch (ProtocolException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_405, null);
+		}
+		catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_400, null);
+		}
 
 		return res;
 	}
@@ -126,7 +145,10 @@ public class RESTUtils {
 			output.write(body.getBytes());
 			res = new RequestResponse(connection, ignoreResponseData);
 		}
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
 		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
 		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
 		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
@@ -137,28 +159,35 @@ public class RESTUtils {
 	public static RequestResponse get(String url) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
-		String urlStr = url;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
+			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("GET");
-			connection.setDoOutput(false); // Don't trigger POST.
+			connection.setDoOutput(false);
 			connection.setChunkedStreamingMode(0);
-			//connection.setReadTimeout(10000);
 			connection.setConnectTimeout(10000);
-			//connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept-Charset", "UTF-8");
 
 			res = new RequestResponse(connection);
-
 		}
-		catch (IParapheurException e) { throw e; }
-		catch (MalformedURLException e) { throw new IParapheurException(R.string.http_error_malformed_url, url); }
-		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
-		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
-		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_malformed_url, url);
+		}
+		catch (ProtocolException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_405, null);
+		}
+		catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.http_error_400, null);
+		}
 
 		return res;
 	}
@@ -170,9 +199,9 @@ public class RESTUtils {
 	public static RequestResponse delete(String url, boolean ignoreResponseData) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
-		String urlStr = url;
+
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(urlStr).openConnection();
+			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
 			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("DELETE");
@@ -185,21 +214,13 @@ public class RESTUtils {
 
 			res = new RequestResponse(connection, ignoreResponseData);
 		}
-		catch (IParapheurException e) {
-			throw e;
-		}
 		catch (MalformedURLException e) {
+			e.printStackTrace();
 			throw new IParapheurException(R.string.http_error_malformed_url, url);
 		}
-		catch (ProtocolException e) {
-			throw new IParapheurException(R.string.http_error_405, null);
-		}
-		catch (GeneralSecurityException e) {
-			throw new IParapheurException(R.string.http_error_ssl_failed, null);
-		}
-		catch (IOException e) {
-			throw new IParapheurException(R.string.http_error_400, null);
-		}
+		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
+		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
+		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
 		return res;
 	}
 
@@ -225,12 +246,15 @@ public class RESTUtils {
 	}
 
 	private static SSLSocketFactory getSSLSocketFactory() throws GeneralSecurityException, IOException {
+
 		InputStream in = new ByteArrayInputStream(certAcAdullact.getBytes());
 		CertificateFactory factory = CertificateFactory.getInstance("X.509");
 		Certificate certif = factory.generateCertificate(in);
+
 		final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		trustStore.load(null, null);
 		trustStore.setCertificateEntry("trust", certif);
+
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
 		tmf.init(trustStore);
 
@@ -239,11 +263,41 @@ public class RESTUtils {
 		return context.getSocketFactory();
 	}
 
-	public static IParapheurException getExceptionForError(int code, String message) {
-		Log.d(LOG_TAG, "getExceptionForError : " + code + " " + message);
-		if (message != null) {
-			return new IParapheurException(R.string.http_error_explicit, message);
+	public static @Nullable String getAuthenticationJsonData(@NonNull Account account) {
+
+		String requestContent = null;
+
+		try {
+			JSONStringer requestStringer = new JSONStringer();
+			requestStringer.object();
+			requestStringer.key("username").value(account.getLogin());
+			requestStringer.key("password").value(account.getPassword());
+			requestStringer.endObject();
+
+			requestContent = requestStringer.toString();
 		}
+		catch (JSONException e) {
+			Crashlytics.logException(e);
+			e.printStackTrace();
+		}
+
+		return requestContent;
+	}
+
+	public static boolean hasValidTicket(@NonNull Account account) {
+
+		String ticket = account.getTicket();
+		Long time = new Date().getTime();
+
+		return ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < RESTClientAPI.SESSION_TIMEOUT));
+	}
+
+	public static IParapheurException getExceptionForError(int code, String message) {
+
+		Log.d(LOG_TAG, "getExceptionForError : " + code + " " + message);
+		if (message != null)
+			return new IParapheurException(R.string.http_error_explicit, message);
+
 		IParapheurException exception;
 		switch (code) {
 			case 400:

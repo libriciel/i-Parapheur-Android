@@ -32,22 +32,24 @@ import java.util.UUID;
 public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
 	public static final String FRAGMENT_TAG = "bureaux_list_fragment";
-	private BureauListFragmentListener listener;
 
+	private BureauListFragmentListener mListener;
 	private List<Bureau> mBureaux;                                // List of mBureaux currently displayed in this Fragment
 	private int selectedBureau = ListView.INVALID_POSITION;       // The currently selected dossier
 	private ListView listView;                                    // ListView used to show the mBureaux of the currently selected account
 	private SwipeRefreshLayout swipeRefreshLayout;                // Swipe refresh layout on top of the list view
 	private View mSpinnerProgressView;
 
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	// <editor-fold desc="LifeCycle">
+
+	@Override public void onAttach(Context context) {
+		super.onAttach(context);
 
 		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof BureauListFragmentListener))
+		if (!(context instanceof BureauListFragmentListener))
 			throw new IllegalStateException("Activity must implement BureauSelectedListener.");
 
-		listener = (BureauListFragmentListener) activity;
+		mListener = (BureauListFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,6 +83,15 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		updateBureaux(true);
 	}
 
+	@Override public void onDetach() {
+		super.onDetach();
+
+		// Reset the active callbacks interface.
+		mListener = null;
+	}
+
+	// </editor-fold desc="LifeCycle">
+
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload)
 			this.mBureaux = null;
@@ -98,7 +109,8 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (position != selectedBureau)
-			listener.onBureauListFragmentSelected(mBureaux.get(position).getId());
+			if (mListener != null)
+				mListener.onBureauListFragmentSelected(mBureaux.get(position).getId());
 	}
 
 	// </editor-fold desc="OnItemClickListener">
@@ -110,7 +122,8 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 		// if a bureau was previously selected, we have to notify the parent
 		// activity that the data has changed, so the activity remove the previously selected
 		// dossiers list and details
-		listener.onBureauListFragmentSelected(null);
+		if (mListener != null)
+			mListener.onBureauListFragmentSelected(null);
 	}
 
 	// </editor-fold desc="DataChangeListener">

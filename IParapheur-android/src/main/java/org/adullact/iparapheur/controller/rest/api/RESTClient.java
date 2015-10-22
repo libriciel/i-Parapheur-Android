@@ -15,11 +15,12 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.json.JSONException;
+import org.adullact.iparapheur.utils.JsonExplorer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 public enum RESTClient implements IParapheurAPI {
 
@@ -32,6 +33,10 @@ public enum RESTClient implements IParapheurAPI {
 	private final RESTClientAPI3 restClientAPI3 = new RESTClientAPI3();
 	private final RESTClientAPI3 restClientAPI4 = new RESTClientAPI4();
 
+	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
+		return getAPIVersion(account, true, false);
+	}
+
 	/**
 	 * Renvoie la version d'API du serveur i-Parapheur associé à ce compte.
 	 * Cette méthode peut faire une requête au serveur, il faut donc l'appeler dans
@@ -40,54 +45,69 @@ public enum RESTClient implements IParapheurAPI {
 	 * @param account le compte pour lequel on veur récupérer la version de l'API
 	 * @return in entier représentant la version de l'API.
 	 */
-	private int getAPIVersion(Account account) throws IParapheurException {
+	private int getAPIVersion(@NonNull Account account, boolean withTenant, boolean withAuthentication) throws IParapheurException {
+
+		// Default check
 
 		Integer apiVersion = account.getApiVersion();
+		if ((apiVersion != null))
+			return apiVersion;
 
-		if (apiVersion == null) {
-			String tenant = account.getTenant();
+		// Request
 
-			String url = BASE_PATH +
-					((tenant != null) ? tenant + "." : "") +
-					account.getUrl() +
-					RESOURCE_API_VERSION +
-					(account.getTicket() != null ? "?alf_ticket=" + account.getTicket() : "");
+		String url = restClientAPI4.buildUrl(account, RESOURCE_API_VERSION, null, withAuthentication, withTenant);
 
-			try {
-				RequestResponse response = RESTUtils.get(url);
-				apiVersion = response.getResponse().getInt("level");
-				account.setApiVersion(apiVersion);
+		try {
+			RequestResponse response = RESTUtils.get(url);
+			apiVersion = new JsonExplorer(response.getResponse()).optInt("level", -1);
+		}
+		catch (IParapheurException e) {
+
+			// 404 errors may be Tenant unavailability
+			// So we check for non-tenant reachability with a recursive call
+			if ((e.getResId() == R.string.http_error_404) && withTenant) {
+
+				boolean isReachableWithoutTenant = true;
+				try { getAPIVersion(account, false, withAuthentication); }
+				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.http_error_404); }
+
+				if (isReachableWithoutTenant)
+					throw new IParapheurException(R.string.test_tenant_not_exist, null);
+				else
+					throw new IParapheurException(R.string.test_unreachable, null);
 			}
-			catch (JSONException e) {
-				throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
+
+			// Certificate errors may be Tenant wrong parameter
+			// So we check for non-tenant reachability with a recursive call
+			if ((e.getResId() == R.string.error_server_not_configured) && withTenant) {
+
+				boolean isReachableWithoutTenant = true;
+				try { getAPIVersion(account, false, withAuthentication); }
+				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.error_server_not_configured); }
+
+				if (isReachableWithoutTenant)
+					throw new IParapheurException(R.string.error_server_not_configured_for_tenant, null);
+
+				throw e;
 			}
-			catch (IParapheurException e) {
-				// Pour apiVersion < 3, authentification obligatoire...
-				if (e.getResId() == R.string.http_error_401) {
-					restClientAPI1.getTicket(account);
-					url = BASE_PATH +
-							((tenant != null) ? tenant + "." : "") +
-							account.getUrl() +
-							RESOURCE_API_VERSION +
-							"?alf_ticket=" + account.getTicket();
 
-					RequestResponse response = RESTUtils.get(url);
+			// Authentication is mandatory on (API < 3)
+			// So we have to retrieve a ticket, and recursive call the method
+			else if ((e.getResId() == R.string.http_error_401) && !withAuthentication) {
 
-					try {
-						apiVersion = response.getResponse().getInt("level");
-					}
-					catch (JSONException e1) {
-						throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
-					}
+				restClientAPI1.getTicket(account);
+				apiVersion = getAPIVersion(account, withTenant, true);
+			}
 
-					account.setApiVersion(apiVersion);
-				}
-				else {
-					throw e;
-				}
+			else {
+				throw e;
 			}
 		}
 
+		if (apiVersion == -1)
+			throw new IParapheurException(R.string.error_mismatch_versions, account.getTitle());
+
+		account.setApiVersion(apiVersion);
 		return apiVersion;
 	}
 

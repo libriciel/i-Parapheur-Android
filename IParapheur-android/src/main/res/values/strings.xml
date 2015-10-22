@@ -64,7 +64,6 @@
     <string name="etape_courante">Étape courante</string>
 
     <!-- Dialogs -->
-
     <string name="import_title">Importer un certificat BKS</string>
     <string name="import_certificate">Importer</string>
     <string name="import_successful">Le certificat a été importé avec succès.</string>
@@ -98,8 +97,8 @@
     <string name="test_forbidden">Nom d\'utilisateur ou mot de passe incorrect</string>
     <string name="test_not_found">URL non trouvée</string>
     <string name="test_unreachable">Impossible d\'accéder au serveur</string>
-    <string name="test_tenant_not_exist">La collectivité renseignée n\'existe pas.</string>
-    <string name="pref_account_test">Tester la connexion</string>
+    <string name="test_tenant_not_exist">La collectivité est inaccessible.</string>
+    <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
     <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
@@ -112,10 +111,10 @@
     <string name="http_error_ssl_failed">Erreur lors de la mise en place de la connexion sécurisée</string>
     <string name="http_error_explicit">%s</string>
 
-    <string name="http_error_400">Erreur lors de l\'envoi de la requête</string>
+    <string name="http_error_400">Erreur lors de l\'envoi de la requête (HTTP 400)</string>
     <string name="http_error_401">Authentification obligatoire</string>
     <string name="http_error_403">Votre compte ne permet pas d\'effectuer cette action</string>
-    <string name="http_error_404">Ressource non trouvée</string>
+    <string name="http_error_404">Page non trouvée (HTTP 404)</string>
     <string name="http_error_405">Méthode de requête non autorisée</string>
     <string name="http_error_503">Le service est actuellement indisponible</string>
 
@@ -123,9 +122,11 @@
     <string name="error_send_request">Erreur à l\'envoi de la requête</string>
     <string name="error_parse">Erreur lors du traitement de la réponse</string>
     <string name="error_no_ticket">Impossible de se connecter, veuillez vérifier vos comptes</string>
+    <string name="error_no_account">Impossible de se connecter, veuillez vérifier vos comptes</string>
     <string name="error_no_storage">Stockage inaccessible</string>
     <string name="error_file_not_found">Impossible d\'enregistrer le fichier.</string>
-    <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application</string>
+    <string name="error_server_not_configured">Le serveur ne permet pas l\'utilisation de l\'application mobile.</string>
+    <string name="error_server_not_configured_for_tenant">Le serveur ne permet pas l\'accès à cette collectivité.</string>
     <string name="action_non_implementee">non implémenté</string>
     <string name="action_journal">Journal d\'événements</string>
     <string name="no_content">Pas de contenu</string>
@@ -135,5 +136,7 @@
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
     <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
+    <string name="action_settings">Settings</string>
+    <string name="Settings">Réglages</string>
 
 </resources>

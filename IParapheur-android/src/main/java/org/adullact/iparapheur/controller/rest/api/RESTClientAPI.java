@@ -1,6 +1,9 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -10,8 +13,7 @@ import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.adullact.iparapheur.utils.JsonExplorer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,84 +26,110 @@ import java.util.Date;
 
 public abstract class RESTClientAPI implements IParapheurAPI {
 
+	public static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
+
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";
-	private static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
 
 	@Override public int test(Account account) throws IParapheurException {
-		int messageRes = R.string.test_unreachable;
-		String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
-		RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
-		if (response != null) {
-			if (response.getCode() == HttpURLConnection.HTTP_OK) {
-				messageRes = R.string.test_ok;
-			}
-			else {
-				switch (response.getCode()) {
-					case HttpURLConnection.HTTP_FORBIDDEN:
-						messageRes = R.string.test_forbidden;
-						break;
-					case HttpURLConnection.HTTP_NOT_FOUND:
-						messageRes = R.string.test_not_found;
-						break;
-					case HttpURLConnection.HTTP_INTERNAL_ERROR:
-						if (response.getError().contains("Tenant does not exist")) {
-							messageRes = R.string.test_tenant_not_exist;
-						}
-						break;
-				}
-			}
-		}
+
+		// Build request
+
+		String requestContent = RESTUtils.getAuthenticationJsonData(account);
+		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+
+		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
+
+		// Parse response
+
+		int messageRes = R.string.http_error_undefined;
+
+		if (response == null)
+			messageRes = R.string.http_error_undefined;
+		else if (response.getCode() == HttpURLConnection.HTTP_OK)
+			messageRes = R.string.test_ok;
+		else if (response.getCode() == HttpURLConnection.HTTP_FORBIDDEN)
+			messageRes = R.string.test_forbidden;
+		else if (response.getCode() == HttpURLConnection.HTTP_NOT_FOUND)
+			messageRes = R.string.test_not_found;
+		else if ((response.getCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) && response.getError().contains("Tenant does not exist"))
+			messageRes = R.string.test_tenant_not_exist;
+
 		return messageRes;
 	}
 
 	@Override public String getTicket(Account account) throws IParapheurException {
 
-		String ticket = account.getTicket();
-		Long time = new Date().getTime();
+		// Default case
 
-		if ((ticket == null) || ((time - account.getLastRequest()) > SESSION_TIMEOUT)) {
-			try {
-				String request = "{'username': '" + account.getLogin() + "', 'password': '" + account.getPassword() + "'}";
-				RequestResponse response = RESTUtils.post(BASE_PATH + account.getUrl() + ACTION_LOGIN, request);
-				if (response != null) {
-					JSONObject json = response.getResponse();
-					if (json != null) {
-						json = json.getJSONObject("data");
-						if (json != null) {
-							ticket = json.getString("ticket");
-							account.setTicket(ticket);
-						}
-					}
-				}
-			}
-			catch (JSONException ex) {
+		if (RESTUtils.hasValidTicket(account))
+			return account.getTicket();
+
+		// Building request
+
+		String requestContent = RESTUtils.getAuthenticationJsonData(account);
+		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+
+		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
+
+		// Parsing response
+
+		if (response != null) {
+
+			String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
+			if (TextUtils.isEmpty(responseTicket))
 				throw new IParapheurException(R.string.error_parse, null);
-			}
+
+			account.setTicket(responseTicket);
 		}
 
-		return ticket;
+		return account.getTicket();
 	}
 
-	public String buildUrl(String action) throws IParapheurException {
+	public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
 		return buildUrl(action, null);
 	}
 
-	public String buildUrl(String action, String params) throws IParapheurException {
-		Account account = MyAccounts.INSTANCE.getSelectedAccount();
-		String ticket = getTicket(account);
-		String tenant = account.getTenant();
+	public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
+		return buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), action, params, true);
+	}
 
-		if (ticket == null) {
+	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
+		return buildUrl(account, action, params, withTicket, true);
+	}
+
+	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket, boolean withTenant) throws IParapheurException {
+
+		// Default checks
+
+		if (account == null)
+			throw new IParapheurException(R.string.error_no_account, null);
+
+		String ticket = null;
+		if (withTicket)
+			ticket = getTicket(account);
+
+		if (withTicket && TextUtils.isEmpty(ticket))
 			throw new IParapheurException(R.string.error_no_ticket, null);
-		}
+
 		account.setLastRequest(new Date().getTime());
 
+		// Build URL
+
 		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
-		stringBuilder.append((tenant != null) ? tenant + "." : "");
-		stringBuilder.append(MyAccounts.INSTANCE.getSelectedAccount().getUrl());
+
+		if (withTenant && (!TextUtils.isEmpty(account.getTenant())))
+			stringBuilder.append(account.getTenant()).append(".");
+
+		stringBuilder.append(account.getServerBaseUrl());
 		stringBuilder.append(action);
-		stringBuilder.append("?alf_ticket=").append(ticket);
-		stringBuilder.append(((params != null) ? "&" + params : ""));
+
+		if (withTicket)
+			stringBuilder.append("?alf_ticket=").append(ticket);
+
+		if (!TextUtils.isEmpty(params))
+			stringBuilder.append("&").append(params);
+
+		//
 
 		return stringBuilder.toString();
 	}
@@ -115,7 +143,6 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 
 		File file = new File(path);
 		String fullUrl = buildUrl(url);
-
 		FileOutputStream fileOutput = null;
 
 		try {
@@ -123,9 +150,10 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			fileOutput = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int bufferLength;
-			while ((bufferLength = response.read(buffer)) > 0) {
+
+			while ((bufferLength = response.read(buffer)) > 0)
 				fileOutput.write(buffer, 0, bufferLength);
-			}
+
 			//close the output stream when done
 			fileOutput.close();
 		}
@@ -139,12 +167,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		}
 		finally {
 			if (fileOutput != null) {
-				try {
-					fileOutput.close();
-				}
-				catch (IOException logOrIgnore) {
-					logOrIgnore.printStackTrace();
-				}
+				try { fileOutput.close(); }
+				catch (IOException logOrIgnore) { logOrIgnore.printStackTrace(); }
 			}
 		}
 

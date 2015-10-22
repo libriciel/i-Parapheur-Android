@@ -106,10 +106,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		return view;
 	}
 
-	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-	}
-
 	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
@@ -130,7 +126,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override public void onDetach() {
 		super.onDetach();
-		// Reset the active callbacks interface .
+
+		// Reset the active callbacks interface.
 		mListener = null;
 	}
 
@@ -151,7 +148,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 							new Runnable() {
 								public void run() {
 									reload();
-									mListener.onDossierCheckedChanged();
+
+									if (mListener != null)
+										mListener.onDossierCheckedChanged();
 								}
 							}, 1500l
 					);
@@ -233,10 +232,13 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 			((DossierListAdapter) getListView().getAdapter()).clearSelection();
 
-			if (mBureauId != null)
-				mListener.onDossiersLoaded(mDossiersList.size());
-			else
-				mListener.onDossiersNotLoaded();
+			if (mListener != null) {
+
+				if (mBureauId != null)
+					mListener.onDossiersLoaded(mDossiersList.size());
+				else
+					mListener.onDossiersNotLoaded();
+			}
 
 			if (selectedDossier != ListView.INVALID_POSITION) {
 				selectedDossier = ListView.INVALID_POSITION;
@@ -245,7 +247,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				 * activity that the data has changed, so the activity remove the previously selected
 				 * dossier details
 				 */
-				mListener.onDossierSelected(null, null);
+				if (mListener != null)
+					mListener.onDossierSelected(null, null);
 			}
 		}
 	}

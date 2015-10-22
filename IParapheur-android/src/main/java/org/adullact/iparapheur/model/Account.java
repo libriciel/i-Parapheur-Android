@@ -1,45 +1,118 @@
 package org.adullact.iparapheur.model;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 public class Account implements Serializable {
 
 	public static final long _serialVersionUID = 1L;
 
-	private final String id;
-	private String title;
-	private String url;
-	private String login;
-	private String tenant;
-	private String password;
-	private String ticket;
-	private Integer apiVersion;
-	private Long lastRequest;
+	private final String mId;
+	private String mTitle;
+	private String mServerBaseUrl;
+	private String mLogin;
+	private String mTenant;
+	private String mPassword;
+	private String mTicket;
+	private Integer mApiVersion;
+	private Long mLastRequest;
 
 	public Account(String id) {
-		this.id = id;
-		this.title = "";
-		this.url = "";
-		this.login = "";
-		this.password = "";
-		this.tenant = null;
-		this.lastRequest = 0L;
+		mId = id;
+		mTitle = "";
+		mServerBaseUrl = "";
+		mLogin = "";
+		mPassword = "";
+		mTenant = null;
+		mLastRequest = 0L;
 	}
 
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return (title != null && !title.isEmpty() && login != null && !login.isEmpty() && password != null && !password.isEmpty() && isURLValid(url));
+	// <editor-fold desc="Getters / Setters">
+
+	public @NonNull String getId() {
+		return mId;
 	}
 
-	private static boolean isURLValid(String url) {
-		if (url == null || url.isEmpty()) {
+	public @NonNull String getTitle() {
+		return mTitle;
+	}
+
+	public void setTitle(@NonNull String title) {
+		mTitle = title;
+	}
+
+	public @NonNull String getServerBaseUrl() {
+		return mServerBaseUrl;
+	}
+
+	public void setServerBaseUrl(@NonNull String url) {
+		mServerBaseUrl = url;
+	}
+
+	public @NonNull String getLogin() {
+		return mLogin;
+	}
+
+	public void setLogin(@NonNull String login) {
+
+		mLogin = login;
+
+		if (login.contains("@"))
+			mTenant = login.substring(login.indexOf("@") + 1);
+	}
+
+	public @Nullable String getTenant() {
+		return mTenant;
+	}
+
+	public @NonNull String getPassword() {
+		return mPassword;
+	}
+
+	public void setPassword(@NonNull String password) {
+		mPassword = password;
+	}
+
+	public String getTicket() {
+		return mTicket;
+	}
+
+	public void setTicket(String ticket) {
+		mTicket = ticket;
+	}
+
+	public Integer getApiVersion() {
+		return mApiVersion;
+	}
+
+	public void setApiVersion(Integer apiVersion) {
+		mApiVersion = apiVersion;
+	}
+
+	public Long getLastRequest() {
+		return mLastRequest;
+	}
+
+	public void setLastRequest(Long lastRequest) {
+		mLastRequest = lastRequest;
+	}
+
+	// </editor-fold desc="Getters / Setters">
+
+	private static boolean isURLValid(@Nullable String url) {
+
+		if (TextUtils.isEmpty(url))
 			return false;
-		}
+
 		try {
 			new URL(IParapheurAPI.BASE_PATH + url);
 			return true;
@@ -49,100 +122,27 @@ public class Account implements Serializable {
 		}
 	}
 
-	@Override
-	public boolean equals(Object o) {
+	public boolean isValid() {
+		return validateAccount(mTitle, mLogin, mPassword, mServerBaseUrl);
+	}
+
+	public static boolean validateAccount(String title, String url, String login, String password) {
+		return StringUtils.areNotEmpty(title, login, password) && isURLValid(url);
+	}
+
+	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;
-			return this.id.equals(toCompare.id);
+			return TextUtils.equals(mId, toCompare.mId);
 		}
 		return false;
 	}
 
-	@Override
-	public int hashCode() {
-		return id.hashCode();
+	@Override public int hashCode() {
+		return mId.hashCode();
 	}
 
-	@Override
-	public String toString() {
-		return title;
+	@Override public String toString() {
+		return mTitle;
 	}
-
-	public boolean isValid() {
-		return (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(login) && !TextUtils.isEmpty(password) && isURLValid(url));
-	}
-
-	// <editor-fold desc="Getters / Setters">
-
-	public String getId() {
-		return id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
-		if (login != null) {
-			int separatorIndex = login.indexOf("@");
-			if (separatorIndex != -1) {
-				this.tenant = login.substring(separatorIndex + 1);
-			}
-		}
-	}
-
-	public String getTenant() {
-		return tenant;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getTicket() {
-		return ticket;
-	}
-
-	public void setTicket(String ticket) {
-		this.ticket = ticket;
-	}
-
-	public Integer getApiVersion() {
-		return apiVersion;
-	}
-
-	public void setApiVersion(Integer apiVersion) {
-		this.apiVersion = apiVersion;
-	}
-
-	public Long getLastRequest() {
-		return lastRequest;
-	}
-
-	public void setLastRequest(Long lastRequest) {
-		this.lastRequest = lastRequest;
-	}
-
-	// </editor-fold desc="Getters / Setters">
 }

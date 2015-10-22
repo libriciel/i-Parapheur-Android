@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class RejectDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "reject_dialog_fragment";
-	public static final int REQUEST_CODE_REJECT = 180510;    // Because R-E-J = 18-5-10
+	public static final int REQUEST_CODE_REJECT = 180510;    // Because R-E-J = 18-05-10
 
 	private static final String LOG_TAG = "RejectDialogFragment";
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
