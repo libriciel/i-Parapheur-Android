@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+
+@SuppressWarnings("unused")
 public class IOUtils {
 
 	/**

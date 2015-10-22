@@ -15,8 +15,10 @@ import android.widget.ListView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -111,6 +113,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 			if (account.isValid())
 				mAccounts.add(account);
 
+		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getContext()));
+
 		if (mAccountListAdapter != null)
 			mAccountListAdapter.notifyDataSetChanged();
 	}
@@ -122,7 +126,9 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	// <editor-fold desc="OnItemClickListener">
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		mListener.onAccountSelected(mAccounts.get(position));
+
+		if (mListener != null)
+			mListener.onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">

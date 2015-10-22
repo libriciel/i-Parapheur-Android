@@ -173,7 +173,9 @@ public class PreferencesAccountFragment extends Fragment {
 		MyAccounts.INSTANCE.save(currentAccount);
 
 		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
-		mListener.onAccountModified(currentAccount);
+
+		if (mListener != null)
+			mListener.onAccountModified(currentAccount);
 	}
 
 	private void onDeleteButtonClicked(int position) {
