@@ -9,7 +9,7 @@
 
     <string name="pref_header_accounts">Comptes</string>
     <string name="pref_header_legal">Informations légales</string>
-    <string name="pref_header_licenses">Licenses</string>
+    <string name="pref_header_licenses">Licenses tierces</string>
     <string name="pref_header_certificates">Certificats</string>
 
     <!-- Account -->
