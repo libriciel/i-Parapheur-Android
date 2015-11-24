@@ -52,6 +52,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "signature_dialog_fragment";
 	public static final int REQUEST_CODE_SIGNATURE = 19090714;    // Because S-I-G-N = 19-09-07-14
+	public static final int RESULT_CODE_SIGN_PAPIER = 1601160518;    // Because P-A-P-E-R = 16-01-16-05-18
 
 	private static final String LOG_TAG = "SignatureDialogFragment";
 	private static final String ARGUMENTS_DOSSIERS = "dossiers";
@@ -108,7 +109,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		// Create view
 
-		View view = View.inflate(getActivity(), R.layout.action_dialog_signature, null);
+		final View view = View.inflate(getActivity(), R.layout.action_dialog_signature, null);
 
 		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_public_annotation);
 		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_private_annotation);
@@ -174,8 +175,17 @@ public class SignatureDialogFragment extends DialogFragment {
 		);
 		builder.setNegativeButton(
 				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
+					@Override public void onClick(DialogInterface dialog, int which) {
 						onCancelButtonClicked();
+					}
+				}
+		);
+		builder.setNeutralButton(
+				R.string.action_sign_papier, new DialogInterface.OnClickListener() {
+					@Override public void onClick(DialogInterface dialog, int which) {
+						// Do nothing here because we override this button in the onStart() to change the close behaviour.
+						// However, we still need this because on older versions of Android :
+						// unless we pass a handler the button doesn't get instantiated
 					}
 				}
 		);
@@ -193,15 +203,27 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		AlertDialog dialog = (AlertDialog) getDialog();
 		if (dialog != null) {
-			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-			positiveButton.setOnClickListener(
+
+			Button signButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+			signButton.setOnClickListener(
 					new View.OnClickListener() {
 						@Override public void onClick(View v) {
 							onSignButtonClicked();
 						}
 					}
 			);
+
+			Button signPapierButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
+			signPapierButton.setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View v) {
+							onSignPapierButtonClicked();
+						}
+					}
+			);
+
 		}
+
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -213,6 +235,12 @@ public class SignatureDialogFragment extends DialogFragment {
 
 			return;
 		}
+		else if ((requestCode == SignaturePapierConfirmDialogFragment.REQUEST_CODE_SIGN_PAPIER) && (resultCode == Activity.RESULT_OK)) {
+
+			new SignPapierTask().execute();
+
+			return;
+		}
 
 		super.onActivityResult(requestCode, resultCode, data);
 	}
@@ -220,6 +248,10 @@ public class SignatureDialogFragment extends DialogFragment {
 	// </editor-fold desc="LifeCycle">
 
 	private void onSignButtonClicked() {
+
+		// TODO : disable sign button, instead
+		if (mAliasesSpinner.getSelectedItem() == null)
+			return;
 
 		AskPasswordDialogFragment askFragment = AskPasswordDialogFragment.newInstance(mAliasesSpinner.getSelectedItem().toString());
 		askFragment.setTargetFragment(this, AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD);
@@ -232,6 +264,13 @@ public class SignatureDialogFragment extends DialogFragment {
 	private void onCancelButtonClicked() {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
 		dismiss();
+	}
+
+	private void onSignPapierButtonClicked() {
+
+		SignaturePapierConfirmDialogFragment confirmationDialog = SignaturePapierConfirmDialogFragment.newInstance();
+		confirmationDialog.setTargetFragment(this, SignaturePapierConfirmDialogFragment.REQUEST_CODE_SIGN_PAPIER);
+		confirmationDialog.show(getActivity().getSupportFragmentManager(), SignaturePapierConfirmDialogFragment.FRAGMENT_TAG);
 	}
 
 	private void refreshCertificatesSpinner() {
@@ -462,6 +501,59 @@ public class SignatureDialogFragment extends DialogFragment {
 			else if (getActivity() != null) {
 				Toast.makeText(
 						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_error_message_unknown_error), Toast.LENGTH_SHORT
+				).show();
+			}
+		}
+	}
+
+	private class SignPapierTask extends AsyncTask<Void, Void, Boolean> {
+
+		private int mErrorMessage;
+
+		@Override protected void onPreExecute() {
+			super.onPreExecute();
+			mErrorMessage = -1;
+		}
+
+		@Override protected Boolean doInBackground(Void... voids) {
+
+			// Default cases
+
+			if (isCancelled())
+				return false;
+
+			//
+
+			int total = mDossierList.size();
+			for (int docIndex = 0; docIndex < total; docIndex++) {
+
+				if (isCancelled())
+					return false;
+
+				// Send request
+
+				try { RESTClient.INSTANCE.signPapier(mDossierList.get(docIndex).getId(), mBureauId); }
+				catch (IParapheurException e) {
+					e.printStackTrace();
+					Crashlytics.logException(e);
+					mErrorMessage = R.string.signature_error_message_not_sent_to_server;
+				}
+			}
+
+			// If no error message, then the signature is successful.
+			return (mErrorMessage == -1);
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if (success) {
+				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_CODE_SIGN_PAPIER, null);
+				dismiss();
+			}
+			else if (getActivity() != null) {
+				Toast.makeText(
+						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_papier_unknown_error), Toast.LENGTH_SHORT
 				).show();
 			}
 		}

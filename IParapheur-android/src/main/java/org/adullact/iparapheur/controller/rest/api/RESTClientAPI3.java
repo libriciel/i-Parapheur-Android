@@ -66,6 +66,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	/* Actions de validation principales les dossiers */
 	private static final String ACTION_VISA = "/parapheur/dossiers/%s/visa";
 	private static final String ACTION_SIGNATURE = "/parapheur/dossiers/%s/signature";
+	private static final String ACTION_SIGNATURE_PAPIER = "/parapheur/dossiers/%s/signPapier";
 	private static final String ACTION_TDT_ACTES = "/parapheur/dossiers/%s/tdtActes";
 	private static final String ACTION_TDT_HELIOS = "/parapheur/dossiers/%s/tdtHelios";
 	private static final String ACTION_MAILSEC = "/parapheur/dossiers/%s/mailsec";
@@ -90,9 +91,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-		if (filter == null) {
+
+		if (filter == null)
 			filter = new Filter();
-		}
 
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
@@ -107,8 +108,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
-
-		return modelMapper.getDossiers(RESTUtils.get(url));
+		RequestResponse response = RESTUtils.get(url);
+		return modelMapper.getDossiers(response);
 	}
 
 	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
@@ -122,8 +123,10 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	}
 
 	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
+
 		String url = buildUrl(String.format(Locale.US, RESOURCE_SIGN_INFO, dossierId), "bureauCourant=" + bureauId);
-		return modelMapper.getSignInfo(RESTUtils.get(url));
+		RequestResponse response = RESTUtils.get(url);
+		return modelMapper.getSignInfo(response);
 	}
 
 	// <editor-fold desc="Annotations">
@@ -281,6 +284,23 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
+		}
+
+		RequestResponse response = RESTUtils.post(buildUrl(actionUrl), jsonStringer.toString());
+		return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
+	}
+
+	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE_PAPIER, dossierId);
+
+		JSONStringer jsonStringer = new JSONStringer();
+		try {
+			jsonStringer.object();
+			jsonStringer.key("bureauCourant").value(bureauId);
+			jsonStringer.endObject();
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de la conversion en signature papier", e);
 		}
 
 		RequestResponse response = RESTUtils.post(buildUrl(actionUrl), jsonStringer.toString());

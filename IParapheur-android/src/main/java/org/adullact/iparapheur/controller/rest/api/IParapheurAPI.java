@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 public interface IParapheurAPI {
 
 	String BASE_PATH = "https://m.";
@@ -72,6 +73,8 @@ public interface IParapheurAPI {
 	boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
 	boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+
+	boolean signPapier(String dossierId, String bureauId) throws IParapheurException;
 
 	boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException;
 

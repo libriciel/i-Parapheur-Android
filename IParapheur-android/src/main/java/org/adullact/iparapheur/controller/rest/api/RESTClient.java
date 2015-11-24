@@ -201,6 +201,10 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().signer(dossierId, signValue, annotPub, annotPriv, bureauId);
 	}
 
+	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
+		return getRESTClient().signPapier(dossierId, bureauId);
+	}
+
 	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
 		return getRESTClient().archiver(dossierId, archiveTitle, withAnnexes, bureauId);
 	}

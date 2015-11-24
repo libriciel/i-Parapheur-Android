@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by jmaire on 09/06/2014.
  * API i-Parapheur version 1
@@ -204,6 +205,10 @@ public class RESTClientAPI1 extends RESTClientAPI {
 	}
 
 	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		return false;
+	}
+
+	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
 		return false;
 	}
 
