@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
@@ -15,8 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
+
 
 public class ModelMapper3 extends ModelMapper {
 
@@ -107,35 +108,36 @@ public class ModelMapper3 extends ModelMapper {
 		return dossiers;
 	}
 
-	@Override public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
+	@Override public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
 
-		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
+		ArrayList<EtapeCircuit> etapes = new ArrayList<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
-		boolean jsonNodeExists = jsonExplorer.findObject(DOSSIER_CIRCUIT).findArray(CIRCUIT_ETAPES).rebase();
 
-		// Default value
+		// Parsing root fields
 
-		if (!jsonNodeExists)
-			return circuit;
+		boolean isDigitSigeMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, false);
+		boolean hasSelectionScript = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_HAS_SELECTION_SCRIPT, false);
+		String signatureFormat = jsonExplorer.findObject(DOSSIER_CIRCUIT).optString(CIRCUIT_SIG_FORMAT, "");
 
-		// Parsing
+		// Parsing Etapes
 
+		jsonExplorer.findObject(DOSSIER_CIRCUIT).findArray(CIRCUIT_ETAPES).rebase();
 		for (int index = 0; index < jsonExplorer.getCurrentArraySize(); index++) {
 
 			EtapeCircuit currentEtape = new EtapeCircuit(
-					new Date(jsonExplorer.find(index).optLong(CIRCUIT_DATE_VALIDATION, -1)),
-					jsonExplorer.find(index).optBoolean(CIRCUIT_APPROVED, false),
-					jsonExplorer.find(index).optBoolean(CIRCUIT_REJECTED, false),
-					jsonExplorer.find(index).optString(CIRCUIT_PARAPHEUR_NAME),
-					jsonExplorer.find(index).optString(CIRCUIT_SIGNATAIRE),
-					Action.valueOf(jsonExplorer.find(index).optString(CIRCUIT_ACTION_DEMANDEE, Action.VISA.toString())),
-					jsonExplorer.find(index).optString(CIRCUIT_PUBLIC_ANNOTATIONS)
+					jsonExplorer.find(index).optLong(CIRCUIT_ETAPES_DATE_VALIDATION, -1),
+					jsonExplorer.find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
+					jsonExplorer.find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
+					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME),
+					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE),
+					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE, Action.VISA.toString()),
+					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS)
 			);
 
-			circuit.add(currentEtape);
+			etapes.add(currentEtape);
 		}
 
-		return circuit;
+		return new Circuit(etapes, signatureFormat, isDigitSigeMandatory, hasSelectionScript);
 	}
 
 	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {

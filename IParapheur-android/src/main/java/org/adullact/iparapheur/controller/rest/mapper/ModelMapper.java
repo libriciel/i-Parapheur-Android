@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+
 public class ModelMapper {
 
 	protected static String DOSSIER_ID = "id";
@@ -46,14 +47,18 @@ public class ModelMapper {
 	protected static String DOCUMENT_IS_LOCKED = "isLocked";
 	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
 
+	protected static String CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY = "isDigitalSignatureMandatory";
+	protected static String CIRCUIT_HAS_SELECTION_SCRIPT = "hasSelectionScript";
+	protected static String CIRCUIT_SIG_FORMAT = "sigFormat";
 	protected static String CIRCUIT_ETAPES = "etapes";
-	protected static String CIRCUIT_DATE_VALIDATION = "dateValidation";
-	protected static String CIRCUIT_APPROVED = "approved";
-	protected static String CIRCUIT_REJECTED = "rejected";
-	protected static String CIRCUIT_PARAPHEUR_NAME = "parapheurName";
-	protected static String CIRCUIT_SIGNATAIRE = "signataire";
-	protected static String CIRCUIT_ACTION_DEMANDEE = "actionDemandee";
-	protected static String CIRCUIT_PUBLIC_ANNOTATIONS = "annotPub";
+
+	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
+	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
+	protected static String CIRCUIT_ETAPES_REJECTED = "rejected";
+	protected static String CIRCUIT_ETAPES_PARAPHEUR_NAME = "parapheurName";
+	protected static String CIRCUIT_ETAPES_SIGNATAIRE = "signataire";
+	protected static String CIRCUIT_ETAPES_ACTION_DEMANDEE = "actionDemandee";
+	protected static String CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS = "annotPub";
 
 	protected static String SIGN_INFO_SIGNATURE_INFORMATIONS = "signatureInformations";
 	protected static String SIGN_INFO_HASH = "hash";
@@ -182,27 +187,25 @@ public class ModelMapper {
 	}
 
 	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
-		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
-		if (response.getResponse() != null) {
-			JSONArray circuitArray = response.getResponse().optJSONArray("circuit");
-			if (circuitArray != null) {
-				for (int i = 0; i < circuitArray.length(); i++) {
-					JSONObject etapeObject = circuitArray.optJSONObject(i);
-					circuit.add(
-							new EtapeCircuit(
-									StringUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
-									etapeObject.optBoolean("approved"),
-									etapeObject.optBoolean("rejected", false),
-									etapeObject.optString("parapheurName"),
-									etapeObject.optString("signataire"),
-									Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
-									etapeObject.optString("annotPub")
-							)
-					);
 
-				}
-			}
+		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
+
+		for (int index = 0; index < jsonExplorer.findArray("circuit").getCurrentArraySize(); index++) {
+
+			EtapeCircuit etapeCircuit = new EtapeCircuit(
+					jsonExplorer.findArray("circuit").find(index).optString("dateValidation"),
+					jsonExplorer.findArray("circuit").find(index).optBoolean("approved", false),
+					jsonExplorer.findArray("circuit").find(index).optBoolean("rejected", false),
+					jsonExplorer.findArray("circuit").find(index).optString("parapheurName", ""),
+					jsonExplorer.findArray("circuit").find(index).optString("signataire", ""),
+					jsonExplorer.findArray("circuit").find(index).optString("actionDemandee", Action.VISA.toString()),
+					jsonExplorer.findArray("circuit").find(index).optString("annotPub", "")
+			);
+
+			circuit.add(etapeCircuit);
 		}
+
 		return circuit;
 	}
 

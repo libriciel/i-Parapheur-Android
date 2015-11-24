@@ -1,6 +1,8 @@
 package org.adullact.iparapheur.controller.dossier.action;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -29,8 +31,20 @@ public class SignaturePapierConfirmDialogFragment extends DialogFragment {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
-		builder.setPositiveButton(R.string.signature_papier_transform, null);
-		builder.setNegativeButton(android.R.string.cancel, null);
+		builder.setPositiveButton(
+				R.string.signature_papier_transform, new DialogInterface.OnClickListener() {
+					@Override public void onClick(DialogInterface dialog, int which) {
+						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
+					}
+				}
+		);
+		builder.setNegativeButton(
+				android.R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override public void onClick(DialogInterface dialog, int which) {
+						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+					}
+				}
+		);
 
 		return builder.create();
 	}

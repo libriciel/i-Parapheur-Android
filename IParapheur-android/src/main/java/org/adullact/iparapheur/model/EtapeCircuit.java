@@ -3,7 +3,10 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.adullact.iparapheur.utils.StringUtils;
+
 import java.util.Date;
+
 
 public class EtapeCircuit implements Parcelable {
 
@@ -28,13 +31,23 @@ public class EtapeCircuit implements Parcelable {
 
 	// <editor-fold desc="Setters / Getters">
 
-	public EtapeCircuit(Date dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, Action action, String publicAnnotation) {
-		this.dateValidation = dateValidation;
+	public EtapeCircuit(Long dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action, String publicAnnotation) {
+		this.dateValidation = new Date(dateValidation);
 		this.isApproved = isApproved;
 		this.isRejected = isRejected;
 		this.bureauName = bureauName;
 		this.signataire = signataire == null ? "" : signataire;
-		this.action = action;
+		this.action = Action.valueOf(action);
+		this.publicAnnotation = publicAnnotation;
+	}
+
+	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action, String publicAnnotation) {
+		this.dateValidation = StringUtils.parseISO8601Date(dateValidation);
+		this.isApproved = isApproved;
+		this.isRejected = isRejected;
+		this.bureauName = bureauName;
+		this.signataire = signataire == null ? "" : signataire;
+		this.action = Action.valueOf(action);
 		this.publicAnnotation = publicAnnotation;
 	}
 
@@ -80,18 +93,15 @@ public class EtapeCircuit implements Parcelable {
 
 	// </editor-fold desc="Setters / Getters">
 
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return bureauName;
 	}
 
-	@Override
-	public int describeContents() {
+	@Override public int describeContents() {
 		return 0;
 	}
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+	@Override public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(dateValidation != null ? dateValidation.getTime() : -1);
 		dest.writeByte(isApproved ? (byte) 1 : (byte) 0);
 		dest.writeByte(isRejected ? (byte) 1 : (byte) 0);
