@@ -291,7 +291,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 		title.setText(mDossier.getName());
 		typologie.setText(mDossier.getType() + " / " + mDossier.getSousType());
-		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit()));
+		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
 
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
 		getActivity().invalidateOptionsMenu();

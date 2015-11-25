@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
@@ -186,27 +187,27 @@ public class ModelMapper {
 		return dossiers;
 	}
 
-	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
+	public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
 
 		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
-		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
 
-		for (int index = 0; index < jsonExplorer.findArray("circuit").getCurrentArraySize(); index++) {
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
+		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_CIRCUIT).getCurrentArraySize(); index++) {
 
 			EtapeCircuit etapeCircuit = new EtapeCircuit(
-					jsonExplorer.findArray("circuit").find(index).optString("dateValidation"),
-					jsonExplorer.findArray("circuit").find(index).optBoolean("approved", false),
-					jsonExplorer.findArray("circuit").find(index).optBoolean("rejected", false),
-					jsonExplorer.findArray("circuit").find(index).optString("parapheurName", ""),
-					jsonExplorer.findArray("circuit").find(index).optString("signataire", ""),
-					jsonExplorer.findArray("circuit").find(index).optString("actionDemandee", Action.VISA.toString()),
-					jsonExplorer.findArray("circuit").find(index).optString("annotPub", "")
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_DATE_VALIDATION),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME, ""),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE, ""),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE, Action.VISA.toString()),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS, "")
 			);
 
 			circuit.add(etapeCircuit);
 		}
 
-		return circuit;
+		return new Circuit(circuit, null, true, false);
 	}
 
 	public ArrayList<Bureau> getBureaux(RequestResponse response) {

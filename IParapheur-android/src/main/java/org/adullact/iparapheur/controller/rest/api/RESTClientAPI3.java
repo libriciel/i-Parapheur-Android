@@ -10,8 +10,8 @@ import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
@@ -117,7 +117,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getTypologie(RESTUtils.get(url));
 	}
 
-	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
 		return modelMapper.getCircuit(RESTUtils.get(url));
 	}

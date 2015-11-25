@@ -25,6 +25,7 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -197,33 +198,33 @@ public class SignatureDialogFragment extends DialogFragment {
 		super.onStart();
 
 		refreshCertificatesSpinner();
+		refreshSignPapierButtonVisibility();
+		retrieveMissingCircuitParameters();
 
 		// Overriding the AlertDialog.Builder#setPositiveButton
 		// To be able to manage a click without dismissing the popup.
 
 		AlertDialog dialog = (AlertDialog) getDialog();
-		if (dialog != null) {
+		if (dialog == null)
+			return;
 
-			Button signButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-			signButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							onSignButtonClicked();
-						}
+		Button signButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+		signButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override public void onClick(View v) {
+						onSignButtonClicked();
 					}
-			);
+				}
+		);
 
-			Button signPapierButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
-			signPapierButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							onSignPapierButtonClicked();
-						}
+		Button signPapierButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
+		signPapierButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override public void onClick(View v) {
+						onSignPapierButtonClicked();
 					}
-			);
-
-		}
-
+				}
+		);
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -359,6 +360,51 @@ public class SignatureDialogFragment extends DialogFragment {
 			}
 		}.execute();
 
+	}
+
+	private void retrieveMissingCircuitParameters() {
+
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override protected Void doInBackground(Void... params) {
+
+				for (Dossier dossier : mDossierList) {
+					if (dossier.getCircuit() == null) {
+						try {
+							Circuit circuit = RESTClient.INSTANCE.getCircuit(dossier.getId());
+							dossier.setCircuit(circuit);
+						}
+						catch (IParapheurException e) {
+							e.printStackTrace();
+							Crashlytics.logException(e);
+						}
+					}
+				}
+
+				return null;
+			}
+
+			@Override protected void onPostExecute(Void aVoid) {
+				super.onPostExecute(aVoid);
+				refreshSignPapierButtonVisibility();
+			}
+
+		}.execute();
+	}
+
+	private void refreshSignPapierButtonVisibility() {
+
+		AlertDialog dialog = (AlertDialog) getDialog();
+		if (dialog == null)
+			return;
+
+		boolean isDigitalSignatureMandatory = false;
+
+		for (Dossier dossier : mDossierList)
+			if ((dossier.getCircuit() == null) || (dossier.getCircuit().isDigitalSignatureMandatory()))
+				isDigitalSignatureMandatory = true;
+
+		dialog.getButton(Dialog.BUTTON_NEUTRAL).setVisibility(isDigitalSignatureMandatory ? View.GONE : View.VISIBLE);
 	}
 
 	private class SignTask extends AsyncTask<String, Void, Boolean> {

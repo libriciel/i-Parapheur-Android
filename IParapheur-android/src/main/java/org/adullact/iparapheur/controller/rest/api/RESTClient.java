@@ -9,8 +9,8 @@ import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
@@ -167,7 +167,7 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getTypologie();
 	}
 
-	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		return getRESTClient().getCircuit(dossierId);
 	}
 

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+
 public class Dossier implements Parcelable {
 
 	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
@@ -34,7 +35,7 @@ public class Dossier implements Parcelable {
 	private final List<Document> mainDocuments = new ArrayList<Document>();
 	private final List<Document> annexes = new ArrayList<Document>();
 	private List<Action> actions;
-	private List<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
+	private Circuit circuit;
 
 	// TODO : remove
 	public Dossier(int i) {
@@ -89,7 +90,7 @@ public class Dossier implements Parcelable {
 		this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
 		in.readTypedList(mainDocuments, Document.CREATOR);
 		in.readTypedList(annexes, Document.CREATOR);
-		in.readTypedList(circuit, EtapeCircuit.CREATOR);
+		this.circuit = in.readParcelable(Circuit.class.getClassLoader());
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -130,11 +131,11 @@ public class Dossier implements Parcelable {
 		return annexes;
 	}
 
-	public List<EtapeCircuit> getCircuit() {
+	public Circuit getCircuit() {
 		return circuit;
 	}
 
-	public void setCircuit(List<EtapeCircuit> circuit) {
+	public void setCircuit(Circuit circuit) {
 		this.circuit = circuit;
 	}
 
@@ -163,11 +164,11 @@ public class Dossier implements Parcelable {
 	public void clearDetails() {
 		this.mainDocuments.clear();
 		this.annexes.clear();
-		this.circuit.clear();
+		this.circuit = null;
 	}
 
 	public boolean isDetailsAvailable() {
-		return (!circuit.isEmpty() && !mainDocuments.isEmpty());
+		return (circuit != null) && (circuit.getEtapeCircuitList() != null) && (!circuit.getEtapeCircuitList().isEmpty()) && (!mainDocuments.isEmpty());
 	}
 
 	public boolean hasActions() {
@@ -191,7 +192,7 @@ public class Dossier implements Parcelable {
 		dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
 		dest.writeTypedList(mainDocuments);
 		dest.writeTypedList(annexes);
-		dest.writeTypedList(circuit);
+		dest.writeParcelable(circuit, 0);
 	}
 
 	// </editor-fold desc="Parcelable">

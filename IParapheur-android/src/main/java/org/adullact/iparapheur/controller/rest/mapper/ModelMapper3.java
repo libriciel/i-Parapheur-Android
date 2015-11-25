@@ -110,16 +110,17 @@ public class ModelMapper3 extends ModelMapper {
 
 	@Override public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
 
-		ArrayList<EtapeCircuit> etapes = new ArrayList<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
 
 		// Parsing root fields
 
-		boolean isDigitSigeMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, false);
+		boolean isDigitSigeMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
 		boolean hasSelectionScript = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_HAS_SELECTION_SCRIPT, false);
 		String signatureFormat = jsonExplorer.findObject(DOSSIER_CIRCUIT).optString(CIRCUIT_SIG_FORMAT, "");
 
 		// Parsing Etapes
+
+		ArrayList<EtapeCircuit> etapes = new ArrayList<>();
 
 		jsonExplorer.findObject(DOSSIER_CIRCUIT).findArray(CIRCUIT_ETAPES).rebase();
 		for (int index = 0; index < jsonExplorer.getCurrentArraySize(); index++) {
