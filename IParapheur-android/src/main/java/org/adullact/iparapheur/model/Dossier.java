@@ -36,6 +36,7 @@ public class Dossier implements Parcelable {
 	private final List<Document> annexes = new ArrayList<Document>();
 	private List<Action> actions;
 	private Circuit circuit;
+	private boolean isSignPapier;
 
 	// TODO : remove
 	public Dossier(int i) {
@@ -47,7 +48,8 @@ public class Dossier implements Parcelable {
 				"Type",
 				"SousType",
 				Calendar.getInstance().getTime(),
-				Calendar.getInstance().getTime()
+				Calendar.getInstance().getTime(),
+				false
 		);
 		getActions().add(Action.VISA);
 	}
@@ -65,7 +67,7 @@ public class Dossier implements Parcelable {
 		this.actions = new ArrayList<>();
 	}
 
-	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
+	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite, boolean isSignPapier) {
 		this.id = id;
 		this.name = name;
 		this.actionDemandee = actionDemandee;
@@ -74,6 +76,7 @@ public class Dossier implements Parcelable {
 		this.sousType = sousType;
 		this.dateCreation = dateCreation;
 		this.dateLimite = dateLimite;
+		this.isSignPapier = isSignPapier;
 	}
 
 	private Dossier(Parcel in) {
@@ -91,6 +94,7 @@ public class Dossier implements Parcelable {
 		in.readTypedList(mainDocuments, Document.CREATOR);
 		in.readTypedList(annexes, Document.CREATOR);
 		this.circuit = in.readParcelable(Circuit.class.getClassLoader());
+		this.isSignPapier = in.readByte() != 0;
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -143,6 +147,10 @@ public class Dossier implements Parcelable {
 		return actionDemandee;
 	}
 
+	public boolean isSignPapier() {
+		return isSignPapier;
+	}
+
 	// </editor-fold desc="Setters / Getters">
 
 	public void addDocument(@Nullable Document document) {
@@ -193,6 +201,7 @@ public class Dossier implements Parcelable {
 		dest.writeTypedList(mainDocuments);
 		dest.writeTypedList(annexes);
 		dest.writeParcelable(circuit, 0);
+		dest.writeByte(isSignPapier ? (byte) 1 : (byte) 0);
 	}
 
 	// </editor-fold desc="Parcelable">

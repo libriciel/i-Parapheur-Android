@@ -38,6 +38,7 @@ public class ModelMapper {
 	protected static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
 	protected static String DOSSIER_EMISSION_DATE = "dateEmission";
 	protected static String DOSSIER_DATE_LIMITE = "dateLimite";
+	protected static String DOSSIER_IS_SIGN_PAPIER = "isSignPapier";
 	protected static String DOSSIER_DOCUMENTS = "documents";
 	protected static String DOSSIER_CIRCUIT = "circuit";
 
@@ -88,7 +89,8 @@ public class ModelMapper {
 				jsonObject.optString("type"),
 				jsonObject.optString("sousType"),
 				StringUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
-				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite"))
+				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite")),
+				jsonObject.optBoolean("isSignPapier", false)
 		);
 
 		JSONArray documents = jsonObject.optJSONArray("documents");

@@ -3,6 +3,8 @@ package org.adullact.iparapheur.controller.rest.mapper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.JsonObject;
+
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
@@ -22,89 +24,110 @@ import java.util.LinkedHashMap;
 public class ModelMapper3 extends ModelMapper {
 
 	@Override public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
+
 		Dossier dossier = null;
 
-		if (requestResponse.getResponse() != null)
-			dossier = getDossier(requestResponse.getResponse());
+		JsonObject dossierJsonObject = new JsonExplorer(requestResponse.getResponse()).optCurrentJsonObject();
+		if (dossierJsonObject != null)
+			dossier = getDossier(dossierJsonObject);
 
 		return dossier;
 	}
 
 	@Override protected Dossier getDossier(JSONObject jsonObject) {
+		JsonObject dossierJsonObject = new JsonExplorer(jsonObject).optCurrentJsonObject();
+		return getDossier(dossierJsonObject);
+	}
 
-		String dossierId = jsonObject.optString(DOSSIER_ID);
+	@Nullable protected Dossier getDossier(@Nullable JsonObject jsonObject) {
+
+		// Default case
+
+		if (jsonObject == null)
+			return null;
+
+		// Parsing
+
+		JsonExplorer jsonExplorer = new JsonExplorer(jsonObject);
+		String dossierId = jsonExplorer.optString(DOSSIER_ID);
 		ArrayList<Action> actions = getActionsForDossier(jsonObject);
 
 		Dossier dossier = new Dossier(
-				jsonObject.optString(DOSSIER_ID),
-				jsonObject.optString(DOSSIER_TITLE),
-				Action.valueOf(jsonObject.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
+				jsonExplorer.optString(DOSSIER_ID, ""),
+				jsonExplorer.optString(DOSSIER_TITLE, ""),
+				Action.valueOf(jsonExplorer.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
 				actions,
-				jsonObject.optString(DOSSIER_TYPE),
-				jsonObject.optString(DOSSIER_SUBTYPE),
-				StringUtils.parseISO8601Date(jsonObject.optString(DOSSIER_EMISSION_DATE)),
-				StringUtils.parseISO8601Date(jsonObject.optString(DOSSIER_DATE_LIMITE))
+				jsonExplorer.optString(DOSSIER_TYPE, ""),
+				jsonExplorer.optString(DOSSIER_SUBTYPE, ""),
+				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
+				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
+				jsonExplorer.optBoolean(DOSSIER_IS_SIGN_PAPIER, false)
 		);
 
-		JSONArray documents = jsonObject.optJSONArray(DOSSIER_DOCUMENTS);
-		if (documents != null) {
-			for (int index = 0; index < documents.length(); index++) {
-				JSONObject doc = documents.optJSONObject(index);
-				dossier.addDocument(parseDocument(doc, dossierId, index));
-			}
+		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_DOCUMENTS).getCurrentArraySize(); index++) {
+			JsonObject doc = jsonExplorer.findArray(DOSSIER_DOCUMENTS).find(index).optCurrentJsonObject();
+			dossier.addDocument(parseDocument(doc, dossierId, index));
 		}
 
 		return dossier;
 	}
 
-	private @Nullable Document parseDocument(@Nullable JSONObject documentJson, @NonNull String dossierId, int index) {
+	private @Nullable Document parseDocument(@Nullable JsonObject documentJson, @NonNull String dossierId, int index) {
 
 		if (documentJson == null)
 			return null;
 
-		String downloadUrl = "/api/node/workspace/SpacesStore/" + documentJson.optString(DOCUMENT_ID) + "/content";
-		if (documentJson.optBoolean(DOCUMENT_VISUEL_PDF, false))
+		JsonExplorer jsonExplorer = new JsonExplorer(documentJson);
+
+		String downloadUrl = "/api/node/workspace/SpacesStore/" + jsonExplorer.optString(DOCUMENT_ID, "") + "/content";
+		if (jsonExplorer.optBoolean(DOCUMENT_VISUEL_PDF, false))
 			downloadUrl += ";ph:visuel-pdf";
 
 		return new Document(
-				documentJson.optString(DOCUMENT_ID),
+				jsonExplorer.optString(DOCUMENT_ID),
 				dossierId,
-				documentJson.optString(DOCUMENT_NAME),
-				documentJson.optInt(DOCUMENT_SIZE, -1),
+				jsonExplorer.optString(DOCUMENT_NAME),
+				jsonExplorer.optInt(DOCUMENT_SIZE, -1),
 				downloadUrl,
-				documentJson.optBoolean(DOCUMENT_IS_LOCKED, false),
-				documentJson.optBoolean(DOCUMENT_IS_MAIN_DOCUMENT, (index == 0))
+				jsonExplorer.optBoolean(DOCUMENT_IS_LOCKED, false),
+				jsonExplorer.optBoolean(DOCUMENT_IS_MAIN_DOCUMENT, (index == 0))
 		);
 	}
 
 	@Override protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
+		JsonObject actionsJsonObject = new JsonExplorer(dossier).optCurrentJsonObject();
+		return getActionsForDossier(actionsJsonObject);
+	}
+
+	protected ArrayList<Action> getActionsForDossier(JsonObject dossier) {
+
 		ArrayList<Action> actions = new ArrayList<>();
-		JSONArray JSONActions = dossier.optJSONArray("actions");
-		if (JSONActions != null) {
-			for (int i = 0; i < JSONActions.length(); i++) {
-				String action = JSONActions.optString(i, null);
-				if (action != null) {
-					actions.add(Action.valueOf(action));
-				}
-			}
+		JsonExplorer jsonExplorer = new JsonExplorer(dossier);
+
+		for (int index = 0; index < jsonExplorer.findArray("actions").getCurrentArraySize(); index++) {
+			String action = jsonExplorer.findArray("actions").find(index).optCurrentString();
+
+			if (action != null)
+				actions.add(Action.valueOf(action));
 		}
+
 		return actions;
 	}
 
 	@Override public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
+
 		ArrayList<Dossier> dossiers = new ArrayList<>();
-		JSONArray array = requestResponse.getResponseArray();
-		if (array != null) {
-			for (int i = 0; i < array.length(); i++) {
-				JSONObject dossierJSON = array.optJSONObject(i);
-				if (dossierJSON != null) {
-					Dossier dossier = getDossier(dossierJSON);
-					if (dossier != null) {
-						dossiers.add(dossier);
-					}
-				}
-			}
+
+		JsonExplorer jsonExplorer = new JsonExplorer(requestResponse.getResponseArray());
+		for (int i = 0; i < jsonExplorer.getCurrentArraySize(); i++) {
+
+			JsonObject dossierJsonObject = jsonExplorer.find(i).optCurrentJsonObject();
+			Dossier dossier = getDossier(dossierJsonObject);
+
+			if (dossier != null)
+				dossiers.add(dossier);
 		}
+
 		return dossiers;
 	}
 

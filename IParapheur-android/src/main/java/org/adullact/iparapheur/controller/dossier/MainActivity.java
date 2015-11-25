@@ -353,52 +353,66 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+
 		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
-		if (fragment != null) {
-			HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
-			if ((checkedDossiers != null) && (!checkedDossiers.isEmpty())) {
-				actionMode.setTitle(getResources().getString(R.string.action_mode_nb_dossiers, checkedDossiers.size()));
-				// Get the intersection of all possible actions on checked dossiers and update the menu
-				menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
-				menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
 
-				HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+		// Default cases
 
-				boolean sign = false;
-				for (Dossier dossier : checkedDossiers) {
-					actions.retainAll(dossier.getActions());
-					sign = sign || dossier.getActions().contains(Action.SIGNATURE);
-				}
+		if (fragment == null)
+			return false;
 
-				for (Action action : actions) {
-					MenuItem item;
-					int menuItemId;
-					String menuTitle;
-					// Si c'est le visa, et qu'on a aussi de la signature dans le lot, on prend
-					// la signature (possible en API v3).
-					if (action.equals(Action.VISA) && (sign)) {
-						menuItemId = Action.SIGNATURE.getMenuItemId();
-						menuTitle = getResources().getString(Action.VISA.getTitle()) + "/" +
-								getResources().getString(Action.SIGNATURE.getTitle());
-					}
-					else {
-						menuItemId = action.getMenuItemId();
-						menuTitle = getResources().getString(action.getTitle());
-					}
+		HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
 
-					item = menu.findItem(menuItemId);
-					if (item != null) {
-						item.setTitle(menuTitle);
-						item.setVisible(true);
-					}
-				}
-				return true;
+		if ((checkedDossiers == null) || (checkedDossiers.isEmpty())) {
+			actionMode.finish();
+			return false;
+		}
+
+		// Compute visibility
+
+		actionMode.setTitle(getResources().getString(R.string.action_mode_nb_dossiers, checkedDossiers.size()));
+		// Get the intersection of all possible actions on checked dossiers and update the menu
+		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
+		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+
+		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+
+		boolean sign = false;
+		for (Dossier dossier : checkedDossiers) {
+			actions.retainAll(dossier.getActions());
+			sign = sign || (dossier.getActions().contains(Action.SIGNATURE) && !dossier.isSignPapier());
+		}
+
+		for (Action action : actions) {
+
+			MenuItem item;
+			int menuItemId;
+			String menuTitle;
+
+			// Si c'est le visa, et qu'on a aussi de la signature dans le lot, on prend
+			// la signature (possible en API v3).
+			if (action.equals(Action.VISA) && (sign)) {
+				menuItemId = Action.SIGNATURE.getMenuItemId();
+				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
 			}
 			else {
-				actionMode.finish();
+				menuItemId = action.getMenuItemId();
+				menuTitle = getString(action.getTitle());
+			}
+
+			// If we only have signPapier type, we only have a VISA, actually
+			boolean isVisible = !(action.equals(Action.SIGNATURE) && !sign);
+
+			// Set current state
+
+			item = menu.findItem(menuItemId);
+			if (item != null) {
+				item.setTitle(menuTitle);
+				item.setVisible(isVisible);
 			}
 		}
-		return false;
+
+		return true;
 	}
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
