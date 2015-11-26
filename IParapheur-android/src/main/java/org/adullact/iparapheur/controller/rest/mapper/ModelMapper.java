@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+
 public class ModelMapper {
 
 	protected static String DOSSIER_ID = "id";
@@ -36,6 +38,7 @@ public class ModelMapper {
 	protected static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
 	protected static String DOSSIER_EMISSION_DATE = "dateEmission";
 	protected static String DOSSIER_DATE_LIMITE = "dateLimite";
+	protected static String DOSSIER_IS_SIGN_PAPIER = "isSignPapier";
 	protected static String DOSSIER_DOCUMENTS = "documents";
 	protected static String DOSSIER_CIRCUIT = "circuit";
 
@@ -46,14 +49,18 @@ public class ModelMapper {
 	protected static String DOCUMENT_IS_LOCKED = "isLocked";
 	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
 
+	protected static String CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY = "isDigitalSignatureMandatory";
+	protected static String CIRCUIT_HAS_SELECTION_SCRIPT = "hasSelectionScript";
+	protected static String CIRCUIT_SIG_FORMAT = "sigFormat";
 	protected static String CIRCUIT_ETAPES = "etapes";
-	protected static String CIRCUIT_DATE_VALIDATION = "dateValidation";
-	protected static String CIRCUIT_APPROVED = "approved";
-	protected static String CIRCUIT_REJECTED = "rejected";
-	protected static String CIRCUIT_PARAPHEUR_NAME = "parapheurName";
-	protected static String CIRCUIT_SIGNATAIRE = "signataire";
-	protected static String CIRCUIT_ACTION_DEMANDEE = "actionDemandee";
-	protected static String CIRCUIT_PUBLIC_ANNOTATIONS = "annotPub";
+
+	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
+	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
+	protected static String CIRCUIT_ETAPES_REJECTED = "rejected";
+	protected static String CIRCUIT_ETAPES_PARAPHEUR_NAME = "parapheurName";
+	protected static String CIRCUIT_ETAPES_SIGNATAIRE = "signataire";
+	protected static String CIRCUIT_ETAPES_ACTION_DEMANDEE = "actionDemandee";
+	protected static String CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS = "annotPub";
 
 	protected static String SIGN_INFO_SIGNATURE_INFORMATIONS = "signatureInformations";
 	protected static String SIGN_INFO_HASH = "hash";
@@ -82,7 +89,8 @@ public class ModelMapper {
 				jsonObject.optString("type"),
 				jsonObject.optString("sousType"),
 				StringUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
-				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite"))
+				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite")),
+				jsonObject.optBoolean("isSignPapier", false)
 		);
 
 		JSONArray documents = jsonObject.optJSONArray("documents");
@@ -181,29 +189,27 @@ public class ModelMapper {
 		return dossiers;
 	}
 
-	public @NonNull ArrayList<EtapeCircuit> getCircuit(@NonNull RequestResponse response) {
-		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
-		if (response.getResponse() != null) {
-			JSONArray circuitArray = response.getResponse().optJSONArray("circuit");
-			if (circuitArray != null) {
-				for (int i = 0; i < circuitArray.length(); i++) {
-					JSONObject etapeObject = circuitArray.optJSONObject(i);
-					circuit.add(
-							new EtapeCircuit(
-									StringUtils.parseISO8601Date(etapeObject.optString("dateValidation")),
-									etapeObject.optBoolean("approved"),
-									etapeObject.optBoolean("rejected", false),
-									etapeObject.optString("parapheurName"),
-									etapeObject.optString("signataire"),
-									Action.valueOf(etapeObject.optString("actionDemandee", "VISA")),
-									etapeObject.optString("annotPub")
-							)
-					);
+	public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
 
-				}
-			}
+		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
+
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
+		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_CIRCUIT).getCurrentArraySize(); index++) {
+
+			EtapeCircuit etapeCircuit = new EtapeCircuit(
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_DATE_VALIDATION),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME, ""),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE, ""),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE, Action.VISA.toString()),
+					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS, "")
+			);
+
+			circuit.add(etapeCircuit);
 		}
-		return circuit;
+
+		return new Circuit(circuit, null, true, false);
 	}
 
 	public ArrayList<Bureau> getBureaux(RequestResponse response) {

@@ -10,8 +10,8 @@ import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
@@ -66,6 +66,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	/* Actions de validation principales les dossiers */
 	private static final String ACTION_VISA = "/parapheur/dossiers/%s/visa";
 	private static final String ACTION_SIGNATURE = "/parapheur/dossiers/%s/signature";
+	private static final String ACTION_SIGNATURE_PAPIER = "/parapheur/dossiers/%s/signPapier";
 	private static final String ACTION_TDT_ACTES = "/parapheur/dossiers/%s/tdtActes";
 	private static final String ACTION_TDT_HELIOS = "/parapheur/dossiers/%s/tdtHelios";
 	private static final String ACTION_MAILSEC = "/parapheur/dossiers/%s/mailsec";
@@ -90,9 +91,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-		if (filter == null) {
+
+		if (filter == null)
 			filter = new Filter();
-		}
 
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
@@ -107,8 +108,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
-
-		return modelMapper.getDossiers(RESTUtils.get(url));
+		RequestResponse response = RESTUtils.get(url);
+		return modelMapper.getDossiers(response);
 	}
 
 	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
@@ -116,14 +117,16 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getTypologie(RESTUtils.get(url));
 	}
 
-	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
 		return modelMapper.getCircuit(RESTUtils.get(url));
 	}
 
 	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
+
 		String url = buildUrl(String.format(Locale.US, RESOURCE_SIGN_INFO, dossierId), "bureauCourant=" + bureauId);
-		return modelMapper.getSignInfo(RESTUtils.get(url));
+		RequestResponse response = RESTUtils.get(url);
+		return modelMapper.getSignInfo(response);
 	}
 
 	// <editor-fold desc="Annotations">
@@ -281,6 +284,23 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la signature", e);
+		}
+
+		RequestResponse response = RESTUtils.post(buildUrl(actionUrl), jsonStringer.toString());
+		return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
+	}
+
+	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
+		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE_PAPIER, dossierId);
+
+		JSONStringer jsonStringer = new JSONStringer();
+		try {
+			jsonStringer.object();
+			jsonStringer.key("bureauCourant").value(bureauId);
+			jsonStringer.endObject();
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors de la conversion en signature papier", e);
 		}
 
 		RequestResponse response = RESTUtils.post(buildUrl(actionUrl), jsonStringer.toString());

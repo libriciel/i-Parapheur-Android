@@ -138,9 +138,18 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		switch (requestCode) {
 
-			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
 			case VisaDialogFragment.REQUEST_CODE_VISA:
 			case RejectDialogFragment.REQUEST_CODE_REJECT:
+			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
+
+				if (resultCode == SignatureDialogFragment.RESULT_CODE_SIGN_PAPIER) {
+					resultCode = Activity.RESULT_OK;
+					clearSelection();
+					if (mListener != null)
+						mListener.onDossierCheckedChanged();
+				}
+
+			default:
 
 				if (resultCode == Activity.RESULT_OK) {
 
@@ -339,12 +348,14 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
 					String actionName = getString(actionDemandee.getTitle());
 
-					if (actionName.contentEquals(getString(R.string.action_signer)))
+					if (actionName.contentEquals(getString(R.string.action_signer)) && !dossier.isSignPapier())
 						iconImageView.setImageResource(R.drawable.ic_sign_24dp);
-					else if (actionName.contentEquals(getString(R.string.action_archiver)))
-						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
+					else if (actionName.contentEquals(getString(R.string.action_signer)) && dossier.isSignPapier())
+						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
 					else if (actionName.contentEquals(getString(R.string.action_viser)))
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+					else if (actionName.contentEquals(getString(R.string.action_archiver)))
+						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
 					else if (actionName.contentEquals(getString(R.string.action_mailsec)))
 						iconImageView.setImageResource(R.drawable.ic_mailsec_24dp);
 					else if (actionName.startsWith(getString(R.string.action_tdt))) // using startsWith, to catch helios and actes

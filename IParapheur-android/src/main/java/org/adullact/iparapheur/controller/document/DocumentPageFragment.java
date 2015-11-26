@@ -20,7 +20,10 @@ import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.IParapheurException;
 
+
 public class DocumentPageFragment extends Fragment implements PageLayout.PageLayoutListener {
+
+	public static final String ARGUMENT_PAGE_NUMBER = "page_number";
 
 	private int mNumPage;
 	private PageLayout mPageLayout;
@@ -32,16 +35,14 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	//<editor-fold desc="LifeCycle">
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if ((getArguments() != null) && getArguments().containsKey("NUM_PAGE")) {
-			mNumPage = getArguments().getInt("NUM_PAGE");
-		}
+
+		if ((getArguments() != null) && getArguments().containsKey(ARGUMENT_PAGE_NUMBER))
+			mNumPage = getArguments().getInt(ARGUMENT_PAGE_NUMBER);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		// Top layout : Relative layout.
 		ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -56,13 +57,11 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		return scrollView;
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
 
-	@Override
-	public void onStop() {
+	@Override public void onStop() {
 		super.onStop();
 
 		mPageLayout.setPageLayoutListener(null);
@@ -111,8 +110,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 
 	//<editor-fold desc="PageLayoutListener">
 
-	@Override
-	public void onDoubleTap(@NonNull MotionEvent me) {
+	@Override public void onDoubleTap(@NonNull MotionEvent me) {
 
 		// Loop around mCurrentScaleType to the next available.
 		int nextScaleTypeOrdinal = (mCurrentScaleType.ordinal() + 1) % ScaleType.values().length;
@@ -121,16 +119,14 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		scale(mCurrentScaleType);
 	}
 
-	@Override
-	public void onCreateAnnotation(@NonNull final Annotation annotation) {
+	@Override public void onCreateAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
 			private IParapheurException mException;
 			private String mUuidResponse;
 
-			@Override
-			protected Void doInBackground(Void... params) {
+			@Override protected Void doInBackground(Void... params) {
 				try {
 					mUuidResponse = RESTClient.INSTANCE.createAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation, mNumPage);
 				}
@@ -142,8 +138,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 				return null;
 			}
 
-			@Override
-			protected void onPostExecute(Void aVoid) {
+			@Override protected void onPostExecute(Void aVoid) {
 				super.onPostExecute(aVoid);
 
 				if (mException != null)
@@ -155,15 +150,13 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		}.execute(null, null, null);
 	}
 
-	@Override
-	public void onUpdateAnnotation(@NonNull final Annotation annotation) {
+	@Override public void onUpdateAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
 			private IParapheurException mException;
 
-			@Override
-			protected Void doInBackground(Void... params) {
+			@Override protected Void doInBackground(Void... params) {
 				try {
 					RESTClient.INSTANCE.updateAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation, mNumPage);
 				}
@@ -175,8 +168,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 				return null;
 			}
 
-			@Override
-			protected void onPostExecute(Void aVoid) {
+			@Override protected void onPostExecute(Void aVoid) {
 				super.onPostExecute(aVoid);
 
 				if (mException != null)
@@ -186,15 +178,13 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		}.execute(null, null, null);
 	}
 
-	@Override
-	public void onDeleteAnnotation(@NonNull final Annotation annotation) {
+	@Override public void onDeleteAnnotation(@NonNull final Annotation annotation) {
 
 		new AsyncTask<Void, Void, Void>() {
 
 			private IParapheurException mException;
 
-			@Override
-			protected Void doInBackground(Void... params) {
+			@Override protected Void doInBackground(Void... params) {
 				try {
 					RESTClient.INSTANCE.deleteAnnotation(mCurrentDossierId, mCurrentDocumentId, annotation.getUuid(), mNumPage);
 				}
@@ -206,8 +196,7 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 				return null;
 			}
 
-			@Override
-			protected void onPostExecute(Void aVoid) {
+			@Override protected void onPostExecute(Void aVoid) {
 				super.onPostExecute(aVoid);
 
 				if (mException != null)

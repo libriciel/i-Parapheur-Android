@@ -49,7 +49,7 @@ public class JsonExplorer {
 		_rootObject = _currentObject;
 	}
 
-	public JsonExplorer(JSONObject jsonObject) {
+	public JsonExplorer(@Nullable JSONObject jsonObject) {
 		if (jsonObject != null)
 			_currentObject = sGson.fromJson(jsonObject.toString(), JsonElement.class);
 		else
@@ -58,7 +58,7 @@ public class JsonExplorer {
 		_rootObject = _currentObject;
 	}
 
-	public JsonExplorer(JSONArray jsonArray) {
+	public JsonExplorer(@Nullable JSONArray jsonArray) {
 		if (jsonArray != null)
 			_currentObject = sGson.fromJson(jsonArray.toString(), JsonElement.class);
 		else
@@ -67,7 +67,7 @@ public class JsonExplorer {
 		_rootObject = _currentObject;
 	}
 
-	public JsonExplorer(JsonElement jsonObject) {
+	public JsonExplorer(@Nullable JsonElement jsonObject) {
 		_currentObject = jsonObject;
 		_rootObject = _currentObject;
 	}
@@ -140,6 +140,26 @@ public class JsonExplorer {
 	// </editor-fold desc="JsonElements">
 
 	// <editor-fold desc="Primitive types">
+
+	public @Nullable JsonObject optCurrentJsonObject() {
+		JsonObject result = null;
+
+		if ((_currentObject != null) && (_currentObject.isJsonObject()))
+			result = (JsonObject) _currentObject;
+
+		resetRootElement();
+		return result;
+	}
+
+	public @Nullable String optCurrentString() {
+		String result = null;
+
+		if ((_currentObject != null) && (_currentObject.isJsonPrimitive()) && (_currentObject.getAsJsonPrimitive().isString()))
+			result = _currentObject.getAsJsonPrimitive().getAsString();
+
+		resetRootElement();
+		return result;
+	}
 
 	public String optString(@NonNull String fieldName) {
 		return optString(fieldName, null);

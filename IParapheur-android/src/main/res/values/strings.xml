@@ -38,6 +38,7 @@
     <!-- actions de validation -->
     <string name="action_viser">Viser</string>
     <string name="action_signer">Signer</string>
+    <string name="action_sign_papier">Sign. papier</string>
     <string name="action_tdt">Envoyer au TdT</string>
     <string name="action_tdt_actes">Envoyer au TdT - ACTES</string>
     <string name="action_tdt_helios">Envoyer au TdT - HELIOS</string>
@@ -85,6 +86,10 @@
     <string name="signature_error_message_no_data_to_sign">Le contenu à signer n\'a pu être récupéré.</string>
     <string name="signature_error_message_not_sent_to_server">Un problème est survenu à l\'envoi de la signature au serveur.</string>
     <string name="signature_error_message_not_get_from_server">Un problème réseau est survenu à la récupération des données à signer.</string>
+
+    <string name="signature_papier_transform">Transformer</string>
+    <string name="signature_papier_unknown_error">Erreur inconnue lors de la transformation en signature papier.</string>
+    <string name="signature_papier_confirmation_text">Voulez vous réellement changer le mode de signature de ce dossier vers le mode signature papier ?\nVous devrez imprimer et signer le document manuellement.</string>
 
     <string name="visa_error_message_not_sent_to_server">Un problème est survenu à l\'envoi du visa au serveur.</string>
     <string name="visa_error_message_unknown_error">Erreur inconnue lors du visa.</string>

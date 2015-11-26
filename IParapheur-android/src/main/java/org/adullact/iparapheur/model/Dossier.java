@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+
 public class Dossier implements Parcelable {
 
 	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
@@ -34,7 +35,8 @@ public class Dossier implements Parcelable {
 	private final List<Document> mainDocuments = new ArrayList<Document>();
 	private final List<Document> annexes = new ArrayList<Document>();
 	private List<Action> actions;
-	private List<EtapeCircuit> circuit = new ArrayList<EtapeCircuit>();
+	private Circuit circuit;
+	private boolean isSignPapier;
 
 	// TODO : remove
 	public Dossier(int i) {
@@ -46,7 +48,8 @@ public class Dossier implements Parcelable {
 				"Type",
 				"SousType",
 				Calendar.getInstance().getTime(),
-				Calendar.getInstance().getTime()
+				Calendar.getInstance().getTime(),
+				false
 		);
 		getActions().add(Action.VISA);
 	}
@@ -64,7 +67,7 @@ public class Dossier implements Parcelable {
 		this.actions = new ArrayList<>();
 	}
 
-	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite) {
+	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite, boolean isSignPapier) {
 		this.id = id;
 		this.name = name;
 		this.actionDemandee = actionDemandee;
@@ -73,6 +76,7 @@ public class Dossier implements Parcelable {
 		this.sousType = sousType;
 		this.dateCreation = dateCreation;
 		this.dateLimite = dateLimite;
+		this.isSignPapier = isSignPapier;
 	}
 
 	private Dossier(Parcel in) {
@@ -89,7 +93,8 @@ public class Dossier implements Parcelable {
 		this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
 		in.readTypedList(mainDocuments, Document.CREATOR);
 		in.readTypedList(annexes, Document.CREATOR);
-		in.readTypedList(circuit, EtapeCircuit.CREATOR);
+		this.circuit = in.readParcelable(Circuit.class.getClassLoader());
+		this.isSignPapier = in.readByte() != 0;
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -130,16 +135,20 @@ public class Dossier implements Parcelable {
 		return annexes;
 	}
 
-	public List<EtapeCircuit> getCircuit() {
+	public Circuit getCircuit() {
 		return circuit;
 	}
 
-	public void setCircuit(List<EtapeCircuit> circuit) {
+	public void setCircuit(Circuit circuit) {
 		this.circuit = circuit;
 	}
 
 	public Action getActionDemandee() {
 		return actionDemandee;
+	}
+
+	public boolean isSignPapier() {
+		return isSignPapier;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -163,11 +172,11 @@ public class Dossier implements Parcelable {
 	public void clearDetails() {
 		this.mainDocuments.clear();
 		this.annexes.clear();
-		this.circuit.clear();
+		this.circuit = null;
 	}
 
 	public boolean isDetailsAvailable() {
-		return (!circuit.isEmpty() && !mainDocuments.isEmpty());
+		return (circuit != null) && (circuit.getEtapeCircuitList() != null) && (!circuit.getEtapeCircuitList().isEmpty()) && (!mainDocuments.isEmpty());
 	}
 
 	public boolean hasActions() {
@@ -191,7 +200,8 @@ public class Dossier implements Parcelable {
 		dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
 		dest.writeTypedList(mainDocuments);
 		dest.writeTypedList(annexes);
-		dest.writeTypedList(circuit);
+		dest.writeParcelable(circuit, 0);
+		dest.writeByte(isSignPapier ? (byte) 1 : (byte) 0);
 	}
 
 	// </editor-fold desc="Parcelable">

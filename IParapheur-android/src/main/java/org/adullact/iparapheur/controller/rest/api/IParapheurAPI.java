@@ -6,8 +6,8 @@ import android.util.SparseArray;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -15,6 +15,7 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 public interface IParapheurAPI {
 
@@ -45,19 +46,17 @@ public interface IParapheurAPI {
 
 	Map<String, ArrayList<String>> getTypologie() throws IParapheurException;
 
-	List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException;
+	Circuit getCircuit(String dossierId) throws IParapheurException;
 
 	SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException;
 
 	/**
-	 * @param dossierId
 	 * @return les annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
 	SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
 
 	/**
-	 * @param dossierId
 	 * @return l'id de l'annotation crééeles annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
@@ -72,6 +71,8 @@ public interface IParapheurAPI {
 	boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
 	boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+
+	boolean signPapier(String dossierId, String bureauId) throws IParapheurException;
 
 	boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException;
 

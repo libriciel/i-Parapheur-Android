@@ -9,8 +9,8 @@ import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
@@ -167,7 +167,7 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getTypologie();
 	}
 
-	@Override public List<EtapeCircuit> getCircuit(String dossierId) throws IParapheurException {
+	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		return getRESTClient().getCircuit(dossierId);
 	}
 
@@ -199,6 +199,10 @@ public enum RESTClient implements IParapheurAPI {
 
 	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().signer(dossierId, signValue, annotPub, annotPriv, bureauId);
+	}
+
+	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
+		return getRESTClient().signPapier(dossierId, bureauId);
 	}
 
 	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
