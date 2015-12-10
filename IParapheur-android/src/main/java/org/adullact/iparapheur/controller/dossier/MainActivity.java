@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,8 +32,12 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
@@ -46,12 +53,14 @@ import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
+import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.io.File;
@@ -78,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
+
+	private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
+	private static final String SCHEME_URI_IMPORTCERTIFICATE_URL = "AndroidUrl";
+	private static final String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
 
 	private DrawerLayout mLeftDrawerLayout;
 	private DrawerLayout mRightDrawerLayout;
@@ -166,6 +179,28 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public void onResume() {
 		super.onResume();
+
+		// Check possible Scheme URI call.
+		// Waiting arguments like :
+		//
+		// iparapheur://importCertificate?AndroidUrl=https%3A%2F%2Fcurl.adullact.org%2FsC4VU%2Fbma.p12      (mandatory)
+		//                               &AndroidPwd=bma                                                    (optional)
+		//                               &iOsUrl=https%3A%2F%2Fcurl.adullact.org%2FSUZI2%2Fbma.p12          (ignored)
+		//                               &iOsPwd=bma                                                        (ignored)
+
+		Uri schemeUri = getIntent().getData();
+		if (schemeUri != null) {
+			if (TextUtils.equals(schemeUri.getHost(), SCHEME_URI_IMPORTCERTIFICATE)) {
+
+				String certifUrl = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_URL);
+				String certifPassword = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_PASSWORD);
+
+				if (!TextUtils.isEmpty(certifUrl))
+					importCertificate(certifUrl, certifPassword);
+				else
+					Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
+			}
+		}
 
 		// On first launch, we have to open the NavigationDrawer.
 		// It's in the Android guidelines, the user have to know it's here.
@@ -489,9 +524,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(
-				animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center
-		);
+
+		int enter = animated ? R.anim.push_right_to_center : 0;
+		int exit = animated ? R.anim.push_center_to_left : 0;
+		transaction.setCustomAnimations(enter, exit, R.anim.push_center_to_right, R.anim.push_left_to_center);
 		transaction.replace(R.id.left_fragment, fragment, tag);
 
 		if (animated)
@@ -505,15 +541,65 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-		transaction.setCustomAnimations(
-				animated ? R.anim.push_right_to_center : 0, animated ? R.anim.push_center_to_left : 0, R.anim.push_center_to_right, R.anim.push_left_to_center
-		);
+
+		int enter = animated ? R.anim.push_right_to_center : 0;
+		int exit = animated ? R.anim.push_center_to_left : 0;
+		transaction.setCustomAnimations(enter, exit, R.anim.push_center_to_right, R.anim.push_left_to_center);
 		transaction.replace(R.id.drawer_panel, fragment, tag);
 
 		if (animated)
 			transaction.addToBackStack(null);
 
 		transaction.commit();
+	}
+
+	private void importCertificate(@NonNull final String url, @Nullable final String password) {
+
+		String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
+		final String certificateLocalPath = new File(IParapheurApplication.getContext().getExternalCacheDir(), certificateFileName).getAbsolutePath();
+
+		// Download and import
+
+		new AsyncTask<Void, Void, Void>() {
+
+			private int mErrorMessageResource = -1;
+
+			@Override protected Void doInBackground(Void... params) {
+
+				try {
+					boolean downloadSuccessful = RESTClient.INSTANCE.downloadFile(url, certificateLocalPath);
+
+					if (!downloadSuccessful)
+						mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
+				}
+				catch (IParapheurException e) {
+					Crashlytics.logException(e);
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+			@Override protected void onPostExecute(Void aVoid) {
+
+				if (mErrorMessageResource == -1) {
+
+					if (password != null) {
+						FileUtils.importCertificate(MainActivity.this, new File(certificateLocalPath), password);
+					}
+					else {
+						DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(new File(certificateLocalPath));
+						actionDialog.show(getSupportFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+					}
+				}
+				else {
+					Toast.makeText(MainActivity.this, mErrorMessageResource, Toast.LENGTH_SHORT).show();
+				}
+
+				super.onPostExecute(aVoid);
+			}
+
+		}.execute();
 	}
 
 	// <editor-fold desc="AccountFragmentListener">

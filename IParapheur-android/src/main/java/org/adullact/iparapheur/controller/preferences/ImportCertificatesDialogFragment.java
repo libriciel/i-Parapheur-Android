@@ -2,7 +2,6 @@ package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -13,17 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.utils.FileUtils;
-import org.adullact.iparapheur.utils.PKCS7Signer;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 
 
 public class ImportCertificatesDialogFragment extends DialogFragment {
@@ -34,15 +27,16 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 	private static final String LOG_TAG = "ImportCertificatesDialogFragment";
 
 	protected File mCertificateFile;
+
 	protected EditText mPasswordEditText;
 	protected TextView mPasswordLabel;
 
-	public static ImportCertificatesDialogFragment newInstance(@NonNull File certificateFound) {
+	public static ImportCertificatesDialogFragment newInstance(@NonNull File certificate) {
 
 		ImportCertificatesDialogFragment fragment = new ImportCertificatesDialogFragment();
 
 		Bundle args = new Bundle();
-		args.putString(ARGUMENT_CERTIFICATE_PATH, certificateFound.getAbsolutePath());
+		args.putString(ARGUMENT_CERTIFICATE_PATH, certificate.getAbsolutePath());
 		fragment.setArguments(args);
 
 		return fragment;
@@ -54,8 +48,8 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			String path = getArguments().getString(ARGUMENT_CERTIFICATE_PATH);
 
+			String path = getArguments().getString(ARGUMENT_CERTIFICATE_PATH);
 			if (path != null)
 				mCertificateFile = new File(path);
 		}
@@ -133,49 +127,10 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 
 	private void onImportButtonClicked() {
 
-		// Test password
+		boolean success = FileUtils.importCertificate(getActivity(), mCertificateFile, mPasswordEditText.getText().toString());
 
-		boolean bksOpeningSuccess = false;
-		try {
-			PKCS7Signer pkcs7signer = new PKCS7Signer(mCertificateFile.getAbsolutePath(), mPasswordEditText.getText().toString(), "", "");
-			pkcs7signer.loadKeyStore();
-			bksOpeningSuccess = true;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Toast.makeText(getActivity(), R.string.import_error_message_error_opening_bks_file, Toast.LENGTH_SHORT).show();
-		}
-		catch (NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
-			e.printStackTrace();
-			Toast.makeText(getActivity(), R.string.import_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
-		}
-
-		// Stop on error
-
-		if (!bksOpeningSuccess)
-			return;
-
-		// Import to intern memory
-
-		boolean movedSuccessfully;
-
-		File from = mCertificateFile;
-		File to = new File(FileUtils.getInternalCertificateStoragePath(getContext()), mCertificateFile.getName());
-		movedSuccessfully = from.renameTo(to);
-
-		if (movedSuccessfully) {
-
-			SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(mCertificateFile.getName(), mPasswordEditText.getText().toString());
-			editor.apply();
-
-			Toast.makeText(getActivity(), R.string.import_successful, Toast.LENGTH_SHORT).show();
+		if (success)
 			dismiss();
-		}
-		else {
-			Toast.makeText(getActivity(), R.string.import_error_cant_copy_certificate, Toast.LENGTH_SHORT).show();
-		}
 	}
 
 	private void onCancelButtonClicked() {
