@@ -2,8 +2,8 @@
 <manifest
     package="org.adullact.iparapheur"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="13"
-    android:versionName="1.5.01">
+    android:versionCode="14"
+    android:versionName="1.5.02">
 
     <!-- Only supports Tablets -->
     <supports-screens
