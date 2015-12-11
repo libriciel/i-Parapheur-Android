@@ -66,7 +66,9 @@ public interface IParapheurAPI {
 
 	void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException;
 
-	boolean downloadFile(String url, String path) throws IParapheurException;
+	boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException;
+
+	boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException;
 
 	boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 

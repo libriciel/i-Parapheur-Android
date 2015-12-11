@@ -12,6 +12,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.HttpException;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 
@@ -20,7 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 
 
@@ -134,7 +137,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		return stringBuilder.toString();
 	}
 
-	@Override public boolean downloadFile(String url, String path) throws IParapheurException {
+	@Override public boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException {
 
 		String state = Environment.getExternalStorageState();
 
@@ -173,6 +176,55 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		}
 
 		return file.exists();
+	}
+
+	@Override public boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException {
+
+		InputStream input = null;
+		OutputStream output = null;
+		HttpURLConnection connection = null;
+
+		try {
+			URL url = new URL(urlString);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.connect();
+
+			// expect HTTP 200 OK, so we don't mistakenly save error report
+			// instead of the file
+			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+				throw new HttpException(connection.getResponseCode());
+
+			// download the file
+			input = connection.getInputStream();
+			output = new FileOutputStream(certificateLocalPath);
+
+			byte data[] = new byte[4096];
+			int count;
+
+			while ((count = input.read(data)) != -1)
+				output.write(data, 0, count);
+		}
+		catch (HttpException | IOException e) {
+			Crashlytics.logException(e);
+			e.printStackTrace();
+			throw new IParapheurException(R.string.import_error_message_cant_download_certificate, e.getLocalizedMessage());
+		}
+		finally {
+
+			try {
+				if (output != null)
+					output.close();
+
+				if (input != null)
+					input.close();
+			}
+			catch (IOException ignored) { }
+
+			if (connection != null)
+				connection.disconnect();
+		}
+
+		return new File(certificateLocalPath).exists();
 	}
 
 }

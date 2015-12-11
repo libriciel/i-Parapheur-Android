@@ -171,8 +171,6 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getCircuit(dossierId);
 	}
 
-	@Override
-
 	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
@@ -189,8 +187,12 @@ public enum RESTClient implements IParapheurAPI {
 		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
 	}
 
-	@Override public boolean downloadFile(String url, String path) throws IParapheurException {
+	@Override public boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException {
 		return getRESTClient().downloadFile(url, path);
+	}
+
+	@Override public boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException {
+		return getRESTClient().downloadCertificate(urlString, certificateLocalPath);
 	}
 
 	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
@@ -231,4 +233,5 @@ public enum RESTClient implements IParapheurAPI {
 	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
 		return getRESTClient().getSignInfo(dossierId, bureauId);
 	}
+
 }

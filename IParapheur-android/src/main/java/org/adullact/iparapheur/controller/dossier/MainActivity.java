@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
 
+	private static final String SCHEME_URI = "iparapheur";
 	private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
 	private static final String SCHEME_URI_IMPORTCERTIFICATE_URL = "AndroidUrl";
 	private static final String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
@@ -187,9 +188,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		//                               &AndroidPwd=bma                                                    (optional)
 		//                               &iOsUrl=https%3A%2F%2Fcurl.adullact.org%2FSUZI2%2Fbma.p12          (ignored)
 		//                               &iOsPwd=bma                                                        (ignored)
-
 		Uri schemeUri = getIntent().getData();
-		if (schemeUri != null) {
+		boolean isValidUriScheme = (schemeUri != null && TextUtils.equals(schemeUri.getScheme(), SCHEME_URI));
+
+		if (isValidUriScheme) {
 			if (TextUtils.equals(schemeUri.getHost(), SCHEME_URI_IMPORTCERTIFICATE)) {
 
 				String certifUrl = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_URL);
@@ -200,6 +202,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 				else
 					Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
 			}
+
+			// If we let the intent data, it can try to re-import certificate, back from history.
+			getIntent().setData(null);
 		}
 
 		// On first launch, we have to open the NavigationDrawer.
@@ -405,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Compute visibility
 
-		actionMode.setTitle(getResources().getString(R.string.action_mode_nb_dossiers, checkedDossiers.size()));
+		actionMode.setTitle(getString(R.string.action_mode_nb_dossiers).replace("-number-", String.valueOf(checkedDossiers.size())));
 		// Get the intersection of all possible actions on checked dossiers and update the menu
 		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
 		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
@@ -567,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			@Override protected Void doInBackground(Void... params) {
 
 				try {
-					boolean downloadSuccessful = RESTClient.INSTANCE.downloadFile(url, certificateLocalPath);
+					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(url, certificateLocalPath);
 
 					if (!downloadSuccessful)
 						mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
