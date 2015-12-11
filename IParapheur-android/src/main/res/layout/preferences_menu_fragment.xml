@@ -162,7 +162,7 @@
                             android:layout_height="match_parent"
                             android:layout_margin="16dp"
                             android:contentDescription="@string/pref_header_licenses"
-                            android:src="@drawable/ic_extension_white_24dp"
+                            android:src="@drawable/ic_copyright_white_24dp"
                             android:tint="@color/settings_primary_500"/>
 
                         <TextView

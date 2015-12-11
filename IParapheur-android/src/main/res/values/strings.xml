@@ -68,8 +68,10 @@
     <string name="import_title">Importer un certificat BKS</string>
     <string name="import_certificate">Importer</string>
     <string name="import_successful">Le certificat a été importé avec succès.</string>
-    <string name="import_error_message_error_opening_bks_file">Le mot de passe est invalide, ou le certificat est corrompu.</string>
-    <string name="import_error_cant_copy_certificate">Impossible de copier le certificat sur la mémoire interne.</string>
+    <string name="import_error_message_incorrect_scheme">Le scheme pour importer le certificat est incorrect.</string>
+    <string name="import_error_message_cant_download_certificate">Erreur au téléchargement du certificat.</string>
+    <string name="import_error_message_opening_bks_file">Le mot de passe est invalide, ou le certificat est corrompu.</string>
+    <string name="import_error_message_cant_copy_certificate">Impossible de copier le certificat sur la mémoire interne.</string>
     <string name="import_error_message_incompatible_device">Cet appareil ne semble pas compatible avec les outils de cryptage utilisés.</string>
 
     <string name="reject_error_message_not_sent_to_server">Un problème est survenu à l\'envoi du rejet au serveur.</string>
@@ -137,7 +139,7 @@
     <string name="no_content">Pas de contenu</string>
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
-    <string name="action_mode_nb_dossiers">%d dossier(s)</string>
+    <string name="action_mode_nb_dossiers">-number- dossier(s)</string>
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
     <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>

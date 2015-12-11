@@ -1,11 +1,15 @@
 package org.adullact.iparapheur.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
+import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheurApplication;
 
 import java.io.File;
@@ -13,6 +17,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +79,53 @@ public class FileUtils {
 					jks.add(file);
 
 		return jks;
+	}
+
+	public static boolean importCertificate(@NonNull Activity activity, @NonNull File certificateFile, @NonNull String password) {
+
+		// Test password
+
+		boolean bksOpeningSuccess = false;
+		try {
+			PKCS7Signer pkcs7signer = new PKCS7Signer(certificateFile.getAbsolutePath(), password, "", "");
+			pkcs7signer.loadKeyStore();
+			bksOpeningSuccess = true;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			Toast.makeText(activity, R.string.import_error_message_opening_bks_file, Toast.LENGTH_SHORT).show();
+		}
+		catch (NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
+			e.printStackTrace();
+			Toast.makeText(activity, R.string.import_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
+		}
+
+		// Stop on error
+
+		if (!bksOpeningSuccess)
+			return false;
+
+		// Import to intern memory
+
+		boolean movedSuccessfully;
+
+		File to = new File(FileUtils.getInternalCertificateStoragePath(activity), certificateFile.getName());
+		movedSuccessfully = certificateFile.renameTo(to);
+
+		if (movedSuccessfully) {
+
+			SharedPreferences settings = activity.getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(certificateFile.getName(), password);
+			editor.apply();
+
+			Toast.makeText(activity, R.string.import_successful, Toast.LENGTH_SHORT).show();
+			return true;
+		}
+		else {
+			Toast.makeText(activity, R.string.import_error_message_cant_copy_certificate, Toast.LENGTH_SHORT).show();
+			return false;
+		}
 	}
 
 	/**

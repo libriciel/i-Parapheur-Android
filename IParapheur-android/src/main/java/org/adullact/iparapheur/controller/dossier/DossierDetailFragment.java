@@ -416,7 +416,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 					}
 					else {
 						currentDocument.setPath(path);
-						Log.d("debug", file.exists() ? "Document par defaut trouvé" : "Document par defaut non trouvé");
+						Log.d("debug", file.exists() ? "Default document found" : "Default document not found");
 					}
 				}
 			}
