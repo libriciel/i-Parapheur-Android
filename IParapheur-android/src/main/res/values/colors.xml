@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- General colors -->
-    <color name="primary_100">@color/light_blue_100</color>
-    <color name="primary_500">@color/light_blue_500</color>
-    <color name="primary_700">@color/light_blue_700</color>
-    <color name="primary_900">@color/light_blue_900</color>
-    <color name="secondary_50">@color/brown_50</color>
-    <color name="secondary_100">@color/brown_100</color>
-    <color name="secondary_200">@color/brown_200</color>
-    <color name="secondary_300">@color/brown_300</color>
-    <color name="secondary_400">@color/brown_400</color>
-    <color name="secondary_500">@color/brown_500</color>
-    <color name="secondary_700">@color/brown_700</color>
-    <color name="contextual_500">@color/grey_500</color>
-    <color name="contextual_700">@color/grey_700</color>
-    <color name="settings_500">@color/blue_grey_900</color>
-    <color name="settings_700">@color/blue_grey_950</color>
-    <color name="settings_primary_500">@color/teal_500</color>
-
     <!-- Text material color -->
     <color name="text_black">#DE000000</color>
     <color name="text_black_secondary">#8A000000</color>
@@ -64,9 +46,50 @@
     <color name="blue_grey_900">#263238</color>
     <color name="blue_grey_950">#21272b</color>
 
+    <!-- Yellow material design colors -->
+    <color name="yellow_100">#fff9c4</color>
+    <color name="yellow_200">#fff59d</color>
+    <color name="yellow_300">#fff176</color>
+    <color name="yellow_400">#ffee58</color>
+    <color name="yellow_500">#ffeb3b</color>
+    <color name="yellow_600">#fdd835</color>
+    <color name="yellow_700">#fbc02d</color>
+    <color name="yellow_800">#f9a825</color>
+    <color name="yellow_900">#f57f17</color>
+
+    <!-- Every color in the app should match these : -->
+    <!-- https://www.google.com/design/spec/style/color.html#color-color-palette -->
+
+    <!-- General -->
+    <color name="primary_100">@color/light_blue_100</color>
+    <color name="primary_500">@color/light_blue_500</color>
+    <color name="primary_700">@color/light_blue_700</color>
+    <color name="primary_900">@color/light_blue_900</color>
+    <color name="secondary_50">@color/brown_50</color>
+    <color name="secondary_100">@color/brown_100</color>
+    <color name="secondary_200">@color/brown_200</color>
+    <color name="secondary_300">@color/brown_300</color>
+    <color name="secondary_400">@color/brown_400</color>
+    <color name="secondary_500">@color/brown_500</color>
+    <color name="secondary_700">@color/brown_700</color>
+    <color name="contextual_500">@color/grey_500</color>
+    <color name="contextual_700">@color/grey_700</color>
+    <color name="settings_500">@color/blue_grey_900</color>
+    <color name="settings_700">@color/blue_grey_950</color>
+    <color name="settings_primary_500">@color/teal_500</color>
+
+    <!-- Annotations -->
+    <color name="annotation_text">@color/text_black</color>
+    <color name="annotation_selected">@color/red_500</color>
+    <color name="annotation_post_it_background">@color/yellow_500</color>
+    <color name="annotation_info_background">@color/light_blue_100</color>
+    <color name="annotation_border">@android:color/black</color>
+    <color name="annotation_button">@android:color/black</color>
+    <color name="annotation_button_border">@android:color/white</color>
+
     <!-- MuPDF -->
     <color name="canvas">@color/grey_800</color>
     <color name="bar">@color/primary_100</color>
-    <color name="background_grey_light">#ffdadada</color>
+    <color name="background_grey_light">@color/grey_400</color>
 
 </resources>

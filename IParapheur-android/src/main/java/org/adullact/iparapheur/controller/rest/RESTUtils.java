@@ -221,6 +221,7 @@ public class RESTUtils {
 		catch (ProtocolException e) { throw new IParapheurException(R.string.http_error_405, null); }
 		catch (GeneralSecurityException e) { throw new IParapheurException(R.string.http_error_ssl_failed, null); }
 		catch (IOException e) { throw new IParapheurException(R.string.http_error_400, null); }
+
 		return res;
 	}
 
