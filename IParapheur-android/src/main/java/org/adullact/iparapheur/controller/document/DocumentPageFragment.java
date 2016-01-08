@@ -1,7 +1,6 @@
 package org.adullact.iparapheur.controller.document;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -76,7 +75,6 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 	}
 
 	private void scale(@NonNull ScaleType scaleType) {
-		mPageLayout.setBackgroundColor(Color.RED);
 
 		switch (scaleType) {
 
