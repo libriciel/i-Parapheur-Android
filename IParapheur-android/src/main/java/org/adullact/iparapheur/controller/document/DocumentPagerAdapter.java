@@ -18,6 +18,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 
+
 public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
 	private final SparseArray<PointF> pageSizes = new SparseArray<PointF>();
@@ -30,8 +31,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		this.context = context;
 	}
 
-	@Override
-	public Object instantiateItem(ViewGroup container, int position) {
+	@Override public Object instantiateItem(ViewGroup container, int position) {
 		DocumentPageFragment item = (DocumentPageFragment) super.instantiateItem(container, position);
 		if (muPDFCore != null) {
 			new DocumentPageLoadingTask((Activity) context, position, item, null, container.getWidth(), container.getHeight()).execute();
@@ -39,23 +39,19 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		return item;
 	}
 
-	@Override
-	public Fragment getItem(int i) {
+	@Override public Fragment getItem(int i) {
 		return new DocumentPageFragment();
 	}
 
-	@Override
-	public int getCount() {
+	@Override public int getCount() {
 		return (muPDFCore != null) ? muPDFCore.countPages() : 0;
 	}
 
-	@Override
-	public String getPageTitle(int position) {
+	@Override public String getPageTitle(int position) {
 		return "page " + position;
 	}
 
-	@Override
-	public int getItemPosition(Object object) {
+	@Override public int getItemPosition(Object object) {
 		return POSITION_NONE;
 	}
 
@@ -78,7 +74,9 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			if (pageSizes.get(position) != null)
 				pdfSize = new Point(Math.round(pageSizes.get(position).x), Math.round(pageSizes.get(position).y));
 
-			fragment.updatePage(document.getDossierId(), document.getId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize, pdfSize);
+			fragment.updatePage(
+					document.getDossierId(), document.getId(), bm, document.getPagesAnnotations().get(position, new PageAnnotations()), initSize, pdfSize
+			);
 		}
 	}
 
@@ -92,7 +90,8 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 		private Bitmap mBitmap;
 		private DocumentPageFragment mFragment;
 
-		public DocumentPageLoadingTask(Activity context, int numPage, DocumentPageFragment fragment, DataChangeListener listener, int containerWidth, int containerHeight) {
+		public DocumentPageLoadingTask(Activity context, int numPage, DocumentPageFragment fragment, DataChangeListener listener, int containerWidth,
+									   int containerHeight) {
 			super(context, listener);
 			mNumPage = numPage;
 			mContainerWidth = containerWidth;
@@ -101,8 +100,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			mScale = 1f;
 		}
 
-		@Override
-		protected void load(String... params) throws IParapheurException {
+		@Override protected void load(String... params) throws IParapheurException {
 			// Check if this task is cancelled as often as possible.
 			if ((muPDFCore == null) || isCancelled())
 				return;
@@ -131,8 +129,7 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 				muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
 		}
 
-		@Override
-		protected void onPostExecute(String error) {
+		@Override protected void onPostExecute(String error) {
 			super.onPostExecute(error);
 
 			if ((error == null) && (muPDFCore != null))

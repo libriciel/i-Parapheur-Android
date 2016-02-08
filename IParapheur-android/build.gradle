@@ -26,10 +26,16 @@ android {
         targetSdkVersion 23
     }
 
-    /*lintOptions {
-        abortOnError false
-        checkAllWarnings true
-    }*/
+    // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
+    // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
+    /* splits {
+        abi {
+            enable true
+            reset()
+            include 'x86', 'armeabi', 'armeabi-v7a', 'mips'
+            universalApk false
+        }
+    } */
 }
 
 
