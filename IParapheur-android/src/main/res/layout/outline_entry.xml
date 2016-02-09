@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-	<TextView
-		android:id="@+id/title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_toLeftOf="@+id/page"
-		android:singleLine="true"
-		android:layout_centerVertical="true"
-		android:paddingLeft="8dp"
-		android:textAppearance="?android:attr/textAppearanceMedium" />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:singleLine="false"
+        android:paddingLeft="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="test"
+        android:layout_marginLeft="112dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
-	<TextView
-		android:id="@+id/page"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignBaseline="@+id/title"
-		android:layout_alignBottom="@+id/title"
-		android:layout_alignParentRight="true"
-		android:paddingRight="8dp"
-		android:textAppearance="?android:attr/textAppearanceMedium" />
+    <TextView
+        android:id="@+id/page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/title"
+        android:layout_alignBottom="@+id/title"
+        android:layout_alignParentRight="true"
+        android:paddingRight="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:text="lalalalalalalal"
+        android:layout_alignTop="@+id/title"
+        android:layout_toRightOf="@+id/title" />
 
 </RelativeLayout>
