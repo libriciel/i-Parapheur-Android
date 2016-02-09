@@ -125,8 +125,8 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			if (isCancelled())
 				return;
 
-			if (muPDFCore != null)
-				muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
+//			if (muPDFCore != null)
+//				muPDFCore.drawPage(mBitmap, mNumPage, scaledSize.x, scaledSize.y, 0, 0, scaledSize.x, scaledSize.y);
 		}
 
 		@Override protected void onPostExecute(String error) {
