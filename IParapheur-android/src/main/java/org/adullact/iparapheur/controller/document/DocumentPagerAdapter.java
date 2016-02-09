@@ -2,15 +2,18 @@ package org.adullact.iparapheur.controller.document;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import com.artifex.mupdfdemo.MuPDFActivity;
 import com.artifex.mupdfdemo.MuPDFCore;
 
 import org.adullact.iparapheur.model.Document;
@@ -131,6 +134,12 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 
 		@Override protected void onPostExecute(String error) {
 			super.onPostExecute(error);
+
+			Uri uri = Uri.parse(document.getPath());
+			Intent intent = new Intent(context, MuPDFActivity.class);
+			intent.setAction(Intent.ACTION_VIEW);
+			intent.setData(uri);
+			context.startActivity(intent);
 
 			if ((error == null) && (muPDFCore != null))
 				updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);

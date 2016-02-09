@@ -65,7 +65,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
 	private final int OUTLINE_REQUEST = 0;
 	private final int PRINT_REQUEST = 1;
-	private final int FILEPICK_REQUEST = 2;
 	private final int PROOF_REQUEST = 3;
 	private MuPDFCore core;
 	private String mFileName;
@@ -712,9 +711,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 					showInfo(getString(R.string.print_failed));
 				}
 				break;
-			case FILEPICK_REQUEST:
-				if (mFilePicker != null && resultCode == RESULT_OK)
-					mFilePicker.onPick(data.getData());
 			case PROOF_REQUEST:
 				//  we're returning from a proofing activity
 
@@ -1454,9 +1450,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 
 	@Override public void performPickFor(FilePicker picker) {
 		mFilePicker = picker;
-		Intent intent = new Intent(this, ChoosePDFActivity.class);
-		intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
-		startActivityForResult(intent, FILEPICK_REQUEST);
+//		Intent intent = new Intent(this, ChoosePDFActivity.class);
+//		intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
+//		startActivityForResult(intent, FILEPICK_REQUEST);
 	}
 
 }
