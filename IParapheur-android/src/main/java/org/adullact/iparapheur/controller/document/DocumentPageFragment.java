@@ -56,10 +56,6 @@ public class DocumentPageFragment extends Fragment implements PageLayout.PageLay
 		return scrollView;
 	}
 
-	@Override public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-	}
-
 	@Override public void onStop() {
 		super.onStop();
 

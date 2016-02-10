@@ -369,9 +369,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onNothingSelected(AdapterView<?> parent) {
-
-	}
+	@Override public void onNothingSelected(AdapterView<?> parent) { }
 
 	// </editor-fold desc="ActionBar">
 

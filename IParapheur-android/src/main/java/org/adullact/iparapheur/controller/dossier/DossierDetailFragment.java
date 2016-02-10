@@ -1,29 +1,24 @@
 package org.adullact.iparapheur.controller.dossier;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.artifex.mupdfdemo.MuPDFFragment;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
-import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -31,11 +26,8 @@ import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -43,7 +35,7 @@ import java.util.UUID;
  * A fragment representing a single Dossier detail screen.
  * This fragment is contained in a {@link MainActivity}.
  */
-public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
+public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
 	public static final String TAG = "dossier_details_fragment";
 	public static final String DOSSIER = "dossier";
@@ -63,67 +55,67 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-
-		if (getArguments() != null) {
-			mBureauId = getArguments().getString(BUREAU_ID);
-			mDossier = getArguments().getParcelable(DOSSIER);
-		}
-		mCurrentPage = 0;
-	}
-
-	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
-	}
-
-	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		isReaderEnabled = true;
-		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
-		seekBar.setVisibility(View.INVISIBLE);
-        seekBar.setOnSeekBarChangeListener(this);*/
-		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
-		mLoadingSpinner = view.findViewById(android.R.id.progress);
-
-		// Reload data after rotation
-
-		if (savedInstanceState != null)
-			mShouldReload = true;
-	}
-
-	@Override public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-
-		mViewPager.post(
-				new Runnable() {
-					public void run() {
-						mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
-					}
-				}
-		);
-
-		String state = Environment.getExternalStorageState();
-		if (!Environment.MEDIA_MOUNTED.equals(state)) {
-			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
-			isReaderEnabled = false;
-		}
-		if (mDossier != null) {
-			getDossierDetails(false);
-		}
-		setHasOptionsMenu(true);
-	}
-
-	@Override public void onStart() {
-		super.onStart();
-
-		if (mShouldReload) {
-			mShouldReload = false;
-			update(mDossier, mBureauId);
-		}
-	}
+//	@Override public void onCreate(Bundle savedInstanceState) {
+//		super.onCreate(savedInstanceState);
+//		setRetainInstance(true);
+//
+//		if (getArguments() != null) {
+//			mBureauId = getArguments().getString(BUREAU_ID);
+//			mDossier = getArguments().getParcelable(DOSSIER);
+//		}
+//		mCurrentPage = 0;
+//	}
+//
+//	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
+//	}
+//
+//	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
+//		super.onViewCreated(view, savedInstanceState);
+//
+//		isReaderEnabled = true;
+//		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
+//		seekBar.setVisibility(View.INVISIBLE);
+//        seekBar.setOnSeekBarChangeListener(this);*/
+//		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
+//		mLoadingSpinner = view.findViewById(android.R.id.progress);
+//
+//		// Reload data after rotation
+//
+//		if (savedInstanceState != null)
+//			mShouldReload = true;
+//	}
+//
+//	@Override public void onActivityCreated(Bundle savedInstanceState) {
+//		super.onActivityCreated(savedInstanceState);
+//
+//		mViewPager.post(
+//				new Runnable() {
+//					public void run() {
+//						mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
+//					}
+//				}
+//		);
+//
+//		String state = Environment.getExternalStorageState();
+//		if (!Environment.MEDIA_MOUNTED.equals(state)) {
+//			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
+//			isReaderEnabled = false;
+//		}
+//		if (mDossier != null) {
+//			getDossierDetails(false);
+//		}
+//		setHasOptionsMenu(true);
+//	}
+//
+//	@Override public void onStart() {
+//		super.onStart();
+//
+//		if (mShouldReload) {
+//			mShouldReload = false;
+//			update(mDossier, mBureauId);
+//		}
+//	}
 
 	// </editor-fold desc="LifeCycle">
 
@@ -235,43 +227,51 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// TODO : aucun apercu disponible
 	private void updateReader() {
-		final Document document = findCurrentDocument(mDossier, mDocumentId);
 
-		if (document != null) {
-			if (isReaderEnabled && (document.getPath() != null)) {
-				mViewPager.post(
-						new Runnable() {
-							@Override public void run() {
-								try {
-									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
-									mViewPager.setCurrentItem(0, false);
-									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
-								}
-								catch (Exception e) {
-									e.printStackTrace();
-									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-								}
-							}
-						}
-				);
-			}
-		}
-		else {
-			mViewPager.post(
-					new Runnable() {
-						@Override public void run() {
-							try {
-								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
-								//mViewPager.setCurrentItem(0, false);
-							}
-							catch (Exception e) {
-								//e.printStackTrace();
-								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-							}
-						}
-					}
-			);
-		}
+		Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+
+		Log.d("Adrien", "id = " + document.getId());
+		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
+
+		Log.d("Adrien", "path   = " + documentFile.getAbsolutePath());
+		Log.d("Adrien", "exists = " + documentFile.exists());
+		openFile(documentFile.getAbsolutePath());
+
+//		if (document != null) {
+//			if (isReaderEnabled && (document.getPath() != null)) {
+//				mViewPager.post(
+//						new Runnable() {
+//							@Override public void run() {
+//								try {
+//									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
+//									mViewPager.setCurrentItem(0, false);
+//									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
+//								}
+//								catch (Exception e) {
+//									e.printStackTrace();
+//									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+//								}
+//							}
+//						}
+//				);
+//			}
+//		}
+//		else {
+//			mViewPager.post(
+//					new Runnable() {
+//						@Override public void run() {
+//							try {
+//								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
+//								//mViewPager.setCurrentItem(0, false);
+//							}
+//							catch (Exception e) {
+//								//e.printStackTrace();
+//								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+//							}
+//						}
+//					}
+//			);
+//		}
 	}
 
 	private void updateDetails() {
@@ -297,27 +297,6 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		getActivity().invalidateOptionsMenu();
 	}
 
-	private @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
-
-		// Default case
-
-		if (dossier == null)
-			return null;
-
-		// Finding doc
-
-		List<Document> documents = new ArrayList<>();
-		documents.addAll(dossier.getMainDocuments());
-		documents.addAll(dossier.getAnnexes());
-
-		if (!TextUtils.isEmpty(documentId))
-			for (Document document : documents)
-				if (TextUtils.equals(document.getId(), documentId))
-					return document;
-
-		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
-	}
-
 	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
 
 		if (dossier == null)
@@ -335,7 +314,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	}
 
 	public void showSpinner() {
-		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
+//		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
 	}
 
 	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
@@ -399,7 +378,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 			// Loading PDF
 
-			Document currentDocument = findCurrentDocument(mDossier, mDocumentId);
+			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
 
 			if (isReaderEnabled && (currentDocument != null)) {
 				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {

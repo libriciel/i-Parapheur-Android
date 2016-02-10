@@ -3,6 +3,7 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ public class Dossier implements Parcelable {
 		this.actions = new ArrayList<>();
 	}
 
-	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite, boolean isSignPapier) {
+	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
+				   boolean isSignPapier) {
 		this.id = id;
 		this.name = name;
 		this.actionDemandee = actionDemandee;
@@ -182,6 +184,31 @@ public class Dossier implements Parcelable {
 	public boolean hasActions() {
 		return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
 	}
+
+	// <editor-fold desc="Static utils">
+
+	public static @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
+
+		// Default case
+
+		if (dossier == null)
+			return null;
+
+		// Finding doc
+
+		List<Document> documents = new ArrayList<>();
+		documents.addAll(dossier.getMainDocuments());
+		documents.addAll(dossier.getAnnexes());
+
+		if (!TextUtils.isEmpty(documentId))
+			for (Document document : documents)
+				if (TextUtils.equals(document.getId(), documentId))
+					return document;
+
+		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+	}
+
+	// </editor-fold desc="Static utils">
 
 	// <editor-fold desc="Parcelable">
 

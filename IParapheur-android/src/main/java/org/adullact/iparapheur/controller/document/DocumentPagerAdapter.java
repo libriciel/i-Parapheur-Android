@@ -2,7 +2,6 @@ package org.adullact.iparapheur.controller.document;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -13,7 +12,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
-import com.artifex.mupdfdemo.MuPDFActivity;
 import com.artifex.mupdfdemo.MuPDFCore;
 
 import org.adullact.iparapheur.model.Document;
@@ -35,11 +33,11 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 	}
 
 	@Override public Object instantiateItem(ViewGroup container, int position) {
-		DocumentPageFragment item = (DocumentPageFragment) super.instantiateItem(container, position);
+		DocumentPageFragment fragment = (DocumentPageFragment) super.instantiateItem(container, position);
 		if (muPDFCore != null) {
-			new DocumentPageLoadingTask((Activity) context, position, item, null, container.getWidth(), container.getHeight()).execute();
+			new DocumentPageLoadingTask((Activity) context, position, fragment, null, container.getWidth(), container.getHeight()).execute();
 		}
-		return item;
+		return fragment;
 	}
 
 	@Override public Fragment getItem(int i) {
@@ -136,10 +134,10 @@ public class DocumentPagerAdapter extends FragmentStatePagerAdapter {
 			super.onPostExecute(error);
 
 			Uri uri = Uri.parse(document.getPath());
-			Intent intent = new Intent(context, MuPDFActivity.class);
-			intent.setAction(Intent.ACTION_VIEW);
-			intent.setData(uri);
-			context.startActivity(intent);
+//			Intent intent = new Intent(context, MuPDFActivity.class);
+//			intent.setAction(Intent.ACTION_VIEW);
+//			intent.setData(uri);
+//			context.startActivity(intent);
 
 			if ((error == null) && (muPDFCore != null))
 				updateFragment(mNumPage, mBitmap, mScale, mFragment, mInitSize);

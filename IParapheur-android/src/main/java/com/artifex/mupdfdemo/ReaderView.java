@@ -1,14 +1,8 @@
 package com.artifex.mupdfdemo;
 
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -23,53 +17,52 @@ import android.widget.Scroller;
 
 import org.adullact.iparapheur.R;
 
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
-public class ReaderView
-		extends AdapterView<Adapter>
-		implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable {
-	private static final int  MOVING_DIAGONALLY = 0;
-	private static final int  MOVING_LEFT       = 1;
-	private static final int  MOVING_RIGHT      = 2;
-	private static final int  MOVING_UP         = 3;
-	private static final int  MOVING_DOWN       = 4;
 
-	private static final int  FLING_MARGIN      = 100;
-	private static final int  GAP               = 20;
+public class ReaderView extends AdapterView<Adapter> implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable {
 
-	private static final float MIN_SCALE        = 1.0f;
-	private static final float MAX_SCALE        = 5.0f;
+	private static final int MOVING_DIAGONALLY = 0;
+	private static final int MOVING_LEFT = 1;
+	private static final int MOVING_RIGHT = 2;
+	private static final int MOVING_UP = 3;
+	private static final int MOVING_DOWN = 4;
+
+	private static final int FLING_MARGIN = 100;
+	private static final int GAP = 20;
+
+	private static final float MIN_SCALE = 1.0f;
+	private static final float MAX_SCALE = 5.0f;
 	private static final float REFLOW_SCALE_FACTOR = 0.5f;
 
 	private static final boolean HORIZONTAL_SCROLLING = true;
 
-	private Adapter           mAdapter;
-	private int               mCurrent;    // Adapter's index for the current view
-	private boolean           mResetLayout;
-	private final SparseArray<View>
-				  mChildViews = new SparseArray<View>(3);
-					       // Shadows the children of the adapter view
-					       // but with more sensible indexing
-	private final LinkedList<View>
-				  mViewCache = new LinkedList<View>();
-	private boolean           mUserInteracting;  // Whether the user is interacting
-	private boolean           mScaling;    // Whether the user is currently pinch zooming
-	private float             mScale     = 1.0f;
-	private int               mXScroll;    // Scroll amounts recorded from events.
-	private int               mYScroll;    // and then accounted for in onLayout
-	private boolean           mReflow = false;
-	private boolean           mReflowChanged = false;
-	private final GestureDetector
-				  mGestureDetector;
-	private final ScaleGestureDetector
-				  mScaleGestureDetector;
-	private final Scroller    mScroller;
-	private final Stepper     mStepper;
-	private int               mScrollerLastX;
-	private int               mScrollerLastY;
-	private float		  mLastScaleFocusX;
-	private float		  mLastScaleFocusY;
+	private Adapter mAdapter;
+	private int mCurrent;    // Adapter's index for the current view
+	private boolean mResetLayout;
+	private final SparseArray<View> mChildViews = new SparseArray<View>(3);
+	// Shadows the children of the adapter view
+	// but with more sensible indexing
+	private final LinkedList<View> mViewCache = new LinkedList<View>();
+	private boolean mUserInteracting;  // Whether the user is interacting
+	private boolean mScaling;    // Whether the user is currently pinch zooming
+	private float mScale = 1.0f;
+	private int mXScroll;    // Scroll amounts recorded from events.
+	private int mYScroll;    // and then accounted for in onLayout
+	private boolean mReflow = false;
+	private boolean mReflowChanged = false;
+	private final GestureDetector mGestureDetector;
+	private final ScaleGestureDetector mScaleGestureDetector;
+	private final Scroller mScroller;
+	private final Stepper mStepper;
+	private int mScrollerLastX;
+	private int mScrollerLastY;
+	private float mLastScaleFocusX;
+	private float mLastScaleFocusY;
 
 	static abstract class ViewMapper {
+
 		abstract void applyToView(View view);
 	}
 
@@ -77,27 +70,25 @@ public class ReaderView
 		super(context);
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
-		mScroller        = new Scroller(context);
+		mScroller = new Scroller(context);
 		mStepper = new Stepper(this, this);
 	}
 
 	public ReaderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		
+
 		// "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
 		// is instantiated in the IDE, so we need to be a bit careful what we do).
-		if (isInEditMode())
-		{
+		if (isInEditMode()) {
 			mGestureDetector = null;
 			mScaleGestureDetector = null;
 			mScroller = null;
 			mStepper = null;
 		}
-		else
-		{
+		else {
 			mGestureDetector = new GestureDetector(this);
 			mScaleGestureDetector = new ScaleGestureDetector(context, this);
-			mScroller        = new Scroller(context);
+			mScroller = new Scroller(context);
 			mStepper = new Stepper(this, this);
 		}
 	}
@@ -106,7 +97,7 @@ public class ReaderView
 		super(context, attrs, defStyle);
 		mGestureDetector = new GestureDetector(this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
-		mScroller        = new Scroller(context);
+		mScroller = new Scroller(context);
 		mStepper = new Stepper(this, this);
 	}
 
@@ -125,13 +116,13 @@ public class ReaderView
 	}
 
 	public void moveToNext() {
-		View v = mChildViews.get(mCurrent+1);
+		View v = mChildViews.get(mCurrent + 1);
 		if (v != null)
 			slideViewOntoScreen(v);
 	}
 
 	public void moveToPrevious() {
-		View v = mChildViews.get(mCurrent-1);
+		View v = mChildViews.get(mCurrent - 1);
 		if (v != null)
 			slideViewOntoScreen(v);
 	}
@@ -141,19 +132,21 @@ public class ReaderView
 	// 80% and 95% if it means we hit the bottom in a whole number
 	// of steps.
 	private int smartAdvanceAmount(int screenHeight, int max) {
-		int advance = (int)(screenHeight * 0.9 + 0.5);
+		int advance = (int) (screenHeight * 0.9 + 0.5);
 		int leftOver = max % advance;
 		int steps = max / advance;
 		if (leftOver == 0) {
 			// We'll make it exactly. No adjustment
-		} else if ((float)leftOver / steps <= screenHeight * 0.05) {
+		}
+		else if ((float) leftOver / steps <= screenHeight * 0.05) {
 			// We can adjust up by less than 5% to make it exact.
-			advance += (int)((float)leftOver/steps + 0.5);
-		} else {
+			advance += (int) ((float) leftOver / steps + 0.5);
+		}
+		else {
 			int overshoot = advance - leftOver;
-			if ((float)overshoot / steps <= screenHeight * 0.1) {
+			if ((float) overshoot / steps <= screenHeight * 0.1) {
 				// We can adjust down by less than 10% to make it exact.
-				advance -= (int)((float)overshoot/steps + 0.5);
+				advance -= (int) ((float) overshoot / steps + 0.5);
 			}
 		}
 		if (advance > max)
@@ -176,7 +169,7 @@ public class ReaderView
 		// code.
 
 		// screenWidth/Height are the actual width/height of the screen. e.g. 480/800
-		int screenWidth  = getWidth();
+		int screenWidth = getWidth();
 		int screenHeight = getHeight();
 		// We might be mid scroll; we want to calculate where we scroll to based on
 		// where this scroll would end, not where we are now (to allow for people
@@ -184,11 +177,11 @@ public class ReaderView
 		int remainingX = mScroller.getFinalX() - mScroller.getCurrX();
 		int remainingY = mScroller.getFinalY() - mScroller.getCurrY();
 		// right/bottom is in terms of pixels within the scaled document; e.g. 1000
-		int top = -(v.getTop()  + mYScroll + remainingY);
-		int right  = screenWidth -(v.getLeft() + mXScroll + remainingX);
-		int bottom = screenHeight+top;
+		int top = -(v.getTop() + mYScroll + remainingY);
+		int right = screenWidth - (v.getLeft() + mXScroll + remainingX);
+		int bottom = screenHeight + top;
 		// docWidth/Height are the width/height of the scaled document e.g. 2000x3000
-		int docWidth  = v.getMeasuredWidth();
+		int docWidth = v.getMeasuredWidth();
 		int docHeight = v.getMeasuredHeight();
 
 		int xOffset, yOffset;
@@ -196,21 +189,22 @@ public class ReaderView
 			// We are flush with the bottom. Advance to next column.
 			if (right + screenWidth > docWidth) {
 				// No room for another column - go to next page
-				View nv = mChildViews.get(mCurrent+1);
+				View nv = mChildViews.get(mCurrent + 1);
 				if (nv == null) // No page to advance to
 					return;
-				int nextTop  = -(nv.getTop() + mYScroll + remainingY);
+				int nextTop = -(nv.getTop() + mYScroll + remainingY);
 				int nextLeft = -(nv.getLeft() + mXScroll + remainingX);
 				int nextDocWidth = nv.getMeasuredWidth();
 				int nextDocHeight = nv.getMeasuredHeight();
 
 				// Allow for the next page maybe being shorter than the screen is high
-				yOffset = (nextDocHeight < screenHeight ? ((nextDocHeight - screenHeight)>>1) : 0);
+				yOffset = (nextDocHeight < screenHeight ? ((nextDocHeight - screenHeight) >> 1) : 0);
 
 				if (nextDocWidth < screenWidth) {
 					// Next page is too narrow to fill the screen. Scroll to the top, centred.
-					xOffset = (nextDocWidth - screenWidth)>>1;
-				} else {
+					xOffset = (nextDocWidth - screenWidth) >> 1;
+				}
+				else {
 					// Reset X back to the left hand column
 					xOffset = right % screenWidth;
 					// Adjust in case the previous page is less wide
@@ -219,12 +213,14 @@ public class ReaderView
 				}
 				xOffset -= nextLeft;
 				yOffset -= nextTop;
-			} else {
+			}
+			else {
 				// Move to top of next column
 				xOffset = screenWidth;
 				yOffset = screenHeight - bottom;
 			}
-		} else {
+		}
+		else {
 			// Advance by 90% of the screen height downwards (in case lines are partially cut off)
 			xOffset = 0;
 			yOffset = smartAdvanceAmount(screenHeight, docHeight - bottom);
@@ -249,7 +245,7 @@ public class ReaderView
 		// code.
 
 		// screenWidth/Height are the actual width/height of the screen. e.g. 480/800
-		int screenWidth  = getWidth();
+		int screenWidth = getWidth();
 		int screenHeight = getHeight();
 		// We might be mid scroll; we want to calculate where we scroll to based on
 		// where this scroll would end, not where we are now (to allow for people
@@ -257,8 +253,8 @@ public class ReaderView
 		int remainingX = mScroller.getFinalX() - mScroller.getCurrX();
 		int remainingY = mScroller.getFinalY() - mScroller.getCurrY();
 		// left/top is in terms of pixels within the scaled document; e.g. 1000
-		int left  = -(v.getLeft() + mXScroll + remainingX);
-		int top   = -(v.getTop()  + mYScroll + remainingY);
+		int left = -(v.getLeft() + mXScroll + remainingX);
+		int top = -(v.getTop() + mYScroll + remainingY);
 		// docWidth/Height are the width/height of the scaled document e.g. 2000x3000
 		int docHeight = v.getMeasuredHeight();
 
@@ -267,36 +263,39 @@ public class ReaderView
 			// We are flush with the top. Step back to previous column.
 			if (left < screenWidth) {
 				/* No room for previous column - go to previous page */
-				View pv = mChildViews.get(mCurrent-1);
+				View pv = mChildViews.get(mCurrent - 1);
 				if (pv == null) /* No page to advance to */
 					return;
 				int prevDocWidth = pv.getMeasuredWidth();
 				int prevDocHeight = pv.getMeasuredHeight();
 
 				// Allow for the next page maybe being shorter than the screen is high
-				yOffset = (prevDocHeight < screenHeight ? ((prevDocHeight - screenHeight)>>1) : 0);
+				yOffset = (prevDocHeight < screenHeight ? ((prevDocHeight - screenHeight) >> 1) : 0);
 
-				int prevLeft  = -(pv.getLeft() + mXScroll);
-				int prevTop  = -(pv.getTop() + mYScroll);
+				int prevLeft = -(pv.getLeft() + mXScroll);
+				int prevTop = -(pv.getTop() + mYScroll);
 				if (prevDocWidth < screenWidth) {
 					// Previous page is too narrow to fill the screen. Scroll to the bottom, centred.
-					xOffset = (prevDocWidth - screenWidth)>>1;
-				} else {
+					xOffset = (prevDocWidth - screenWidth) >> 1;
+				}
+				else {
 					// Reset X back to the right hand column
 					xOffset = (left > 0 ? left % screenWidth : 0);
 					if (xOffset + screenWidth > prevDocWidth)
 						xOffset = prevDocWidth - screenWidth;
-					while (xOffset + screenWidth*2 < prevDocWidth)
+					while (xOffset + screenWidth * 2 < prevDocWidth)
 						xOffset += screenWidth;
 				}
 				xOffset -= prevLeft;
-				yOffset -= prevTop-prevDocHeight+screenHeight;
-			} else {
+				yOffset -= prevTop - prevDocHeight + screenHeight;
+			}
+			else {
 				// Move to bottom of previous column
 				xOffset = -screenWidth;
 				yOffset = docHeight - screenHeight + top;
 			}
-		} else {
+		}
+		else {
 			// Retreat by 90% of the screen height downwards (in case lines are partially cut off)
 			xOffset = 0;
 			yOffset = -smartAdvanceAmount(screenHeight, top);
@@ -333,13 +332,21 @@ public class ReaderView
 
 	protected void onMoveOffChild(int i) {}
 
-	protected void onSettle(View v) {};
+	protected void onSettle(View v) {}
 
-	protected void onUnsettle(View v) {};
+	;
 
-	protected void onNotInUse(View v) {};
+	protected void onUnsettle(View v) {}
 
-	protected void onScaleChild(View v, Float scale) {};
+	;
+
+	protected void onNotInUse(View v) {}
+
+	;
+
+	protected void onScaleChild(View v, Float scale) {}
+
+	;
 
 	public View getView(int i) {
 		return mChildViews.get(i);
@@ -375,59 +382,58 @@ public class ReaderView
 		return true;
 	}
 
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 		if (mScaling)
 			return true;
 
 		View v = mChildViews.get(mCurrent);
 		if (v != null) {
 			Rect bounds = getScrollBounds(v);
-			switch(directionOfTravel(velocityX, velocityY)) {
-			case MOVING_LEFT:
-				if (HORIZONTAL_SCROLLING && bounds.left >= 0) {
-					// Fling off to the left bring next view onto screen
-					View vl = mChildViews.get(mCurrent+1);
+			switch (directionOfTravel(velocityX, velocityY)) {
+				case MOVING_LEFT:
+					if (HORIZONTAL_SCROLLING && bounds.left >= 0) {
+						// Fling off to the left bring next view onto screen
+						View vl = mChildViews.get(mCurrent + 1);
 
-					if (vl != null) {
-						slideViewOntoScreen(vl);
-						return true;
+						if (vl != null) {
+							slideViewOntoScreen(vl);
+							return true;
+						}
 					}
-				}
-				break;
-			case MOVING_UP:
-				if (!HORIZONTAL_SCROLLING && bounds.top >= 0) {
-					// Fling off to the top bring next view onto screen
-					View vl = mChildViews.get(mCurrent+1);
+					break;
+				case MOVING_UP:
+					if (!HORIZONTAL_SCROLLING && bounds.top >= 0) {
+						// Fling off to the top bring next view onto screen
+						View vl = mChildViews.get(mCurrent + 1);
 
-					if (vl != null) {
-						slideViewOntoScreen(vl);
-						return true;
+						if (vl != null) {
+							slideViewOntoScreen(vl);
+							return true;
+						}
 					}
-				}
-				break;
-			case MOVING_RIGHT:
-				if (HORIZONTAL_SCROLLING && bounds.right <= 0) {
-					// Fling off to the right bring previous view onto screen
-					View vr = mChildViews.get(mCurrent-1);
+					break;
+				case MOVING_RIGHT:
+					if (HORIZONTAL_SCROLLING && bounds.right <= 0) {
+						// Fling off to the right bring previous view onto screen
+						View vr = mChildViews.get(mCurrent - 1);
 
-					if (vr != null) {
-						slideViewOntoScreen(vr);
-						return true;
+						if (vr != null) {
+							slideViewOntoScreen(vr);
+							return true;
+						}
 					}
-				}
-				break;
-			case MOVING_DOWN:
-				if (!HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
-					// Fling off to the bottom bring previous view onto screen
-					View vr = mChildViews.get(mCurrent-1);
+					break;
+				case MOVING_DOWN:
+					if (!HORIZONTAL_SCROLLING && bounds.bottom <= 0) {
+						// Fling off to the bottom bring previous view onto screen
+						View vr = mChildViews.get(mCurrent - 1);
 
-					if (vr != null) {
-						slideViewOntoScreen(vr);
-						return true;
+						if (vr != null) {
+							slideViewOntoScreen(vr);
+							return true;
+						}
 					}
-				}
-				break;
+					break;
 			}
 			mScrollerLastX = mScrollerLastY = 0;
 			// If the page has been dragged out of bounds then we want to spring back
@@ -442,9 +448,8 @@ public class ReaderView
 			Rect expandedBounds = new Rect(bounds);
 			expandedBounds.inset(-FLING_MARGIN, -FLING_MARGIN);
 
-			if(withinBoundsInDirectionOfTravel(bounds, velocityX, velocityY)
-					&& expandedBounds.contains(0, 0)) {
-				mScroller.fling(0, 0, (int)velocityX, (int)velocityY, bounds.left, bounds.right, bounds.top, bounds.bottom);
+			if (withinBoundsInDirectionOfTravel(bounds, velocityX, velocityY) && expandedBounds.contains(0, 0)) {
+				mScroller.fling(0, 0, (int) velocityX, (int) velocityY, bounds.left, bounds.right, bounds.top, bounds.bottom);
 				mStepper.prod();
 			}
 		}
@@ -455,8 +460,7 @@ public class ReaderView
 	public void onLongPress(MotionEvent e) {
 	}
 
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 		if (!mScaling) {
 			mXScroll -= distanceX;
 			mYScroll -= distanceY;
@@ -483,27 +487,28 @@ public class ReaderView
 			View v = mChildViews.get(mCurrent);
 			if (v != null)
 				onScaleChild(v, mScale);
-		} else {
-			float factor = mScale/previousScale;
+		}
+		else {
+			float factor = mScale / previousScale;
 
 			View v = mChildViews.get(mCurrent);
 			if (v != null) {
 				float currentFocusX = detector.getFocusX();
 				float currentFocusY = detector.getFocusY();
 				// Work out the focus point relative to the view top left
-				int viewFocusX = (int)currentFocusX - (v.getLeft() + mXScroll);
-				int viewFocusY = (int)currentFocusY - (v.getTop() + mYScroll);
+				int viewFocusX = (int) currentFocusX - (v.getLeft() + mXScroll);
+				int viewFocusY = (int) currentFocusY - (v.getTop() + mYScroll);
 				// Scroll to maintain the focus point
 				mXScroll += viewFocusX - viewFocusX * factor;
 				mYScroll += viewFocusY - viewFocusY * factor;
 
-				if (mLastScaleFocusX>=0)
-					mXScroll+=currentFocusX-mLastScaleFocusX;
-				if (mLastScaleFocusY>=0)
-					mYScroll+=currentFocusY-mLastScaleFocusY;
+				if (mLastScaleFocusX >= 0)
+					mXScroll += currentFocusX - mLastScaleFocusX;
+				if (mLastScaleFocusY >= 0)
+					mYScroll += currentFocusY - mLastScaleFocusY;
 
-				mLastScaleFocusX=currentFocusX;
-				mLastScaleFocusY=currentFocusY;
+				mLastScaleFocusX = currentFocusX;
+				mLastScaleFocusY = currentFocusY;
 				requestLayout();
 			}
 		}
@@ -522,18 +527,18 @@ public class ReaderView
 
 	public void onScaleEnd(ScaleGestureDetector detector) {
 		if (mReflow) {
-			applyToChildren(new ViewMapper() {
-				@Override
-				void applyToView(View view) {
-					onScaleChild(view, mScale);
-				}
-			});
+			applyToChildren(
+					new ViewMapper() {
+						@Override void applyToView(View view) {
+							onScaleChild(view, mScale);
+						}
+					}
+			);
 		}
 		mScaling = false;
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+	@Override public boolean onTouchEvent(MotionEvent event) {
 		mScaleGestureDetector.onTouchEvent(event);
 		mGestureDetector.onTouchEvent(event);
 
@@ -564,8 +569,7 @@ public class ReaderView
 		return true;
 	}
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	@Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 		int n = getChildCount();
@@ -573,8 +577,7 @@ public class ReaderView
 			measureView(getChildAt(i));
 	}
 
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+	@Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
 
 		try {
@@ -589,15 +592,16 @@ public class ReaderView
 
 			if (!memAlert) {
 				memAlert = true;
-				AlertDialog alertDialog = MuPDFActivity.getAlertBuilder().create();
+				AlertDialog alertDialog = MuPDFFragment.getAlertBuilder().create();
 				alertDialog.setMessage("Out of memory during layout");
-				alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							memAlert = false;
+				alertDialog.setButton(
+						AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								memAlert = false;
+							}
 						}
-					});
+				);
 				alertDialog.show();
 			}
 		}
@@ -605,8 +609,7 @@ public class ReaderView
 
 	private boolean memAlert = false;
 
-	private void onLayout2(boolean changed, int left, int top, int right,
-			int bottom) {
+	private void onLayout2(boolean changed, int left, int top, int right, int bottom) {
 
 		// "Edit mode" means when the View is being displayed in the Android GUI editor. (this class
 		// is instantiated in the IDE, so we need to be a bit careful what we do).
@@ -624,9 +627,9 @@ public class ReaderView
 				// cv.getRight() may be out of date with the current scale
 				// so add left to the measured width for the correct position
 				if (HORIZONTAL_SCROLLING)
-					move = cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + GAP/2 + mXScroll < getWidth()/2;
+					move = cv.getLeft() + cv.getMeasuredWidth() + cvOffset.x + GAP / 2 + mXScroll < getWidth() / 2;
 				else
-					move = cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + GAP/2 + mYScroll < getHeight()/2;
+					move = cv.getTop() + cv.getMeasuredHeight() + cvOffset.y + GAP / 2 + mYScroll < getHeight() / 2;
 				if (move && mCurrent + 1 < mAdapter.getCount()) {
 					postUnsettle(cv);
 					// post to invoke test for end of animation
@@ -639,9 +642,9 @@ public class ReaderView
 				}
 
 				if (HORIZONTAL_SCROLLING)
-					move = cv.getLeft() - cvOffset.x - GAP/2 + mXScroll >= getWidth()/2;
+					move = cv.getLeft() - cvOffset.x - GAP / 2 + mXScroll >= getWidth() / 2;
 				else
-					move = cv.getTop() - cvOffset.y - GAP/2 + mYScroll >= getHeight()/2;
+					move = cv.getTop() - cvOffset.y - GAP / 2 + mYScroll >= getHeight() / 2;
 				if (move && mCurrent > 0) {
 					postUnsettle(cv);
 					// post to invoke test for end of animation
@@ -670,7 +673,8 @@ public class ReaderView
 					mChildViews.remove(ai);
 				}
 			}
-		} else {
+		}
+		else {
 			mResetLayout = false;
 			mXScroll = mYScroll = 0;
 
@@ -705,35 +709,38 @@ public class ReaderView
 		if (notPresent) {
 			//Main item not already present. Just place it top left
 			cvLeft = cvOffset.x;
-			cvTop  = cvOffset.y;
-		} else {
+			cvTop = cvOffset.y;
+		}
+		else {
 			// Main item already present. Adjust by scroll offsets
 			cvLeft = cv.getLeft() + mXScroll;
-			cvTop  = cv.getTop()  + mYScroll;
+			cvTop = cv.getTop() + mYScroll;
 		}
 		// Scroll values have been accounted for
 		mXScroll = mYScroll = 0;
-		cvRight  = cvLeft + cv.getMeasuredWidth();
-		cvBottom = cvTop  + cv.getMeasuredHeight();
+		cvRight = cvLeft + cv.getMeasuredWidth();
+		cvBottom = cvTop + cv.getMeasuredHeight();
 
 		if (!mUserInteracting && mScroller.isFinished()) {
 			Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
-			cvRight  += corr.x;
-			cvLeft   += corr.x;
-			cvTop    += corr.y;
+			cvRight += corr.x;
+			cvLeft += corr.x;
+			cvTop += corr.y;
 			cvBottom += corr.y;
-		} else if (HORIZONTAL_SCROLLING && cv.getMeasuredHeight() <= getHeight()) {
+		}
+		else if (HORIZONTAL_SCROLLING && cv.getMeasuredHeight() <= getHeight()) {
 			// When the current view is as small as the screen in height, clamp
 			// it vertically
 			Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
-			cvTop    += corr.y;
+			cvTop += corr.y;
 			cvBottom += corr.y;
-		} else if (!HORIZONTAL_SCROLLING && cv.getMeasuredWidth() <= getWidth()) {
+		}
+		else if (!HORIZONTAL_SCROLLING && cv.getMeasuredWidth() <= getWidth()) {
 			// When the current view is as small as the screen in width, clamp
 			// it horizontally
 			Point corr = getCorrection(getScrollBounds(cvLeft, cvTop, cvRight, cvBottom));
-			cvRight  += corr.x;
-			cvLeft   += corr.x;
+			cvRight += corr.x;
+			cvLeft += corr.x;
 		}
 
 		cv.layout(cvLeft, cvTop, cvRight, cvBottom);
@@ -741,60 +748,65 @@ public class ReaderView
 		if (mCurrent > 0) {
 			View lv = getOrCreateChild(mCurrent - 1);
 			Point leftOffset = subScreenSizeOffset(lv);
-			if (HORIZONTAL_SCROLLING)
-			{
+			if (HORIZONTAL_SCROLLING) {
 				int gap = leftOffset.x + GAP + cvOffset.x;
-				lv.layout(cvLeft - lv.getMeasuredWidth() - gap,
-						(cvBottom + cvTop - lv.getMeasuredHeight())/2,
+				lv.layout(
+						cvLeft - lv.getMeasuredWidth() - gap,
+						(cvBottom + cvTop - lv.getMeasuredHeight()) / 2,
 						cvLeft - gap,
-						(cvBottom + cvTop + lv.getMeasuredHeight())/2);
-			} else {
+						(cvBottom + cvTop + lv.getMeasuredHeight()) / 2
+				);
+			}
+			else {
 				int gap = leftOffset.y + GAP + cvOffset.y;
-				lv.layout((cvLeft + cvRight - lv.getMeasuredWidth())/2,
+				lv.layout(
+						(cvLeft + cvRight - lv.getMeasuredWidth()) / 2,
 						cvTop - lv.getMeasuredHeight() - gap,
-						(cvLeft + cvRight + lv.getMeasuredWidth())/2,
-						cvTop - gap);
+						(cvLeft + cvRight + lv.getMeasuredWidth()) / 2,
+						cvTop - gap
+				);
 			}
 		}
 
 		if (mCurrent + 1 < mAdapter.getCount()) {
 			View rv = getOrCreateChild(mCurrent + 1);
 			Point rightOffset = subScreenSizeOffset(rv);
-			if (HORIZONTAL_SCROLLING)
-			{
+			if (HORIZONTAL_SCROLLING) {
 				int gap = cvOffset.x + GAP + rightOffset.x;
-				rv.layout(cvRight + gap,
-						(cvBottom + cvTop - rv.getMeasuredHeight())/2,
+				rv.layout(
+						cvRight + gap,
+						(cvBottom + cvTop - rv.getMeasuredHeight()) / 2,
 						cvRight + rv.getMeasuredWidth() + gap,
-						(cvBottom + cvTop + rv.getMeasuredHeight())/2);
-			} else {
+						(cvBottom + cvTop + rv.getMeasuredHeight()) / 2
+				);
+			}
+			else {
 				int gap = cvOffset.y + GAP + rightOffset.y;
-				rv.layout((cvLeft + cvRight - rv.getMeasuredWidth())/2,
+				rv.layout(
+						(cvLeft + cvRight - rv.getMeasuredWidth()) / 2,
 						cvBottom + gap,
-						(cvLeft + cvRight + rv.getMeasuredWidth())/2,
-						cvBottom + gap + rv.getMeasuredHeight());
+						(cvLeft + cvRight + rv.getMeasuredWidth()) / 2,
+						cvBottom + gap + rv.getMeasuredHeight()
+				);
 			}
 		}
 
 		invalidate();
 	}
 
-	@Override
-	public Adapter getAdapter() {
+	@Override public Adapter getAdapter() {
 		return mAdapter;
 	}
 
-	@Override
-	public View getSelectedView() {
+	@Override public View getSelectedView() {
 		return null;
 	}
 
-	@Override
-	public void setAdapter(Adapter adapter) {
+	@Override public void setAdapter(Adapter adapter) {
 
 		//  release previous adapter's bitmaps
-		if (null!=mAdapter && adapter!=mAdapter) {
-			if (adapter instanceof MuPDFPageAdapter){
+		if (null != mAdapter && adapter != mAdapter) {
+			if (adapter instanceof MuPDFPageAdapter) {
 				((MuPDFPageAdapter) adapter).releaseBitmaps();
 			}
 		}
@@ -804,8 +816,7 @@ public class ReaderView
 		requestLayout();
 	}
 
-	@Override
-	public void setSelection(int arg0) {
+	@Override public void setSelection(int arg0) {
 		throw new UnsupportedOperationException(getContext().getString(R.string.not_supported));
 	}
 
@@ -843,15 +854,20 @@ public class ReaderView
 		v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 
 		if (!mReflow) {
-		// Work out a scale that will fit it to this view
-		float scale = Math.min((float)getWidth()/(float)v.getMeasuredWidth(),
-					(float)getHeight()/(float)v.getMeasuredHeight());
-		// Use the fitting values scaled by our current scale factor
-		v.measure(View.MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()*scale*mScale),
-				View.MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()*scale*mScale));
-		} else {
-			v.measure(View.MeasureSpec.EXACTLY | (int)(v.getMeasuredWidth()),
-					View.MeasureSpec.EXACTLY | (int)(v.getMeasuredHeight()));
+			// Work out a scale that will fit it to this view
+			float scale = Math.min(
+					(float) getWidth() / (float) v.getMeasuredWidth(), (float) getHeight() / (float) v.getMeasuredHeight()
+			);
+			// Use the fitting values scaled by our current scale factor
+			v.measure(
+					View.MeasureSpec.EXACTLY | (int) (v.getMeasuredWidth() * scale * mScale),
+					View.MeasureSpec.EXACTLY | (int) (v.getMeasuredHeight() * scale * mScale)
+			);
+		}
+		else {
+			v.measure(
+					View.MeasureSpec.EXACTLY | (int) (v.getMeasuredWidth()), View.MeasureSpec.EXACTLY | (int) (v.getMeasuredHeight())
+			);
 		}
 	}
 
@@ -863,8 +879,10 @@ public class ReaderView
 
 		// In either dimension, if view smaller than screen then
 		// constrain it to be central
-		if (xmin > xmax) xmin = xmax = (xmin + xmax)/2;
-		if (ymin > ymax) ymin = ymax = (ymin + ymax)/2;
+		if (xmin > xmax)
+			xmin = xmax = (xmin + xmax) / 2;
+		if (ymin > ymax)
+			ymin = ymax = (ymin + ymax) / 2;
 
 		return new Rect(xmin, ymin, xmax, ymax);
 	}
@@ -873,34 +891,38 @@ public class ReaderView
 		// There can be scroll amounts not yet accounted for in
 		// onLayout, so add mXScroll and mYScroll to the current
 		// positions when calculating the bounds.
-		return getScrollBounds(v.getLeft() + mXScroll,
-				               v.getTop() + mYScroll,
-				               v.getLeft() + v.getMeasuredWidth() + mXScroll,
-				               v.getTop() + v.getMeasuredHeight() + mYScroll);
+		return getScrollBounds(
+				v.getLeft() + mXScroll, v.getTop() + mYScroll, v.getLeft() + v.getMeasuredWidth() + mXScroll, v.getTop() + v.getMeasuredHeight() + mYScroll
+		);
 	}
 
 	private Point getCorrection(Rect bounds) {
-		return new Point(Math.min(Math.max(0,bounds.left),bounds.right),
-				         Math.min(Math.max(0,bounds.top),bounds.bottom));
+		return new Point(
+				Math.min(Math.max(0, bounds.left), bounds.right), Math.min(Math.max(0, bounds.top), bounds.bottom)
+		);
 	}
 
 	private void postSettle(final View v) {
 		// onSettle and onUnsettle are posted so that the calls
 		// wont be executed until after the system has performed
 		// layout.
-		post (new Runnable() {
-			public void run () {
-				onSettle(v);
-			}
-		});
+		post(
+				new Runnable() {
+					public void run() {
+						onSettle(v);
+					}
+				}
+		);
 	}
 
 	private void postUnsettle(final View v) {
-		post (new Runnable() {
-			public void run () {
-				onUnsettle(v);
-			}
-		});
+		post(
+				new Runnable() {
+					public void run() {
+						onUnsettle(v);
+					}
+				}
+		);
 	}
 
 	private void slideViewOntoScreen(View v) {
@@ -913,8 +935,9 @@ public class ReaderView
 	}
 
 	private Point subScreenSizeOffset(View v) {
-		return new Point(Math.max((getWidth() - v.getMeasuredWidth())/2, 0),
-				Math.max((getHeight() - v.getMeasuredHeight())/2, 0));
+		return new Point(
+				Math.max((getWidth() - v.getMeasuredWidth()) / 2, 0), Math.max((getHeight() - v.getMeasuredHeight()) / 2, 0)
+		);
 	}
 
 	private static int directionOfTravel(float vx, float vy) {
@@ -928,12 +951,18 @@ public class ReaderView
 
 	private static boolean withinBoundsInDirectionOfTravel(Rect bounds, float vx, float vy) {
 		switch (directionOfTravel(vx, vy)) {
-		case MOVING_DIAGONALLY: return bounds.contains(0, 0);
-		case MOVING_LEFT:       return bounds.left <= 0;
-		case MOVING_RIGHT:      return bounds.right >= 0;
-		case MOVING_UP:         return bounds.top <= 0;
-		case MOVING_DOWN:       return bounds.bottom >= 0;
-		default: throw new NoSuchElementException();
+			case MOVING_DIAGONALLY:
+				return bounds.contains(0, 0);
+			case MOVING_LEFT:
+				return bounds.left <= 0;
+			case MOVING_RIGHT:
+				return bounds.right >= 0;
+			case MOVING_UP:
+				return bounds.top <= 0;
+			case MOVING_DOWN:
+				return bounds.bottom >= 0;
+			default:
+				throw new NoSuchElementException();
 		}
 	}
 }
