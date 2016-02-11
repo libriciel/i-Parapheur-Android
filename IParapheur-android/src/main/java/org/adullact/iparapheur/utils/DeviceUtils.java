@@ -7,7 +7,7 @@ import android.util.TypedValue;
 
 public class DeviceUtils {
 
-	private static boolean DEBUG_FORCE_OFFLINE = true;
+	private static boolean DEBUG_FORCE_OFFLINE = false;
 	private static boolean DEBUG_FORCE_SSL = true;
 
 	public static float dipsToPixels(@NonNull Context context, int dips) {

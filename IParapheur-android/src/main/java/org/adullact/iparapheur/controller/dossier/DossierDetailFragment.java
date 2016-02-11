@@ -1,6 +1,6 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.app.Activity;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -214,7 +214,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			mDossier.clearDetails();
 
 		// Download information only if details aren't already available
-		new DossierLoadingTask(getActivity(), this).execute();
+
+		new DossierLoadingAsyncTask().execute();
 	}
 
 	@Override public void onDataChanged() {
@@ -225,16 +226,20 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		updateReader();
 	}
 
-	// TODO : aucun apercu disponible
 	private void updateReader() {
+		//Adrien - TODO - Error messages
 
 		Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+		Log.d("Adrien", "document ? " + (document == null));
+		if (document == null)
+			return;
 
-		Log.d("Adrien", "id = " + document.getId());
 		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
+		Log.d("Adrien", "documentFile ? " + ((documentFile == null) || (!documentFile.exists())));
+		if ((documentFile == null) || (!documentFile.exists()))
+			return;
 
 		Log.d("Adrien", "path   = " + documentFile.getAbsolutePath());
-		Log.d("Adrien", "exists = " + documentFile.exists());
 		openFile(documentFile.getAbsolutePath());
 
 //		if (document != null) {
@@ -344,21 +349,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// </editor-fold desc="DossierDetailsFragmentListener">
 
-	private class DossierLoadingTask extends LoadingTask {
+	private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
 
-		public DossierLoadingTask(Activity context, DataChangeListener listener) {
-			super(context, listener);
-		}
-
-		@Override protected void load(String... params) throws IParapheurException {
+		// TODO : Error messages
+		@Override protected Void doInBackground(Void... params) {
 
 			// Default cases
 
 			if (mDossier == null)
-				return;
-
-			if (isCancelled())
-				return;
+				return null;
 
 			// Download the dossier Metadata (if missing, and according to the debug mode)
 
@@ -366,39 +365,47 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 			else if (!mDossier.isDetailsAvailable()) {
-
-				mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
-				if (isCancelled())
-					return;
-
-				mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
-				if (isCancelled())
-					return;
+				try {
+					mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
+					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+				}
+				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
 			// Loading PDF
 
 			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
 
-			if (isReaderEnabled && (currentDocument != null)) {
+			if (currentDocument != null) {
 				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
 
 					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
-					String path = file.getAbsolutePath();
+					String path = (file != null) ? file.getAbsolutePath() : "";
 
 					if (!DeviceUtils.isDebugOffline()) {
-						if (RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), path)) {
-							currentDocument.setPath(path);
-							String dossierId = mDossier.getId();
-							currentDocument.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()));
+						try {
+							if (RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), path)) {
+								currentDocument.setPath(path);
+								String dossierId = mDossier.getId();
+								currentDocument.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()));
+							}
 						}
+						catch (IParapheurException e) { e.printStackTrace(); }
 					}
 					else {
 						currentDocument.setPath(path);
-						Log.d("debug", file.exists() ? "Default document found" : "Default document not found");
+						Log.d("debug", ((file != null) && (file.exists())) ? "Default document found" : "Default document not found");
 					}
 				}
 			}
+
+			return null;
+		}
+
+		@Override protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			updateReader();
 		}
 	}
 
