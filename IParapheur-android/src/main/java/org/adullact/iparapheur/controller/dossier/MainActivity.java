@@ -83,7 +83,9 @@ import java.util.List;
  * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener,
+		AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener,
+		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -702,10 +704,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
 				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
 		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
-			((DossierDetailFragment) fragment).showSpinner();
-			((DossierDetailFragment) fragment).update(dossier, bureauId);
+			fragment.showSpinner();
+			fragment.update(dossier, bureauId);
 		}
 	}
 

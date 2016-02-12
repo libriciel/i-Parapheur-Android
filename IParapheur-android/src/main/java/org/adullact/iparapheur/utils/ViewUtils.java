@@ -11,6 +11,7 @@ import android.view.View;
 
 import org.adullact.iparapheur.R;
 
+
 public class ViewUtils {
 
 	/**
@@ -43,13 +44,14 @@ public class ViewUtils {
 		// Animate the loading view to 0% opacity. After the animation ends,
 		// set its visibility to GONE as an optimization step (it won't
 		// participate in layout passes, etc.)
-		spinnerView.animate().alpha(0f).setDuration(mShortAnimationDuration).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				spinnerView.setVisibility(View.GONE);
-				spinnerView.setAlpha(1f);
-			}
-		});
+		spinnerView.animate().alpha(0f).setDuration(mShortAnimationDuration).setListener(
+				new AnimatorListenerAdapter() {
+					@Override public void onAnimationEnd(Animator animation) {
+						spinnerView.setVisibility(View.GONE);
+						spinnerView.setAlpha(1f);
+					}
+				}
+		);
 	}
 
 	/**

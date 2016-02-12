@@ -44,7 +44,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
 	private String mDocumentId;              // The Document this fragment is presenting.
-	private boolean isReaderEnabled;
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
 
