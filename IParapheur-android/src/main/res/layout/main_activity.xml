@@ -51,15 +51,12 @@
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
-                        android:background="#8A8A8A" />
+                        android:background="@color/text_black_divider" />
 
-                    <fragment
-                        android:id="@+id/dossier_detail"
-                        android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
+                    <FrameLayout
+                        android:id="@+id/dossier_detail_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:tag="dossier_details_fragment"
-                        tools:layout="@layout/fragment_dossier_detail" />
+                        android:layout_height="match_parent" />
                 </LinearLayout>
 
                 <ProgressBar

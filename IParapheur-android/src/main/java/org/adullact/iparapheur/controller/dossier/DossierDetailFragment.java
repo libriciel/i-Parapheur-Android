@@ -1,16 +1,19 @@
 package org.adullact.iparapheur.controller.dossier;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -37,7 +40,7 @@ import java.util.UUID;
  */
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static final String TAG = "dossier_details_fragment";
+	public static final String FRAGMENT_TAG = "dossier_details_fragment";
 	public static final String DOSSIER = "dossier";
 	public static final String BUREAU_ID = "bureau_id";
 
@@ -50,21 +53,30 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
 	private View mLoadingSpinner;
 
-	public DossierDetailFragment() { }
+	public DossierDetailFragment() {
+		Log.i("Adrien", "Constructor");
+	}
 
 	// <editor-fold desc="LifeCycle">
 
-//	@Override public void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		setRetainInstance(true);
+	@Override public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
+		Log.i("Adrien", "onCreate");
 //
 //		if (getArguments() != null) {
 //			mBureauId = getArguments().getString(BUREAU_ID);
 //			mDossier = getArguments().getParcelable(DOSSIER);
 //		}
 //		mCurrentPage = 0;
-//	}
-//
+	}
+
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		Log.i("Adrien", "onCreateView");
+		return super.onCreateView(inflater, container, savedInstanceState);
+	}
+
+	//
 //	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
 //	}
@@ -198,6 +210,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
 
 		if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
+			showSpinner();
 			getDossierDetails(false);
 		}
 		else {
@@ -350,6 +363,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
 
+		private void showSpinnerOnUiThread() {
+			getActivity().runOnUiThread(
+					new Runnable() {
+						@Override public void run() {
+							showSpinner();
+						}
+					}
+			);
+		}
+
 		// TODO : Error messages
 		@Override protected Void doInBackground(Void... params) {
 
@@ -364,6 +387,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 			else if (!mDossier.isDetailsAvailable()) {
+				showSpinnerOnUiThread();
+
 				try {
 					mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
 					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
@@ -378,6 +403,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			if (currentDocument != null) {
 				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
 
+					showSpinnerOnUiThread();
 					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
 					String path = (file != null) ? file.getAbsolutePath() : "";
 

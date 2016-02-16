@@ -160,6 +160,16 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
+		// ContentView Fragment restore
+
+		Fragment contentFragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		if (contentFragment == null)
+			contentFragment = new DossierDetailFragment();
+
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
+		transaction.commit();
+
 		//
 
 		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.FRAGMENT_TAG);
@@ -704,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
 				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
-		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
 			fragment.showSpinner();
 			fragment.update(dossier, bureauId);
