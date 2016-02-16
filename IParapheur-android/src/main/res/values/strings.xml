@@ -136,6 +136,7 @@
     <string name="error_server_not_configured_for_tenant">Le serveur ne permet pas l\'accès à cette collectivité.</string>
     <string name="action_non_implementee">non implémenté</string>
     <string name="action_journal">Journal d\'événements</string>
+    <string name="action_transfert">Transfert d\'action</string>
     <string name="no_content">Pas de contenu</string>
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
