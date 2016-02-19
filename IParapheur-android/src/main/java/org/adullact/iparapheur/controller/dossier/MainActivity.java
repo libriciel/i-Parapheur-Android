@@ -716,7 +716,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
-			fragment.showSpinner();
+			fragment.showProgressLayout();
 			fragment.update(dossier, bureauId);
 		}
 	}

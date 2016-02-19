@@ -62,7 +62,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		Log.i("Adrien", "onCreate");
 //
 //		if (getArguments() != null) {
 //			mBureauId = getArguments().getString(BUREAU_ID);
@@ -72,7 +71,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		Log.i("Adrien", "onCreateView");
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
@@ -210,7 +208,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
 
 		if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
-			showSpinner();
+			showProgressLayout();
 			getDossierDetails(false);
 		}
 		else {
@@ -330,10 +328,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		return null;
 	}
 
-	public void showSpinner() {
-//		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
-	}
-
 	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
 	// <editor-fold desc="SeekBar Listener">
@@ -367,7 +361,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			getActivity().runOnUiThread(
 					new Runnable() {
 						@Override public void run() {
-							showSpinner();
+							showProgressLayout();
 						}
 					}
 			);
@@ -430,6 +424,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		@Override protected void onPostExecute(Void aVoid) {
 			super.onPostExecute(aVoid);
 
+			showContentLayout();
 			updateReader();
 		}
 	}
