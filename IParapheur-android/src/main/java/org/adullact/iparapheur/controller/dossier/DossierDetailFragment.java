@@ -275,9 +275,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 												if (document.getPagesAnnotations().get(mCurrentPage).getAnnotations() != null)
 													for (Annotation annotation : document.getPagesAnnotations().get(mCurrentPage).getAnnotations())
 														annotationList.add(
+																// TODO : open parameter for the 150 dpi translate
 																new CustomAnnotation(
 																		annotation.getUuid(),
-																		annotation.getRect(),
+																		DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
 																		ContextCompat.getColor(getActivity(), R.color.red_500),
 																		annotation.getText(),
 																		"",
