@@ -80,4 +80,5 @@ public class ViewUtils {
 		if (animationListener != null)
 			inAnim.addListener(animationListener);
 	}
+
 }

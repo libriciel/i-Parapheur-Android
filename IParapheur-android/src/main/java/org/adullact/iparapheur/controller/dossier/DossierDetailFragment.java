@@ -2,8 +2,10 @@ package org.adullact.iparapheur.controller.dossier;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,11 +20,13 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.artifex.customannotations.CustomAnnotation;
 import com.artifex.mupdfdemo.MuPDFFragment;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.DeviceUtils;
@@ -31,6 +35,7 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.UUID;
 
 
@@ -40,6 +45,7 @@ import java.util.UUID;
  */
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
+	public static final String LOG_TAG = "DossierDetailFragment";
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
 	public static final String DOSSIER = "dossier";
 	public static final String BUREAU_ID = "bureau_id";
@@ -239,18 +245,53 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void updateReader() {
 		//Adrien - TODO - Error messages
 
-		Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
-		Log.d("Adrien", "document ? " + (document == null));
+		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+		Log.d(LOG_TAG, "document ? " + (document == null));
 		if (document == null)
 			return;
 
 		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
-		Log.d("Adrien", "documentFile ? " + ((documentFile == null) || (!documentFile.exists())));
+		Log.d(LOG_TAG, "documentFile ? " + ((documentFile == null) || (!documentFile.exists())));
 		if ((documentFile == null) || (!documentFile.exists()))
 			return;
 
-		Log.d("Adrien", "path   = " + documentFile.getAbsolutePath());
+		Log.d(LOG_TAG, "path   = " + documentFile.getAbsolutePath());
 		openFile(documentFile.getAbsolutePath());
+
+		//
+
+		final Handler handler = new Handler();
+		handler.postDelayed(
+				new Runnable() {
+					@Override public void run() {
+
+						getActivity().runOnUiThread(
+								new Runnable() {
+									@Override public void run() {
+										ArrayList<CustomAnnotation> annotationList = new ArrayList<>();
+
+										if (document.getPagesAnnotations() != null)
+											if (document.getPagesAnnotations().get(mCurrentPage) != null)
+												if (document.getPagesAnnotations().get(mCurrentPage).getAnnotations() != null)
+													for (Annotation annotation : document.getPagesAnnotations().get(mCurrentPage).getAnnotations())
+														annotationList.add(
+																new CustomAnnotation(
+																		annotation.getUuid(),
+																		annotation.getRect(),
+																		ContextCompat.getColor(getActivity(), R.color.red_500),
+																		annotation.getText(),
+																		"",
+																		""
+																)
+														);
+
+										refreshAnnotations(annotationList);
+									}
+								}
+						);
+					}
+				}, 2000
+		);
 
 //		if (document != null) {
 //			if (isReaderEnabled && (document.getPath() != null)) {
