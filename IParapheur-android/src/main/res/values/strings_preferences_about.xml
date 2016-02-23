@@ -10,7 +10,7 @@
     <string name="about_library_licenses_title">Licences Open Sources</string>
 
     <string name="about_library_license_mupdf_title">MuPDF</string>
-    <string name="about_library_license_mupdf_copyright">Copyright 2006–2013 Artifex Software, Inc.</string>
+    <string name="about_library_license_mupdf_copyright">v1.8 - Copyright 2006–2013 Artifex Software, Inc.</string>
     <string name="about_library_license_mupdf_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
 
     <string name="about_library_license_spongy_title">SpongyCastle</string>
