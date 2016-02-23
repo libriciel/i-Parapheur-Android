@@ -1,14 +1,14 @@
 package org.adullact.iparapheur.controller.dossier;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,13 +29,14 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 
@@ -58,10 +59,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
 	private View mLoadingSpinner;
-
-	public DossierDetailFragment() {
-		Log.i("Adrien", "Constructor");
-	}
 
 	// <editor-fold desc="LifeCycle">
 
@@ -258,41 +255,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		Log.d(LOG_TAG, "path   = " + documentFile.getAbsolutePath());
 		openFile(documentFile.getAbsolutePath());
 
+		SparseArray<HashMap<String, CustomAnnotation>> muPdfCustomAnnotations = parapheurToMuPdfAnnotations(document.getPagesAnnotations());
+		updateCustomAnnotations(muPdfCustomAnnotations);
+
 		//
-
-		final Handler handler = new Handler();
-		handler.postDelayed(
-				new Runnable() {
-					@Override public void run() {
-
-						getActivity().runOnUiThread(
-								new Runnable() {
-									@Override public void run() {
-										ArrayList<CustomAnnotation> annotationList = new ArrayList<>();
-
-										if (document.getPagesAnnotations() != null)
-											if (document.getPagesAnnotations().get(mCurrentPage) != null)
-												if (document.getPagesAnnotations().get(mCurrentPage).getAnnotations() != null)
-													for (Annotation annotation : document.getPagesAnnotations().get(mCurrentPage).getAnnotations())
-														annotationList.add(
-																// TODO : open parameter for the 150 dpi translate
-																new CustomAnnotation(
-																		annotation.getUuid(),
-																		DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
-																		ContextCompat.getColor(getActivity(), R.color.red_500),
-																		annotation.getText(),
-																		"",
-																		""
-																)
-														);
-
-										refreshAnnotations(annotationList);
-									}
-								}
-						);
-					}
-				}, 2000
-		);
 
 //		if (document != null) {
 //			if (isReaderEnabled && (document.getPath() != null)) {
@@ -352,6 +318,34 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
 		getActivity().invalidateOptionsMenu();
+	}
+
+	private static @NonNull SparseArray<HashMap<String, CustomAnnotation>> parapheurToMuPdfAnnotations(SparseArray<PageAnnotations> parapheurAnnotations) {
+		SparseArray<HashMap<String, CustomAnnotation>> result = new SparseArray<>();
+
+		for (int i = 0; i < parapheurAnnotations.size(); i++) {
+
+			HashMap<String, CustomAnnotation> annotationMap = new HashMap<>();
+			int pageIndex = parapheurAnnotations.keyAt(i);
+			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
+
+			for (Annotation annotation : pageAnnotation.getAnnotations()) {
+				annotationMap.put(
+						annotation.getUuid(), new CustomAnnotation(
+								annotation.getUuid(),
+								DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
+								Color.RED,
+								annotation.getText(),
+								"",
+								annotation.getAuthor()
+						)
+				);
+			}
+
+			result.put(pageIndex, annotationMap);
+		}
+
+		return result;
 	}
 
 	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
@@ -466,8 +460,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		@Override protected void onPostExecute(Void aVoid) {
 			super.onPostExecute(aVoid);
 
-			showContentLayout();
 			updateReader();
+			showContentLayout();
 		}
 	}
 
