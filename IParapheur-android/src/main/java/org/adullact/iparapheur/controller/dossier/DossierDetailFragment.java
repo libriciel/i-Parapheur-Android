@@ -119,15 +119,17 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 //		}
 //		setHasOptionsMenu(true);
 //	}
-//
-//	@Override public void onStart() {
-//		super.onStart();
-//
+
+	@Override public void onStart() {
+		super.onStart();
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
 //		if (mShouldReload) {
 //			mShouldReload = false;
 //			update(mDossier, mBureauId);
 //		}
-//	}
+	}
 
 	// </editor-fold desc="LifeCycle">
 
@@ -197,6 +199,35 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	// </editor-fold desc="ActionBar">
+
+	// <editor-fold desc="MuPdfFragment">
+
+	@Override public void showProgressLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+
+		super.showProgressLayout();
+
+	}
+
+	@Override public void showContentLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.VISIBLE);
+
+		super.showContentLayout();
+	}
+
+	@Override public void showErrorLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+
+		super.showErrorLayout();
+	}
+
+	// </editor-fold desc="MuPdfFragment">
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		update(dossier, bureauId, null);
