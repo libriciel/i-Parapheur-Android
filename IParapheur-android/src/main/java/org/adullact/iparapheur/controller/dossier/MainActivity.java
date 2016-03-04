@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-		if (!isDrawerKnown || isDeviceInPortrait) {
+		if ((!isDrawerKnown) && isDeviceInPortrait) {
 
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
