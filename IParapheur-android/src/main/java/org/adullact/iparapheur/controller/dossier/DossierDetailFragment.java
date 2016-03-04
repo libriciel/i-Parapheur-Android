@@ -1,6 +1,5 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -131,7 +130,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 					new View.OnClickListener() {
 						@Override public void onClick(View v) {
 							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-							((DossierDetailsFragmentListener) getActivity()).toggleInfoDrawer();
+							startCreateAnnotationOnNextMove(true);
 						}
 					}
 			);
@@ -395,7 +394,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 						annotation.getUuid(), new CustomAnnotation(
 								annotation.getUuid(),
 								DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
-								Color.RED,
 								annotation.getText(),
 								"",
 								annotation.getAuthor()
