@@ -366,6 +366,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
+	@Override protected void onAnnotationChanged(@NonNull String annotationId) {
+		Log.i("Adrien", "annotation changed " + annotationId);
+
+	}
+
 	// <editor-fold desc="SeekBar Listener">
 
 	@Override public void onStartTrackingTouch(SeekBar seekBar) { }
