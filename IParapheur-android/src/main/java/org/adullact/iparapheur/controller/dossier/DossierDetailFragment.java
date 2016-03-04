@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.artifex.customannotations.CustomAnnotation;
 import com.artifex.mupdfdemo.MuPDFFragment;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
@@ -123,12 +124,41 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	@Override public void onStart() {
 		super.onStart();
 
-		if (getView() != null)
+		if (getView() != null) {
+
 			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View v) {
+							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+							((DossierDetailsFragmentListener) getActivity()).toggleInfoDrawer();
+						}
+					}
+			);
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_validate).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View v) {
+							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+							((DossierDetailsFragmentListener) getActivity()).onValidateButtonClicked(mDossier, mBureauId);
+						}
+					}
+			);
+			;
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel).setOnClickListener(
+					new View.OnClickListener() {
+						@Override public void onClick(View v) {
+							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+							((DossierDetailsFragmentListener) getActivity()).onCancelButtonClicked(mDossier, mBureauId);
+						}
+					}
+			);
+		}
+
 //		if (mShouldReload) {
 //			mShouldReload = false;
 //			update(mDossier, mBureauId);
 //		}
+
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -423,6 +453,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		void lockInfoDrawer(boolean lock);
 
+		void onValidateButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId);
+
+		void onCancelButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId);
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">

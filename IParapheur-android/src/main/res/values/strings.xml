@@ -97,7 +97,7 @@
     <string name="visa_error_message_unknown_error">Erreur inconnue lors du visa.</string>
 
     <!-- MuPDF strings -->
-    <string name="add_annotation">Annotater</string>
+    <string name="add_annotation">Annoter</string>
 
     <string name="cannot_open_file_Path">Impossible d\'ouvrir le fichier : %1$s</string>
     <string name="cannot_open_buffer">Impossible d\'ouvrir le buffer</string>

@@ -466,6 +466,12 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		return (dossierListFragment != null) && onActionItemChecked(menuItem, dossierListFragment.getCheckedDossiers());
+	}
+
+	private boolean onActionItemChecked(MenuItem menuItem, HashSet<Dossier> dossiers) {
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
 		if (dossierListFragment != null) {
@@ -617,6 +623,30 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}.execute();
 	}
 
+	private void launchActionPopup(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
+
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		ArrayList<Dossier> singleList = new ArrayList<>();
+		singleList.add(dossier);
+		DialogFragment actionDialog;
+
+		if (action == Action.REJET) {
+			actionDialog = RejectDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
+			actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.VISA) {
+			actionDialog = VisaDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
+			actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.SIGNATURE) {
+			actionDialog = SignatureDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
+			actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
+		}
+	}
+
 	// <editor-fold desc="AccountFragmentListener">
 
 	@Override public void onAccountSelected(@NonNull Account account) {
@@ -721,12 +751,11 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onDossierCheckedChanged() {
-
-		if (mActionMode == null)
-			mActionMode = startSupportActionMode(this);
-		else
+	@Override public void onDossierCheckedChanged(boolean forceClose) {
+		if (mActionMode != null)
 			mActionMode.invalidate();
+		else if (!forceClose)
+			mActionMode = startSupportActionMode(this);
 	}
 
 	@Override public void onDossiersLoaded(int size) {
@@ -764,6 +793,17 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		else {
 			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+	}
+
+	@Override public void onValidateButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
+		if (dossier.getActions().contains(Action.SIGNATURE))
+			launchActionPopup(dossier, bureauId, Action.SIGNATURE);
+		else
+			launchActionPopup(dossier, bureauId, Action.VISA);
+	}
+
+	@Override public void onCancelButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
+		launchActionPopup(dossier, bureauId, Action.REJET);
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">
