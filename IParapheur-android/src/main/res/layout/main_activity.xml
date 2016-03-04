@@ -51,7 +51,7 @@
                     <View
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
-                        android:background="@color/text_black_divider" />
+                        android:background="@color/text_black_divider_opaque" />
 
                     <FrameLayout
                         android:id="@+id/dossier_detail_layout"
