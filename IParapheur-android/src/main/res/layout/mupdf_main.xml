@@ -27,7 +27,7 @@
             fab:fab_addButtonPlusIconColor="@color/text_white"
             fab:fab_addButtonSize="normal"
             fab:fab_expandDirection="up"
-            fab:fab_labelStyle="@style/menu_labels_style"
+            fab:fab_labelStyle="@style/fab_menu_labels_style"
             fab:fab_labelsPosition="left">
 
             <com.getbase.floatingactionbutton.FloatingActionButton

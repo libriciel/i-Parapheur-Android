@@ -28,23 +28,24 @@ android {
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
     // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
-    /* splits {
+    splits {
         abi {
             enable true
             reset()
-            include 'x86', 'armeabi', 'armeabi-v7a', 'mips'
+            /* include 'x86', 'armeabi', 'armeabi-v7a', 'mips' */
+            include 'armeabi-v7a'
             universalApk false
         }
-    } */
+    }
 }
 
 
 dependencies {
-    compile 'com.android.support:support-v13:23.1.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:support-v13:23.2.0'
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:cardview-v7:23.2.0'
+    compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.android.support:design:23.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.madgag.spongycastle:core:1.53.0.0'
     compile 'com.madgag.spongycastle:pkix:1.53.0.0'

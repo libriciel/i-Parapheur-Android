@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -57,71 +56,26 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
 
-	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
-	private View mLoadingSpinner;
-
 	// <editor-fold desc="LifeCycle">
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-//
+
 //		if (getArguments() != null) {
 //			mBureauId = getArguments().getString(BUREAU_ID);
 //			mDossier = getArguments().getParcelable(DOSSIER);
 //		}
-//		mCurrentPage = 0;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
-	//
-//	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
-//	}
-//
-//	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
-//		super.onViewCreated(view, savedInstanceState);
-//
-//		isReaderEnabled = true;
-//		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
-//		seekBar.setVisibility(View.INVISIBLE);
-//        seekBar.setOnSeekBarChangeListener(this);*/
-//		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
-//		mLoadingSpinner = view.findViewById(android.R.id.progress);
-//
-//		// Reload data after rotation
-//
-//		if (savedInstanceState != null)
-//			mShouldReload = true;
-//	}
-//
-//	@Override public void onActivityCreated(Bundle savedInstanceState) {
-//		super.onActivityCreated(savedInstanceState);
-//
-//		mViewPager.post(
-//				new Runnable() {
-//					public void run() {
-//						mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
-//					}
-//				}
-//		);
-//
-//		String state = Environment.getExternalStorageState();
-//		if (!Environment.MEDIA_MOUNTED.equals(state)) {
-//			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
-//			isReaderEnabled = false;
-//		}
-//		if (mDossier != null) {
-//			getDossierDetails(false);
-//		}
-//		setHasOptionsMenu(true);
-//	}
+	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-	@Override public void onStart() {
-		super.onStart();
+		// Set listeners
 
 		if (getView() != null) {
 
@@ -153,11 +107,43 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			);
 		}
 
-//		if (mShouldReload) {
-//			mShouldReload = false;
-//			update(mDossier, mBureauId);
+		//
+
+//		isReaderEnabled = true;
+//		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
+//		seekBar.setVisibility(View.INVISIBLE);
+//        seekBar.setOnSeekBarChangeListener(this);*/
+//		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
+//		mLoadingSpinner = view.findViewById(android.R.id.progress);
+
+		// Reload data after rotation
+
+		if (savedInstanceState != null)
+			mShouldReload = true;
+	}
+
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+//		String state = Environment.getExternalStorageState();
+//		if (!Environment.MEDIA_MOUNTED.equals(state)) {
+//			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
+//			isReaderEnabled = false;
 //		}
 
+		if (mDossier != null)
+			getDossierDetails(false);
+
+		setHasOptionsMenu(true);
+	}
+
+	@Override public void onStart() {
+		super.onStart();
+
+		if (mShouldReload) {
+			mShouldReload = false;
+			update(mDossier, mBureauId);
+		}
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -294,7 +280,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	@Override public void onDataChanged() {
 
 		if (!DeviceUtils.isDebugOffline())
-			updateDetails();
+			updateCircuitInfoDrawerContent();
 
 		updateReader();
 	}
@@ -357,23 +343,24 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 //		}
 	}
 
-	private void updateDetails() {
+	private void updateCircuitInfoDrawerContent() {
 
-		View infosLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
+		View infoLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
 
 		// Default case (this should not happen !)
 
-		if (infosLayout == null)
+		if (infoLayout == null)
 			return;
 
 		// Updating info
 
-		ListView circuitView = (ListView) infosLayout.findViewById(R.id.fragment_dossier_detail_circuit);
-		TextView title = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_title);
-		TextView typologie = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_typologie);
+		ListView circuitView = (ListView) infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
+		TextView title = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_title);
+		TextView typology = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
 
 		title.setText(mDossier.getName());
-		typologie.setText(mDossier.getType() + " / " + mDossier.getSousType());
+		String typeString = mDossier.getType() + " / " + mDossier.getSousType();
+		typology.setText(typeString);
 		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
 
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
@@ -528,6 +515,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(aVoid);
 
 			updateReader();
+			updateCircuitInfoDrawerContent();
 			showContentLayout();
 		}
 	}
