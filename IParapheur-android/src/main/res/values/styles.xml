@@ -6,9 +6,7 @@
         <item name="android:textColor">@color/text_white</item>
     </style>
 
-    <style name="CheckBoxStyle" parent="@android:style/Widget.Holo.Light.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/material_checkbox_black</item>
-    </style>
+    <style name="CheckBoxStyle" parent="@android:style/Widget.Holo.Light.CompoundButton.CheckBox"/>
 
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
