@@ -480,33 +480,29 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
-			// Loading PDF
+			// Getting metadata
 
 			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
-
-			if (currentDocument != null) {
-				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
-
-					showSpinnerOnUiThread();
-					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
-					String path = (file != null) ? file.getAbsolutePath() : "";
-
-					if (!DeviceUtils.isDebugOffline()) {
-						try {
-							if (RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), path)) {
-								currentDocument.setPath(path);
-								String dossierId = mDossier.getId();
-								currentDocument.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()));
-							}
-						}
-						catch (IParapheurException e) { e.printStackTrace(); }
-					}
-					else {
-						currentDocument.setPath(path);
-						Log.d("debug", ((file != null) && (file.exists())) ? "Default document found" : "Default document not found");
-					}
-				}
+			if (currentDocument == null) {
+				Log.e("Adrien", "current document null !?!");
+				return null;
 			}
+
+			showSpinnerOnUiThread();
+			File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
+			currentDocument.setPath(file.getAbsolutePath());
+
+			if (!file.exists()) {
+				try { RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), file.getAbsolutePath()); }
+				catch (IParapheurException e) { e.printStackTrace(); }
+			}
+
+			String dossierId = mDossier.getId();
+
+			SparseArray<PageAnnotations> annotations = new SparseArray<>();
+			try { RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()); }
+			catch (IParapheurException e) { e.printStackTrace(); }
+			currentDocument.setPagesAnnotations(annotations);
 
 			return null;
 		}

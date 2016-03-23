@@ -7,6 +7,7 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
@@ -26,18 +27,25 @@ import java.util.List;
 
 public class FileUtils {
 
+	public static final String LOG = "FileUtils";
 	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
 
 	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
 		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
-		directory.mkdirs();
+
+		if (!directory.mkdirs())
+			if (!directory.exists())
+				Log.e(LOG, "getDirectoryForDossier failed");
+
+		Log.e(LOG, "directory : " + directory.getAbsolutePath() + " " + directory.exists());
 
 		return directory;
 	}
 
-	public static @Nullable File getFileForDocument(@NonNull Context context, @NonNull String dossierId, @NonNull String documentId) {
+	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull String dossierId,
+																						   @NonNull String documentId) {
 
 		if (!DeviceUtils.isDebugOffline())
 			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
