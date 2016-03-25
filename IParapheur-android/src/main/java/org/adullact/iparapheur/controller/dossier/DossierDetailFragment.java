@@ -289,16 +289,13 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		//Adrien - TODO - Error messages
 
 		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
-		Log.d(LOG_TAG, "document ? " + (document == null));
 		if (document == null)
 			return;
 
 		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
-		Log.d(LOG_TAG, "documentFile ? " + ((documentFile == null) || (!documentFile.exists())));
-		if ((documentFile == null) || (!documentFile.exists()))
+		if (!documentFile.exists())
 			return;
 
-		Log.d(LOG_TAG, "path   = " + documentFile.getAbsolutePath());
 		openFile(documentFile.getAbsolutePath());
 
 		SparseArray<HashMap<String, CustomAnnotation>> muPdfCustomAnnotations = parapheurToMuPdfAnnotations(document.getPagesAnnotations());
