@@ -232,6 +232,14 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		super.showErrorLayout();
 	}
 
+	@Override protected void onAnnotationChanged(@NonNull CustomAnnotation annotation, boolean deleteInvoked) {
+		Log.i("Adrien", "annotation changed id:" + annotation.getId() + " delete?" + deleteInvoked);
+	}
+
+	@NonNull @Override protected String getAnnotationAuthorName() {
+		return "Adrien";
+	}
+
 	// </editor-fold desc="MuPdfFragment">
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
@@ -356,11 +364,13 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
-				annotationMap.put(annotation.getUuid(), new CustomAnnotation(annotation.getUuid(),
-																			 DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
-																			 annotation.getText(),
-																			 annotation.getAuthor()
-				));
+				annotationMap.put(annotation.getUuid(),
+								  new CustomAnnotation(annotation.getUuid(),
+													   DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
+													   annotation.getText(),
+													   annotation.getAuthor()
+								  )
+				);
 			}
 
 			result.put(pageIndex, annotationMap);
@@ -383,11 +393,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return annexes.getId();
 
 		return null;
-	}
-
-	@Override protected void onAnnotationChanged(@NonNull String annotationId) {
-		Log.i("Adrien", "annotation changed " + annotationId);
-
 	}
 
 	@Override public void onDataChanged() {
