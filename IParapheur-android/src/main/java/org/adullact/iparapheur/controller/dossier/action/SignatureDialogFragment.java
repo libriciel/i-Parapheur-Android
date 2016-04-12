@@ -133,24 +133,19 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		// Set listeners
 
-		mPublicAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
+		mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 					@Override public void onFocusChange(View v, boolean hasFocus) {
 						mPublicAnnotationLabel.setActivated(hasFocus);
 					}
-				}
-		);
+		});
 
-		mPrivateAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
+		mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 					@Override public void onFocusChange(View v, boolean hasFocus) {
 						mPrivateAnnotationLabel.setActivated(hasFocus);
 					}
-				}
-		);
+		});
 
-		mCertificateSpinner.setOnItemSelectedListener(
-				new AdapterView.OnItemSelectedListener() {
+		mCertificateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 					@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 						refreshAliasesSpinner();
 					}
@@ -209,22 +204,18 @@ public class SignatureDialogFragment extends DialogFragment {
 			return;
 
 		Button signButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-		signButton.setOnClickListener(
-				new View.OnClickListener() {
+		signButton.setOnClickListener(new View.OnClickListener() {
 					@Override public void onClick(View v) {
 						onSignButtonClicked();
 					}
-				}
-		);
+		});
 
 		Button signPapierButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
-		signPapierButton.setOnClickListener(
-				new View.OnClickListener() {
+		signPapierButton.setOnClickListener(new View.OnClickListener() {
 					@Override public void onClick(View v) {
 						onSignPapierButtonClicked();
 					}
-				}
-		);
+		});
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -545,8 +536,9 @@ public class SignatureDialogFragment extends DialogFragment {
 				dismiss();
 			}
 			else if (getActivity() != null) {
-				Toast.makeText(
-						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_error_message_unknown_error), Toast.LENGTH_SHORT
+				Toast.makeText(getActivity(),
+							   ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_error_message_unknown_error),
+							   Toast.LENGTH_SHORT
 				).show();
 			}
 		}
@@ -598,9 +590,7 @@ public class SignatureDialogFragment extends DialogFragment {
 				dismiss();
 			}
 			else if (getActivity() != null) {
-				Toast.makeText(
-						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_papier_unknown_error), Toast.LENGTH_SHORT
-				).show();
+				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_papier_unknown_error), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

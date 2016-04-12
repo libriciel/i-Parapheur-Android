@@ -45,10 +45,8 @@ import java.util.UUID;
  */
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static final String LOG_TAG = "DossierDetailFragment";
+	// public static final String LOG_TAG = "DossierDetailFragment";
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
-	public static final String DOSSIER = "dossier";
-	public static final String BUREAU_ID = "bureau_id";
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
@@ -80,31 +78,27 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (getView() != null) {
 
 			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-							startCreateAnnotationOnNextMove(true);
-						}
-					}
-			);
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_validate).setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-							((DossierDetailsFragmentListener) getActivity()).onValidateButtonClicked(mDossier, mBureauId);
-						}
-					}
-			);
-			;
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel).setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-							((DossierDetailsFragmentListener) getActivity()).onCancelButtonClicked(mDossier, mBureauId);
-						}
-					}
-			);
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					startCreateAnnotationOnNextMove(true);
+				}
+			});
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_validate).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					((DossierDetailsFragmentListener) getActivity()).onValidateButtonClicked(mDossier, mBureauId);
+				}
+			});
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					((DossierDetailsFragmentListener) getActivity()).onCancelButtonClicked(mDossier, mBureauId);
+				}
+			});
 		}
 
 		//
@@ -173,14 +167,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			documentSelectorSubMenu.clear();
 
 			for (Document mainDocument : mDossier.getMainDocuments())
-				documentSelectorSubMenu.add(
-						Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()
-				).setIcon(R.drawable.ic_description_black_24dp);
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
 			for (Document annexe : mDossier.getAnnexes())
-				documentSelectorSubMenu.add(
-						Menu.NONE, R.id.action_document_selected, 0, annexe.getName()
-				).setIcon(R.drawable.ic_attachment_black_24dp);
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
 		//
@@ -277,14 +267,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		new DossierLoadingAsyncTask().execute();
 	}
 
-	@Override public void onDataChanged() {
-
-		if (!DeviceUtils.isDebugOffline())
-			updateCircuitInfoDrawerContent();
-
-		updateReader();
-	}
-
 	private void updateReader() {
 		//Adrien - TODO - Error messages
 
@@ -374,15 +356,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
-				annotationMap.put(
-						annotation.getUuid(), new CustomAnnotation(
-								annotation.getUuid(),
-								DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
-								annotation.getText(),
-								"",
-								annotation.getAuthor()
-						)
-				);
+				annotationMap.put(annotation.getUuid(), new CustomAnnotation(annotation.getUuid(),
+																			 DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
+																			 annotation.getText(),
+																			 annotation.getAuthor()
+				));
 			}
 
 			result.put(pageIndex, annotationMap);
@@ -407,14 +385,22 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		return null;
 	}
 
-	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
-
 	@Override protected void onAnnotationChanged(@NonNull String annotationId) {
 		Log.i("Adrien", "annotation changed " + annotationId);
 
 	}
 
+	@Override public void onDataChanged() {
+
+		if (!DeviceUtils.isDebugOffline())
+			updateCircuitInfoDrawerContent();
+
+		updateReader();
+	}
+
 	// <editor-fold desc="SeekBar Listener">
+
+	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
 	@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 
@@ -445,13 +431,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
 
 		private void showSpinnerOnUiThread() {
-			getActivity().runOnUiThread(
-					new Runnable() {
-						@Override public void run() {
-							showProgressLayout();
-						}
-					}
-			);
+			getActivity().runOnUiThread(new Runnable() {
+				@Override public void run() {
+					showProgressLayout();
+				}
+			});
 		}
 
 		// TODO : Error messages

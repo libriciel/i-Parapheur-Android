@@ -100,23 +100,18 @@ public class RejectDialogFragment extends DialogFragment {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
-		builder.setPositiveButton(
-				R.string.action_rejeter, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.action_rejeter, new DialogInterface.OnClickListener() {
 					@Override public void onClick(DialogInterface dialog, int which) {
-
 						// Do nothing here because we override this button in the onStart() to change the close behaviour.
 						// However, we still need this because on older versions of Android :
 						// unless we pass a handler the button doesn't get instantiated
 					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						onCancelButtonClicked();
 					}
-				}
-		);
+		});
 
 		return builder.create();
 	}
@@ -130,13 +125,11 @@ public class RejectDialogFragment extends DialogFragment {
 		AlertDialog dialog = (AlertDialog) getDialog();
 		if (dialog != null) {
 			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-			positiveButton.setOnClickListener(
-					new View.OnClickListener() {
+			positiveButton.setOnClickListener(new View.OnClickListener() {
 						@Override public void onClick(View v) {
 							onRejectButtonClicked();
 						}
-					}
-			);
+			});
 		}
 	}
 
@@ -204,9 +197,7 @@ public class RejectDialogFragment extends DialogFragment {
 				dismiss();
 			}
 			else if (getActivity() != null) {
-				Toast.makeText(
-						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.reject_error_message_unknown_error), Toast.LENGTH_SHORT
-				).show();
+				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.reject_error_message_unknown_error), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

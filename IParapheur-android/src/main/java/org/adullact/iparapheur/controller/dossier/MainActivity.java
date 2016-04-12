@@ -122,7 +122,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
 		mFiltersSpinner = (Spinner) findViewById(R.id.activity_dossiers_toolbar_spinner);
 
-		mFiltersSpinner.setOnItemSelectedListener(this);
+		if (mFiltersSpinner != null)
+			mFiltersSpinner.setOnItemSelectedListener(this);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		setSupportActionBar(toolbar);
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Drawers
 
 		mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
-		mLeftDrawerLayout.setDrawerListener(mLeftDrawerToggle);
+		mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 	}
 
@@ -314,8 +315,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Alignment in TopBar isn't working on XML, but works programmatically
 
-		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(
-				Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END
+		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT,
+																					 Toolbar.LayoutParams.WRAP_CONTENT,
+																					 Gravity.TOP | Gravity.END
 		);
 		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
 		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
