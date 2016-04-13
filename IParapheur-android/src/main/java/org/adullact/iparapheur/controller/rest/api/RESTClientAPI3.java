@@ -173,8 +173,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 				annotationJson.key("author").value(annotation.getAuthor());
 				annotationJson.key("date").value(annotation.getDate());
 				annotationJson.key("page").value(page);
-				annotationJson.key("text").value(annotation.getText());
-				annotationJson.key("type").value("rect");
+				annotationJson.key("text").value(annotation.getText() != null ? annotation.getText() : "");
+				annotationJson.key("type").value("rect"); //TODO
 			}
 			annotationJson.endObject();
 		}

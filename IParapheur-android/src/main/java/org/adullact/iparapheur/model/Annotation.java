@@ -15,7 +15,7 @@ public class Annotation implements Parcelable {
 	private static final String ID = "id";
 	private static final String IS_SECRETAIRE = "secretaire";
 	private static final String AUTHOR = "author";
-	private static final String DATE = "mDate";
+	private static final String DATE = "date";
 	private static final String TYPE = "type";
 	private static final String TEXT = "text";
 	private static final String RECT = "rect";
@@ -68,7 +68,7 @@ public class Annotation implements Parcelable {
 				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(X, 0),
 				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(Y, 0)
 		);
-		text = jsonExplorer.optString(TEXT);
+		text = jsonExplorer.optString(TEXT, "");
 		type = jsonExplorer.optString(TYPE, "rect");
 		mStep = step;
 		mPenColor = jsonExplorer.optString(PEN_COLOR, "blue");

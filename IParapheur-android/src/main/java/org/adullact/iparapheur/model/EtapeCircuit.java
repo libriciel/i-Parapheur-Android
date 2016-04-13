@@ -42,7 +42,7 @@ public class EtapeCircuit implements Parcelable {
 	}
 
 	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action, String publicAnnotation) {
-		this.dateValidation = StringUtils.parseISO8601Date(dateValidation);
+		this.dateValidation = StringUtils.parseIso8601Date(dateValidation);
 		this.isApproved = isApproved;
 		this.isRejected = isRejected;
 		this.bureauName = bureauName;

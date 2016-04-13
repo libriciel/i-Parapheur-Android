@@ -85,8 +85,8 @@ public class ModelMapper {
 									  actions,
 									  jsonObject.optString("type"),
 									  jsonObject.optString("sousType"),
-									  StringUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
-									  StringUtils.parseISO8601Date(jsonObject.optString("dateLimite")),
+									  StringUtils.parseIso8601Date(jsonObject.optString("dateCreation")),
+									  StringUtils.parseIso8601Date(jsonObject.optString("dateLimite")),
 									  jsonObject.optBoolean("isSignPapier", false)
 		);
 

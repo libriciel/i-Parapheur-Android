@@ -59,8 +59,8 @@ public class ModelMapper3 extends ModelMapper {
 				actions,
 				jsonExplorer.optString(DOSSIER_TYPE, ""),
 				jsonExplorer.optString(DOSSIER_SUBTYPE, ""),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
 				jsonExplorer.optBoolean(DOSSIER_IS_SIGN_PAPIER, false)
 		);
 

@@ -34,6 +34,8 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class StringUtils {
 
+	private static String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
 	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
 
 		return new Comparator<Account>() {
@@ -105,12 +107,17 @@ public class StringUtils {
 		return total.toString();
 	}
 
-	public static @Nullable Date parseISO8601Date(@Nullable String iso8601Date) {
+	public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
+
 		if (TextUtils.isEmpty(iso8601Date))
 			return null;
 
-		try { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.FRENCH).parse(iso8601Date); }
+		try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); }
 		catch (ParseException ex) { return null; }
+	}
+
+	public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
+		return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
 	}
 
 	public static boolean areNotEmpty(@Nullable String... strings) {

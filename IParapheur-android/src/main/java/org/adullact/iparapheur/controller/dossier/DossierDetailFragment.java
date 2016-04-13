@@ -23,12 +23,14 @@ import com.artifex.mupdfdemo.MuPDFFragment;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -50,6 +52,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
 
 	private static final String ANNOTATION_PAYLOAD_STEP = "step";
+	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
+	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
@@ -248,7 +252,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@NonNull @Override protected String getAnnotationAuthorName() {
-		return "Adrien"; // TODO;
+		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
 	}
 
 	// </editor-fold desc="MuPdfFragment">
@@ -367,18 +371,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private @NonNull Annotation muPdfToParapheurAnnotation(@NonNull CustomAnnotation muPdfAnnotation) {
 
-		int currentStep = -1;
-		if (muPdfAnnotation.getPayload() != null)
-			currentStep = (Integer) muPdfAnnotation.getPayload().get(ANNOTATION_PAYLOAD_STEP);
-
 		return new Annotation(
+				muPdfAnnotation.getId(),
 				muPdfAnnotation.getAuthor(),
 				getCurrentPage(),
-				false,
-				String.valueOf(muPdfAnnotation.getDate()),
+				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
+				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
 				DeviceUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
 				muPdfAnnotation.getText(),
-				currentStep
+				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
+				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
 		);
 	}
 
@@ -394,9 +396,13 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
 
 				// Payload, to ease irrelevants MuPdfAnnotation data
+				Log.w("Adrien", "in:" + annotation.getDate());
+				Log.w("Adrien", "out:" + StringUtils.parseIso8601Date(annotation.getDate()));
 
 				HashMap<String, Object> payload = new HashMap<>();
 				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
+//				payload.put(ANNOTATION_PAYLOAD_TYPE, annotation.getStep());      // TODO
+//				payload.put(ANNOTATION_PAYLOAD_IS_SECRETAIRE, annotation.get()); // TODO
 
 				// Building final annotation object
 
@@ -405,7 +411,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 						DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
 						annotation.getText(),
 						annotation.getAuthor(),
-						StringUtils.parseISO8601Date(annotation.getDate()),
+						StringUtils.parseIso8601Date(annotation.getDate()),
 						payload
 				));
 			}
