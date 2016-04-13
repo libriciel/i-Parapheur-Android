@@ -286,7 +286,7 @@ public class ModelMapper {
 				PageAnnotations pageAnnotations = new PageAnnotations();
 
 				for (int annotationNumber = 0; annotationNumber < jsonPageExplorer.getCurrentArraySize(); annotationNumber++) {
-					pageAnnotations.add(new Annotation(jsonPageExplorer.find(annotationNumber).getCurrentJsonElement().getAsJsonObject(),
+					pageAnnotations.add(new Annotation(jsonPageExplorer.find(annotationNumber).optCurrentJsonObject(new JsonObject()),
 													   Integer.valueOf(pageDict.getKey()),
 													   etapeNumber
 					));

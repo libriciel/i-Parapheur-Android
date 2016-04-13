@@ -396,8 +396,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
 
 				// Payload, to ease irrelevants MuPdfAnnotation data
-				Log.w("Adrien", "in:" + annotation.getDate());
-				Log.w("Adrien", "out:" + StringUtils.parseIso8601Date(annotation.getDate()));
 
 				HashMap<String, Object> payload = new HashMap<>();
 				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
@@ -563,10 +561,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		@Override protected void onPostExecute(Void aVoid) {
 
-			if (mCurrentAnnotation != null)
+			if (!TextUtils.isEmpty(mNewId)) {
+				updateCustomAnnotationData(mCurrentAnnotation.getUuid(), mNewId, null, null);
 				mCurrentAnnotation.setUuid(mNewId);
+			}
 
-			Log.e("Adrien", "annotation newId = " + mNewId);
 			super.onPostExecute(aVoid);
 		}
 	}
