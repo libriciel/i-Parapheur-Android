@@ -33,6 +33,7 @@ import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -47,6 +48,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// public static final String LOG_TAG = "DossierDetailFragment";
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
+
+	private static final String ANNOTATION_PAYLOAD_STEP = "step";
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
@@ -232,12 +235,20 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		super.showErrorLayout();
 	}
 
-	@Override protected void onAnnotationChanged(@NonNull CustomAnnotation annotation, boolean deleteInvoked) {
-		Log.i("Adrien", "annotation changed id:" + annotation.getId() + " delete?" + deleteInvoked);
+	@Override protected void onAnnotationChanged(@NonNull final CustomAnnotation annotation, boolean deleteInvoked) {
+
+		final Annotation newAnnotation = muPdfToParapheurAnnotation(annotation);
+
+		if (deleteInvoked)
+			new DeleteAnnotationAsyncTask().execute(newAnnotation);
+		else if (annotation.getId().startsWith("new_"))
+			new CreateAnnotationAsyncTask().execute(newAnnotation);
+		else
+			new UpdateAnnotationAsyncTask().execute(newAnnotation);
 	}
 
 	@NonNull @Override protected String getAnnotationAuthorName() {
-		return "Adrien";
+		return "Adrien"; // TODO;
 	}
 
 	// </editor-fold desc="MuPdfFragment">
@@ -354,6 +365,23 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		getActivity().invalidateOptionsMenu();
 	}
 
+	private @NonNull Annotation muPdfToParapheurAnnotation(@NonNull CustomAnnotation muPdfAnnotation) {
+
+		int currentStep = -1;
+		if (muPdfAnnotation.getPayload() != null)
+			currentStep = (Integer) muPdfAnnotation.getPayload().get(ANNOTATION_PAYLOAD_STEP);
+
+		return new Annotation(
+				muPdfAnnotation.getAuthor(),
+				getCurrentPage(),
+				false,
+				String.valueOf(muPdfAnnotation.getDate()),
+				DeviceUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+				muPdfAnnotation.getText(),
+				currentStep
+		);
+	}
+
 	private static @NonNull SparseArray<HashMap<String, CustomAnnotation>> parapheurToMuPdfAnnotations(SparseArray<PageAnnotations> parapheurAnnotations) {
 		SparseArray<HashMap<String, CustomAnnotation>> result = new SparseArray<>();
 
@@ -364,13 +392,22 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
-				annotationMap.put(annotation.getUuid(),
-								  new CustomAnnotation(annotation.getUuid(),
-													   DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
-													   annotation.getText(),
-													   annotation.getAuthor()
-								  )
-				);
+
+				// Payload, to ease irrelevants MuPdfAnnotation data
+
+				HashMap<String, Object> payload = new HashMap<>();
+				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
+
+				// Building final annotation object
+
+				annotationMap.put(annotation.getUuid(), new CustomAnnotation(
+						annotation.getUuid(),
+						DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
+						annotation.getText(),
+						annotation.getAuthor(),
+						StringUtils.parseISO8601Date(annotation.getDate()),
+						payload
+				));
 			}
 
 			result.put(pageIndex, annotationMap);
@@ -469,10 +506,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Getting metadata
 
 			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
-			if (currentDocument == null) {
-				Log.e("Adrien", "current document null !?!");
+			if (currentDocument == null)
 				return null;
-			}
 
 			showSpinnerOnUiThread();
 			File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
@@ -486,7 +521,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			String dossierId = mDossier.getId();
 
 			SparseArray<PageAnnotations> annotations = new SparseArray<>();
-			try { RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()); }
+			try { annotations = RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()); }
 			catch (IParapheurException e) { e.printStackTrace(); }
 			currentDocument.setPagesAnnotations(annotations);
 
@@ -502,4 +537,63 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		}
 	}
 
+	private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+
+		private String mNewId = null;
+		private Annotation mCurrentAnnotation = null;
+
+		@Override protected Void doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			mCurrentAnnotation = params[0];
+
+			try { mNewId = RESTClient.INSTANCE.createAnnotation(mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage()); }
+			catch (IParapheurException e) { e.printStackTrace(); }
+
+			return null;
+		}
+
+		@Override protected void onPostExecute(Void aVoid) {
+
+			if (mCurrentAnnotation != null)
+				mCurrentAnnotation.setUuid(mNewId);
+
+			Log.e("Adrien", "annotation newId = " + mNewId);
+			super.onPostExecute(aVoid);
+		}
+	}
+
+	private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+
+		@Override protected Void doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			Annotation currentAnnotation = params[0];
+
+			try { RESTClient.INSTANCE.updateAnnotation(mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage()); }
+			catch (IParapheurException e) { e.printStackTrace(); }
+
+			return null;
+		}
+	}
+
+	private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+
+		@Override protected Void doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			Annotation currentAnnotation = params[0];
+
+			try { RESTClient.INSTANCE.deleteAnnotation(mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage()); }
+			catch (IParapheurException e) { e.printStackTrace(); }
+
+			return null;
+		}
+	}
 }

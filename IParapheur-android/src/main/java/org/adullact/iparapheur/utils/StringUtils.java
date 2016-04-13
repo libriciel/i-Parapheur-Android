@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+@SuppressWarnings("unused")
 public class StringUtils {
 
 	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
@@ -49,7 +50,7 @@ public class StringUtils {
 		};
 	}
 
-	@SuppressWarnings("unused") public static @NonNull String bundleToString(@Nullable Bundle bundle) {
+	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)
 			return "(Bundle null)";
 
@@ -105,18 +106,14 @@ public class StringUtils {
 	}
 
 	public static @Nullable Date parseISO8601Date(@Nullable String iso8601Date) {
-		if ((iso8601Date == null) || iso8601Date.isEmpty())
+		if (TextUtils.isEmpty(iso8601Date))
 			return null;
 
-		try {
-			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.FRENCH).parse(iso8601Date);
-		}
-		catch (ParseException ex) {
-			return null;
-		}
+		try { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.FRENCH).parse(iso8601Date); }
+		catch (ParseException ex) { return null; }
 	}
 
-	@SuppressWarnings("unused") public static boolean areNotEmpty(@Nullable String... strings) {
+	public static boolean areNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return false;
@@ -128,7 +125,7 @@ public class StringUtils {
 		return true;
 	}
 
-	@SuppressWarnings("unused") public static String firstNotEmpty(@Nullable String... strings) {
+	public static String firstNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return null;

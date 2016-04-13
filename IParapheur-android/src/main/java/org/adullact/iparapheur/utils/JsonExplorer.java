@@ -142,7 +142,11 @@ public class JsonExplorer {
 	// <editor-fold desc="Primitive types">
 
 	public @Nullable JsonObject optCurrentJsonObject() {
-		JsonObject result = null;
+		return optCurrentJsonObject(null);
+	}
+
+	public JsonObject optCurrentJsonObject(JsonObject defaultValue) {
+		JsonObject result = defaultValue;
 
 		if ((_currentObject != null) && (_currentObject.isJsonObject()))
 			result = (JsonObject) _currentObject;
@@ -161,7 +165,7 @@ public class JsonExplorer {
 		return result;
 	}
 
-	public String optString(@NonNull String fieldName) {
+	public @Nullable String optString(@NonNull String fieldName) {
 		return optString(fieldName, null);
 	}
 

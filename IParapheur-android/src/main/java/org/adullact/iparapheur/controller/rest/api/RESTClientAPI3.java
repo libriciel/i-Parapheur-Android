@@ -144,7 +144,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+											 int page) throws IParapheurException {
 
 		// Build json object
 
@@ -196,7 +197,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return null;
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+										   int page) throws IParapheurException {
 
 		// Build Json object
 
@@ -244,7 +246,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 			throw new IParapheurException(R.string.error_annotation_update, "");
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+										   int page) throws IParapheurException {
 		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
 		RESTUtils.delete(url, true);
 	}
@@ -340,7 +343,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+										   String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -361,7 +365,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
+										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+										  String bureauId) throws IParapheurException {
 
 		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
 		try {
