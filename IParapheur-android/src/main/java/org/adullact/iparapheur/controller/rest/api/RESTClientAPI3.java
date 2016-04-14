@@ -248,6 +248,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
 										   int page) throws IParapheurException {
+
 		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
 		RESTUtils.delete(url, true);
 	}

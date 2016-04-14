@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -562,7 +561,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		@Override protected void onPostExecute(Void aVoid) {
 
 			if (!TextUtils.isEmpty(mNewId)) {
-				updateCustomAnnotationData(mCurrentAnnotation.getUuid(), mNewId, null, null);
+				updateCustomAnnotationData(mCurrentAnnotation.getUuid(), mNewId, null);
 				mCurrentAnnotation.setUuid(mNewId);
 			}
 
