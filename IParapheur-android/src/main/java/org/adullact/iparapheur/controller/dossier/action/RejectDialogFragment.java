@@ -80,37 +80,33 @@ public class RejectDialogFragment extends DialogFragment {
 
 		// Set listeners
 
-		mPublicAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPublicAnnotationLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPublicAnnotationLabel.setActivated(hasFocus);
+			}
+		});
 
-		mPrivateAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPrivateAnnotationLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPrivateAnnotationLabel.setActivated(hasFocus);
+			}
+		});
 
 		// Build Dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
 		builder.setPositiveButton(R.string.action_rejeter, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						// Do nothing here because we override this button in the onStart() to change the close behaviour.
-						// However, we still need this because on older versions of Android :
-						// unless we pass a handler the button doesn't get instantiated
-					}
+			@Override public void onClick(DialogInterface dialog, int which) {
+				// Do nothing here because we override this button in the onStart() to change the close behaviour.
+				// However, we still need this because on older versions of Android :
+				// unless we pass a handler the button doesn't get instantiated
+			}
 		});
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						onCancelButtonClicked();
-					}
+			public void onClick(DialogInterface dialog, int id) {
+				onCancelButtonClicked();
+			}
 		});
 
 		return builder.create();
@@ -126,9 +122,9 @@ public class RejectDialogFragment extends DialogFragment {
 		if (dialog != null) {
 			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
 			positiveButton.setOnClickListener(new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							onRejectButtonClicked();
-						}
+				@Override public void onClick(View v) {
+					onRejectButtonClicked();
+				}
 			});
 		}
 	}

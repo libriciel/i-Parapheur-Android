@@ -362,7 +362,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		title.setText(mDossier.getName());
 		String typeString = mDossier.getType() + " / " + mDossier.getSousType();
 		typology.setText(typeString);
-		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
+
+		if (mDossier.getCircuit() != null) // FIXME Why NPE ???
+			circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
 
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
 		getActivity().invalidateOptionsMenu();
