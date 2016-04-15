@@ -8,6 +8,7 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
@@ -108,7 +109,8 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		return modelMapper.getAnnotations(RESTUtils.post(url, body));
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+											 int page) throws IParapheurException {
 		String url = buildUrl(ACTION_CREATE_ANNOTATION);
 		JSONObject annot = new JSONObject();
 		float annotHeight = annotation.getRect().height();
@@ -117,16 +119,24 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		float centerY = annotation.getRect().centerY();
 
 		try {
-			JSONObject rect = new JSONObject().putOpt(
-					"bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
-
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put(
-					"annotations", new JSONArray().put(
-							new JSONObject().put("author", annotation.getAuthor()).put(
-									"page", page
-							).put("rect", rect).put("text", annotation.getText()).put("type", "rect")
+			JSONObject rect = new JSONObject().putOpt("bottomRight",
+													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
 					)
+			);
+
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations",
+																			 new JSONArray().put(new JSONObject().put("author", annotation.getAuthor()).put(
+																					 "page",
+																					 page
+																			 ).put("rect", rect).put("text", annotation.getText()).put("type", "rect"))
 			);
 		}
 		catch (JSONException e) {
@@ -146,7 +156,8 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		return null;
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+										   int page) throws IParapheurException {
 		String url = buildUrl(ACTION_CREATE_ANNOTATION);
 		JSONObject annot = new JSONObject();
 		float annotHeight = annotation.getRect().height();
@@ -155,14 +166,23 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		float centerY = annotation.getRect().centerY();
 
 		try {
-			JSONObject rect = new JSONObject().putOpt(
-					"bottomRight", new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
-
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put(
-					"annotation", new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put(
-							"text", annotation.getText()
+			JSONObject rect = new JSONObject().putOpt("bottomRight",
+													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
 					)
+			);
+
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation",
+																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put("text",
+																																					  annotation.getText()
+																			 )
 			);
 		}
 		catch (JSONException e) {
@@ -175,7 +195,8 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		}
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+										   int page) throws IParapheurException {
 		String url = buildUrl(ACTION_DELETE_ANNOTATION);
 		String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
 				"\"page\": " + page + "," +
@@ -184,6 +205,10 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
 			throw new IParapheurException(R.string.error_annotation_delete, "");
 		}
+	}
+
+	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+		return false;
 	}
 
 	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
@@ -220,11 +245,14 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		return false;
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+										   String annotPriv, String bureauId) throws IParapheurException {
 		return false;
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
+										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+										  String bureauId) throws IParapheurException {
 		return false;
 	}
 

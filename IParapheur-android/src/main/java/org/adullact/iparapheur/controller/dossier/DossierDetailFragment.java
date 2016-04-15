@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -254,6 +255,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
 	}
 
+	@NonNull @Override protected String generateNewCustomAnnotationId() {
+		return "new_" + UUID.randomUUID();
+	}
+
 	// </editor-fold desc="MuPdfFragment">
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
@@ -400,10 +405,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				HashMap<String, Object> payload = new HashMap<>();
 				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
-//				payload.put(ANNOTATION_PAYLOAD_TYPE, annotation.getStep());      // TODO
-//				payload.put(ANNOTATION_PAYLOAD_IS_SECRETAIRE, annotation.get()); // TODO
 
 				// Building final annotation object
+
+				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getLogin());
 
 				annotationMap.put(annotation.getUuid(), new CustomAnnotation(
 						annotation.getUuid(),
@@ -411,6 +416,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 						annotation.getText(),
 						annotation.getAuthor(),
 						StringUtils.parseIso8601Date(annotation.getDate()),
+						isLocked ? CustomAnnotation.Color.RED : CustomAnnotation.Color.BLUE,
+						isLocked,
 						payload
 				));
 			}

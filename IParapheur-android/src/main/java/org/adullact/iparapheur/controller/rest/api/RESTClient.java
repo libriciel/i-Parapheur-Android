@@ -119,6 +119,10 @@ public enum RESTClient implements IParapheurAPI {
 		return null;
 	}
 
+	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+		return getRESTClient(account).updateAccountInformations(account);
+	}
+
 	@Override public List<Bureau> getBureaux() throws IParapheurException {
 		return getRESTClient().getBureaux();
 	}
@@ -175,15 +179,18 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+											 int page) throws IParapheurException {
 		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+										   int page) throws IParapheurException {
 		getRESTClient().updateAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+										   int page) throws IParapheurException {
 		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
 	}
 
@@ -215,14 +222,25 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().envoiTdtHelios(dossierId, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+										   String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().envoiTdtActes(dossierId, nature, classification, numero, dateActes, objet, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
+										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+										  String bureauId) throws IParapheurException {
 		// TODO : manage annexes
-		return getRESTClient().envoiMailSec(
-				dossierId, destinataires, destinatairesCC, destinatairesCCI, sujet, message, password, showPassword, annexesIncluded, bureauId
+		return getRESTClient().envoiMailSec(dossierId,
+											destinataires,
+											destinatairesCC,
+											destinatairesCCI,
+											sujet,
+											message,
+											password,
+											showPassword,
+											annexesIncluded,
+											bureauId
 		);
 	}
 

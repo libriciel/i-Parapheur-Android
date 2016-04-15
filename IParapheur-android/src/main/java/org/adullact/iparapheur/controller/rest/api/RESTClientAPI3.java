@@ -8,6 +8,7 @@ import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
@@ -17,6 +18,8 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -51,8 +54,11 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	private static final String RESOURCE_TYPES = "/parapheur/types";
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
+	private static final String RESOURCE_USER_INFO = "/webframework/content/metadata2";
 	// private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
 
+	private static final String USER_INFO_FIRST_NAME = "{http://www.alfresco.org/model/content/1.0}firstName";
+	private static final String USER_INFO_LAST_NAME = "{http://www.alfresco.org/model/content/1.0}lastName";
 	/* Ressources secondaires */
 	// private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
 	// private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
@@ -127,6 +133,25 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_SIGN_INFO, dossierId), "bureauCourant=" + bureauId);
 		RequestResponse response = RESTUtils.get(url);
 		return modelMapper.getSignInfo(response);
+	}
+
+	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+
+		String params = "user=" + account.getLogin();
+		String url = buildUrl(account, RESOURCE_USER_INFO, params, true);
+		RequestResponse response = RESTUtils.get(url);
+
+		if (response.getResponse() != null) {
+
+			JsonExplorer json = new JsonExplorer(response.getResponse());
+			String firstName = json.findObject("data").findObject("properties").optString(USER_INFO_FIRST_NAME);
+			String lastName = json.findObject("data").findObject("properties").optString(USER_INFO_LAST_NAME);
+
+			if (StringUtils.areNotEmpty(firstName, lastName))
+				account.setName(firstName + " " + lastName);
+		}
+
+		return true;
 	}
 
 	// <editor-fold desc="Annotations">
