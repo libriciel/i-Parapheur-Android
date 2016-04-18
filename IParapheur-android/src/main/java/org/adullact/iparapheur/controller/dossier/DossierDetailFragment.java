@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.artifex.customannotations.CustomAnnotation;
 import com.artifex.mupdfdemo.MuPDFFragment;
@@ -26,6 +26,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -408,7 +409,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				// Building final annotation object
 
-				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getLogin());
+				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserName());
 
 				annotationMap.put(annotation.getUuid(), new CustomAnnotation(
 						annotation.getUuid(),
@@ -416,7 +417,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 						annotation.getText(),
 						annotation.getAuthor(),
 						StringUtils.parseIso8601Date(annotation.getDate()),
-						isLocked ? CustomAnnotation.Color.RED : CustomAnnotation.Color.BLUE,
+						isLocked ? CustomAnnotation.Color.BLUE_GREY : CustomAnnotation.Color.BLUE,
 						isLocked,
 						payload
 				));
@@ -530,10 +531,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
-			String dossierId = mDossier.getId();
+			// Loading user data and annotations
 
 			SparseArray<PageAnnotations> annotations = new SparseArray<>();
-			try { annotations = RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()); }
+			try {
+				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				if (TextUtils.isEmpty(currentAccount.getUserName()))
+					RESTClient.INSTANCE.updateAccountInformations(currentAccount);
+
+				annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId());
+			}
 			catch (IParapheurException e) { e.printStackTrace(); }
 			currentDocument.setPagesAnnotations(annotations);
 
@@ -549,64 +556,96 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		}
 	}
 
-	private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+	private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
 		private String mNewId = null;
 		private Annotation mCurrentAnnotation = null;
 
-		@Override protected Void doInBackground(Annotation... params) {
+		@Override protected Boolean doInBackground(Annotation... params) {
 
 			if (params.length < 1)
 				return null;
 
 			mCurrentAnnotation = params[0];
 
-			try { mNewId = RESTClient.INSTANCE.createAnnotation(mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage()); }
-			catch (IParapheurException e) { e.printStackTrace(); }
+			try {
+				mNewId = RESTClient.INSTANCE.createAnnotation(mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
 
-			return null;
+			return true;
 		}
 
-		@Override protected void onPostExecute(Void aVoid) {
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
 
-			if (!TextUtils.isEmpty(mNewId)) {
+			if ((!success) || TextUtils.isEmpty(mNewId)) {
+				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+			}
+			else {
 				updateCustomAnnotationData(mCurrentAnnotation.getUuid(), mNewId, null);
 				mCurrentAnnotation.setUuid(mNewId);
 			}
 
-			super.onPostExecute(aVoid);
 		}
 	}
 
-	private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+	private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
-		@Override protected Void doInBackground(Annotation... params) {
+		@Override protected Boolean doInBackground(Annotation... params) {
 
 			if (params.length < 1)
 				return null;
 
 			Annotation currentAnnotation = params[0];
 
-			try { RESTClient.INSTANCE.updateAnnotation(mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage()); }
-			catch (IParapheurException e) { e.printStackTrace(); }
+			try {
+				RESTClient.INSTANCE.updateAnnotation(mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
 
-			return null;
+			return true;
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if (!success)
+				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
 		}
 	}
 
-	private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Void> {
+	private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
-		@Override protected Void doInBackground(Annotation... params) {
+		@Override protected Boolean doInBackground(Annotation... params) {
 
 			if (params.length < 1)
 				return null;
 
 			Annotation currentAnnotation = params[0];
 
-			try { RESTClient.INSTANCE.deleteAnnotation(mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage()); }
-			catch (IParapheurException e) { e.printStackTrace(); }
+			try {
+				RESTClient.INSTANCE.deleteAnnotation(mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
 
-			return null;
+			return true;
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if (!success)
+				Toast.makeText(getActivity(), R.string.error_annotation_delete, Toast.LENGTH_LONG).show();
 		}
 	}
 }
