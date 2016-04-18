@@ -18,8 +18,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.artifex.customannotations.CustomAnnotation;
-import com.artifex.mupdfdemo.MuPDFFragment;
+import coop.adullactprojet.mupdffragment.customannotations.CustomAnnotation;
+import coop.adullactprojet.mupdffragment.MuPDFFragment;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.adullact.iparapheur.R;
