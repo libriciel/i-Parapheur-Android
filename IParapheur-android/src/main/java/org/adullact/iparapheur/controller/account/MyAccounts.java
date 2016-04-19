@@ -120,7 +120,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		return (index != -1) ? mAccounts.get(index) : null;
 	}
 
-	public @Nullable Account getSelectedAccount() {
+	public Account getSelectedAccount() {
 		return mSelectedAccount;
 	}
 

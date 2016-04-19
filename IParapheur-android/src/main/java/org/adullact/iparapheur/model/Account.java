@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
+import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
+import org.json.JSONArray;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -18,6 +20,7 @@ public class Account implements Serializable {
 
 	private final String mId;
 	private String mTitle;
+	private String mName;
 	private String mServerBaseUrl;
 	private String mLogin;
 	private String mTenant;
@@ -104,6 +107,14 @@ public class Account implements Serializable {
 
 	public void setLastRequest(Long lastRequest) {
 		mLastRequest = lastRequest;
+	}
+
+	public String getUserName() {
+		return mName;
+	}
+
+	public void setName(String name) {
+		mName = name;
 	}
 
 	// </editor-fold desc="Getters / Setters">

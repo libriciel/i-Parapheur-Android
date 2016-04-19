@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -35,7 +36,11 @@ public class RequestResponse {
 
 			if (this.code < HttpURLConnection.HTTP_BAD_REQUEST) { // if code < 400, response is in inputStream
 				if (!ignoreResponseData) {
-					data = StringUtils.inputStreamToString(httpURLConnection.getInputStream());
+
+					InputStream is = httpURLConnection.getInputStream();
+					data = StringUtils.inputStreamToString(is);
+					is.close();
+
 					Object json = new JSONTokener(data).nextValue();
 
 					if (json instanceof JSONObject)

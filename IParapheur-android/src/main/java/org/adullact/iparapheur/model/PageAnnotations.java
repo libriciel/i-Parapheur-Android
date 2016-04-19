@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
 public class PageAnnotations implements Parcelable {
 
 	//<editor-fold desc="Static methods">
@@ -75,13 +76,11 @@ public class PageAnnotations implements Parcelable {
 
 	// <editor-fold desc="Parcelable">
 
-	@Override
-	public int describeContents() {
+	@Override public int describeContents() {
 		return 0;
 	}
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+	@Override public void writeToParcel(Parcel dest, int flags) {
 		dest.writeTypedList(mAnnotations);
 	}
 

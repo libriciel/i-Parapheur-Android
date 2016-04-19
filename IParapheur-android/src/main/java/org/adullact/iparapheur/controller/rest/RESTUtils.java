@@ -90,8 +90,10 @@ public class RESTUtils {
 		OutputStream output;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			if (connection instanceof HttpsURLConnection)
+				((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+
 			connection.setDoOutput(true); // Triggers POST.
 			connection.setChunkedStreamingMode(0);
 			connection.setConnectTimeout(10000);
@@ -156,13 +158,14 @@ public class RESTUtils {
 		return res;
 	}
 
-	public static RequestResponse get(String url) throws IParapheurException {
+	public static RequestResponse get(@NonNull String url) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			if (connection instanceof HttpsURLConnection)
+				((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("GET");
 			connection.setDoOutput(false);

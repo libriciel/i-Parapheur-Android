@@ -1,8 +1,10 @@
 package org.adullact.iparapheur.controller.rest.mapper;
 
-import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
@@ -17,16 +19,12 @@ import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Locale;
+import java.util.Map;
 
 
 public class ModelMapper {
@@ -81,16 +79,15 @@ public class ModelMapper {
 			dossierRef = dossierRef.substring("workspace://SpacesStore/".length());
 		}
 		ArrayList<Action> actions = getActionsForDossier(jsonObject);
-		Dossier dossier = new Dossier(
-				dossierRef,
-				jsonObject.optString("titre"),
-				Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
-				actions,
-				jsonObject.optString("type"),
-				jsonObject.optString("sousType"),
-				StringUtils.parseISO8601Date(jsonObject.optString("dateCreation")),
-				StringUtils.parseISO8601Date(jsonObject.optString("dateLimite")),
-				jsonObject.optBoolean("isSignPapier", false)
+		Dossier dossier = new Dossier(dossierRef,
+									  jsonObject.optString("titre"),
+									  Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
+									  actions,
+									  jsonObject.optString("type"),
+									  jsonObject.optString("sousType"),
+									  StringUtils.parseIso8601Date(jsonObject.optString("dateCreation")),
+									  StringUtils.parseIso8601Date(jsonObject.optString("dateLimite")),
+									  jsonObject.optBoolean("isSignPapier", false)
 		);
 
 		JSONArray documents = jsonObject.optJSONArray("documents");
@@ -109,11 +106,7 @@ public class ModelMapper {
 						downloadUrl += ";ph:visuel-pdf";
 					}
 
-					dossier.addDocument(
-							new Document(
-									docRef, dossierRef, doc.optString("name"), doc.optInt("size", -1), downloadUrl, false, (index == 0)
-							)
-					);
+					dossier.addDocument(new Document(docRef, dossierRef, doc.optString("name"), doc.optInt("size", -1), downloadUrl, false, (index == 0)));
 				}
 			}
 		}
@@ -121,7 +114,7 @@ public class ModelMapper {
 	}
 
 	protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
-		ArrayList<Action> actions = new ArrayList<Action>();
+		ArrayList<Action> actions = new ArrayList<>();
 		boolean isActeurCourant = dossier.optBoolean("isActeurCourant", false);
 		if (isActeurCourant) {
 			actions.add(Action.EMAIL);
@@ -196,14 +189,15 @@ public class ModelMapper {
 		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
 		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_CIRCUIT).getCurrentArraySize(); index++) {
 
-			EtapeCircuit etapeCircuit = new EtapeCircuit(
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_DATE_VALIDATION),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME, ""),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE, ""),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE, Action.VISA.toString()),
-					jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS, "")
+			EtapeCircuit etapeCircuit = new EtapeCircuit(jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_DATE_VALIDATION),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME, ""),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE, ""),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE,
+																													   Action.VISA.toString()
+														 ),
+														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS, "")
 			);
 
 			circuit.add(etapeCircuit);
@@ -274,69 +268,34 @@ public class ModelMapper {
 	public SparseArray<PageAnnotations> getAnnotations(RequestResponse response) {
 		SparseArray<PageAnnotations> annotations = new SparseArray<>();
 
+		// Default case
+
 		if (response.getResponseArray() == null)
 			return annotations;
 
-		JSONArray etapes = response.getResponseArray();
-		for (int step = 0; step < etapes.length(); step++) {
-			JSONObject etapeAnnotations = etapes.optJSONObject(step);
-			if (etapeAnnotations != null) {
-				Iterator pages = etapeAnnotations.keys();
-				while (pages.hasNext()) {
-					String pageStr = (String) pages.next();
-					JSONArray pagesAnnotations = etapeAnnotations.optJSONArray(pageStr);
-					if (pagesAnnotations != null) {
-						PageAnnotations pageAnnotations = new PageAnnotations();
-						for (int page = 0; page < pagesAnnotations.length(); page++) {
-							JSONObject jsonAnnotation = pagesAnnotations.optJSONObject(page);
-							if (jsonAnnotation != null) {
+		// Parsing
 
-								try {
-									Date date = null;
-									try {
-										date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US).parse(
-												jsonAnnotation.getString("date")
-										);
-									}
-									catch (ParseException e) {
-										date = new Date();
-									}
-									catch (JSONException e) {
-										date = new Date();
-									}
-									String outDate = new SimpleDateFormat("dd/MM/yyyy' - 'HH:mm").format(date);
+		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponseArray());
 
-									JSONObject jsonRect = jsonAnnotation.getJSONObject("rect");
-									JSONObject topLeft = jsonRect.getJSONObject("topLeft");
-									JSONObject bottomRight = jsonRect.getJSONObject("bottomRight");
-									RectF rect = new RectF(
-											topLeft.getLong("x"), topLeft.getLong("y"), bottomRight.getLong("x"), bottomRight.getLong("y")
-									);
+		for (int etapeNumber = 0; etapeNumber < jsonExplorer.getCurrentArraySize(); etapeNumber++) {
+			JsonObject pagesDict = jsonExplorer.find(etapeNumber).optCurrentJsonObject(new JsonObject());
 
-									pageAnnotations.add(
-											new Annotation(
-													jsonAnnotation.optString("id"),
-													jsonAnnotation.optString("author"),
-													Integer.parseInt(pageStr),
-													jsonAnnotation.optBoolean("secretaire"),
-													outDate,
-													rect,
-													jsonAnnotation.optString("text"),
-													jsonAnnotation.optString("type", "rect"),
-													step
-											)
-									);
-								}
-								catch (JSONException e) {
-									// Tant pis, on passe l'annotation
-								}
-							}
-						}
-						annotations.append(Integer.parseInt(pageStr), pageAnnotations);
-					}
+			for (Map.Entry<String, JsonElement> pageDict : pagesDict.entrySet()) {
+				JsonExplorer jsonPageExplorer = new JsonExplorer(pageDict.getValue());
+
+				PageAnnotations pageAnnotations = new PageAnnotations();
+
+				for (int annotationNumber = 0; annotationNumber < jsonPageExplorer.getCurrentArraySize(); annotationNumber++) {
+					pageAnnotations.add(new Annotation(jsonPageExplorer.find(annotationNumber).optCurrentJsonObject(new JsonObject()),
+													   Integer.valueOf(pageDict.getKey()),
+													   etapeNumber
+					));
 				}
+
+				annotations.put(Integer.valueOf(pageDict.getKey()), pageAnnotations);
 			}
 		}
+
 		return annotations;
 	}
 }

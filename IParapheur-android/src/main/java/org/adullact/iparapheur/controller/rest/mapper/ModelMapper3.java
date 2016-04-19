@@ -59,8 +59,8 @@ public class ModelMapper3 extends ModelMapper {
 				actions,
 				jsonExplorer.optString(DOSSIER_TYPE, ""),
 				jsonExplorer.optString(DOSSIER_SUBTYPE, ""),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
 				jsonExplorer.optBoolean(DOSSIER_IS_SIGN_PAPIER, false)
 		);
 
@@ -137,7 +137,7 @@ public class ModelMapper3 extends ModelMapper {
 
 		// Parsing root fields
 
-		boolean isDigitSigeMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
+		boolean isDigitSignMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
 		boolean hasSelectionScript = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_HAS_SELECTION_SCRIPT, false);
 		String signatureFormat = jsonExplorer.findObject(DOSSIER_CIRCUIT).optString(CIRCUIT_SIG_FORMAT, "");
 
@@ -161,7 +161,7 @@ public class ModelMapper3 extends ModelMapper {
 			etapes.add(currentEtape);
 		}
 
-		return new Circuit(etapes, signatureFormat, isDigitSigeMandatory, hasSelectionScript);
+		return new Circuit(etapes, signatureFormat, isDigitSignMandatory, hasSelectionScript);
 	}
 
 	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {

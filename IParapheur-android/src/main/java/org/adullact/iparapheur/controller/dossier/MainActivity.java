@@ -83,7 +83,9 @@ import java.util.List;
  * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener,
+		AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener,
+		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -120,7 +122,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
 		mFiltersSpinner = (Spinner) findViewById(R.id.activity_dossiers_toolbar_spinner);
 
-		mFiltersSpinner.setOnItemSelectedListener(this);
+		if (mFiltersSpinner != null)
+			mFiltersSpinner.setOnItemSelectedListener(this);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 		setSupportActionBar(toolbar);
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		// Drawers
 
 		mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
-		mLeftDrawerLayout.setDrawerListener(mLeftDrawerToggle);
+		mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 	}
 
@@ -157,6 +160,16 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+		// ContentView Fragment restore
+
+		Fragment contentFragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		if (contentFragment == null)
+			contentFragment = new DossierDetailFragment();
+
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
+		transaction.commit();
 
 		//
 
@@ -215,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-		if (!isDrawerKnown || isDeviceInPortrait) {
+		if ((!isDrawerKnown) && isDeviceInPortrait) {
 
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
@@ -302,8 +315,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Alignment in TopBar isn't working on XML, but works programmatically
 
-		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(
-				Toolbar.LayoutParams.WRAP_CONTENT, Toolbar.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END
+		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT,
+																					 Toolbar.LayoutParams.WRAP_CONTENT,
+																					 Gravity.TOP | Gravity.END
 		);
 		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
 		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
@@ -369,9 +383,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onNothingSelected(AdapterView<?> parent) {
-
-	}
+	@Override public void onNothingSelected(AdapterView<?> parent) { }
 
 	// </editor-fold desc="ActionBar">
 
@@ -456,6 +468,12 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	}
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		return (dossierListFragment != null) && onActionItemChecked(menuItem, dossierListFragment.getCheckedDossiers());
+	}
+
+	private boolean onActionItemChecked(MenuItem menuItem, HashSet<Dossier> dossiers) {
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
 		if (dossierListFragment != null) {
@@ -607,6 +625,30 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}.execute();
 	}
 
+	private void launchActionPopup(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
+
+		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		ArrayList<Dossier> singleList = new ArrayList<>();
+		singleList.add(dossier);
+		DialogFragment actionDialog;
+
+		if (action == Action.REJET) {
+			actionDialog = RejectDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
+			actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.VISA) {
+			actionDialog = VisaDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
+			actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.SIGNATURE) {
+			actionDialog = SignatureDialogFragment.newInstance(singleList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
+			actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
+		}
+	}
+
 	// <editor-fold desc="AccountFragmentListener">
 
 	@Override public void onAccountSelected(@NonNull Account account) {
@@ -704,19 +746,18 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
 				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
-		Fragment fragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.TAG);
+		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
-			((DossierDetailFragment) fragment).showSpinner();
-			((DossierDetailFragment) fragment).update(dossier, bureauId);
+			fragment.showProgressLayout();
+			fragment.update(dossier, bureauId);
 		}
 	}
 
-	@Override public void onDossierCheckedChanged() {
-
-		if (mActionMode == null)
-			mActionMode = startSupportActionMode(this);
-		else
+	@Override public void onDossierCheckedChanged(boolean forceClose) {
+		if (mActionMode != null)
 			mActionMode.invalidate();
+		else if (!forceClose)
+			mActionMode = startSupportActionMode(this);
 	}
 
 	@Override public void onDossiersLoaded(int size) {
@@ -754,6 +795,17 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		else {
 			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+	}
+
+	@Override public void onValidateButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
+		if (dossier.getActions().contains(Action.SIGNATURE))
+			launchActionPopup(dossier, bureauId, Action.SIGNATURE);
+		else
+			launchActionPopup(dossier, bureauId, Action.VISA);
+	}
+
+	@Override public void onCancelButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
+		launchActionPopup(dossier, bureauId, Action.REJET);
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">

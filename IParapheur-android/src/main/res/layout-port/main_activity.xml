@@ -8,7 +8,8 @@
     android:divider="@android:drawable/divider_horizontal_bright"
     android:elevation="7dp"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="UnusedAttribute">
 
     <!-- The main content view -->
 
@@ -20,7 +21,7 @@
 
         <include
             android:id="@+id/home_toolbar"
-            layout="@layout/activity_dossiers_toolbar"/>
+            layout="@layout/activity_dossiers_toolbar" />
 
         <android.support.v4.widget.DrawerLayout
             android:id="@+id/activity_dossiers_right_drawer_layout"
@@ -41,14 +42,11 @@
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
-                    <fragment
-                        android:id="@+id/dossier_detail"
-                        android:name="org.adullact.iparapheur.controller.dossier.DossierDetailFragment"
+                    <FrameLayout
+                        android:id="@+id/dossier_detail_layout"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="3"
-                        android:tag="dossier_details_fragment"
-                        tools:layout="@layout/fragment_dossier_detail"/>
+                        android:layout_weight="3" />
                 </LinearLayout>
 
                 <ProgressBar
@@ -57,7 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="100"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible" />
 
             </FrameLayout>
 
@@ -71,8 +69,7 @@
                 android:layout_gravity="end"
                 android:orientation="horizontal">
 
-                <include
-                    layout="@layout/dossiers_info"/>
+                <include layout="@layout/dossiers_info" />
 
             </FrameLayout>
 
@@ -103,7 +100,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="178dp"
-                    android:background="@drawable/navigation_drawer_header_gradient"/>
+                    android:background="@drawable/navigation_drawer_header_gradient" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -112,13 +109,13 @@
                     android:padding="25dp"
                     android:text="@string/parapheurs"
                     android:textColor="@color/text_white"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
                 <View
                     android:id="@+id/navigation_drawer_fake_status_bar"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:background="@color/secondary_700"/>
+                    android:background="@color/secondary_700" />
 
             </FrameLayout>
 
@@ -133,7 +130,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:tag="account_list_fragment"
-                    tools:layout="@layout/account_list_fragment"/>
+                    tools:layout="@layout/account_list_fragment" />
 
             </FrameLayout>
 

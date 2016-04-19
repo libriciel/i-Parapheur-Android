@@ -29,7 +29,7 @@ import java.util.Date;
 
 public abstract class RESTClientAPI implements IParapheurAPI {
 
-	public static final long SESSION_TIMEOUT = 30 * 60 * 1000l;
+	public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
 
 	protected static final String ACTION_LOGIN = "/parapheur/api/login";
 
@@ -100,7 +100,8 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 		return buildUrl(account, action, params, withTicket, true);
 	}
 
-	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket, boolean withTenant) throws IParapheurException {
+	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket,
+									boolean withTenant) throws IParapheurException {
 
 		// Default checks
 

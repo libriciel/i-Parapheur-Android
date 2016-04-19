@@ -1,5 +1,6 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/canvas">
@@ -24,7 +25,8 @@
             android:indeterminate="true"
             android:layout_gravity="center"
             android:indeterminateTint="@color/secondary_300"
-            android:indeterminateTintMode="src_in"/>
+            android:indeterminateTintMode="src_in"
+            tools:ignore="UnusedAttribute" />
     </FrameLayout>
 
 </FrameLayout>

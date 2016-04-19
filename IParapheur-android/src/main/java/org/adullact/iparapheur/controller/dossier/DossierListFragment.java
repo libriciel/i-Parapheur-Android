@@ -146,7 +146,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 					resultCode = Activity.RESULT_OK;
 					clearSelection();
 					if (mListener != null)
-						mListener.onDossierCheckedChanged();
+						mListener.onDossierCheckedChanged(true);
 				}
 
 			default:
@@ -159,7 +159,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 									reload();
 
 									if (mListener != null)
-										mListener.onDossierCheckedChanged();
+										mListener.onDossierCheckedChanged(true);
 								}
 							}, 1500l
 					);
@@ -292,7 +292,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 		void onDossiersNotLoaded();
 
-		void onDossierCheckedChanged();
+		void onDossierCheckedChanged(boolean forceClose);
 	}
 
 	// </editor-fold desc="Listener">
@@ -412,7 +412,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 								@Override public void onAnimationStart(Animator animator) { }
 
-								@Override public void onAnimationEnd(Animator animator) { listener.onDossierCheckedChanged(); }
+								@Override public void onAnimationEnd(Animator animator) { listener.onDossierCheckedChanged(false); }
 
 								@Override public void onAnimationCancel(Animator animator) { }
 
@@ -423,7 +423,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 				else {
 					checkedDossiers.add(dossier);
 					ViewUtils.flip(getActivity(), mainView, selectorView, null);
-					listener.onDossierCheckedChanged();
+					listener.onDossierCheckedChanged(false);
 				}
 			}
 		}

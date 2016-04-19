@@ -66,6 +66,8 @@ public interface IParapheurAPI {
 
 	void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException;
 
+	boolean updateAccountInformations(@NonNull Account account) throws IParapheurException;
+
 	boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException;
 
 	boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException;
@@ -80,9 +82,11 @@ public interface IParapheurAPI {
 
 	boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+						  String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
+	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet,
+						 String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
 
 	boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 }

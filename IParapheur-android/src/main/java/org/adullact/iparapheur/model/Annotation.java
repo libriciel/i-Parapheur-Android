@@ -1,13 +1,33 @@
 package org.adullact.iparapheur.model;
 
-import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
+import com.google.gson.JsonObject;
+
+import org.adullact.iparapheur.utils.JsonExplorer;
+
 
 public class Annotation implements Parcelable {
 
+	private static final String ID = "id";
+	private static final String IS_SECRETAIRE = "secretaire";
+	private static final String AUTHOR = "author";
+	private static final String DATE = "date";
+	private static final String TYPE = "type";
+	private static final String TEXT = "text";
+	private static final String RECT = "rect";
+	private static final String PEN_COLOR = "penColor";
+	private static final String FILL_COLOR = "fillColor";
+	private static final String TOP_LEFT = "topLeft";
+	private static final String BOTTOM_RIGHT = "bottomRight";
+	private static final String X = "x";
+	private static final String Y = "y";
+
 	public static Parcelable.Creator<Annotation> CREATOR = new Parcelable.Creator<Annotation>() {
+
 		public Annotation createFromParcel(Parcel source) {
 			return new Annotation(source);
 		}
@@ -16,58 +36,86 @@ public class Annotation implements Parcelable {
 			return new Annotation[size];
 		}
 	};
+
 	private String uuid;
-	private int page;
+	private int mPage;
 	private String author;
 	private boolean secretaire;
-	private String date;
+	private String mDate;
 	private RectF rect;
-	private float scale = 1f;
 	private String text;
 	private String type;
-	private int step;
-
+	private String mPenColor;
+	private String mFillColor;
+	private int mStep;
 	private boolean updated = false;
 	private boolean deleted = false;
+
+	// <editor-fold desc="Constructors">
+
+	public Annotation(@NonNull JsonObject json, int page, int step) {
+
+		JsonExplorer jsonExplorer = new JsonExplorer(json);
+
+		uuid = jsonExplorer.optString(ID);
+		author = jsonExplorer.optString(AUTHOR, "");
+		mPage = page;
+		secretaire = jsonExplorer.optBoolean(IS_SECRETAIRE, false);
+		mDate = jsonExplorer.optString(DATE);
+		rect = new RectF(
+				jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(X, 0),
+				jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(Y, 0),
+				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(X, 0),
+				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(Y, 0)
+		);
+		text = jsonExplorer.optString(TEXT, "");
+		type = jsonExplorer.optString(TYPE, "rect");
+		mStep = step;
+		mPenColor = jsonExplorer.optString(PEN_COLOR, "blue");
+		mFillColor = jsonExplorer.optString(FILL_COLOR, "undefined");
+	}
 
 	public Annotation(String author, int page, boolean secretaire, String date, RectF rect, String text, int step) {
 
 		this.author = author;
-		this.page = page;
+		mPage = page;
 		this.secretaire = secretaire;
-		this.date = date;
+		mDate = date;
 		this.rect = rect;
 		this.text = text;
-		this.step = step;
+		mStep = step;
 	}
 
 	public Annotation(String uuid, String author, int page, boolean secretaire, String date, RectF rect, String text, String type, int step) {
 
 		this.uuid = uuid;
 		this.author = author;
-		this.page = page;
+		mPage = page;
 		this.secretaire = secretaire;
-		this.date = date;
+		mDate = date;
 		this.rect = rect;
 		this.text = text;
 		this.type = type;
-		this.step = step;
+		mStep = step;
 	}
 
 	private Annotation(Parcel in) {
 		this.uuid = in.readString();
-		this.page = in.readInt();
+		mPage = in.readInt();
 		this.author = in.readString();
 		this.secretaire = in.readByte() != 0;
-		this.date = in.readString();
+		mDate = in.readString();
 		this.rect = in.readParcelable(((Object) rect).getClass().getClassLoader());
-		this.scale = in.readFloat();
 		this.text = in.readString();
 		this.type = in.readString();
-		this.step = in.readInt();
+		mStep = in.readInt();
 		this.updated = in.readByte() != 0;
 		this.deleted = in.readByte() != 0;
 	}
+
+	// </editor-fold desc="Constructors">
+
+	// <editor-fold desc="Getters / Setters">
 
 	public String getUuid() {
 		return uuid;
@@ -86,10 +134,6 @@ public class Annotation implements Parcelable {
 		this.updated = true;
 	}
 
-	public RectF getUnscaledRect() {
-		return new RectF(rect.left / scale, rect.top / scale, rect.right / scale, rect.bottom / scale);
-	}
-
 	public String getText() {
 		return this.text;
 	}
@@ -97,21 +141,6 @@ public class Annotation implements Parcelable {
 	public void setText(String text) {
 		this.text = text;
 		this.updated = true;
-	}
-
-	public State getState() {
-		if (this.uuid == null) {
-			return State.NEW;
-		}
-		else if (!this.updated) {
-			return State.UNCHANGE;
-		}
-		else if (this.deleted) {
-			return State.DELETED;
-		}
-		else {
-			return State.UPDATED;
-		}
 	}
 
 	public boolean isUpdated() {
@@ -135,66 +164,42 @@ public class Annotation implements Parcelable {
 	}
 
 	public String getDate() {
-		return date;
+		return mDate;
 	}
 
-	public void moveTo(float x, float y, PointF offset) {
-		this.rect.offsetTo(x - offset.x, y - offset.y);
-		this.updated = true;
+	public int getStep() {
+		return mStep;
 	}
 
-	public boolean isEditable(int step) {
-		return true; // TODO
+	public void setStep(int step) {
+		mStep = step;
 	}
 
-	public float getScale() {
-		return scale;
-	}
+	// </editor-fold desc="Getters / Setters">
 
-	public void setScale(float scale) {
-		rect.set(rect.left / this.scale * scale, rect.top / this.scale * scale, rect.right / this.scale * scale, rect.bottom / this.scale * scale);
-		this.scale = scale;
-	}
+	// <editor-fold desc="Parcelable">
 
-	// PARCELABLE IMPLEMENTATION
-
-	@Override
-	public String toString() {
-		return "{uuid : " + uuid +
-				", author : " + author +
-				", page : " + page +
-				", secretaire : " + secretaire +
-				", date : " + date +
-				", rect : " + rect +
-				", text : " + text +
-				", type : " + type + "}";
-	}
-
-	@Override
-	public int describeContents() {
+	@Override public int describeContents() {
 		return 0;
 	}
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
+	@Override public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.uuid);
-		dest.writeInt(this.page);
+		dest.writeInt(mPage);
 		dest.writeString(this.author);
 		dest.writeByte(secretaire ? (byte) 1 : (byte) 0);
-		dest.writeString(this.date);
+		dest.writeString(mDate);
 		dest.writeParcelable(this.rect, 0);
-		dest.writeFloat(this.scale);
 		dest.writeString(this.text);
 		dest.writeString(this.type);
-		dest.writeInt(this.step);
+		dest.writeInt(mStep);
 		dest.writeByte(updated ? (byte) 1 : (byte) 0);
 		dest.writeByte(deleted ? (byte) 1 : (byte) 0);
 	}
 
-	public enum State {
-		NEW,
-		UPDATED,
-		DELETED,
-		UNCHANGE
+	// </editor-fold desc="Parcelable">
+
+	@Override public String toString() {
+		return "{Annotation uuid:" + uuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + "}";
 	}
 }

@@ -32,8 +32,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
 	protected abstract void load(String... params) throws IParapheurException;
 
-	@Override
-	protected void onPreExecute() {
+	@Override protected void onPreExecute() {
 		if (DeviceUtils.isDebugOffline()) {
 			Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
 			showProgress();
@@ -51,8 +50,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 		}
 	}
 
-	@Override
-	protected String doInBackground(String... params) {
+	@Override protected String doInBackground(String... params) {
 		String error = null;
 		try {
 			load(params);
@@ -64,8 +62,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 		return error;
 	}
 
-	@Override
-	protected void onPostExecute(String error) {
+	@Override protected void onPostExecute(String error) {
 		hideProgress();
 		if (error != null) {
 			Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
@@ -75,8 +72,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 		}
 	}
 
-	@Override
-	protected void onCancelled() {
+	@Override protected void onCancelled() {
 		hideProgress();
 	}
 
@@ -102,7 +98,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 	 * with the call of the function onDataChanged().
 	 * Created by jmaire on 04/11/2013.
 	 */
-	public static interface DataChangeListener {
+	public interface DataChangeListener {
 
 		/**
 		 * Used to notify a class that its data has changed. The class should reload the UI in case

@@ -1,14 +1,11 @@
 package org.adullact.iparapheur.controller.dossier;
 
-import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,45 +18,51 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
+
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
-import org.adullact.iparapheur.controller.document.DocumentPagerAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
-import org.adullact.iparapheur.utils.ViewUtils;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.UUID;
+
+import coop.adullactprojet.mupdffragment.MuPDFFragment;
+import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
+import coop.adullactprojet.mupdffragment.utils.ViewUtils;
 
 
 /**
  * A fragment representing a single Dossier detail screen.
  * This fragment is contained in a {@link MainActivity}.
  */
-public class DossierDetailFragment extends Fragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
+public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static final String TAG = "dossier_details_fragment";
-	public static final String DOSSIER = "dossier";
-	public static final String BUREAU_ID = "bureau_id";
+	// public static final String LOG_TAG = "DossierDetailFragment";
+	public static final String FRAGMENT_TAG = "dossier_details_fragment";
+
+	private static final String ANNOTATION_PAYLOAD_STEP = "step";
+	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
+	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
 	private String mDocumentId;              // The Document this fragment is presenting.
-	private boolean isReaderEnabled;
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
-
-	private ViewPager mViewPager;            // Used to display the document's pages. Each page is managed by a fragment.
-	private View mLoadingSpinner;
-
-	public DossierDetailFragment() { }
 
 	// <editor-fold desc="LifeCycle">
 
@@ -67,26 +70,55 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
-		if (getArguments() != null) {
-			mBureauId = getArguments().getString(BUREAU_ID);
-			mDossier = getArguments().getParcelable(DOSSIER);
-		}
-		mCurrentPage = 0;
+//		if (getArguments() != null) {
+//			mBureauId = getArguments().getString(BUREAU_ID);
+//			mDossier = getArguments().getParcelable(DOSSIER);
+//		}
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_dossier_detail, container, false);
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
-	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
+	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		isReaderEnabled = true;
-		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
-		seekBar.setVisibility(View.INVISIBLE);
-        seekBar.setOnSeekBarChangeListener(this);*/
-		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
-		mLoadingSpinner = view.findViewById(android.R.id.progress);
+		// Set listeners
+
+		if (getView() != null) {
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					startCreateStickyNoteOnNextMove(true);
+				}
+			});
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_validate).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					((DossierDetailsFragmentListener) getActivity()).onValidateButtonClicked(mDossier, mBureauId);
+				}
+			});
+
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel).setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+					((DossierDetailsFragmentListener) getActivity()).onCancelButtonClicked(mDossier, mBureauId);
+				}
+			});
+		}
+
+		//
+
+//		isReaderEnabled = true;
+//		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
+//		seekBar.setVisibility(View.INVISIBLE);
+//        seekBar.setOnSeekBarChangeListener(this);*/
+//		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
+//		mLoadingSpinner = view.findViewById(android.R.id.progress);
 
 		// Reload data after rotation
 
@@ -97,22 +129,15 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		mViewPager.post(
-				new Runnable() {
-					public void run() {
-						mViewPager.setAdapter(new DocumentPagerAdapter(getActivity(), getActivity().getSupportFragmentManager()));
-					}
-				}
-		);
+//		String state = Environment.getExternalStorageState();
+//		if (!Environment.MEDIA_MOUNTED.equals(state)) {
+//			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
+//			isReaderEnabled = false;
+//		}
 
-		String state = Environment.getExternalStorageState();
-		if (!Environment.MEDIA_MOUNTED.equals(state)) {
-			Toast.makeText(getActivity(), R.string.media_not_mounted, Toast.LENGTH_LONG).show();
-			isReaderEnabled = false;
-		}
-		if (mDossier != null) {
+		if (mDossier != null)
 			getDossierDetails(false);
-		}
+
 		setHasOptionsMenu(true);
 	}
 
@@ -152,14 +177,10 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			documentSelectorSubMenu.clear();
 
 			for (Document mainDocument : mDossier.getMainDocuments())
-				documentSelectorSubMenu.add(
-						Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()
-				).setIcon(R.drawable.ic_description_black_24dp);
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
 			for (Document annexe : mDossier.getAnnexes())
-				documentSelectorSubMenu.add(
-						Menu.NONE, R.id.action_document_selected, 0, annexe.getName()
-				).setIcon(R.drawable.ic_attachment_black_24dp);
+				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
 		//
@@ -194,6 +215,55 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 	// </editor-fold desc="ActionBar">
 
+	// <editor-fold desc="MuPdfFragment">
+
+	@Override public void showProgressLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+
+		super.showProgressLayout();
+
+	}
+
+	@Override public void showContentLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.VISIBLE);
+
+		super.showContentLayout();
+	}
+
+	@Override public void showErrorLayout() {
+
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+
+		super.showErrorLayout();
+	}
+
+	@Override protected void onStickyNoteChanged(@NonNull final StickyNote stickyNote, boolean deleteInvoked) {
+
+		final Annotation newStickyNote = muPdfStickyNoteToParapheurAnnotation(stickyNote);
+
+		if (deleteInvoked)
+			new DeleteAnnotationAsyncTask().execute(newStickyNote);
+		else if (stickyNote.getId().startsWith("new_"))
+			new CreateAnnotationAsyncTask().execute(newStickyNote);
+		else
+			new UpdateAnnotationAsyncTask().execute(newStickyNote);
+	}
+
+	@NonNull @Override protected String getStickyNoteAuthorName() {
+		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
+	}
+
+	@NonNull @Override protected String generateNewStickyNoteId() {
+		return "new_" + UUID.randomUUID();
+	}
+
+	// </editor-fold desc="MuPdfFragment">
+
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		update(dossier, bureauId, null);
 	}
@@ -207,6 +277,7 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
 
 		if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
+			showProgressLayout();
 			getDossierDetails(false);
 		}
 		else {
@@ -222,100 +293,142 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 			mDossier.clearDetails();
 
 		// Download information only if details aren't already available
-		new DossierLoadingTask(getActivity(), this).execute();
+
+		new DossierLoadingAsyncTask().execute();
 	}
 
-	@Override public void onDataChanged() {
-
-		if (!DeviceUtils.isDebugOffline())
-			updateDetails();
-
-		updateReader();
-	}
-
-	// TODO : aucun apercu disponible
 	private void updateReader() {
-		final Document document = findCurrentDocument(mDossier, mDocumentId);
+		//Adrien - TODO - Error messages
 
-		if (document != null) {
-			if (isReaderEnabled && (document.getPath() != null)) {
-				mViewPager.post(
-						new Runnable() {
-							@Override public void run() {
-								try {
-									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
-									mViewPager.setCurrentItem(0, false);
-									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
-								}
-								catch (Exception e) {
-									e.printStackTrace();
-									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-								}
-							}
-						}
-				);
-			}
-		}
-		else {
-			mViewPager.post(
-					new Runnable() {
-						@Override public void run() {
-							try {
-								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
-								//mViewPager.setCurrentItem(0, false);
-							}
-							catch (Exception e) {
-								//e.printStackTrace();
-								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-							}
-						}
-					}
-			);
-		}
+		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+		if (document == null)
+			return;
+
+		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
+		if (!documentFile.exists())
+			return;
+
+		openFile(documentFile.getAbsolutePath());
+
+		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
+		updateStickyNotes(muPdfStickyNotes);
+
+		//
+
+//		if (document != null) {
+//			if (isReaderEnabled && (document.getPath() != null)) {
+//				mViewPager.post(
+//						new Runnable() {
+//							@Override public void run() {
+//								try {
+//									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
+//									mViewPager.setCurrentItem(0, false);
+//									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
+//								}
+//								catch (Exception e) {
+//									e.printStackTrace();
+//									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+//								}
+//							}
+//						}
+//				);
+//			}
+//		}
+//		else {
+//			mViewPager.post(
+//					new Runnable() {
+//						@Override public void run() {
+//							try {
+//								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
+//								//mViewPager.setCurrentItem(0, false);
+//							}
+//							catch (Exception e) {
+//								//e.printStackTrace();
+//								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
+//							}
+//						}
+//					}
+//			);
+//		}
 	}
 
-	private void updateDetails() {
+	private void updateCircuitInfoDrawerContent() {
 
-		View infosLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
+		View infoLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
 
 		// Default case (this should not happen !)
 
-		if (infosLayout == null)
+		if (infoLayout == null)
 			return;
 
 		// Updating info
 
-		ListView circuitView = (ListView) infosLayout.findViewById(R.id.fragment_dossier_detail_circuit);
-		TextView title = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_title);
-		TextView typologie = (TextView) infosLayout.findViewById(R.id.fragment_dossier_detail_typologie);
+		ListView circuitView = (ListView) infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
+		TextView title = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_title);
+		TextView typology = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
 
 		title.setText(mDossier.getName());
-		typologie.setText(mDossier.getType() + " / " + mDossier.getSousType());
-		circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
+		String typeString = mDossier.getType() + " / " + mDossier.getSousType();
+		typology.setText(typeString);
+
+		if (mDossier.getCircuit() != null) // FIXME Why NPE ???
+			circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
 
 		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
 		getActivity().invalidateOptionsMenu();
 	}
 
-	private @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
+	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
 
-		// Default case
+		return new Annotation(
+				muPdfAnnotation.getId(),
+				muPdfAnnotation.getAuthor(),
+				getCurrentPage(),
+				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
+				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
+				ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+				muPdfAnnotation.getText(),
+				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
+				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
+		);
+	}
 
-		if (dossier == null)
-			return null;
+	private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(SparseArray<PageAnnotations> parapheurAnnotations) {
+		SparseArray<HashMap<String, StickyNote>> result = new SparseArray<>();
 
-		// Finding doc
+		for (int i = 0; i < parapheurAnnotations.size(); i++) {
 
-		List<Document> documents = new ArrayList<>();
-		documents.addAll(dossier.getMainDocuments());
-		documents.addAll(dossier.getAnnexes());
+			HashMap<String, StickyNote> stickyNoteMap = new HashMap<>();
+			int pageIndex = parapheurAnnotations.keyAt(i);
+			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
-		if (!TextUtils.isEmpty(documentId))
-			for (Document document : documents)
-				if (TextUtils.equals(document.getId(), documentId))
-					return document;
+			for (Annotation annotation : pageAnnotation.getAnnotations()) {
 
-		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+				// Payload, to ease irrelevants MuPdf lib data
+
+				HashMap<String, Object> payload = new HashMap<>();
+				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
+
+				// Building final StickyNote object
+
+				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserName());
+
+				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
+						annotation.getUuid(),
+						ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
+						annotation.getText(),
+						annotation.getAuthor(),
+						StringUtils.parseIso8601Date(annotation.getDate()),
+						isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
+						isLocked,
+						payload
+				));
+			}
+
+			result.put(pageIndex, stickyNoteMap);
+		}
+
+		return result;
 	}
 
 	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
@@ -334,13 +447,17 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 		return null;
 	}
 
-	public void showSpinner() {
-		ViewUtils.crossfade(getActivity(), mLoadingSpinner, mViewPager);
+	@Override public void onDataChanged() {
+
+		if (!DeviceUtils.isDebugOffline())
+			updateCircuitInfoDrawerContent();
+
+		updateReader();
 	}
 
-	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
-
 	// <editor-fold desc="SeekBar Listener">
+
+	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
 	@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 
@@ -361,25 +478,30 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 
 		void lockInfoDrawer(boolean lock);
 
+		void onValidateButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId);
+
+		void onCancelButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId);
 	}
 
 	// </editor-fold desc="DossierDetailsFragmentListener">
 
-	private class DossierLoadingTask extends LoadingTask {
+	private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
 
-		public DossierLoadingTask(Activity context, DataChangeListener listener) {
-			super(context, listener);
+		private void showSpinnerOnUiThread() {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override public void run() {
+					showProgressLayout();
+				}
+			});
 		}
 
-		@Override protected void load(String... params) throws IParapheurException {
+		// TODO : Error messages
+		@Override protected Void doInBackground(Void... params) {
 
 			// Default cases
 
 			if (mDossier == null)
-				return;
-
-			if (isCancelled())
-				return;
+				return null;
 
 			// Download the dossier Metadata (if missing, and according to the debug mode)
 
@@ -387,40 +509,144 @@ public class DossierDetailFragment extends Fragment implements LoadingTask.DataC
 				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 			else if (!mDossier.isDetailsAvailable()) {
+				showSpinnerOnUiThread();
 
-				mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
-				if (isCancelled())
-					return;
-
-				mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
-				if (isCancelled())
-					return;
+				try {
+					mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
+					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+				}
+				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
-			// Loading PDF
+			// Getting metadata
 
-			Document currentDocument = findCurrentDocument(mDossier, mDocumentId);
+			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
+			if (currentDocument == null)
+				return null;
 
-			if (isReaderEnabled && (currentDocument != null)) {
-				if ((currentDocument.getPath() == null) || !(new File(currentDocument.getPath()).exists())) {
+			showSpinnerOnUiThread();
+			File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
+			currentDocument.setPath(file.getAbsolutePath());
 
-					File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
-					String path = file.getAbsolutePath();
+			if (!file.exists()) {
+				try { RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), file.getAbsolutePath()); }
+				catch (IParapheurException e) { e.printStackTrace(); }
+			}
 
-					if (!DeviceUtils.isDebugOffline()) {
-						if (RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), path)) {
-							currentDocument.setPath(path);
-							String dossierId = mDossier.getId();
-							currentDocument.setPagesAnnotations(RESTClient.INSTANCE.getAnnotations(dossierId, currentDocument.getId()));
-						}
-					}
-					else {
-						currentDocument.setPath(path);
-						Log.d("debug", file.exists() ? "Default document found" : "Default document not found");
-					}
-				}
+			// Loading user data and annotations
+
+			SparseArray<PageAnnotations> annotations = new SparseArray<>();
+			try {
+				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				if (TextUtils.isEmpty(currentAccount.getUserName()))
+					RESTClient.INSTANCE.updateAccountInformations(currentAccount);
+
+				annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId());
+			}
+			catch (IParapheurException e) { e.printStackTrace(); }
+			currentDocument.setPagesAnnotations(annotations);
+
+			return null;
+		}
+
+		@Override protected void onPostExecute(Void aVoid) {
+			super.onPostExecute(aVoid);
+
+			updateReader();
+			updateCircuitInfoDrawerContent();
+			showContentLayout();
+		}
+	}
+
+	private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+
+		private String mNewId = null;
+		private Annotation mCurrentAnnotation = null;
+
+		@Override protected Boolean doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			mCurrentAnnotation = params[0];
+
+			try {
+				mNewId = RESTClient.INSTANCE.createAnnotation(mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if ((!success) || TextUtils.isEmpty(mNewId)) {
+				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+			}
+			else {
+				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null);
+				mCurrentAnnotation.setUuid(mNewId);
 			}
 		}
 	}
 
+	private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+
+		@Override protected Boolean doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			Annotation currentAnnotation = params[0];
+
+			try {
+				RESTClient.INSTANCE.updateAnnotation(mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if (!success)
+				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+		}
+	}
+
+	private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+
+		@Override protected Boolean doInBackground(Annotation... params) {
+
+			if (params.length < 1)
+				return null;
+
+			Annotation currentAnnotation = params[0];
+
+			try {
+				RESTClient.INSTANCE.deleteAnnotation(mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
+			}
+			catch (IParapheurException e) {
+				e.printStackTrace();
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override protected void onPostExecute(Boolean success) {
+			super.onPostExecute(success);
+
+			if (!success)
+				Toast.makeText(getActivity(), R.string.error_annotation_delete, Toast.LENGTH_LONG).show();
+		}
+	}
 }
