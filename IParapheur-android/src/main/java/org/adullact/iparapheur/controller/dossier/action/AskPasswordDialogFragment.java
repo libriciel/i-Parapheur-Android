@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
@@ -62,43 +79,35 @@ public class AskPasswordDialogFragment extends DialogFragment {
 
 		// Set listeners
 
-		mPasswordEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPasswordLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPasswordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPasswordLabel.setActivated(hasFocus);
+			}
+		});
 
-		mPasswordEditText.setOnEditorActionListener(
-				new TextView.OnEditorActionListener() {
-					@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-						onValidButtonClicked();
-						dismiss();
-						return true;
-					}
-				}
-		);
+		mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				onValidButtonClicked();
+				dismiss();
+				return true;
+			}
+		});
 
 		// Build Dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
 		builder.setTitle(mSelectedAlias);
-		builder.setPositiveButton(
-				android.R.string.ok, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						onValidButtonClicked();
-					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						onCancelButtonClicked();
-					}
-				}
-		);
+		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onValidButtonClicked();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				onCancelButtonClicked();
+			}
+		});
 
 		return builder.create();
 	}

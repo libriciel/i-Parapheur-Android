@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
@@ -134,57 +151,50 @@ public class SignatureDialogFragment extends DialogFragment {
 		// Set listeners
 
 		mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPublicAnnotationLabel.setActivated(hasFocus);
-					}
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPublicAnnotationLabel.setActivated(hasFocus);
+			}
 		});
 
 		mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPrivateAnnotationLabel.setActivated(hasFocus);
-					}
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPrivateAnnotationLabel.setActivated(hasFocus);
+			}
 		});
 
 		mCertificateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-					@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-						refreshAliasesSpinner();
-					}
+			@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				refreshAliasesSpinner();
+			}
 
-					@Override public void onNothingSelected(AdapterView<?> parent) {
-						refreshAliasesSpinner();
-					}
-				}
-		);
+			@Override public void onNothingSelected(AdapterView<?> parent) {
+				refreshAliasesSpinner();
+			}
+		});
 
 		// Build Dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
-		builder.setPositiveButton(
-				R.string.action_signer, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						// Do nothing here because we override this button in the onStart() to change the close behaviour.
-						// However, we still need this because on older versions of Android :
-						// unless we pass a handler the button doesn't get instantiated
-					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						onCancelButtonClicked();
-					}
-				}
-		);
-		builder.setNeutralButton(
-				R.string.action_sign_papier, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						// Do nothing here because we override this button in the onStart() to change the close behaviour.
-						// However, we still need this because on older versions of Android :
-						// unless we pass a handler the button doesn't get instantiated
-					}
-				}
-		);
+		builder.setPositiveButton(R.string.action_signer, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				// Do nothing here because we override this button in the onStart() to change the close behaviour.
+				// However, we still need this because on older versions of Android :
+				// unless we pass a handler the button doesn't get instantiated
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onCancelButtonClicked();
+			}
+		});
+		builder.setNeutralButton(R.string.action_sign_papier, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				// Do nothing here because we override this button in the onStart() to change the close behaviour.
+				// However, we still need this because on older versions of Android :
+				// unless we pass a handler the button doesn't get instantiated
+			}
+		});
 
 		return builder.create();
 	}
@@ -205,16 +215,16 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		Button signButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
 		signButton.setOnClickListener(new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						onSignButtonClicked();
-					}
+			@Override public void onClick(View v) {
+				onSignButtonClicked();
+			}
 		});
 
 		Button signPapierButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
 		signPapierButton.setOnClickListener(new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						onSignPapierButtonClicked();
-					}
+			@Override public void onClick(View v) {
+				onSignPapierButtonClicked();
+			}
 		});
 	}
 

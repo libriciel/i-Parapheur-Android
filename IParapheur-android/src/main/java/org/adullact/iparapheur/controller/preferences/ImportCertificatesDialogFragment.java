@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Dialog;
@@ -66,59 +83,47 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 
 		// Set listeners
 
-		mPasswordEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPasswordLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPasswordEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPasswordLabel.setActivated(hasFocus);
+			}
+		});
 
-		mPasswordEditText.setOnEditorActionListener(
-				new TextView.OnEditorActionListener() {
-					@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-						onImportButtonClicked();
-						return true;
-					}
-				}
-		);
+		mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				onImportButtonClicked();
+				return true;
+			}
+		});
 
 		// Build Dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setTitle(mCertificateFile.getName());
 		builder.setView(view);
-		builder.setPositiveButton(
-				R.string.import_certificate, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						onImportButtonClicked();
-					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						onCancelButtonClicked();
-					}
-				}
-		);
+		builder.setPositiveButton(R.string.import_certificate, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onImportButtonClicked();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				onCancelButtonClicked();
+			}
+		});
 
 		final AlertDialog alertDialog = builder.create();
-		alertDialog.setOnShowListener(
-				new DialogInterface.OnShowListener() {
-					@Override public void onShow(DialogInterface dialog) {
+		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override public void onShow(DialogInterface dialog) {
 
-						Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-						positiveButton.setOnClickListener(
-								new View.OnClickListener() {
-									@Override public void onClick(View v) {
-										onImportButtonClicked();
-									}
-								}
-						);
+				Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+				positiveButton.setOnClickListener(new View.OnClickListener() {
+					@Override public void onClick(View v) {
+						onImportButtonClicked();
 					}
-				}
-		);
+				});
+			}
+		});
 
 		return alertDialog;
 	}

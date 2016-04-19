@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
@@ -121,16 +138,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations",
 																			 new JSONArray().put(new JSONObject().put("author", annotation.getAuthor()).put(
@@ -168,16 +176,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation",
 																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put("text",

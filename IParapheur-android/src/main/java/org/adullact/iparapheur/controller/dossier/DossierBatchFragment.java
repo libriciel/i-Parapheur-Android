@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier;
 
 import android.os.Bundle;
@@ -12,6 +29,7 @@ import org.adullact.iparapheur.R;
 
 import java.util.ArrayList;
 
+
 public class DossierBatchFragment extends Fragment {
 
 	public static final String DOSSIER = "dossier";
@@ -22,13 +40,11 @@ public class DossierBatchFragment extends Fragment {
 		this.dossiers = new ArrayList<String>();
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.dossiers_batch_fragment, container, false);
 	}
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
 		if ((getArguments() != null) && getArguments().containsKey(DOSSIER)) {
 			this.dossiers.add(getArguments().getString(DOSSIER));
 		}
@@ -36,8 +52,7 @@ public class DossierBatchFragment extends Fragment {
 		listView.setItemsCanFocus(false);
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
 	}

@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.bureau;
 
 import android.app.Activity;
@@ -29,7 +46,8 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class BureauxListFragment extends Fragment implements LoadingTask.DataChangeListener, AdapterView.OnItemClickListener,
+		SwipeRefreshLayout.OnRefreshListener {
 
 	public static final String FRAGMENT_TAG = "bureaux_list_fragment";
 
@@ -166,14 +184,12 @@ public class BureauxListFragment extends Fragment implements LoadingTask.DataCha
 					mBureaux = RESTClient.INSTANCE.getBureaux();
 				}
 				catch (final IParapheurException exception) {
-					activity.runOnUiThread(
-							new Runnable() {
-								public void run() {
-									String message = activity.getString(exception.getResId());
-									Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
-								}
-							}
-					);
+					activity.runOnUiThread(new Runnable() {
+						public void run() {
+							String message = activity.getString(exception.getResId());
+							Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+						}
+					});
 				}
 			}
 			else {

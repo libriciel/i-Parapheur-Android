@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier.filter;
 
 import android.app.Activity;
@@ -81,31 +98,27 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
 
 		(textView).setText(type);
 		textView.setTag(checkBox);
-		textView.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						CheckBox checkBox1 = (CheckBox) v.getTag();
-						checkBox1.performClick();
-					}
-				}
-		);
+		textView.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				CheckBox checkBox1 = (CheckBox) v.getTag();
+				checkBox1.performClick();
+			}
+		});
 
 		checkBox.setChecked(selection.containsKey(type));
 		checkBox.setTag(type);
-		checkBox.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						CheckBox cb = (CheckBox) v;
-						if (cb.isChecked()) {
-							selectGroup((String) cb.getTag());
-						}
-						else {
-							unselectGroup((String) cb.getTag());
-						}
-						TypologieListAdapter.this.notifyDataSetChanged();
-					}
+		checkBox.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				CheckBox cb = (CheckBox) v;
+				if (cb.isChecked()) {
+					selectGroup((String) cb.getTag());
 				}
-		);
+				else {
+					unselectGroup((String) cb.getTag());
+				}
+				TypologieListAdapter.this.notifyDataSetChanged();
+			}
+		});
 		//Log.d("debug", "GET TYPE");
 		return convertView;
 	}
@@ -122,34 +135,30 @@ class TypologieListAdapter extends BaseExpandableListAdapter implements LoadingT
 
 		textView.setText(sousType);
 		textView.setTag(checkBox);
-		textView.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						CheckBox checkBox1 = (CheckBox) v.getTag();
-						checkBox1.performClick();
-					}
-				}
-		);
+		textView.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				CheckBox checkBox1 = (CheckBox) v.getTag();
+				checkBox1.performClick();
+			}
+		});
 
 		String type = getGroup(groupPosition);
 
 		(checkBox).setChecked((selection.containsKey(type)) && (selection.get(type).contains(sousType)));
 		checkBox.setTag(new Pair<String, String>(type, sousType));
-		checkBox.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						CheckBox cb = (CheckBox) v;
-						Pair<String, String> pair = (Pair<String, String>) cb.getTag();
-						if (cb.isChecked()) {
-							selectChild(pair.first, pair.second);
-						}
-						else {
-							unselectChild(pair.first, pair.second);
-						}
-						TypologieListAdapter.this.notifyDataSetChanged();
-					}
+		checkBox.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				CheckBox cb = (CheckBox) v;
+				Pair<String, String> pair = (Pair<String, String>) cb.getTag();
+				if (cb.isChecked()) {
+					selectChild(pair.first, pair.second);
 				}
-		);
+				else {
+					unselectChild(pair.first, pair.second);
+				}
+				TypologieListAdapter.this.notifyDataSetChanged();
+			}
+		});
 		//Log.d("debug", "GET SOUTYPE");
 		return convertView;
 	}

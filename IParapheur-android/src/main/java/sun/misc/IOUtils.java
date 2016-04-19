@@ -23,10 +23,6 @@
  * questions.
  */
 
-/**
- * IOUtils: A collection of IO-related public static methods.
- */
-
 package sun.misc;
 
 import java.io.EOFException;
@@ -34,7 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-
+/**
+ * IOUtils: A collection of IO-related public static methods.
+ */
 @SuppressWarnings("unused")
 public class IOUtils {
 
