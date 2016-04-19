@@ -18,8 +18,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import coop.adullactprojet.mupdffragment.customannotations.CustomAnnotation;
-import coop.adullactprojet.mupdffragment.MuPDFFragment;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.adullact.iparapheur.R;
@@ -41,6 +39,10 @@ import org.adullact.iparapheur.utils.StringUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
+
+import coop.adullactprojet.mupdffragment.MuPDFFragment;
+import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
+import coop.adullactprojet.mupdffragment.utils.ViewUtils;
 
 
 /**
@@ -90,7 +92,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(new View.OnClickListener() {
 				@Override public void onClick(View v) {
 					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-					startCreateAnnotationOnNextMove(true);
+					startCreateStickyNoteOnNextMove(true);
 				}
 			});
 
@@ -240,23 +242,23 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		super.showErrorLayout();
 	}
 
-	@Override protected void onAnnotationChanged(@NonNull final CustomAnnotation annotation, boolean deleteInvoked) {
+	@Override protected void onStickyNoteChanged(@NonNull final StickyNote stickyNote, boolean deleteInvoked) {
 
-		final Annotation newAnnotation = muPdfToParapheurAnnotation(annotation);
+		final Annotation newStickyNote = muPdfStickyNoteToParapheurAnnotation(stickyNote);
 
 		if (deleteInvoked)
-			new DeleteAnnotationAsyncTask().execute(newAnnotation);
-		else if (annotation.getId().startsWith("new_"))
-			new CreateAnnotationAsyncTask().execute(newAnnotation);
+			new DeleteAnnotationAsyncTask().execute(newStickyNote);
+		else if (stickyNote.getId().startsWith("new_"))
+			new CreateAnnotationAsyncTask().execute(newStickyNote);
 		else
-			new UpdateAnnotationAsyncTask().execute(newAnnotation);
+			new UpdateAnnotationAsyncTask().execute(newStickyNote);
 	}
 
-	@NonNull @Override protected String getAnnotationAuthorName() {
+	@NonNull @Override protected String getStickyNoteAuthorName() {
 		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
 	}
 
-	@NonNull @Override protected String generateNewCustomAnnotationId() {
+	@NonNull @Override protected String generateNewStickyNoteId() {
 		return "new_" + UUID.randomUUID();
 	}
 
@@ -308,8 +310,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		openFile(documentFile.getAbsolutePath());
 
-		SparseArray<HashMap<String, CustomAnnotation>> muPdfCustomAnnotations = parapheurToMuPdfAnnotations(document.getPagesAnnotations());
-		updateCustomAnnotations(muPdfCustomAnnotations);
+		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
+		updateStickyNotes(muPdfStickyNotes);
 
 		//
 
@@ -376,7 +378,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		getActivity().invalidateOptionsMenu();
 	}
 
-	private @NonNull Annotation muPdfToParapheurAnnotation(@NonNull CustomAnnotation muPdfAnnotation) {
+	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
 
 		return new Annotation(
 				muPdfAnnotation.getId(),
@@ -384,46 +386,46 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				getCurrentPage(),
 				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
 				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
-				DeviceUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+				ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
 				muPdfAnnotation.getText(),
 				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
 				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
 		);
 	}
 
-	private static @NonNull SparseArray<HashMap<String, CustomAnnotation>> parapheurToMuPdfAnnotations(SparseArray<PageAnnotations> parapheurAnnotations) {
-		SparseArray<HashMap<String, CustomAnnotation>> result = new SparseArray<>();
+	private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(SparseArray<PageAnnotations> parapheurAnnotations) {
+		SparseArray<HashMap<String, StickyNote>> result = new SparseArray<>();
 
 		for (int i = 0; i < parapheurAnnotations.size(); i++) {
 
-			HashMap<String, CustomAnnotation> annotationMap = new HashMap<>();
+			HashMap<String, StickyNote> stickyNoteMap = new HashMap<>();
 			int pageIndex = parapheurAnnotations.keyAt(i);
 			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
 			for (Annotation annotation : pageAnnotation.getAnnotations()) {
 
-				// Payload, to ease irrelevants MuPdfAnnotation data
+				// Payload, to ease irrelevants MuPdf lib data
 
 				HashMap<String, Object> payload = new HashMap<>();
 				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
 
-				// Building final annotation object
+				// Building final StickyNote object
 
 				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserName());
 
-				annotationMap.put(annotation.getUuid(), new CustomAnnotation(
+				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
 						annotation.getUuid(),
-						DeviceUtils.translateDpiRect(annotation.getRect(), 150, 144),
+						ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
 						annotation.getText(),
 						annotation.getAuthor(),
 						StringUtils.parseIso8601Date(annotation.getDate()),
-						isLocked ? CustomAnnotation.Color.BLUE_GREY : CustomAnnotation.Color.BLUE,
+						isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
 						isLocked,
 						payload
 				));
 			}
 
-			result.put(pageIndex, annotationMap);
+			result.put(pageIndex, stickyNoteMap);
 		}
 
 		return result;
@@ -586,10 +588,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
 			}
 			else {
-				updateCustomAnnotationData(mCurrentAnnotation.getUuid(), mNewId, null);
+				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null);
 				mCurrentAnnotation.setUuid(mNewId);
 			}
-
 		}
 	}
 
