@@ -252,11 +252,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
-			if (resultCode == Activity.RESULT_OK) {
 				// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
 				AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
-				if (accountListFragment != null)
+			if (accountListFragment != null) {
 					accountListFragment.accountsChanged();
 			}
 		}

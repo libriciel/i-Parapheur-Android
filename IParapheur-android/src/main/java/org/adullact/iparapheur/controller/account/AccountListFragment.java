@@ -67,14 +67,12 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mListView.addFooterView(separatorView, null, false);
 
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
-		footerView.setOnClickListener(
-				new View.OnClickListener() {
+		footerView.setOnClickListener(new View.OnClickListener() {
 					@Override public void onClick(View v) {
 						if (mListener != null)
 							mListener.onCreateAccountInvoked();
 					}
-				}
-		);
+		});
 		mListView.addFooterView(footerView, null, false);
 
 		return content;
@@ -111,6 +109,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		for (Account account : MyAccounts.INSTANCE.getAccounts())
 			if (account.isValid())
+				if (account.isActivated())
 				mAccounts.add(account);
 
 		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getContext()));

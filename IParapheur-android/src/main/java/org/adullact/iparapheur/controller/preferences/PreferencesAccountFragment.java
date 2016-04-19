@@ -15,10 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -51,9 +53,9 @@ public class PreferencesAccountFragment extends Fragment {
 	private static final String LIST_FIELD_URL = "list_field_url";
 	private static final String LIST_FIELD_LOGIN = "list_field_login";
 	private static final String LIST_FIELD_PASSWORD = "list_field_password";
+	private static final String LIST_FIELD_ACTIVATED = "list_field_activated";
 	private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
 
-	private PreferencesAccountFragmentListener mListener;
 	private ListView mAccountList;
 	private List<Map<String, String>> mAccountData;
 
@@ -73,16 +75,6 @@ public class PreferencesAccountFragment extends Fragment {
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		// Activities containing this fragment must implement its callbacks.
-		if (!(context instanceof PreferencesAccountFragmentListener))
-			throw new IllegalStateException("Activity must implement PreferencesAccountFragmentListener.");
-
-		mListener = (PreferencesAccountFragmentListener) context;
-	}
-
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
@@ -99,13 +91,11 @@ public class PreferencesAccountFragment extends Fragment {
 
 		// Set listeners
 
-		floatingButtonAction.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						onAddFloatingButtonClicked();
-					}
-				}
-		);
+		floatingButtonAction.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onAddFloatingButtonClicked();
+			}
+		});
 
 		// Building ListAdapter
 
@@ -117,8 +107,11 @@ public class PreferencesAccountFragment extends Fragment {
 				R.id.preferences_accounts_fragment_cell_password_edittext
 		};
 
-		SimpleAdapter accountAdapter = new AccountSimpleAdapter(
-				getActivity(), mAccountData, R.layout.preferences_accounts_fragment_cell, orderedFieldNames, orderedFieldIds
+		SimpleAdapter accountAdapter = new AccountSimpleAdapter(getActivity(),
+																mAccountData,
+																R.layout.preferences_accounts_fragment_cell,
+																orderedFieldNames,
+																orderedFieldIds
 		);
 		mAccountList.setAdapter(accountAdapter);
 
@@ -135,13 +128,6 @@ public class PreferencesAccountFragment extends Fragment {
 			if (parentActivity.getSupportActionBar() != null)
 				parentActivity.getSupportActionBar().setTitle(R.string.pref_header_accounts);
 		}
-	}
-
-	@Override public void onDetach() {
-		super.onDetach();
-
-		// Reset the active callbacks interface.
-		mListener = null;
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -173,9 +159,6 @@ public class PreferencesAccountFragment extends Fragment {
 		MyAccounts.INSTANCE.save(currentAccount);
 
 		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
-
-		if (mListener != null)
-			mListener.onAccountModified(currentAccount);
 	}
 
 	private void onDeleteButtonClicked(int position) {
@@ -248,19 +231,11 @@ public class PreferencesAccountFragment extends Fragment {
 			accountData.put(LIST_FIELD_URL, account.getServerBaseUrl());
 			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
 			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
+			accountData.put(LIST_FIELD_ACTIVATED, String.valueOf(account.isActivated()));
 
 			mAccountData.add(accountData);
 		}
 	}
-
-	// <editor-fold desc="PreferencesAccountFragmentListener">
-
-	public interface PreferencesAccountFragmentListener {
-
-		void onAccountModified(@NonNull Account account);
-	}
-
-	// </editor-fold desc="PreferencesAccountFragmentListener">
 
 	private class AccountSimpleAdapter extends SimpleAdapter {
 
@@ -301,7 +276,7 @@ public class PreferencesAccountFragment extends Fragment {
 			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext));
 			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
 			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
-
+			final ToggleButton enableToggleButton = ((ToggleButton) v.findViewById(R.id.preferences_accounts_fragment_cell_enabled_togglebutton));
 			final Button saveButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
 			final Button deleteButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
 			final Button testButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
@@ -319,44 +294,61 @@ public class PreferencesAccountFragment extends Fragment {
 
 			// Cell buttons listener
 
-			saveButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View arg0) {
-							onSaveButtonClicked(urlEditText, position);
-						}
-					}
-			);
+			saveButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View arg0) {
+					onSaveButtonClicked(urlEditText, position);
+				}
+			});
 
-			deleteButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View arg0) {
-							onDeleteButtonClicked(position);
-						}
-					}
-			);
+			deleteButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View arg0) {
+					onDeleteButtonClicked(position);
+				}
+			});
 
-			testButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View arg0) {
-							String login = loginEditText.getText().toString();
-							String password = passwordEditText.getText().toString();
+			testButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View arg0) {
+					String login = loginEditText.getText().toString();
+					String password = passwordEditText.getText().toString();
 
-							onTestButtonClicked(urlEditText, login, password);
-						}
-					}
-			);
+					onTestButtonClicked(urlEditText, login, password);
+				}
+			});
 
-			// Lock what should be locked
+			// Demo case
 
 			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), getString(R.string.demo_account_id));
+			boolean isActivated = Boolean.valueOf(mAccountData.get(position).get(LIST_FIELD_ACTIVATED));
 
 			lockEditText(titleEditText, !isDemoAccount);
 			lockEditText(urlEditText, !isDemoAccount);
 			lockEditText(loginEditText, !isDemoAccount);
 			lockEditText(passwordEditText, !isDemoAccount);
 
-			deleteButton.setVisibility(isDemoAccount ? View.INVISIBLE : View.VISIBLE);
-			saveButton.setVisibility(isDemoAccount ? View.INVISIBLE : View.VISIBLE);
+			deleteButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
+			saveButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
+			enableToggleButton.setVisibility(isDemoAccount ? View.VISIBLE : View.GONE);
+
+			enableToggleButton.setOnCheckedChangeListener(null);
+			enableToggleButton.setChecked(isActivated);
+			enableToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), getString(R.string.demo_account_id));
+					if (isDemoAccount) {
+
+						int currentPosition = (Integer) v.getTag(LIST_CELL_TAG_POSITION);
+						mAccountData.get(currentPosition).put(LIST_FIELD_ACTIVATED, String.valueOf(isChecked));
+
+						String currentAccountId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
+						Account currentAccount = MyAccounts.INSTANCE.getAccount(currentAccountId);
+						if (currentAccount != null) {
+							currentAccount.setActivated(isChecked);
+							MyAccounts.INSTANCE.save(currentAccount);
+						}
+					}
+				}
+			});
 
 			//
 
@@ -384,8 +376,7 @@ public class PreferencesAccountFragment extends Fragment {
 							if (currentPosition != -1)
 								mAccountData.get(currentPosition).put(dataMapField, editText.getText().toString());
 						}
-					}
-			);
+					});
 		}
 
 	}

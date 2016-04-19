@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 import org.adullact.iparapheur.model.Account;
 
 import java.io.BufferedReader;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -262,5 +265,19 @@ public class StringUtils {
 
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
 		return dateFormat.format(date);
+	}
+
+	public static boolean isUrlValid(@Nullable String url) {
+
+		if (TextUtils.isEmpty(url))
+			return false;
+
+		try {
+			new URL(IParapheurAPI.BASE_PATH + url);
+			return true;
+		}
+		catch (MalformedURLException ignored) {
+			return false;
+		}
 	}
 }

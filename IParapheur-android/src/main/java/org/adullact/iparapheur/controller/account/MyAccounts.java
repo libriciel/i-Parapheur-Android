@@ -24,6 +24,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	public static final String PREFS_URL_SUFFIX = "_url";
 	public static final String PREFS_LOGIN_SUFFIX = "_login";
 	public static final String PREFS_PASSWORD_SUFFIX = "_password";
+	public static final String PREFS_ACTIVATED_SUFFIX = "_activated";
 	public static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
 	private ArrayList<Account> mAccounts = null;
@@ -46,6 +47,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 						account.setLogin(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX, ""));
 						account.setServerBaseUrl(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX, ""));
 						account.setPassword(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX, ""));
+						account.setActivated(sharedPreferences.getBoolean(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX, true));
 						mAccounts.add(account);
 					}
 				}
@@ -77,6 +79,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_URL_SUFFIX, account.getServerBaseUrl());
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_LOGIN_SUFFIX, account.getLogin());
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_PASSWORD_SUFFIX, account.getPassword());
+		editor.putBoolean(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_ACTIVATED_SUFFIX, account.isActivated());
 		editor.apply();
 	}
 
@@ -92,6 +95,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX);
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX);
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX);
+			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX);
 			editor.apply();
 		}
 
