@@ -92,7 +92,7 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 				if (isCancelled()) {return;}
 				// TODO : distinguer Actes et Helios
 				//Log.d("debug", "Mailsec sur " + dossier.getName());
-				RESTClient.INSTANCE.envoiTdtActes(dossier.getId(), "", "", "", 0l, "", annotPub, annotPriv, bureauId);
+				RESTClient.INSTANCE.envoiTdtActes(dossier.getId(), "", "", "", 0L, "", annotPub, annotPriv, bureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

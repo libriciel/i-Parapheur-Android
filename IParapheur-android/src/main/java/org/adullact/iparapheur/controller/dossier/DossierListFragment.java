@@ -177,7 +177,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 							if (mListener != null)
 								mListener.onDossierCheckedChanged(true);
 						}
-					}, 1500l);
+					}, 1500L);
 				}
 
 				break;

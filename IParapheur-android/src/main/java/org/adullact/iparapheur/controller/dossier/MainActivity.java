@@ -694,6 +694,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	// <editor-fold desc="BureauListFragmentListener">
 
 	@Override public void onBureauListFragmentSelected(@Nullable String id) {
+
 		if (id != null) {
 			DossierListFragment fragment = DossierListFragment.newInstance(id);
 			replaceLeftFragment(fragment, DossierListFragment.FRAGMENT_TAG, true);
