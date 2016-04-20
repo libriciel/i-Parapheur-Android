@@ -39,6 +39,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,7 +63,7 @@ import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
-import org.adullact.iparapheur.controller.dossier.action.TdtHeliosDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.TdtActesDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
@@ -75,6 +76,7 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -85,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -269,11 +272,11 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
-				// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-				AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+			// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
+			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
 			if (accountListFragment != null) {
-					accountListFragment.accountsChanged();
+				accountListFragment.accountsChanged();
 			}
 		}
 	}
@@ -436,20 +439,20 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			return false;
 		}
 
-		// Compute visibility
-
-		actionMode.setTitle(getString(R.string.action_mode_nb_dossiers).replace("-number-", String.valueOf(checkedDossiers.size())));
-		// Get the intersection of all possible actions on checked dossiers and update the menu
-		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
-		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+		// Get available actions from Dossiers
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
-
 		boolean sign = false;
 		for (Dossier dossier : checkedDossiers) {
 			actions.retainAll(dossier.getActions());
 			sign = sign || (dossier.getActions().contains(Action.SIGNATURE) && !dossier.isSignPapier());
 		}
+
+		// Compute visibility
+
+		actionMode.setTitle(getString(R.string.action_mode_nb_dossiers).replace("-number-", String.valueOf(checkedDossiers.size())));
+		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
+		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
 
 		for (Action action : actions) {
 
@@ -493,41 +496,12 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
 		if (dossierListFragment != null) {
-			String bureauId = dossierListFragment.getBureauId();
 
-			DialogFragment actionDialog;
-			switch (menuItem.getItemId()) {
-				case R.id.action_visa:
-					actionDialog = VisaDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
-					actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
-					return true;
-				case R.id.action_signature:
-					actionDialog = SignatureDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
-					actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
-					return true;
-				case R.id.action_mailsec:
-					actionDialog = MailSecDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "MailSecDialogFragment");
-					return true;
-				case R.id.action_tdt_actes:
-				case R.id.action_tdt_helios:
-					actionDialog = TdtHeliosDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "TdtHeliosDialogFragment");
-					return true;
-				case R.id.action_archivage:
-					actionDialog = ArchivageDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
-					return true;
-				case R.id.action_rejet:
-					actionDialog = RejectDialogFragment.newInstance(new ArrayList<>(dossierListFragment.getCheckedDossiers()), bureauId);
-					actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
-					actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
-					return true;
-				default:
-					return false;
-			}
+			String bureauId = dossierListFragment.getBureauId();
+			Action invokedAction = Action.fromId(menuItem.getItemId());
+
+			if (invokedAction != null)
+				launchActionPopup(dossiers, bureauId, invokedAction);
 		}
 
 		return false;
@@ -641,27 +615,42 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}.execute();
 	}
 
-	private void launchActionPopup(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
+	private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
 		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
-		ArrayList<Dossier> singleList = new ArrayList<>();
-		singleList.add(dossier);
 		DialogFragment actionDialog;
+		ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
 
 		if (action == Action.REJET) {
-			actionDialog = RejectDialogFragment.newInstance(singleList, bureauId);
+			actionDialog = RejectDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
 			actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.VISA) {
-			actionDialog = VisaDialogFragment.newInstance(singleList, bureauId);
+			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
 			actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.SIGNATURE) {
-			actionDialog = SignatureDialogFragment.newInstance(singleList, bureauId);
+			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
 			actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.MAILSEC) {
+			actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId);
+			actionDialog.show(getSupportFragmentManager(), "MailSecDialogFragment");
+		}
+		else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
+			actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
+			actionDialog.setTargetFragment(dossierListFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
+			actionDialog.show(getSupportFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.ARCHIVAGE) {
+			actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId);
+			actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
+		}
+		else {
+			Log.e("Adrien", "UNKNOWN ACTION : " + action);
 		}
 	}
 
@@ -813,18 +802,11 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		}
 	}
 
-	@Override public void onValidateButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
-		if (dossier.getActions().contains(Action.SIGNATURE))
-			launchActionPopup(dossier, bureauId, Action.SIGNATURE);
-		else
-			launchActionPopup(dossier, bureauId, Action.VISA);
+	@Override public void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
+		launchActionPopup(CollectionUtils.asSet(dossier), bureauId, action);
 	}
 
-	@Override public void onCancelButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId) {
-		launchActionPopup(dossier, bureauId, Action.REJET);
-	}
-
-	// </editor-fold desc="DossierDetailsFragmentListener">
+// </editor-fold desc="DossierDetailsFragmentListener">
 
 	/**
 	 * Listener used on the Drawer Layout used to control the Action Bar content depending

@@ -19,11 +19,16 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import org.adullact.iparapheur.R;
 
 
 public enum Action implements Parcelable {
+
 	// TODO : all possible actions (secretariat, supprimer, ...)
 	VISA(R.string.action_viser, R.id.action_visa, R.drawable.iw_visa, R.drawable.ip_visa),
 	SIGNATURE(R.string.action_signer, R.id.action_signature, R.drawable.iw_signature, R.drawable.ip_signature),
@@ -49,7 +54,9 @@ public enum Action implements Parcelable {
 	RAZ,
 	EDITION,
 	ENCHAINER_CIRCUIT;
+
 	public static final Creator<Action> CREATOR = new Creator<Action>() {
+
 		@Override public Action createFromParcel(final Parcel source) {
 			return Action.values()[source.readInt()];
 		}
@@ -58,35 +65,45 @@ public enum Action implements Parcelable {
 			return new Action[size];
 		}
 	};
-	private final int icon;
-	private final int approvedIcon;
-	private final int title;
-	private final int menuItemId;
 
-	Action(int title, int menuItemId, int icon, int approvedIcon) {
-		this.title = title;
-		this.menuItemId = menuItemId;
-		this.icon = icon;
-		this.approvedIcon = approvedIcon;
+	private final int mIcon;
+	private final int mApprovedIcon;
+	private final int mTitle;
+	private final int mMenuItemId;
+
+	Action(@StringRes int title, @IdRes int menuItemId, @DrawableRes int icon, @DrawableRes int approvedIcon) {
+		mTitle = title;
+		mMenuItemId = menuItemId;
+		mIcon = icon;
+		mApprovedIcon = approvedIcon;
 	}
 
 	Action() {
-		this.title = R.string.action_non_implementee;
-		this.menuItemId = -1;
-		this.icon = -1;
-		this.approvedIcon = -1;
+		mTitle = R.string.action_non_implementee;
+		mMenuItemId = -1;
+		mIcon = -1;
+		mApprovedIcon = -1;
 	}
 
-	public int getIcon(boolean approved) {
-		return approved ? approvedIcon : icon;
+	public @DrawableRes int getIcon(boolean approved) {
+		return approved ? mApprovedIcon : mIcon;
 	}
 
-	public int getTitle() {
-		return title;
+	public @StringRes int getTitle() {
+		return mTitle;
 	}
 
-	public int getMenuItemId() {
-		return menuItemId;
+	public @IdRes int getMenuItemId() {
+		return mMenuItemId;
+	}
+
+	public static @Nullable Action fromId(@IdRes int id) {
+
+		for (Action action : Action.values())
+			if (action.getMenuItemId() == id)
+				return action;
+
+		return null;
 	}
 
 	@Override public int describeContents() {

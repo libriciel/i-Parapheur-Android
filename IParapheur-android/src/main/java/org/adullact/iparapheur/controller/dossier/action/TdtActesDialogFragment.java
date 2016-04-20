@@ -32,15 +32,18 @@ import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 import java.util.ArrayList;
 
 
-public class TdtHeliosDialogFragment extends ActionDialogFragment {
+public class TdtActesDialogFragment extends ActionDialogFragment {
+
+	public static final int REQUEST_CODE_ACTES = 103200519;    // Because A-C-T-E-S = 1-03-20-05-19
+	public static final String FRAGMENT_TAG = "tdt_actes_dialog_fragment";
 
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
 
-	public TdtHeliosDialogFragment() {}
+	public TdtActesDialogFragment() {}
 
-	public static TdtHeliosDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
-		TdtHeliosDialogFragment f = new TdtHeliosDialogFragment();
+	public static TdtActesDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
+		TdtActesDialogFragment f = new TdtActesDialogFragment();
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
@@ -61,7 +64,7 @@ public class TdtHeliosDialogFragment extends ActionDialogFragment {
 	}
 
 	@Override protected int getTitle() {
-		return Action.TDT_HELIOS.getTitle();
+		return Action.TDT_ACTES.getTitle();
 	}
 
 	@Override protected int getViewId() {

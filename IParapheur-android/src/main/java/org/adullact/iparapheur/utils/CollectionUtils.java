@@ -17,7 +17,12 @@
  */
 package org.adullact.iparapheur.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class CollectionUtils {
@@ -32,4 +37,15 @@ public class CollectionUtils {
 			return defaultValue;
 	}
 
+	@SafeVarargs public static <T> List<T> asList(T... objects) {
+		ArrayList<T> result = new ArrayList<>();
+		Collections.addAll(result, objects);
+		return result;
+	}
+
+	@SafeVarargs public static <T> Set<T> asSet(T... objects) {
+		HashSet<T> result = new HashSet<>();
+		Collections.addAll(result, objects);
+		return result;
+	}
 }
