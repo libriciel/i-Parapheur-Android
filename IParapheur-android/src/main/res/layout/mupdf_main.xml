@@ -34,8 +34,8 @@
                 android:id="@+id/mupdffragment_main_fabbutton_annotation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/white_1000"
-                fab:fab_colorPressed="@color/grey_200"
+                fab:fab_colorNormal="@color/grey_200"
+                fab:fab_colorPressed="@color/grey_400"
                 fab:fab_icon="@drawable/ic_speaker_notes_black_24dp"
                 fab:fab_size="mini"
                 fab:fab_title="@string/add_annotation" />
