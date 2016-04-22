@@ -74,13 +74,15 @@ import java.util.List;
  */
 public class DossierListFragment extends SwipeRefreshListFragment implements LoadingTask.DataChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
-	public static String FRAGMENT_TAG = "dossiers_list_fragment";
-	public static String ARG_BUREAU_ID = "bureau_id";
+	public static final String FRAGMENT_TAG = "dossiers_list_fragment";
+
+	private static final String ARG_BUREAU_ID = "bureau_id";
+	private static final String ARG_SELECTED_DOSSIER_ID = "selected_dossier_id";
 
 	private DossierListFragmentListener mListener;
 	private String mBureauId;                                   // Bureau id where the dossiers belongs
 	private List<Dossier> mDossiersList;                        // List of dossiers displayed in this fragment
-	private int selectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
+	private int mSelectedDossier = ListView.INVALID_POSITION;    // The currently selected dossier
 
 	private View mSpinnerProgress;
 	private View mContentView;
@@ -137,7 +139,6 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 
 	@Override public void onStart() {
 		super.onStart();
-
 		setBureauId(getArguments().getString(ARG_BUREAU_ID, null));
 	}
 
@@ -192,6 +193,10 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		return mBureauId;
 	}
 
+	public int getSelectedDossier() {
+		return mSelectedDossier;
+	}
+
 	public void setBureauId(String bureauId) {
 		if ((mBureauId == null) || !(mBureauId.contentEquals(bureauId))) {
 			mBureauId = bureauId;
@@ -220,7 +225,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		else
 			getListView().setItemChecked(position, true);
 
-		selectedDossier = position;
+		mSelectedDossier = position;
 	}
 
 	public HashSet<Dossier> getCheckedDossiers() {
@@ -240,8 +245,8 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 		// activity that the data has changed, so the activity remove the previously selected
 		// dossier details
 
-		if (selectedDossier != ListView.INVALID_POSITION) {
-			selectedDossier = ListView.INVALID_POSITION;
+		if (mSelectedDossier != ListView.INVALID_POSITION) {
+			mSelectedDossier = ListView.INVALID_POSITION;
 			setActivatedPosition(ListView.INVALID_POSITION);
 		}
 
@@ -264,13 +269,13 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 					mListener.onDossiersNotLoaded();
 			}
 
-			if (selectedDossier != ListView.INVALID_POSITION) {
-				selectedDossier = ListView.INVALID_POSITION;
+			if (mSelectedDossier != ListView.INVALID_POSITION) {
+
+				mSelectedDossier = ListView.INVALID_POSITION;
 				setActivatedPosition(ListView.INVALID_POSITION);
-				/* if a dossier was previously selected, we have to notify the parent
-				 * activity that the data has changed, so the activity remove the previously selected
-				 * dossier details
-				 */
+
+				// if a dossier was previously selected, we have to notify the parent activity that the data has changed,
+				// so the activity remove the previously selected dossier details
 				if (mListener != null)
 					mListener.onDossierSelected(null, null);
 			}
@@ -444,7 +449,7 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			switch (v.getId()) {
 				default:
 					Integer position = (Integer) v.getTag();
-					if (position != selectedDossier && !isRefreshing()) {
+					if (position != mSelectedDossier && !isRefreshing()) {
 						listener.onDossierSelected(mDossiersList.get(position), mBureauId);
 						setActivatedPosition(position);
 					}

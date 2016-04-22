@@ -679,7 +679,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
 			}
 			else {
-				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null);
+				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null, null);
 				mCurrentAnnotation.setUuid(mNewId);
 			}
 		}
