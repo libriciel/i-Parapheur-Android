@@ -133,7 +133,8 @@ public class HierarchyListFragment extends Fragment {
 		mDossierSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 		mDossierListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//				mSelectedBureauId = ((BureauListAdapter) mBureauListView.getAdapter()).getItem(position);
+				Dossier selectedDossier = ((DossierListAdapter) mDossierListView.getAdapter()).getItem(position);
+				mListener.onDossierListFragmentSelected(selectedDossier, mSelectedBureauId);
 			}
 		});
 		mDossierListView.setEmptyView(mDossierEmptyView);
@@ -179,8 +180,8 @@ public class HierarchyListFragment extends Fragment {
 		mSelectedBureauId = bureau.getId();
 		new DossiersLoadingTask().execute();
 
-		mViewSwitcher.setInAnimation(getActivity(), R.anim.slide_right_to_center);
-		mViewSwitcher.setOutAnimation(getActivity(), R.anim.slide_center_to_left);
+		mViewSwitcher.setInAnimation(getActivity(), R.anim.slide_in_right);
+		mViewSwitcher.setOutAnimation(getActivity(), R.anim.slide_out_left);
 		mViewSwitcher.setDisplayedChild(1);
 	}
 
@@ -323,6 +324,7 @@ public class HierarchyListFragment extends Fragment {
 			super.onPostExecute(aVoid);
 			ViewUtils.crossfade(getActivity(), mBureauEmptyView, mBureauListView);
 			mDossierSwipeRefreshLayout.setRefreshing(false);
+			mDossierListView.setItemChecked(ListView.INVALID_POSITION, true);
 			((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 		}
 	}

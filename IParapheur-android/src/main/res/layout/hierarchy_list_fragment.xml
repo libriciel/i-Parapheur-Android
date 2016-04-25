@@ -24,7 +24,8 @@
                     android:id="@+id/hierarchy_bureaux_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="none" />
+                    android:choiceMode="none"
+                    android:divider="@android:color/background_light" />
 
                 <LinearLayout
                     android:id="@+id/hierarchy_bureaux_empty"
@@ -72,7 +73,8 @@
                     android:id="@+id/hierarchy_dossier_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="singleChoice" />
+                    android:choiceMode="singleChoice"
+                    android:divider="@android:color/background_light" />
 
                 <LinearLayout
                     android:id="@+id/hierarchy_dossier_empty"
