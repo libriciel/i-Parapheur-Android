@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0-beta1'
+        classpath 'com.android.tools.build:gradle:2.1.0-beta3'
         //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -32,9 +32,9 @@ android {
         abi {
             enable true
             reset()
-            /* include 'x86', 'armeabi', 'armeabi-v7a', 'mips' */
-            include 'armeabi-v7a'    // OnePlus One
-            include 'x86'            // Emulateur
+            /* include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64' */
+            // include 'armeabi-v7a'    // OnePlus One
+            include 'x86_64'            // Emulateur
             universalApk false
         }
     }

@@ -58,7 +58,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.bureau.BureauxListFragment;
+import org.adullact.iparapheur.controller.bureau.HierarchyListFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
@@ -103,9 +103,9 @@ import java.util.Set;
  * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener, BureauxListFragment.BureauListFragmentListener,
-		AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener,
-		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener,
+		HierarchyListFragment.HierarchyListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener,
+		LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -193,16 +193,16 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		//
 
-		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(BureauxListFragment.FRAGMENT_TAG);
+		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 
 		if (fragmentToDisplay == null)
-			fragmentToDisplay = new BureauxListFragment();
+			fragmentToDisplay = new HierarchyListFragment();
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		fragmentToDisplay.setRetainInstance(true);
 		if (findViewById(R.id.left_fragment) != null)
-			replaceLeftFragment(fragmentToDisplay, BureauxListFragment.FRAGMENT_TAG, false);
+			replaceLeftFragment(fragmentToDisplay, HierarchyListFragment.FRAGMENT_TAG, false);
 
 		// Selecting the first account by default, the demo one
 
@@ -314,10 +314,10 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 			// Then, try to pop backstack
 
-			if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-				getSupportFragmentManager().popBackStack();
-				return;
-			}
+			HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+			if (bureauxFragment != null)
+				if (bureauxFragment.popBackStack())
+					return;
 		}
 
 		super.onBackPressed();
@@ -538,9 +538,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-		int enter = animated ? R.anim.push_right_to_center : 0;
-		int exit = animated ? R.anim.push_center_to_left : 0;
-		transaction.setCustomAnimations(enter, exit, R.anim.push_center_to_right, R.anim.push_left_to_center);
+//		int enter = animated ? R.anim.slide_in_right : 0;
+//		int exit = animated ? R.anim.slide_out_right : 0;
+//		transaction.setCustomAnimations(enter, exit, R.anim.slide_out_left, R.anim.slide_in_left);
 		transaction.replace(R.id.left_fragment, fragment, tag);
 
 		if (animated)
@@ -555,9 +555,9 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-		int enter = animated ? R.anim.push_right_to_center : 0;
-		int exit = animated ? R.anim.push_center_to_left : 0;
-		transaction.setCustomAnimations(enter, exit, R.anim.push_center_to_right, R.anim.push_left_to_center);
+//		int enter = animated ? R.anim.slide_in_right : 0;
+//		int exit = animated ? R.anim.slide_out_right : 0;
+//		transaction.setCustomAnimations(enter, exit, R.anim.slide_out_left, R.anim.slide_in_left);
 		transaction.replace(R.id.drawer_panel, fragment, tag);
 
 		if (animated)
@@ -659,8 +659,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	@Override public void onAccountSelected(@NonNull Account account) {
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			BureauxListFragment bureauxFragment = new BureauxListFragment();
-			replaceDrawerFragment(bureauxFragment, BureauxListFragment.FRAGMENT_TAG, true);
+			HierarchyListFragment bureauxFragment = new HierarchyListFragment();
+			replaceDrawerFragment(bureauxFragment, HierarchyListFragment.FRAGMENT_TAG, true);
 		}
 		else {
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
@@ -678,7 +678,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Then , we just update the BureauFragment to the accurate Account
 
-		BureauxListFragment bureauxFragment = (BureauxListFragment) getSupportFragmentManager().findFragmentByTag(BureauxListFragment.FRAGMENT_TAG);
+		HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 		if (bureauxFragment != null)
 			bureauxFragment.updateBureaux(true);
 	}
@@ -698,6 +698,18 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		if (id != null) {
 			DossierListFragment fragment = DossierListFragment.newInstance(id);
 			replaceLeftFragment(fragment, DossierListFragment.FRAGMENT_TAG, true);
+		}
+	}
+
+	@Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
+
+		if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
+			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+
+		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		if ((fragment != null)) {
+			fragment.showProgressLayout();
+			fragment.update(dossier, bureauId);
 		}
 	}
 
