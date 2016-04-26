@@ -91,17 +91,14 @@ public class HierarchyListFragment extends Fragment {
 		// Retrieve Views
 
 		mViewSwitcher = (ViewSwitcher) view.findViewById(R.id.hierarchy_viewswitcher);
-
 		mBureauSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.hierarchy_bureaux_swiperefreshlayout);
 		mDossierSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.hierarchy_dossier_swiperefreshlayout);
-
 		mBureauListView = (ListView) view.findViewById(R.id.hierarchy_bureaux_listview);
 		mDossierListView = (ListView) view.findViewById(R.id.hierarchy_dossier_listview);
-
 		mBureauEmptyView = view.findViewById(R.id.hierarchy_bureaux_empty);
 		mDossierEmptyView = view.findViewById(R.id.hierarchy_dossier_empty);
 
-		// Setting up
+		// Setting up listeners, etc
 
 		mBureauSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override public void onRefresh() {
@@ -211,6 +208,11 @@ public class HierarchyListFragment extends Fragment {
 			mViewSwitcher.setInAnimation(getActivity(), android.R.anim.slide_in_left);
 			mViewSwitcher.setOutAnimation(getActivity(), android.R.anim.slide_out_right);
 			mViewSwitcher.setDisplayedChild(0);
+
+			// Fore some reason, the bureau list view is empty on a ViewSwitcher flip
+			// Calling the adapter refresh fixes it...
+			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
+
 			return true;
 		}
 		else {
@@ -386,7 +388,7 @@ public class HierarchyListFragment extends Fragment {
 	private class DossierListAdapter extends ArrayAdapter<Dossier> {
 
 		//		private final DossierListFragmentListener listener;
-//		private final GestureDetector gestureDetector = new GestureDetector(getContext(), new OnSwipeGestureListener());
+		//		private final GestureDetector gestureDetector = new GestureDetector(getContext(), new OnSwipeGestureListener());
 		private HashSet<Dossier> checkedDossiers;
 
 		//		public DossierListAdapter(Context context, DossierListFragmentListener listener) {
