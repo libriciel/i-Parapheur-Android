@@ -5,7 +5,7 @@
     android:id="@+id/dossiers_list_item_selectable_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_background_main_secondary_color">
+    android:background="@drawable/list_background_secondary100">
 
     <FrameLayout
         android:id="@+id/dossiers_list_item_checkable_layout"

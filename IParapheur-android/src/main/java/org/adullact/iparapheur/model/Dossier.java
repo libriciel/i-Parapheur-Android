@@ -254,13 +254,16 @@ public class Dossier implements Parcelable {
 	 * Equals and hashCode overriding, so we can find dossier with its id.
 	 */
 	@Override public boolean equals(Object o) {
-		if (o instanceof Dossier) {
-			Dossier toCompare = (Dossier) o;
-			return this.id.equals(toCompare.id);
-		}
-		else if (o instanceof String) {
-			return this.id.equals(o);
-		}
+
+		if (o == null)
+			return false;
+
+		if (o instanceof Dossier)
+			return TextUtils.equals(id, ((Dossier) o).getId());
+
+		else if (o instanceof String)
+			return TextUtils.equals(id, (String) o);
+
 		return false;
 	}
 
