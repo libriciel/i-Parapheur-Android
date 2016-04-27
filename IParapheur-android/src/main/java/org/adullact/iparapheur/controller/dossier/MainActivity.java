@@ -452,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 		// Compute visibility
 
-		actionMode.setTitle(getString(R.string.action_mode_nb_dossiers).replace("-number-", String.valueOf(checkedDossiers.size())));
+		actionMode.setTitle(String.format(getString(R.string.action_mode_nb_dossiers), checkedDossiers.size()));
 		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
 		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
 
@@ -660,29 +660,22 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public void onAccountSelected(@NonNull Account account) {
 
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-			menuFragment.updateBureaux(true);
-		}
-		else {
-			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-		}
-
 		MyAccounts.INSTANCE.selectAccount(account.getId());
 
-		// If we selected a new account, and we are on the DossierFragment displayed
-		// We'll want to pop the BackStack to get on the BureauFragment
+		// Close the drawer
 
-		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
-		if (dossierListFragment != null)
-			if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-				getSupportFragmentManager().popBackStack();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
-		// Then , we just update the BureauFragment to the accurate Account
+		// If we selected a new account, and we have a Dossier list displayed
+		// We'll want to pop the BackStack to get on the Bureau list
+		// Then , we just update the Bureau with the accurate Account
 
-		HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-		if (bureauxFragment != null)
-			bureauxFragment.updateBureaux(true);
+		HierarchyListFragment hierarchyListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		if (hierarchyListFragment != null) {
+			hierarchyListFragment.onBackPressed();
+			hierarchyListFragment.updateBureaux(true);
+		}
 	}
 
 	@Override public void onCreateAccountInvoked() {

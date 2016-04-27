@@ -28,7 +28,7 @@
     <string name="drawer_close">Fermer le menu contextuel</string>
 
     <string name="one_dossier">1 dossier</string>
-    <string name="nb_dossiers">-number- dossiers</string>
+    <string name="nb_dossiers">%d dossiers</string>
     <string name="no_dossier">Aucun dossier</string>
 
     <!-- Actions sur un dossier -->
@@ -142,7 +142,7 @@
     <string name="no_content">Pas de contenu</string>
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
-    <string name="action_mode_nb_dossiers">-number- dossier(s)</string>
+    <string name="action_mode_nb_dossiers">%d dossier(s)</string>
     <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
     <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
     <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>

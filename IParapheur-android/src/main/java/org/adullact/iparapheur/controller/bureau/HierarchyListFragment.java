@@ -52,6 +52,11 @@ import java.util.List;
 import java.util.UUID;
 
 
+/**
+ * This fragment manages {@link Bureau} and {@link Dossier} lists on the left panel.
+ * Both lists are pretty much the same, but some actions on the {@link Dossier} needs to be helded by the parent list.
+ * That's a mess with two separate {@link Fragment}s, that's why we have an easiest {@link ViewSwitcher}.
+ */
 public class HierarchyListFragment extends Fragment {
 
 	public static final String FRAGMENT_TAG = "bureaux_list_fragment";
@@ -151,7 +156,7 @@ public class HierarchyListFragment extends Fragment {
 		super.onStart();
 
 		if (mBureauxList.isEmpty())
-		updateBureaux(true);
+			updateBureaux(true);
 	}
 
 	@Override public void onDetach() {
@@ -402,7 +407,7 @@ public class HierarchyListFragment extends Fragment {
 				else if (currentBureau.getTodoCount() == 1)
 					subtitle = getString(R.string.one_dossier);
 				else
-					subtitle = getString(R.string.nb_dossiers).replace("-number-", String.valueOf(currentBureau.getTodoCount()));
+					subtitle = String.format(getString(R.string.nb_dossiers), currentBureau.getTodoCount());
 
 				// Applies values
 
@@ -433,11 +438,8 @@ public class HierarchyListFragment extends Fragment {
 
 	private class DossierListAdapter extends ArrayAdapter<Dossier> {
 
-		//		private final DossierListFragmentListener listener;
-		//		private final GestureDetector gestureDetector = new GestureDetector(getContext(), new OnSwipeGestureListener());
 		private HashSet<Dossier> checkedDossiers;
 
-		//		public DossierListAdapter(Context context, DossierListFragmentListener listener) {
 		public DossierListAdapter(Context context) {
 			super(context, R.layout.dossiers_list_cell, R.id.dossiers_list_item_title);
 //			this.listener = listener;
@@ -572,60 +574,14 @@ public class HierarchyListFragment extends Fragment {
 //			}
 //		}
 
-		public HashSet<Dossier> getCheckedDossiers() {
-			return checkedDossiers;
-		}
-
 		public void clearSelection() {
 			checkedDossiers.clear();
 			notifyDataSetChanged();
 		}
 
-//		@Override public boolean onTouch(View v, MotionEvent event) {
-//			return gestureDetector.onTouchEvent(event);
-//		}
-
-		public void onSwipeRight() {
-			//Log.d("swipe", "SWIPE RIGHT");
+		public HashSet<Dossier> getCheckedDossiers() {
+			return checkedDossiers;
 		}
-
-		public void onSwipeLeft() {
-			//Log.d("swipe", "SWIPE LEFT");
-		}
-
-//		private final class OnSwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
-//
-//			private static final int SWIPE_THRESHOLD = 100;
-//			private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-//
-//			@Override public boolean onDown(MotionEvent e) {
-//				return true;
-//			}
-//
-//			@Override public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-//
-//				try {
-//					float diffY = e2.getY() - e1.getY();
-//					float diffX = e2.getX() - e1.getX();
-//					if (Math.abs(diffX) > Math.abs(diffY)) {
-//						if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-//							if (diffX > 0) {
-//								onSwipeRight();
-//							}
-//							else {
-//								onSwipeLeft();
-//							}
-//						}
-//					}
-//				}
-//				catch (Exception exception) {
-//					//exception.printStackTrace();
-//				}
-//
-//				return false;
-//			}
-//		}
-
 	}
 
 }

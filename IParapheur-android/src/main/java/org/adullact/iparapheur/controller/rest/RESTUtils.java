@@ -320,29 +320,21 @@ public class RESTUtils {
 			return new IParapheurException(R.string.http_error_explicit, message);
 
 		IParapheurException exception;
-		switch (code) {
-			case 400:
-				exception = new IParapheurException(R.string.http_error_400, null);
-				break;
-			case 401:
-				exception = new IParapheurException(R.string.http_error_401, null);
-				break;
-			case 403:
-				exception = new IParapheurException(R.string.http_error_403, null);
-				break;
-			case 404:
-				exception = new IParapheurException(R.string.http_error_404, null);
-				break;
-			case 405:
-				exception = new IParapheurException(R.string.http_error_405, null);
-				break;
-			case 503:
-				exception = new IParapheurException(R.string.http_error_503, null);
-				break;
-			default:
-				exception = new IParapheurException(R.string.http_error_undefined, null);
-				break;
-		}
+		if (code == 400)
+			exception = new IParapheurException(R.string.http_error_400, null);
+		else if (code == 401)
+			exception = new IParapheurException(R.string.http_error_401, null);
+		else if (code == 403)
+			exception = new IParapheurException(R.string.http_error_403, null);
+		else if (code == 404)
+			exception = new IParapheurException(R.string.http_error_404, null);
+		else if (code == 405)
+			exception = new IParapheurException(R.string.http_error_405, null);
+		else if (code == 503)
+			exception = new IParapheurException(R.string.http_error_503, null);
+		else
+			exception = new IParapheurException(R.string.http_error_undefined, null);
+
 		return exception;
 	}
 }
