@@ -287,13 +287,15 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 			// First, try to pop backStack (and open the drawer to show it)
 
-			if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+			HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+			if (bureauxFragment != null) {
+				if (bureauxFragment.onBackPressed()) {
 
-				if (!mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
-					mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+					if (!mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
+						mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
-				getSupportFragmentManager().popBackStack();
-				return;
+					return;
+				}
 			}
 
 			// Then, close the drawer
@@ -659,8 +661,8 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 	@Override public void onAccountSelected(@NonNull Account account) {
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			HierarchyListFragment bureauxFragment = new HierarchyListFragment();
-			replaceDrawerFragment(bureauxFragment, HierarchyListFragment.FRAGMENT_TAG, true);
+			HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+			menuFragment.updateBureaux(true);
 		}
 		else {
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
