@@ -107,12 +107,11 @@ public class PreferencesCertificatesFragment extends Fragment {
 				R.id.preferences_certificates_fragment_cell_title_textview, R.id.preferences_certificates_fragment_cell_expiration_textview
 		};
 
-		SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(
-				getActivity(),
-				mCertificatesData,
-				R.layout.preferences_certificates_fragment_cell,
-				orderedFieldNames,
-				orderedFieldIds
+		SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(getActivity(),
+																		 mCertificatesData,
+																		 R.layout.preferences_certificates_fragment_cell,
+																		 orderedFieldNames,
+																		 orderedFieldIds
 		);
 		mCertificatesList.setAdapter(certificatesAdapter);
 
@@ -172,25 +171,24 @@ public class PreferencesCertificatesFragment extends Fragment {
 			String certificatePassword = settings.getString(certificate.getName(), "");
 			PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
 
-			Date certificateExpirationDate = null;
+			Date certifExpDate = null;
 			try {
 				signer.loadKeyStore();
-				certificateExpirationDate = signer.getCertificateExpirationDate();
+				certifExpDate = signer.getCertificateExpirationDate();
 			}
 			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
 				Crashlytics.logException(e);
 				e.printStackTrace();
 			}
 
-			String expirationDateString = getString(R.string.pref_certificates_expiration_date);
-			expirationDateString = expirationDateString.replaceAll("-date-", StringUtils.getLocalizedSmallDate(certificateExpirationDate));
-			Boolean isExpired = (certificateExpirationDate == null) || (certificateExpirationDate.before(new Date()));
+			String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringUtils.getLocalizedSmallDate(certifExpDate));
+			Boolean isExpired = (certifExpDate == null) || (certifExpDate.before(new Date()));
 
 			// Mapping results
 
 			Map<String, Object> certificateData = new HashMap<>();
 			certificateData.put(LIST_FIELD_TITLE, certificate.getName());
-			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expirationDateString);
+			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expString);
 			certificateData.put(LIST_FIELD_IS_EXPIRED, isExpired);
 			mCertificatesData.add(certificateData);
 		}
