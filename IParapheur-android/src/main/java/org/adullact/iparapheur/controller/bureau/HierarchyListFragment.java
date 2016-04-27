@@ -22,7 +22,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
@@ -60,23 +59,24 @@ import java.util.UUID;
  */
 public class HierarchyListFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "bureaux_list_fragment";
+	public static final String FRAGMENT_TAG = "hierarchy_list_fragment";
 
-	private HierarchyListFragmentListener mListener;
+	// Views
 	private ViewSwitcher mViewSwitcher;
-
-	private ListView mBureauListView;                             // ListView used to show the Bureau of the currently selected account
-	private ListView mDossierListView;                            // ListView used to show the Bureau of the currently selected account
-	private SwipeRefreshLayout mBureauSwipeRefreshLayout;         // Swipe refresh layout on top of the list view
-	private SwipeRefreshLayout mDossierSwipeRefreshLayout;        // Swipe refresh layout on top of the list view
+	private ListView mBureauListView;
+	private ListView mDossierListView;
+	private SwipeRefreshLayout mBureauSwipeRefreshLayout;
+	private SwipeRefreshLayout mDossierSwipeRefreshLayout;
 	private View mBureauEmptyView;
 	private View mDossierEmptyView;
 
-	private List<Bureau> mBureauList = new ArrayList<>();         // List of Bureau currently displayed in this Fragment
-	private List<Dossier> mDossierList = new ArrayList<>();       // List of Dossier currently displayed in this Fragment
-	private Bureau mSelectedBureau = null;                        // The currently displayed submenu's Bureau
-	private Dossier mDisplayedDossier = null;                     // The currently displayed Dossier
-	private Bureau mDisplayedBureau = null;                       // The currently displayed Dossier's Bureau
+	// Data
+	private HierarchyListFragmentListener mListener;
+	private List<Bureau> mBureauList = new ArrayList<>();
+	private List<Dossier> mDossierList = new ArrayList<>();
+	private Bureau mSelectedBureau = null;                        // Which Bureau is displayed in the submenu
+	private Dossier mDisplayedDossier = null;                     // Which Dossier is displayed in the Pdf viewer fragment
+	private Bureau mDisplayedBureau = null;                       // Which Bureau is displayed in the Pdf viewer fragment
 
 	// <editor-fold desc="LifeCycle">
 
@@ -162,8 +162,6 @@ public class HierarchyListFragment extends Fragment {
 
 	@Override public void onDetach() {
 		super.onDetach();
-
-		// Reset the active callbacks interface.
 		mListener = null;
 	}
 
@@ -203,8 +201,6 @@ public class HierarchyListFragment extends Fragment {
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 			new BureauxLoadingTask().execute();
 		}
-
-		onBureauDataChanged();
 	}
 
 	private void onBureauClicked(int position) {
@@ -252,44 +248,16 @@ public class HierarchyListFragment extends Fragment {
 		mListener.onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
 	}
 
-	public void onBureauDataChanged() {
-		((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
+	// <editor-fold desc="Interface">
 
-		// if a bureau was previously selected, we have to notify the parent
-		// activity that the data has changed, so the activity remove the previously selected
-		// dossiers list and details
-		if (mListener != null)
-			mListener.onBureauListFragmentSelected(null);
-	}
-
-	public void onDossierDataChanged() {
-		((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
-
-		// if a bureau was previously selected, we have to notify the parent
-		// activity that the data has changed, so the activity remove the previously selected
-		// dossiers list and details
-//		if (mListener != null)
-//			mListener.onDossierListFragmentSelected(null);
-	}
-
-	/**
-	 * The parent activity must implement this interface.
-	 * Used to notify the activity on bureaux changes
-	 */
 	public interface HierarchyListFragmentListener {
-
-		/**
-		 * Called when the bureau identified by the id passed in parameter has been
-		 * selected by the user or when data changes (id will be null)
-		 *
-		 * @param id the bureau id or null if none is selected (data changed)
-		 */
-		void onBureauListFragmentSelected(@Nullable String id);
 
 		void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId);
 
 		void onDossierCheckedChanged(boolean checked);
 	}
+
+	// </editor-fold desc="Interface">
 
 	private class BureauxLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
 
@@ -458,8 +426,8 @@ public class HierarchyListFragment extends Fragment {
 			boolean isChecked = checkedDossiers.contains(dossier);
 
 			// Text
-			// FIXME : changement d'api avec toutes les actions..
 
+			// FIXME : changement d'api avec toutes les actions.
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(String.format("%s / %s", dossier.getType(), dossier.getSousType()));
 
 			// CheckBox
