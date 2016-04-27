@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import org.adullact.iparapheur.R;
@@ -71,8 +72,8 @@ public class HierarchyListFragment extends Fragment {
 	private View mBureauEmptyView;
 	private View mDossierEmptyView;
 
-	private List<Bureau> mBureauxList = new ArrayList<>();        // List of Bureau currently displayed in this Fragment
-	private List<Dossier> mDossiersList = new ArrayList<>();      // List of Bureau currently displayed in this Fragment
+	private List<Bureau> mBureauList = new ArrayList<>();         // List of Bureau currently displayed in this Fragment
+	private List<Dossier> mDossierList = new ArrayList<>();       // List of Dossier currently displayed in this Fragment
 	private Bureau mSelectedBureau = null;                        // The currently displayed submenu's Bureau
 	private Dossier mDisplayedDossier = null;                     // The currently displayed Dossier
 	private Bureau mDisplayedBureau = null;                       // The currently displayed Dossier's Bureau
@@ -134,7 +135,7 @@ public class HierarchyListFragment extends Fragment {
 
 		// Restore previous state, in case of rotation
 
-		if (mBureauxList.isEmpty()) {
+		if (mBureauList.isEmpty()) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 		}
@@ -155,7 +156,7 @@ public class HierarchyListFragment extends Fragment {
 	@Override public void onStart() {
 		super.onStart();
 
-		if (mBureauxList.isEmpty())
+		if (mBureauList.isEmpty())
 			updateBureaux(true);
 	}
 
@@ -195,9 +196,9 @@ public class HierarchyListFragment extends Fragment {
 
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload)
-			this.mBureauxList.clear();
+			this.mBureauList.clear();
 
-		if ((mBureauxList.isEmpty()) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
+		if ((mBureauList.isEmpty()) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 			new BureauxLoadingTask().execute();
@@ -212,7 +213,7 @@ public class HierarchyListFragment extends Fragment {
 		// We want to have a selected state only on the selected Dossier's Bureau.
 		// The bureau will be selected in #onDossierClicked
 
-		int displayedBureauPosition = mBureauxList.indexOf(mDisplayedBureau);
+		int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
 		mBureauListView.setItemChecked(displayedBureauPosition, true);
 
 		// Switching to Dossiers list
@@ -238,12 +239,12 @@ public class HierarchyListFragment extends Fragment {
 		// only on the selected Dossier's Bureau.
 
 		mDisplayedBureau = mSelectedBureau;
-		int displayedBureauPosition = mBureauxList.indexOf(mDisplayedBureau);
+		int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
 		mBureauListView.setItemChecked(displayedBureauPosition, true);
 
 		// Saving it in case of back and forth in menuing
 
-		mDisplayedDossier = mDossiersList.get(position);
+		mDisplayedDossier = mDossierList.get(position);
 
 		// Callback
 
@@ -290,95 +291,100 @@ public class HierarchyListFragment extends Fragment {
 		void onDossierCheckedChanged(boolean checked);
 	}
 
-	private class BureauxLoadingTask extends AsyncTask<Void, Void, Void> {
+	private class BureauxLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
 
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mBureauSwipeRefreshLayout.setRefreshing(true);
 		}
 
-		@Override protected Void doInBackground(Void... params) {
-			mBureauxList.clear();
+		@Override protected IParapheurException doInBackground(Void... params) {
+			mBureauList.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
-				try { mBureauxList.addAll(RESTClient.INSTANCE.getBureaux()); }
-				catch (final IParapheurException exception) { exception.printStackTrace(); }
+				try { mBureauList.addAll(RESTClient.INSTANCE.getBureaux()); }
+				catch (final IParapheurException exception) { return exception; }
 			}
 			else {
-				mBureauxList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
+				mBureauList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
 			}
+
 			return null;
 		}
 
-		@Override protected void onPostExecute(Void aVoid) {
-			super.onPostExecute(aVoid);
+		@Override protected void onPostExecute(IParapheurException exception) {
+			super.onPostExecute(exception);
 
 			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
 
 			// Retrieving previous state
 
-			int displayedBureauPosition = mBureauxList.indexOf(mDisplayedBureau);
+			int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
 			mBureauListView.setItemChecked(displayedBureauPosition, true);
 
 			// Refreshing views state
 
 			mBureauSwipeRefreshLayout.setRefreshing(false);
 
-			if (mBureauEmptyView.getVisibility() == View.VISIBLE)
+			if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty())
 				ViewUtils.crossfade(getActivity(), mBureauListView, mBureauEmptyView);
 
-			// TODO : error Toast
+			// Error management
 
-//			String message = activity.getString(exception.getResId());
-//			Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+			if (exception != null) {
+				String message = getString(exception.getResId());
+				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
-	private class DossiersLoadingTask extends AsyncTask<Void, Void, Void> {
+	private class DossiersLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
 
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mDossierSwipeRefreshLayout.setRefreshing(true);
 		}
 
-		@Override protected Void doInBackground(Void... params) {
-			mDossiersList.clear();
+		@Override protected IParapheurException doInBackground(Void... params) {
+			mDossierList.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
-				try { mDossiersList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
-				catch (IParapheurException e) { e.printStackTrace(); }
+				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
+				catch (IParapheurException exception) { return exception; }
 			}
 			else {
 				Dossier dossier1 = new Dossier(1);
 				Dossier dossier2 = new Dossier(2);
-				mDossiersList.add(dossier1);
-				mDossiersList.add(dossier2);
+				mDossierList.add(dossier1);
+				mDossierList.add(dossier2);
 			}
 
 			return null;
 		}
 
-		@Override protected void onPostExecute(Void aVoid) {
-			super.onPostExecute(aVoid);
+		@Override protected void onPostExecute(IParapheurException exception) {
+			super.onPostExecute(exception);
 
 			((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
 			// Retrieving previous state
 
-			int displayedDossierPosition = mDossiersList.indexOf(mDisplayedDossier);
+			int displayedDossierPosition = mDossierList.indexOf(mDisplayedDossier);
 			mDossierListView.setItemChecked(displayedDossierPosition, true);
 
 			// Refreshing views state
 
 			mDossierSwipeRefreshLayout.setRefreshing(false);
 
-			if (mDossierEmptyView.getVisibility() == View.VISIBLE)
+			if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty())
 				ViewUtils.crossfade(getActivity(), mDossierListView, mDossierEmptyView);
 
-			// TODO : error Toast
+			// Error management
 
-//			String message = activity.getString(exception.getResId());
-//			Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+			if (exception != null) {
+				String message = getString(exception.getResId());
+				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
@@ -420,19 +426,19 @@ public class HierarchyListFragment extends Fragment {
 		}
 
 		@Override public int getCount() {
-			return mBureauxList.size();
+			return mBureauList.size();
 		}
 
 		@Override public Bureau getItem(int position) {
-			return mBureauxList.get(position);
+			return mBureauList.get(position);
 		}
 
 		@Override public int getPosition(Bureau item) {
-			return mBureauxList.indexOf(item);
+			return mBureauList.indexOf(item);
 		}
 
 		@Override public boolean isEmpty() {
-			return mBureauxList.isEmpty();
+			return mBureauList.isEmpty();
 		}
 	}
 
@@ -448,7 +454,7 @@ public class HierarchyListFragment extends Fragment {
 
 		@Override public View getView(int position, View convertView, ViewGroup parent) {
 			final View cellView = super.getView(position, convertView, parent);
-			Dossier dossier = mDossiersList.get(position);
+			Dossier dossier = mDossierList.get(position);
 			boolean isChecked = checkedDossiers.contains(dossier);
 
 			// Text
@@ -460,7 +466,7 @@ public class HierarchyListFragment extends Fragment {
 
 			View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
 
-			if (mDossiersList.get(position).hasActions()) {
+			if (mDossierList.get(position).hasActions()) {
 				checkableLayout.setVisibility(View.VISIBLE);
 				checkableLayout.setTag(position);
 				checkableLayout.setOnClickListener(new View.OnClickListener() {
@@ -513,19 +519,19 @@ public class HierarchyListFragment extends Fragment {
 		}
 
 		@Override public int getCount() {
-			return mDossiersList.size();
+			return mDossierList.size();
 		}
 
 		@Override public Dossier getItem(int position) {
-			return mDossiersList.get(position);
+			return mDossierList.get(position);
 		}
 
 		@Override public int getPosition(Dossier item) {
-			return mDossiersList.indexOf(item);
+			return mDossierList.indexOf(item);
 		}
 
 		@Override public boolean isEmpty() {
-			return mDossiersList.isEmpty();
+			return mDossierList.isEmpty();
 		}
 
 		public void toggleSelection(View view) {
@@ -533,7 +539,7 @@ public class HierarchyListFragment extends Fragment {
 
 				// Toggle checked state, and animate
 
-				Dossier dossier = mDossiersList.get((Integer) view.getTag());
+				Dossier dossier = mDossierList.get((Integer) view.getTag());
 				View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
 				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector_container);
 
@@ -567,7 +573,7 @@ public class HierarchyListFragment extends Fragment {
 //				default:
 //					Integer position = (Integer) v.getTag();
 //					if (position != mSelectedDossier && !isRefreshing()) {
-//						listener.onDossierSelected(mDossiersList.get(position), mBureauId);
+//						listener.onDossierSelected(mDossierList.get(position), mBureauId);
 //						setActivatedPosition(position);
 //					}
 //					break;
