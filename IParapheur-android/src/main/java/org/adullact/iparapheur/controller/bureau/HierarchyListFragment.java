@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +68,7 @@ public class HierarchyListFragment extends Fragment {
 
 	private List<Bureau> mBureauxList = new ArrayList<>();        // List of Bureau currently displayed in this Fragment
 	private List<Dossier> mDossiersList = new ArrayList<>();      // List of Bureau currently displayed in this Fragment
-	private Bureau mSelectedBureau = null;                        // The currently submenu's Bureau
+	private Bureau mSelectedBureau = null;                        // The currently displayed submenu's Bureau
 	private Dossier mDisplayedDossier = null;                     // The currently displayed Dossier
 	private Bureau mDisplayedBureau = null;                       // The currently displayed Dossier's Bureau
 
@@ -128,6 +127,21 @@ public class HierarchyListFragment extends Fragment {
 		mDossierListView.setEmptyView(mDossierEmptyView);
 		mDossierListView.setAdapter(new DossierListAdapter(getActivity()));
 
+		// Restore previous state, in case of rotation
+
+		if (mBureauxList.isEmpty()) {
+			mBureauListView.setVisibility(View.INVISIBLE);
+			mBureauEmptyView.setVisibility(View.VISIBLE);
+		}
+		else {
+			mBureauListView.setVisibility(View.VISIBLE);
+			mBureauEmptyView.setVisibility(View.INVISIBLE);
+
+			if (mSelectedBureau != null) {
+				mViewSwitcher.setDisplayedChild(1);
+			}
+		}
+
 		//
 
 		return view;
@@ -136,8 +150,7 @@ public class HierarchyListFragment extends Fragment {
 	@Override public void onStart() {
 		super.onStart();
 
-		mBureauListView.setVisibility(View.INVISIBLE);
-		mBureauEmptyView.setVisibility(View.VISIBLE);
+		if (mBureauxList.isEmpty())
 		updateBureaux(true);
 	}
 
@@ -146,6 +159,31 @@ public class HierarchyListFragment extends Fragment {
 
 		// Reset the active callbacks interface.
 		mListener = null;
+	}
+
+	/**
+	 * Called manually from parent Activity.
+	 *
+	 * @return true if the event was consumed.
+	 */
+	public boolean onBackPressed() {
+
+		if (mViewSwitcher.getDisplayedChild() == 1) {
+
+			mViewSwitcher.setInAnimation(getActivity(), android.R.anim.slide_in_left);
+			mViewSwitcher.setOutAnimation(getActivity(), android.R.anim.slide_out_right);
+			mViewSwitcher.setDisplayedChild(0);
+
+			// Fore some reason, the bureau list view is empty on a ViewSwitcher flip
+			// Calling the adapter refresh fixes it...
+			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
+
+			mSelectedBureau = null;
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -226,24 +264,6 @@ public class HierarchyListFragment extends Fragment {
 		// dossiers list and details
 //		if (mListener != null)
 //			mListener.onDossierListFragmentSelected(null);
-	}
-
-	public boolean popBackStack() {
-
-		if (mViewSwitcher.getDisplayedChild() == 1) {
-			mViewSwitcher.setInAnimation(getActivity(), android.R.anim.slide_in_left);
-			mViewSwitcher.setOutAnimation(getActivity(), android.R.anim.slide_out_right);
-			mViewSwitcher.setDisplayedChild(0);
-
-			// Fore some reason, the bureau list view is empty on a ViewSwitcher flip
-			// Calling the adapter refresh fixes it...
-			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
-
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 
 	/**

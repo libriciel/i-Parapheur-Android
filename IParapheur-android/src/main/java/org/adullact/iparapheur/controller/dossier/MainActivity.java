@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 			HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null)
-				if (bureauxFragment.popBackStack())
+				if (bureauxFragment.onBackPressed())
 					return;
 		}
 
