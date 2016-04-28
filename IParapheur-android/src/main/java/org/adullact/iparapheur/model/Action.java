@@ -48,9 +48,9 @@ public enum Action implements Parcelable {
 	SUPPRESSION(R.string.action_supprimer, R.id.action_supprimer, -1, -1),
 	JOURNAL(R.string.action_journal, R.id.action_journal, -1, -1),
 	TRANSFERT_ACTION(R.string.action_transfert, R.id.action_avis, -1, -1), // TODO
-	GET_ATTEST(-1, -1, -1, -1), // TODO : WTF
 
 	//non implementées :
+	GET_ATTEST,
 	RAZ,
 	EDITION,
 	ENCHAINER_CIRCUIT;

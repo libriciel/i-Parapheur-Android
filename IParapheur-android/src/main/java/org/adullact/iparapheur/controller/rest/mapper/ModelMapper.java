@@ -39,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class ModelMapper {
 	protected static String DOSSIER_IS_SIGN_PAPIER = "isSignPapier";
 	protected static String DOSSIER_DOCUMENTS = "documents";
 	protected static String DOSSIER_CIRCUIT = "circuit";
+	protected static String DOSSIER_ACTIONS = "actions";
 
 	protected static String DOCUMENT_ID = "id";
 	protected static String DOCUMENT_NAME = "name";
@@ -95,10 +97,10 @@ public class ModelMapper {
 		if (dossierRef.contains("workspace://SpacesStore/")) {
 			dossierRef = dossierRef.substring("workspace://SpacesStore/".length());
 		}
-		ArrayList<Action> actions = getActionsForDossier(jsonObject);
+		HashSet<Action> actions = getActionsForDossier(jsonObject);
 		Dossier dossier = new Dossier(dossierRef,
 									  jsonObject.optString("titre"),
-									  Action.valueOf(jsonObject.optString("actionDemandee", "VISA")),
+									  Action.valueOf(jsonObject.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
 									  actions,
 									  jsonObject.optString("type"),
 									  jsonObject.optString("sousType"),
@@ -130,15 +132,15 @@ public class ModelMapper {
 		return dossier;
 	}
 
-	protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
-		ArrayList<Action> actions = new ArrayList<>();
+	protected HashSet<Action> getActionsForDossier(JSONObject dossier) {
+		HashSet<Action> actions = new HashSet<>();
 		boolean isActeurCourant = dossier.optBoolean("isActeurCourant", false);
 		if (isActeurCourant) {
 			actions.add(Action.EMAIL);
 			actions.add(Action.JOURNAL);
 			actions.add(Action.ENREGISTRER);
 		}
-		JSONObject returnedActions = dossier.optJSONObject("actions");
+		JSONObject returnedActions = dossier.optJSONObject(DOSSIER_ACTIONS);
 		String actionDemandee = dossier.optString("actionDemandee");
 		if (returnedActions != null) {
 			Iterator actionsIterator = returnedActions.keys();

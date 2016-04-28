@@ -42,11 +42,13 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -74,9 +76,10 @@ public class HierarchyListFragment extends Fragment {
 	private HierarchyListFragmentListener mListener;
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
-	private Bureau mSelectedBureau = null;                        // Which Bureau is displayed in the submenu
-	private Dossier mDisplayedDossier = null;                     // Which Dossier is displayed in the Pdf viewer fragment
-	private Bureau mDisplayedBureau = null;                       // Which Bureau is displayed in the Pdf viewer fragment
+	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
+	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
+	private Dossier mDisplayedDossier = null;                       // Which Dossier is displayed in the Pdf viewer fragment
+	private Bureau mDisplayedBureau = null;                         // Which Bureau is displayed in the Pdf viewer fragment
 	private AsyncTask<Void, ?, ?> mPendingAsyncTask = null;
 
 	// <editor-fold desc="LifeCycle">
@@ -196,6 +199,10 @@ public class HierarchyListFragment extends Fragment {
 
 	// </editor-fold desc="LifeCycle">
 
+	public HashSet<Dossier> getCheckedDossiers() {
+		return mCheckedDossiers;
+	}
+
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload)
 			this.mBureauList.clear();
@@ -267,7 +274,7 @@ public class HierarchyListFragment extends Fragment {
 
 		void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId);
 
-		void onDossierCheckedChanged(boolean checked);
+		void onDossierCheckedChanged(boolean forceClose);
 	}
 
 	// </editor-fold desc="Interface">
@@ -339,8 +346,8 @@ public class HierarchyListFragment extends Fragment {
 				catch (IParapheurException exception) { return exception; }
 			}
 			else {
-				Dossier dossier1 = new Dossier(1);
-				Dossier dossier2 = new Dossier(2);
+				Dossier dossier1 = new Dossier("1", "Test 01", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
+				Dossier dossier2 = new Dossier("2", "Test 02", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
 				mDossierList.add(dossier1);
 				mDossierList.add(dossier2);
 			}
@@ -434,18 +441,15 @@ public class HierarchyListFragment extends Fragment {
 
 	private class DossierListAdapter extends ArrayAdapter<Dossier> {
 
-		private HashSet<Dossier> checkedDossiers;
-
 		public DossierListAdapter(Context context) {
 			super(context, R.layout.dossiers_list_cell, R.id.dossiers_list_item_title);
-//			this.listener = listener;
-			this.checkedDossiers = new HashSet<>();
 		}
 
 		@Override public View getView(int position, View convertView, ViewGroup parent) {
+
 			final View cellView = super.getView(position, convertView, parent);
 			Dossier dossier = mDossierList.get(position);
-			boolean isChecked = checkedDossiers.contains(dossier);
+			boolean isChecked = mCheckedDossiers.contains(dossier);
 
 			// Text
 
@@ -525,59 +529,37 @@ public class HierarchyListFragment extends Fragment {
 		}
 
 		public void toggleSelection(View view) {
-			if (!mDossierSwipeRefreshLayout.isRefreshing()) {
 
-				// Toggle checked state, and animate
+			if (mDossierSwipeRefreshLayout.isRefreshing())
+				return;
 
-				Dossier dossier = mDossierList.get((Integer) view.getTag());
-				View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
-				View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector_container);
+			// Toggle checked state, and animate
 
-				if (checkedDossiers.contains(dossier)) {
-					checkedDossiers.remove(dossier);
+			Dossier dossier = mDossierList.get((Integer) view.getTag());
+			View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
+			View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector_container);
 
-					// We call the checkedListener with a delay,
-					// because the ActionMode cancelling calls an invalidate that breaks the animations
-					ViewUtils.flip(getActivity(), selectorView, mainView, new Animator.AnimatorListener() {
+			if (mCheckedDossiers.contains(dossier)) {
+				mCheckedDossiers.remove(dossier);
 
-						@Override public void onAnimationStart(Animator animator) { }
+				// We call the checkedListener with a delay,
+				// because the ActionMode cancelling calls an invalidate that breaks the animations
+				ViewUtils.flip(getActivity(), selectorView, mainView, new Animator.AnimatorListener() {
 
-						@Override public void onAnimationEnd(Animator animator) { mListener.onDossierCheckedChanged(false); }
+					@Override public void onAnimationStart(Animator animator) { }
 
-						@Override public void onAnimationCancel(Animator animator) { }
+					@Override public void onAnimationEnd(Animator animator) { mListener.onDossierCheckedChanged(mCheckedDossiers.isEmpty()); }
 
-						@Override public void onAnimationRepeat(Animator animator) { }
-					});
-				}
-				else {
-					checkedDossiers.add(dossier);
-					ViewUtils.flip(getActivity(), mainView, selectorView, null);
-					mListener.onDossierCheckedChanged(false);
-				}
-		}
-		}
+					@Override public void onAnimationCancel(Animator animator) { }
 
-//		@Override public void onClick(View v) {
-//
-//			switch (v.getId()) {
-//				default:
-//					Integer position = (Integer) v.getTag();
-//					if (position != mSelectedDossier && !isRefreshing()) {
-//						listener.onDossierSelected(mDossierList.get(position), mBureauId);
-//						setActivatedPosition(position);
-//					}
-//					break;
-//			}
-//		}
-
-		public void clearSelection() {
-			checkedDossiers.clear();
-			notifyDataSetChanged();
-	}
-
-		public HashSet<Dossier> getCheckedDossiers() {
-			return checkedDossiers;
+					@Override public void onAnimationRepeat(Animator animator) { }
+				});
+			}
+			else {
+				mCheckedDossiers.add(dossier);
+				ViewUtils.flip(getActivity(), mainView, selectorView, null);
+				mListener.onDossierCheckedChanged(mCheckedDossiers.isEmpty());
+			}
 		}
 	}
-
 }

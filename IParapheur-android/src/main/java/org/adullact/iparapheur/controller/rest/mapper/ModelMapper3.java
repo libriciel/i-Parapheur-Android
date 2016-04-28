@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 
@@ -67,12 +68,28 @@ public class ModelMapper3 extends ModelMapper {
 
 		JsonExplorer jsonExplorer = new JsonExplorer(jsonObject);
 		String dossierId = jsonExplorer.optString(DOSSIER_ID);
-		ArrayList<Action> actions = getActionsForDossier(jsonObject);
+		HashSet<Action> actions = getActionsForDossier(jsonObject);
+		Action actionDemandée = Action.valueOf(jsonExplorer.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString()));
+
+		// Patching weird Signature case :
+		// "actionDemandee" can have any "actions" value...
+		// ... Except when "actionDemandee=SIGNATURE", where "actions" only contains VISA, for some reason
+		// A SIGNATURE action is acceptable in VISA too...
+
+		if (actionDemandée == Action.SIGNATURE) {
+			actions.remove(Action.VISA);
+			actions.add(Action.SIGNATURE);
+		}
+
+		if (actionDemandée == Action.VISA)
+			actions.add(Action.SIGNATURE);
+
+		// Actions patch end
 
 		Dossier dossier = new Dossier(
 				jsonExplorer.optString(DOSSIER_ID, ""),
 				jsonExplorer.optString(DOSSIER_TITLE, ""),
-				Action.valueOf(jsonExplorer.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
+				actionDemandée,
 				actions,
 				jsonExplorer.optString(DOSSIER_TYPE, ""),
 				jsonExplorer.optString(DOSSIER_SUBTYPE, ""),
@@ -83,7 +100,9 @@ public class ModelMapper3 extends ModelMapper {
 
 		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_DOCUMENTS).getCurrentArraySize(); index++) {
 			JsonObject doc = jsonExplorer.findArray(DOSSIER_DOCUMENTS).find(index).optCurrentJsonObject();
-			dossier.addDocument(parseDocument(doc, dossierId, index));
+
+			if (dossierId != null)
+				dossier.addDocument(parseDocument(doc, dossierId, index));
 		}
 
 		return dossier;
@@ -111,14 +130,14 @@ public class ModelMapper3 extends ModelMapper {
 		);
 	}
 
-	@Override protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
+	@Override protected HashSet<Action> getActionsForDossier(JSONObject dossier) {
 		JsonObject actionsJsonObject = new JsonExplorer(dossier).optCurrentJsonObject();
 		return getActionsForDossier(actionsJsonObject);
 	}
 
-	protected ArrayList<Action> getActionsForDossier(JsonObject dossier) {
+	protected HashSet<Action> getActionsForDossier(JsonObject dossier) {
 
-		ArrayList<Action> actions = new ArrayList<>();
+		HashSet<Action> actions = new HashSet<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(dossier);
 
 		for (int index = 0; index < jsonExplorer.findArray("actions").getCurrentArraySize(); index++) {

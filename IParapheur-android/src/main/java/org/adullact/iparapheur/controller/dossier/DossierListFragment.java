@@ -47,6 +47,7 @@ import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
@@ -54,6 +55,7 @@ import org.adullact.iparapheur.utils.SwipeRefreshListFragment;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -529,8 +531,9 @@ public class DossierListFragment extends SwipeRefreshListFragment implements Loa
 			}
 			else {
 				mDossiersList = new ArrayList<>();
-				Dossier dossier1 = new Dossier(1);
-				Dossier dossier2 = new Dossier(2);
+
+				Dossier dossier1 = new Dossier("01", "Test 01", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
+				Dossier dossier2 = new Dossier("02", "Test 01", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
 				mDossiersList.add(dossier1);
 				mDossiersList.add(dossier2);
 			}

@@ -103,9 +103,9 @@ import java.util.Set;
  * {@link DossierListFragment.DossierListFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements DossierListFragment.DossierListFragmentListener,
-		HierarchyListFragment.HierarchyListFragmentListener, AccountListFragment.AccountFragmentListener, AdapterView.OnItemSelectedListener,
-		LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements HierarchyListFragment.HierarchyListFragmentListener, AccountListFragment.AccountFragmentListener,
+		AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback,
+		DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 
 	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		HierarchyListFragment fragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 
 		// Default cases
 
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 		boolean sign = false;
 		for (Dossier dossier : checkedDossiers) {
 			actions.retainAll(dossier.getActions());
-			sign = sign || (dossier.getActions().contains(Action.SIGNATURE) && !dossier.isSignPapier());
+			sign = sign || (dossier.getActionDemandee() == Action.SIGNATURE) && !dossier.isSignPapier();
 		}
 
 		// Compute visibility
@@ -462,8 +462,7 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			int menuItemId;
 			String menuTitle;
 
-			// Si c'est le visa, et qu'on a aussi de la signature dans le lot, on prend
-			// la signature (possible en API v3).
+			// If we have a mixed set of VISA and SIGNATURE, then we have a general SIGNATURE
 			if (action.equals(Action.VISA) && (sign)) {
 				menuItemId = Action.SIGNATURE.getMenuItemId();
 				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
@@ -698,6 +697,14 @@ public class MainActivity extends AppCompatActivity implements DossierListFragme
 			fragment.showProgressLayout();
 			fragment.update(dossier, bureauId);
 		}
+	}
+
+	@Override public void onDossierCheckedChanged(boolean forceClose) {
+
+		if (mActionMode != null)
+			mActionMode.invalidate();
+		else if (!forceClose)
+			mActionMode = startSupportActionMode(this);
 	}
 
 	// </editor-fold desc="BureauListFragmentListener">
