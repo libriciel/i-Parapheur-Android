@@ -192,10 +192,9 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 		transaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
 		transaction.commit();
 
-		//
+		// Right menu Fragment restore
 
-		Fragment fragmentToDisplay = getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-
+		HierarchyListFragment fragmentToDisplay = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 		if (fragmentToDisplay == null)
 			fragmentToDisplay = new HierarchyListFragment();
 
@@ -258,6 +257,18 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
 			editor.apply();
+		}
+
+		// Restoring proper Drawer state on selected dossiers
+
+		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
+			mActionMode = startSupportActionMode(this);
+
+			if (isDeviceInPortrait)
+				mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+			else
+				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 		}
 	}
 
@@ -490,23 +501,17 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-		HierarchyListFragment dossierListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-		return (dossierListFragment != null) && onActionItemChecked(menuItem, dossierListFragment.getCheckedDossiers());
-	}
-
-	private boolean onActionItemChecked(MenuItem menuItem, HashSet<Dossier> dossiers) {
 		HierarchyListFragment hierarchyListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-
-		if (hierarchyListFragment != null) {
+		if (hierarchyListFragment == null)
+			return false;
 
 			Bureau bureau = hierarchyListFragment.getSelectedBureau();
 			Action invokedAction = Action.fromId(menuItem.getItemId());
 
 			if ((invokedAction != null) && (bureau != null))
-				launchActionPopup(dossiers, bureau.getId(), invokedAction);
-		}
+			launchActionPopup(hierarchyListFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
 
-		return false;
+		return true;
 	}
 
 	@Override public void onDestroyActionMode(ActionMode actionMode) {
@@ -686,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	// </editor-fold desc="AccountFragmentListener">
 
-	// <editor-fold desc="BureauListFragmentListener">
+	// <editor-fold desc="HierarchyListFragment">
 
 	@Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
 
@@ -708,7 +713,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 			mActionMode = startSupportActionMode(this);
 	}
 
-	// </editor-fold desc="BureauListFragmentListener">
+	// </editor-fold desc="HierarchyListFragment">
 
 	// <editor-fold desc="FilterDialogListener">
 
