@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -116,35 +117,58 @@ public class HierarchyListFragment extends Fragment {
 
 		// Setting up listeners, etc
 
+		mBureauSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
 		mBureauSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override public void onRefresh() {
 				executeAsyncTask(new BureauxLoadingTask());
 			}
 		});
-		mBureauSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
+
+		mBureauListView.setEmptyView(mBureauEmptyView);
+		mBureauListView.setAdapter(new BureauListAdapter(getActivity()));
 		mBureauListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				onBureauClicked(position);
 			}
 		});
-		mBureauListView.setEmptyView(mBureauEmptyView);
-		mBureauListView.setAdapter(new BureauListAdapter(getActivity()));
+		mBureauListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
-		mDossierSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-			@Override public void onRefresh() {
-				if (mSelectedBureau != null) {
-					executeAsyncTask(new DossiersLoadingTask());
-				}
+			@Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
+
+			@Override public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				int topRowVerticalPosition = (mBureauListView.getChildCount() == 0) ? 0 : mBureauListView.getChildAt(0).getTop();
+				boolean onTop = (firstVisibleItem == 0) && (topRowVerticalPosition >= 0);
+				boolean isDisabled = mBureauEmptyView.getVisibility() == View.VISIBLE;
+				mBureauSwipeRefreshLayout.setEnabled(isDisabled || onTop);
 			}
 		});
+
 		mDossierSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
+		mDossierSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override public void onRefresh() {
+				if (mSelectedBureau != null)
+					executeAsyncTask(new DossiersLoadingTask());
+			}
+		});
+
+		mDossierListView.setEmptyView(mDossierEmptyView);
+		mDossierListView.setAdapter(new DossierListAdapter(getActivity()));
 		mDossierListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				onDossierClicked(position);
 			}
 		});
-		mDossierListView.setEmptyView(mDossierEmptyView);
-		mDossierListView.setAdapter(new DossierListAdapter(getActivity()));
+		mDossierListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+			@Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
+
+			@Override public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+				int topRowVerticalPosition = (mDossierListView.getChildCount() == 0) ? 0 : mDossierListView.getChildAt(0).getTop();
+				boolean onTop = (firstVisibleItem == 0) && (topRowVerticalPosition >= 0);
+				boolean isDisabled = mDossierEmptyView.getVisibility() == View.VISIBLE;
+				mDossierSwipeRefreshLayout.setEnabled(isDisabled || onTop);
+			}
+		});
 
 		// Restore previous state, in case of rotation
 
