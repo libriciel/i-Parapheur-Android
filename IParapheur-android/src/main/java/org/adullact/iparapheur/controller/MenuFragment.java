@@ -15,7 +15,7 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
-package org.adullact.iparapheur.controller.bureau;
+package org.adullact.iparapheur.controller;
 
 import android.animation.Animator;
 import android.app.Activity;
@@ -67,9 +67,9 @@ import java.util.UUID;
  * Both lists are pretty much the same, but some actions on the {@link Dossier} needs to be helded by the parent list.
  * That's a mess with two separate {@link Fragment}s, that's why we have an easiest {@link ViewSwitcher}.
  */
-public class HierarchyListFragment extends Fragment {
+public class MenuFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "hierarchy_list_fragment";
+	public static final String FRAGMENT_TAG = "menu_fragment";
 
 	// Views
 	private ViewSwitcher mViewSwitcher;
@@ -81,7 +81,7 @@ public class HierarchyListFragment extends Fragment {
 	private View mDossierEmptyView;
 
 	// Data
-	private HierarchyListFragmentListener mListener;
+	private MenuFragmentListener mListener;
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
 	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
@@ -96,24 +96,24 @@ public class HierarchyListFragment extends Fragment {
 		super.onAttach(context);
 
 		// Activities containing this fragment must implement its callbacks.
-		if (!(context instanceof HierarchyListFragmentListener))
+		if (!(context instanceof MenuFragmentListener))
 			throw new IllegalStateException("Activity must implement BureauSelectedListener.");
 
-		mListener = (HierarchyListFragmentListener) context;
+		mListener = (MenuFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.hierarchy_list_fragment, container, false);
+		View view = inflater.inflate(R.layout.menu_fragment, container, false);
 
 		// Retrieve Views
 
-		mViewSwitcher = (ViewSwitcher) view.findViewById(R.id.hierarchy_viewswitcher);
-		mBureauSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.hierarchy_bureaux_swiperefreshlayout);
-		mDossierSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.hierarchy_dossier_swiperefreshlayout);
-		mBureauListView = (ListView) view.findViewById(R.id.hierarchy_bureaux_listview);
-		mDossierListView = (ListView) view.findViewById(R.id.hierarchy_dossier_listview);
-		mBureauEmptyView = view.findViewById(R.id.hierarchy_bureaux_empty);
-		mDossierEmptyView = view.findViewById(R.id.hierarchy_dossier_empty);
+		mViewSwitcher = (ViewSwitcher) view.findViewById(R.id.menu_fragment_viewswitcher);
+		mBureauSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.menu_fragment_bureaux_swiperefreshlayout);
+		mDossierSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.menu_fragment_dossiers_swiperefreshlayout);
+		mBureauListView = (ListView) view.findViewById(R.id.menu_fragment_bureaux_listview);
+		mDossierListView = (ListView) view.findViewById(R.id.menu_fragment_dossier_listview);
+		mBureauEmptyView = view.findViewById(R.id.menu_fragment_bureaux_empty);
+		mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
 
 		// Setting up listeners, etc
 
@@ -349,7 +349,7 @@ public class HierarchyListFragment extends Fragment {
 
 	// <editor-fold desc="Interface">
 
-	public interface HierarchyListFragmentListener {
+	public interface MenuFragmentListener {
 
 		void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId);
 

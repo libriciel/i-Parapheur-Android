@@ -15,7 +15,7 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
-package org.adullact.iparapheur.controller.dossier;
+package org.adullact.iparapheur.controller;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -55,10 +55,9 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.account.MyAccounts;
-import org.adullact.iparapheur.controller.bureau.HierarchyListFragment;
+import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
@@ -81,7 +80,6 @@ import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.LoadingTask;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,16 +95,15 @@ import java.util.Set;
  * item details side-by-side using two vertical panes.
  * <p/>
  * The activity makes heavy use of fragments. The list of items is a
- * {@link DossierListFragment} and the item details
+ * {@link MenuFragment} and the item details
  * is a {@link DossierDetailFragment}.
  * <p/>
  * This activity also implements the required
- * {@link DossierListFragment.DossierListFragmentListener} interface
+ * {@link MenuFragment.MenuFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements HierarchyListFragment.HierarchyListFragmentListener, AccountListFragment.AccountFragmentListener,
-		AdapterView.OnItemSelectedListener, LoadingTask.DataChangeListener, FilterDialog.FilterDialogListener, ActionMode.Callback,
-		DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountFragmentListener,
+		AdapterView.OnItemSelectedListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -194,15 +191,15 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 		// Right menu Fragment restore
 
-		HierarchyListFragment fragmentToDisplay = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		MenuFragment fragmentToDisplay = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (fragmentToDisplay == null)
-			fragmentToDisplay = new HierarchyListFragment();
+			fragmentToDisplay = new MenuFragment();
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
 		fragmentToDisplay.setRetainInstance(true);
 		if (findViewById(R.id.left_fragment) != null)
-			replaceLeftFragment(fragmentToDisplay, HierarchyListFragment.FRAGMENT_TAG, false);
+			replaceLeftFragment(fragmentToDisplay, MenuFragment.FRAGMENT_TAG, false);
 
 		// Selecting the first account by default, the demo one
 
@@ -261,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 		// Restoring proper Drawer state on selected dossiers
 
-		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
 			mActionMode = startSupportActionMode(this);
 
@@ -299,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 			// First, try to pop backStack (and open the drawer to show it)
 
-			HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+			MenuFragment bureauxFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null) {
 				if (bureauxFragment.onBackPressed()) {
 
@@ -328,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 			// Then, try to pop backstack
 
-			HierarchyListFragment bureauxFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+			MenuFragment bureauxFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null)
 				if (bureauxFragment.onBackPressed())
 					return;
@@ -362,8 +359,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 		// Show or hide specific menu actions depending on displayed fragment
 
-		Fragment dossierFragment = getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
-		mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
+		// TODO mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
 
 		// Show or hide specific menu actions depending on Drawer state.
 
@@ -404,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 			Filter filter = mFilterAdapter.getItem(position);
 			if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
 				MyFilters.INSTANCE.selectFilter(filter);
-				onDataChanged();
+				// TODO onDataChanged();
 			}
 		}
 		else {
@@ -439,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 
-		HierarchyListFragment fragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		MenuFragment fragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 
 		// Default cases
 
@@ -501,22 +497,22 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-		HierarchyListFragment hierarchyListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-		if (hierarchyListFragment == null)
+		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		if (menuFragment == null)
 			return false;
 
-			Bureau bureau = hierarchyListFragment.getSelectedBureau();
-			Action invokedAction = Action.fromId(menuItem.getItemId());
+		Bureau bureau = menuFragment.getSelectedBureau();
+		Action invokedAction = Action.fromId(menuItem.getItemId());
 
-			if ((invokedAction != null) && (bureau != null))
-			launchActionPopup(hierarchyListFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
+		if ((invokedAction != null) && (bureau != null))
+			launchActionPopup(menuFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
 
 		return true;
 	}
 
 	@Override public void onDestroyActionMode(ActionMode actionMode) {
 
-		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (menuFragment != null)
 			menuFragment.clearCheckSelection();
 
@@ -624,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
-		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		DialogFragment actionDialog;
 		ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
 
@@ -676,10 +672,10 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 		// We'll want to pop the BackStack to get on the Bureau list
 		// Then , we just update the Bureau with the accurate Account
 
-		HierarchyListFragment hierarchyListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
-		if (hierarchyListFragment != null) {
-			hierarchyListFragment.onBackPressed();
-			hierarchyListFragment.updateBureaux(true);
+		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		if (menuFragment != null) {
+			menuFragment.onBackPressed();
+			menuFragment.updateBureaux(true);
 		}
 	}
 
@@ -691,7 +687,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	// </editor-fold desc="AccountFragmentListener">
 
-	// <editor-fold desc="HierarchyListFragment">
+	// <editor-fold desc="MenuFragment">
 
 	@Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
 
@@ -713,7 +709,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 			mActionMode = startSupportActionMode(this);
 	}
 
-	// </editor-fold desc="HierarchyListFragment">
+	// </editor-fold desc="MenuFragment">
 
 	// <editor-fold desc="FilterDialogListener">
 
@@ -724,7 +720,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter), true);
 
 		mFilterAdapter.notifyDataSetChanged();
-		onDataChanged();
+		// TODO onDataChanged();
 	}
 
 	public void onFilterChange(@NonNull Filter filter) {
@@ -732,65 +728,16 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter));
 
 		MyFilters.INSTANCE.selectFilter(filter);
-		onDataChanged();
+		// TODO onDataChanged();
 	}
 
 	public void onFilterCancel() {
 		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
 	}
 
-	/**
-	 * Called when an action is done on a dossier. We have to force reload dossier list and
-	 * dismiss details.
-	 */
-	@Override public void onDataChanged() {
-		DossierListFragment listFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
-		if (listFragment != null) {
-			// this method will reload dossiers fragments
-			listFragment.reload();
-		}
-
-		onDossierSelected(null, null);
-		invalidateOptionsMenu();
-	}
-
 	// </editor-fold desc="FilterDialogListener">
 
 	// <editor-fold desc="DossierListFragmentListener">
-
-	@Override public void onDossierSelected(@Nullable Dossier dossier, @Nullable String bureauId) {
-
-		if (dossier != null)
-			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
-				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-
-		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		if ((fragment != null) && (dossier != null) && (bureauId != null)) {
-			fragment.showProgressLayout();
-			fragment.update(dossier, bureauId);
-		}
-	}
-
-	@Override public void onDossierCheckedChanged(boolean forceClose) {
-		if (mActionMode != null)
-			mActionMode.invalidate();
-		else if (!forceClose)
-			mActionMode = startSupportActionMode(this);
-	}
-
-	@Override public void onDossiersLoaded(int size) {
-		onDossierSelected(null, null);
-
-		if (mFilterAdapter == null)
-			mFilterAdapter = new FilterAdapter(this);
-
-		mFiltersSpinner.setAdapter(mFilterAdapter);
-		mFiltersSpinner.setVisibility(View.VISIBLE);
-	}
-
-	@Override public void onDossiersNotLoaded() {
-		mFiltersSpinner.setVisibility(View.INVISIBLE);
-	}
 
 	// </editor-fold desc="DossierListFragmentListener">
 

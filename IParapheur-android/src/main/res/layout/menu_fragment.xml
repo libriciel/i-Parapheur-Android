@@ -6,12 +6,12 @@
     android:background="@android:color/background_light">
 
     <ViewSwitcher
-        android:id="@+id/hierarchy_viewswitcher"
+        android:id="@+id/menu_fragment_viewswitcher"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/hierarchy_bureaux_swiperefreshlayout"
+            android:id="@+id/menu_fragment_bureaux_swiperefreshlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/background_light">
@@ -21,14 +21,14 @@
                 android:layout_height="match_parent">
 
                 <ListView
-                    android:id="@+id/hierarchy_bureaux_listview"
+                    android:id="@+id/menu_fragment_bureaux_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
                     android:divider="@android:color/background_light" />
 
                 <LinearLayout
-                    android:id="@+id/hierarchy_bureaux_empty"
+                    android:id="@+id/menu_fragment_bureaux_empty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clickable="true"
@@ -60,7 +60,7 @@
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/hierarchy_dossier_swiperefreshlayout"
+            android:id="@+id/menu_fragment_dossiers_swiperefreshlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/background_light">
@@ -70,14 +70,14 @@
                 android:layout_height="match_parent">
 
                 <ListView
-                    android:id="@+id/hierarchy_dossier_listview"
+                    android:id="@+id/menu_fragment_dossier_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
                     android:divider="@android:color/background_light" />
 
                 <LinearLayout
-                    android:id="@+id/hierarchy_dossier_empty"
+                    android:id="@+id/menu_fragment_dossier_empty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clickable="true"
