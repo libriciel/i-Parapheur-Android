@@ -316,6 +316,11 @@ public class HierarchyListFragment extends Fragment {
 
 	public void onDossierClicked(int position) {
 
+		// Reselect filter
+
+		if (mDossierList.get(position) == mDisplayedDossier)
+			return;
+
 		// Refreshing Bureau list, to have a selected state
 		// only on the selected Dossier's Bureau.
 
