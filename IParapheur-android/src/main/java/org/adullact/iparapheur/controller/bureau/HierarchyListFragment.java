@@ -77,6 +77,7 @@ public class HierarchyListFragment extends Fragment {
 	private Bureau mSelectedBureau = null;                        // Which Bureau is displayed in the submenu
 	private Dossier mDisplayedDossier = null;                     // Which Dossier is displayed in the Pdf viewer fragment
 	private Bureau mDisplayedBureau = null;                       // Which Bureau is displayed in the Pdf viewer fragment
+	private AsyncTask<Void, ?, ?> mPendingAsyncTask = null;
 
 	// <editor-fold desc="LifeCycle">
 
@@ -107,7 +108,7 @@ public class HierarchyListFragment extends Fragment {
 
 		mBureauSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override public void onRefresh() {
-				new BureauxLoadingTask().execute();
+				executeAsyncTask(new BureauxLoadingTask());
 			}
 		});
 		mBureauSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
@@ -121,7 +122,9 @@ public class HierarchyListFragment extends Fragment {
 
 		mDossierSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override public void onRefresh() {
-				new DossiersLoadingTask().execute();
+				if (mSelectedBureau != null) {
+					executeAsyncTask(new DossiersLoadingTask());
+				}
 			}
 		});
 		mDossierSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
@@ -183,6 +186,7 @@ public class HierarchyListFragment extends Fragment {
 			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
 
 			mSelectedBureau = null;
+
 			return true;
 		}
 		else {
@@ -199,7 +203,7 @@ public class HierarchyListFragment extends Fragment {
 		if ((mBureauList.isEmpty()) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
-			new BureauxLoadingTask().execute();
+			executeAsyncTask(new BureauxLoadingTask());
 		}
 	}
 
@@ -218,7 +222,7 @@ public class HierarchyListFragment extends Fragment {
 
 		if (bureauClicked != null) {
 			mSelectedBureau = bureauClicked;
-			new DossiersLoadingTask().execute();
+			executeAsyncTask(new DossiersLoadingTask());
 
 			mViewSwitcher.setInAnimation(getActivity(), R.anim.slide_in_right);
 			mViewSwitcher.setOutAnimation(getActivity(), R.anim.slide_out_left);
@@ -246,6 +250,15 @@ public class HierarchyListFragment extends Fragment {
 
 		Dossier selectedDossier = ((DossierListAdapter) mDossierListView.getAdapter()).getItem(position);
 		mListener.onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
+	}
+
+	private void executeAsyncTask(@NonNull AsyncTask<Void, ?, ?> task) {
+
+		if (mPendingAsyncTask != null)
+			mPendingAsyncTask.cancel(false);
+
+		mPendingAsyncTask = task;
+		mPendingAsyncTask.execute();
 	}
 
 	// <editor-fold desc="Interface">
@@ -282,6 +295,11 @@ public class HierarchyListFragment extends Fragment {
 
 		@Override protected void onPostExecute(IParapheurException exception) {
 			super.onPostExecute(exception);
+
+			mPendingAsyncTask = null;
+
+			if (isCancelled())
+				return;
 
 			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
 
@@ -332,6 +350,10 @@ public class HierarchyListFragment extends Fragment {
 
 		@Override protected void onPostExecute(IParapheurException exception) {
 			super.onPostExecute(exception);
+
+			mPendingAsyncTask = null;
+			if (isCancelled())
+				return;
 
 			((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
@@ -532,7 +554,7 @@ public class HierarchyListFragment extends Fragment {
 					ViewUtils.flip(getActivity(), mainView, selectorView, null);
 					mListener.onDossierCheckedChanged(false);
 				}
-			}
+		}
 		}
 
 //		@Override public void onClick(View v) {
@@ -551,7 +573,7 @@ public class HierarchyListFragment extends Fragment {
 		public void clearSelection() {
 			checkedDossiers.clear();
 			notifyDataSetChanged();
-		}
+	}
 
 		public HashSet<Dossier> getCheckedDossiers() {
 			return checkedDossiers;
