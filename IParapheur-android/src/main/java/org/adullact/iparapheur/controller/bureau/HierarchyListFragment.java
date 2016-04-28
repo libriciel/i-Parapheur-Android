@@ -272,6 +272,11 @@ public class HierarchyListFragment extends Fragment {
 		return mCheckedDossiers;
 	}
 
+	public void clearCheckSelection() {
+		mCheckedDossiers.clear();
+		((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+	}
+
 	public void updateBureaux(boolean forceReload) {
 		if (forceReload)
 			this.mBureauList.clear();

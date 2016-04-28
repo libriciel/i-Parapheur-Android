@@ -515,10 +515,10 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 	}
 
 	@Override public void onDestroyActionMode(ActionMode actionMode) {
-		DossierListFragment fragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
 
-		if (fragment != null)
-			fragment.clearSelection();
+		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
+		if (menuFragment != null)
+			menuFragment.clearCheckSelection();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
