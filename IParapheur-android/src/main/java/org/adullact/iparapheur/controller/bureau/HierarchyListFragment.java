@@ -18,9 +18,13 @@
 package org.adullact.iparapheur.controller.bureau;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,6 +42,9 @@ import android.widget.ViewSwitcher;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
@@ -159,6 +166,40 @@ public class HierarchyListFragment extends Fragment {
 		return view;
 	}
 
+	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		// In case of signature/visa/etc, let's give a few seconds to the server
+		// and refresh the content.
+
+		switch (requestCode) {
+
+			case VisaDialogFragment.REQUEST_CODE_VISA:
+			case RejectDialogFragment.REQUEST_CODE_REJECT:
+			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
+			default:
+
+				if ((resultCode == Activity.RESULT_OK) || (resultCode == SignatureDialogFragment.RESULT_CODE_SIGN_PAPIER)) {
+
+					new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+						public void run() {
+
+							mCheckedDossiers.clear();
+							((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+
+							executeAsyncTask(new DossiersLoadingTask());
+
+							if (mListener != null)
+								mListener.onDossierCheckedChanged(true);
+						}
+					}, 1500L);
+				}
+
+				break;
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
 	@Override public void onStart() {
 		super.onStart();
 
@@ -198,6 +239,10 @@ public class HierarchyListFragment extends Fragment {
 	}
 
 	// </editor-fold desc="LifeCycle">
+
+	public Bureau getSelectedBureau() {
+		return mSelectedBureau;
+	}
 
 	public HashSet<Dossier> getCheckedDossiers() {
 		return mCheckedDossiers;

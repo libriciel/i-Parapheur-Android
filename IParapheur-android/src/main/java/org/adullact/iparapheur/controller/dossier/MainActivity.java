@@ -74,6 +74,7 @@ import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.CollectionUtils;
@@ -489,20 +490,20 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		HierarchyListFragment dossierListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 		return (dossierListFragment != null) && onActionItemChecked(menuItem, dossierListFragment.getCheckedDossiers());
 	}
 
 	private boolean onActionItemChecked(MenuItem menuItem, HashSet<Dossier> dossiers) {
-		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		HierarchyListFragment hierarchyListFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 
-		if (dossierListFragment != null) {
+		if (hierarchyListFragment != null) {
 
-			String bureauId = dossierListFragment.getBureauId();
+			Bureau bureau = hierarchyListFragment.getSelectedBureau();
 			Action invokedAction = Action.fromId(menuItem.getItemId());
 
-			if (invokedAction != null)
-				launchActionPopup(dossiers, bureauId, invokedAction);
+			if ((invokedAction != null) && (bureau != null))
+				launchActionPopup(dossiers, bureau.getId(), invokedAction);
 		}
 
 		return false;
@@ -618,23 +619,23 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 
 	private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
-		DossierListFragment dossierListFragment = (DossierListFragment) getSupportFragmentManager().findFragmentByTag(DossierListFragment.FRAGMENT_TAG);
+		HierarchyListFragment menuFragment = (HierarchyListFragment) getSupportFragmentManager().findFragmentByTag(HierarchyListFragment.FRAGMENT_TAG);
 		DialogFragment actionDialog;
 		ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
 
 		if (action == Action.REJET) {
 			actionDialog = RejectDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(dossierListFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
+			actionDialog.setTargetFragment(menuFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
 			actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.VISA) {
 			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(dossierListFragment, VisaDialogFragment.REQUEST_CODE_VISA);
+			actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
 			actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.SIGNATURE) {
 			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(dossierListFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
+			actionDialog.setTargetFragment(menuFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
 			actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.MAILSEC) {
@@ -643,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements HierarchyListFrag
 		}
 		else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
 			actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(dossierListFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
+			actionDialog.setTargetFragment(menuFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
 			actionDialog.show(getSupportFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.ARCHIVAGE) {
