@@ -20,6 +20,7 @@
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
     <string name="document_selection">Sélection du document</string>
+    <string name="filter_selection">Sélection du filtre</string>
     <string name="password">Mot de passe</string>
     <string name="mandatory">Obligatoire</string>
     <string name="optional">Facultatif</string>

@@ -21,15 +21,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -96,10 +95,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 //			mBureauId = getArguments().getString(BUREAU_ID);
 //			mDossier = getArguments().getParcelable(DOSSIER);
 //		}
-	}
-
-	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -184,19 +179,31 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.dossier_details_menu, menu);
+
+		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+
+		if (actions_toolbar != null) {
+			actions_toolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
+			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+				@Override public boolean onMenuItemClick(MenuItem item) {
+					return onOptionsItemSelected(item);
+				}
+			});
+		}
 	}
 
 	@Override public void onPrepareOptionsMenu(Menu menu) {
 
+		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+
 		// Info item
 
-		MenuItem infoItem = menu.findItem(R.id.action_details);
+		MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
 		infoItem.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
 
 		// Document selector
 
-		MenuItem documentSelectorItem = menu.findItem(R.id.action_document_selection);
+		MenuItem documentSelectorItem = actions_toolbar.getMenu().findItem(R.id.action_document_selection);
 		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getMainDocuments().size() > 1) || (!mDossier.getAnnexes().isEmpty()));
 		documentSelectorItem.setVisible(hasMultipleDoc);
 
@@ -237,7 +244,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return true;
 
 			default:
-				return super.onOptionsItemSelected(item);
+				return getActivity().onOptionsItemSelected(item);
 		}
 	}
 

@@ -40,7 +40,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,7 +76,6 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.CollectionUtils;
-import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
@@ -143,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		if (mFiltersSpinner != null)
 			mFiltersSpinner.setOnItemSelectedListener(this);
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 		setSupportActionBar(toolbar);
 
 		if (getSupportActionBar() != null)
@@ -340,17 +338,17 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
 
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.dossiers_menu, menu);
+		Toolbar actions_toolbar = (Toolbar) findViewById(R.id.actions_toolbar);
 
-		// Alignment in TopBar isn't working on XML, but works programmatically
-
-		Toolbar.LayoutParams spinnerContainerLayoutParams = new Toolbar.LayoutParams(Toolbar.LayoutParams.WRAP_CONTENT,
-																					 Toolbar.LayoutParams.WRAP_CONTENT,
-																					 Gravity.TOP | Gravity.END
-		);
-		spinnerContainerLayoutParams.rightMargin = Math.round(DeviceUtils.dipsToPixels(this, 20));
-		mFiltersSpinner.setLayoutParams(spinnerContainerLayoutParams);
+		if (actions_toolbar != null) {
+			actions_toolbar.getMenu().clear();
+			actions_toolbar.inflateMenu(R.menu.dossiers_menu);
+			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+				@Override public boolean onMenuItemClick(MenuItem item) {
+					return onOptionsItemSelected(item);
+				}
+			});
+		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -771,7 +769,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
 
 		public DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
-			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.home_toolbar), R.string.drawer_open, R.string.drawer_close);
+			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 
 		@Override public void onDrawerClosed(View view) {

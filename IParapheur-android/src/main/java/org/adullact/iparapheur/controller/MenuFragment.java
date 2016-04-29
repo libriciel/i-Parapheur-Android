@@ -21,15 +21,22 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -190,6 +197,11 @@ public class MenuFragment extends Fragment {
 		return view;
 	}
 
+	@Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		// In case of signature/visa/etc, let's give a few seconds to the server
@@ -243,6 +255,8 @@ public class MenuFragment extends Fragment {
 	 */
 	public boolean onBackPressed() {
 
+		getActivity().supportInvalidateOptionsMenu();
+
 		if (mViewSwitcher.getDisplayedChild() == 1) {
 
 			mViewSwitcher.setInAnimation(getActivity(), android.R.anim.slide_in_left);
@@ -263,6 +277,52 @@ public class MenuFragment extends Fragment {
 	}
 
 	// </editor-fold desc="LifeCycle">
+
+	// <editor-fold desc="ActionBar">
+
+	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+
+		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+
+		if (menu_toolbar != null) {
+			menu_toolbar.inflateMenu(R.menu.menu_fragment);
+			menu_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+				@Override public boolean onMenuItemClick(MenuItem item) {
+					return onOptionsItemSelected(item);
+				}
+			});
+		}
+	}
+
+	@Override public void onPrepareOptionsMenu(Menu menu) {
+		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+
+		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
+		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+
+		MenuItem infoItem = menu_toolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
+		infoItem.setVisible(isDossierList && isInLandscape);
+
+		super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
+
+		// Handle presses on the action bar items
+
+		switch (item.getItemId()) {
+
+			case R.id.menu_fragment_filter_selection_item:
+				Log.e("Adrien", "HEEEREEE");
+				return true;
+
+			default:
+				return getActivity().onOptionsItemSelected(item);
+		}
+	}
+
+	// </editor-fold desc="ActionBar">
 
 	public Bureau getSelectedBureau() {
 		return mSelectedBureau;
@@ -288,15 +348,9 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	public void updateDossiers() {
-		executeAsyncTask(new DossiersLoadingTask());
-	}
-
-	public boolean isBureauListDisplayed() {
-		return mViewSwitcher.getDisplayedChild() == 0;
-	}
-
 	private void onBureauClicked(int position) {
+
+		getActivity().supportInvalidateOptionsMenu();
 
 		// Faking the Bureau list selection, by selecting the previous one (or -1 if any).
 		// We want to have a selected state only on the selected Dossier's Bureau.
