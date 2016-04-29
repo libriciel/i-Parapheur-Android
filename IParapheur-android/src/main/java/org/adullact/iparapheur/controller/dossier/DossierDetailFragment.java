@@ -343,6 +343,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
 		updateStickyNotes(muPdfStickyNotes);
 
+		// Set FAB annotation button visibility
+
+		boolean areAnnotationAvailable = document.isMainDocument();
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setVisibility(areAnnotationAvailable ? View.VISIBLE : View.GONE);
+
 		//
 
 //		if (document != null) {
@@ -628,14 +634,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Loading user data and annotations
 
 			SparseArray<PageAnnotations> annotations = new SparseArray<>();
-			try {
-				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
-				if (TextUtils.isEmpty(currentAccount.getUserName()))
-					RESTClient.INSTANCE.updateAccountInformations(currentAccount);
-
-				annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId());
+			Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+			if (TextUtils.isEmpty(currentAccount.getUserName())) {
+				try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
+				catch (IParapheurException e) { e.printStackTrace(); }
 			}
-			catch (IParapheurException e) { e.printStackTrace(); }
+
+			if (currentDocument.isMainDocument()) {
+				try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
+				catch (IParapheurException e) { e.printStackTrace(); }
+			}
 			currentDocument.setPagesAnnotations(annotations);
 
 			return null;
