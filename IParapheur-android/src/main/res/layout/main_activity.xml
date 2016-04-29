@@ -7,7 +7,7 @@
     android:divider="@android:drawable/divider_horizontal_bright"
     android:elevation="7dp"
     android:orientation="vertical"
-    tools:context=".MainActivity"
+    tools:context=".controller.MainActivity"
     tools:ignore="UnusedAttribute">
 
     <!-- The main content view -->
@@ -43,9 +43,10 @@
 
                     <FrameLayout
                         android:id="@+id/left_fragment"
-                        android:layout_width="240dp"
+                        android:layout_width="280dp"
                         android:layout_height="match_parent"
-                        android:background="@android:color/background_light" />
+                        android:background="@android:color/background_light"
+                        android:elevation="2dp" />
 
                     <View
                         android:layout_width="1dp"

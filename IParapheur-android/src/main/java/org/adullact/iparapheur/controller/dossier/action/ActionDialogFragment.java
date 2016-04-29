@@ -54,13 +54,11 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(createView())
 				// Set action button
-				.setPositiveButton(getTitle(), this).setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						ActionDialogFragment.this.getDialog().cancel();
-					}
-				}
-		);
+				.setPositiveButton(getTitle(), this).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				ActionDialogFragment.this.getDialog().cancel();
+			}
+		});
 
 		return builder.create();
 	}

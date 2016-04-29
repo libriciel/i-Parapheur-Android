@@ -19,7 +19,6 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -45,11 +44,6 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
 		f.setArguments(args);
 
 		return f;
-	}
-
-	@Override protected View createView() {
-		View layout = super.createView();
-		return layout;
 	}
 
 	@Override protected int getTitle() {

@@ -737,10 +737,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	// </editor-fold desc="FilterDialogListener">
 
-	// <editor-fold desc="DossierListFragmentListener">
-
-	// </editor-fold desc="DossierListFragmentListener">
-
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
 	@Override public void toggleInfoDrawer() {

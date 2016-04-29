@@ -288,6 +288,14 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
+	public void updateDossiers() {
+		executeAsyncTask(new DossiersLoadingTask());
+	}
+
+	public boolean isBureauListDisplayed() {
+		return mViewSwitcher.getDisplayedChild() == 0;
+	}
+
 	private void onBureauClicked(int position) {
 
 		// Faking the Bureau list selection, by selecting the previous one (or -1 if any).
@@ -314,7 +322,7 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	public void onDossierClicked(int position) {
+	private void onDossierClicked(int position) {
 
 		// Reselect filter
 
