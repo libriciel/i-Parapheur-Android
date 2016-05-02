@@ -45,12 +45,14 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	public static final String FRAGMENT_TAG = "filter_dialog";
 	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
 
-	private Filter filter;
-	private Filter originalFilter;
-	private EditText titleText;
-	private Spinner spinnerState;
-	private ExpandableListView typologieList;
-	private TypologieListAdapter typologieListAdapter;
+	private static final String PARCELABLE_FIELD_FILTER = "filter";
+
+	private Filter mFilter;
+	private Filter mOriginalFilter;
+	private EditText mTitleText;
+	private Spinner mSpinnerState;
+	private ExpandableListView mTypologieList;
+	private TypologieListAdapter mTypologieListAdapter;
 
 	public FilterDialogFragment() {}
 
@@ -59,7 +61,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
-		args.putParcelable("filter", filter);
+		args.putParcelable(PARCELABLE_FIELD_FILTER, filter);
 		f.setArguments(args);
 
 		return f;
@@ -68,27 +70,27 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	// <editor-fold desc="LifeCycle">
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
-		this.originalFilter = getArguments().getParcelable("filter");
-		this.filter = new Filter(originalFilter);
+		mOriginalFilter = getArguments().getParcelable(PARCELABLE_FIELD_FILTER);
+		mFilter = new Filter(mOriginalFilter);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-		builder.setTitle(filter.getName());
+		builder.setTitle(mFilter.getName());
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View content = inflater.inflate(R.layout.filter_dialog, null);
 
 		// Folder title
-		this.titleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
-		this.titleText.setText(this.originalFilter.getTitle());
+		mTitleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
+		mTitleText.setText(mOriginalFilter.getTitle());
 
 		// FolderState
-		this.spinnerState = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
+		mSpinnerState = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
 		FilterStateSpinnerAdapter spinnerAdapterState = new FilterStateSpinnerAdapter(getActivity());
-		this.spinnerState.setAdapter(spinnerAdapterState);
-		this.spinnerState.setSelection(Filter.states.indexOf(this.originalFilter.getState()), false);
+		mSpinnerState.setAdapter(spinnerAdapterState);
+		mSpinnerState.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
 
 		// Typologie
-		this.typologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology_list);
+		mTypologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology_list);
 
 		// Inflate and set the layout for the dialog
 		// Pass null as the parent view because its going in the dialog layout
@@ -103,8 +105,8 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 	@Override public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		this.typologieListAdapter = new TypologieListAdapter(getActivity(), originalFilter);
-		this.typologieList.setAdapter(this.typologieListAdapter);
+		mTypologieListAdapter = new TypologieListAdapter(getActivity(), mOriginalFilter);
+		mTypologieList.setAdapter(mTypologieListAdapter);
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -123,12 +125,12 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 				break;
 
 			case DialogInterface.BUTTON_POSITIVE:
-				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 				updateFilter();
 
-				if (originalFilter.getId().equals(Filter.DEFAULT_ID))
-					filter.setId(Filter.DEFAULT_ID);
+				if (mOriginalFilter.getId().equals(Filter.DEFAULT_ID))
+					mFilter.setId(Filter.DEFAULT_ID);
 
+				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 				break;
 		}
 	}
@@ -142,8 +144,8 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		final EditText content = new EditText(getActivity());
 		content.setHint(R.string.Add_filter);
 		content.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black));
-		if (!originalFilter.getId().equals(Filter.DEFAULT_ID)) {
-			content.setText(filter.getName());
+		if (!mOriginalFilter.getId().equals(Filter.DEFAULT_ID)) {
+			content.setText(mFilter.getName());
 		}
 		builder.setView(content);
 
@@ -152,9 +154,9 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 			@Override public void onClick(DialogInterface dialog, int which) {
 
 				if (TextUtils.isEmpty(String.valueOf(content.getText())))
-					filter.setName(content.getHint().toString());
+					mFilter.setName(content.getHint().toString());
 				else
-					filter.setName(String.valueOf(content.getText()).trim());
+					mFilter.setName(String.valueOf(content.getText()).trim());
 
 				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 				FilterDialogFragment.this.getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
@@ -165,11 +167,11 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	}
 
 	private void updateFilter() {
-		this.filter.setTitle(this.titleText.getText().toString());
-		this.filter.setState(Filter.states.get(this.spinnerState.getSelectedItemPosition()));
+		mFilter.setTitle(mTitleText.getText().toString());
+		mFilter.setState(Filter.states.get(mSpinnerState.getSelectedItemPosition()));
 
-		this.filter.setTypes(this.typologieListAdapter.getSelectedTypes());
-		this.filter.setSubTypes(this.typologieListAdapter.getSelectedSousTypes());
+		mFilter.setTypes(mTypologieListAdapter.getSelectedTypes());
+		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {
