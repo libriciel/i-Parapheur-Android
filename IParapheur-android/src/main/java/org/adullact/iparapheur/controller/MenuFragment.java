@@ -285,24 +285,53 @@ public class MenuFragment extends Fragment {
 
 		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 
-		if (menu_toolbar != null) {
+		if (menu_toolbar != null)
 			menu_toolbar.inflateMenu(R.menu.menu_fragment);
-			menu_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-				@Override public boolean onMenuItemClick(MenuItem item) {
-					return onOptionsItemSelected(item);
-				}
-			});
-		}
 	}
 
 	@Override public void onPrepareOptionsMenu(Menu menu) {
 		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 
+		// Compute filters visibility
+
 		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
-		MenuItem infoItem = menu_toolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
-		infoItem.setVisible(isDossierList && isInLandscape);
+		MenuItem filterItem = menu_toolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
+		filterItem.setVisible(isDossierList && isInLandscape);
+
+		// No filter button (if any filter is available)
+
+		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+		SubMenu filterSubMenu = filterItem.getSubMenu();
+		filterSubMenu.clear();
+
+		if (!filterList.isEmpty()) {
+			MenuItem item = filterSubMenu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter);
+			item.setIcon(R.drawable.ic_no_filter_black_24dp);
+		}
+
+		// Inflate Filters
+
+		mDisplayedFilters.clear();
+
+		for (Filter filter : filterList) {
+
+			MenuItem item = filterSubMenu.add(Menu.NONE, R.id.action_filter, 2, filter.getName());
+			item.setIcon(R.drawable.ic_filter_list_black_24dp);
+
+			mDisplayedFilters.put(item, filter);
+		}
+
+		// Add a Filter button (greyed)
+
+		MenuItem addMenuItem = filterSubMenu.add(Menu.NONE, R.id.action_add_filter, 3, R.string.Add_filter);
+		SpannableString addMenuItemString = new SpannableString(addMenuItem.getTitle());
+		addMenuItemString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.grey_600)), 0, addMenuItemString.length(), 0);
+		addMenuItem.setTitle(addMenuItemString);
+		addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
+
+		//
 
 		super.onPrepareOptionsMenu(menu);
 	}
@@ -313,8 +342,26 @@ public class MenuFragment extends Fragment {
 
 		switch (item.getItemId()) {
 
-			case R.id.menu_fragment_filter_selection_item:
-				Log.e("Adrien", "HEEEREEE");
+			case R.id.action_add_filter:
+
+				Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+				if (filter == null)
+					filter = new Filter();
+
+				FilterDialog filterDialog = FilterDialog.newInstance(filter);
+				filterDialog.setTargetFragment(this, FilterDialog.REQUEST_CODE_FILTER);
+				filterDialog.show(getActivity().getSupportFragmentManager(), FilterDialog.FRAGMENT_TAG);
+
+				return true;
+
+			case R.id.action_filter:
+
+				Filter currentFilter = mDisplayedFilters.get(item);
+				if (currentFilter != null) {
+					MyFilters.INSTANCE.selectFilter(currentFilter);
+					executeAsyncTask(new DossiersLoadingTask());
+				}
+
 				return true;
 
 			default:
