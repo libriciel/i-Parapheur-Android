@@ -25,6 +25,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -38,12 +40,11 @@ import org.adullact.iparapheur.model.Filter;
 import java.util.ArrayList;
 
 
-public class FilterDialog extends DialogFragment implements DialogInterface.OnClickListener {
+public class FilterDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
 	public static final String FRAGMENT_TAG = "filter_dialog";
 	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
 
-	private FilterDialogListener listener;
 	private Filter filter;
 	private Filter originalFilter;
 	private EditText titleText;
@@ -51,10 +52,10 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 	private ExpandableListView typologieList;
 	private TypologieListAdapter typologieListAdapter;
 
-	public FilterDialog() {}
+	public FilterDialogFragment() {}
 
-	public static FilterDialog newInstance(Filter filter) {
-		FilterDialog f = new FilterDialog();
+	public static FilterDialogFragment newInstance(Filter filter) {
+		FilterDialogFragment f = new FilterDialogFragment();
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
@@ -65,15 +66,6 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 	}
 
 	// <editor-fold desc="LifeCycle">
-
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof FilterDialogListener))
-			throw new IllegalStateException("Activity must implement FilterDialogListener.");
-
-		listener = (FilterDialogListener) activity;
-	}
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		this.originalFilter = getArguments().getParcelable("filter");
@@ -115,31 +107,28 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 		this.typologieList.setAdapter(this.typologieListAdapter);
 	}
 
-	@Override public void onDetach() {
-		super.onDetach();
-
-		// Reset the active callbacks interface.
-		listener = null;
-	}
-
 	// </editor-fold desc="LifeCycle">
 
 	@Override public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
+
 			case DialogInterface.BUTTON_NEGATIVE:
-				listener.onFilterCancel();
+				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_CANCELED, null);
 				dismiss();
 				break;
+
 			case DialogInterface.BUTTON_NEUTRAL:
 				updateFilter();
 				createTitleDialog();
 				break;
+
 			case DialogInterface.BUTTON_POSITIVE:
+				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 				updateFilter();
-				if (originalFilter.getId().equals(Filter.DEFAULT_ID)) {
+
+				if (originalFilter.getId().equals(Filter.DEFAULT_ID))
 					filter.setId(Filter.DEFAULT_ID);
-				}
-				listener.onFilterChange(filter);
+
 				break;
 		}
 	}
@@ -152,21 +141,23 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 		// CONTENT
 		final EditText content = new EditText(getActivity());
 		content.setHint(R.string.Add_filter);
+		content.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black));
 		if (!originalFilter.getId().equals(Filter.DEFAULT_ID)) {
 			content.setText(filter.getName());
 		}
 		builder.setView(content);
 
 		// Enregistrer
-		builder.setNeutralButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
 			@Override public void onClick(DialogInterface dialog, int which) {
-				if (content.getText().toString().trim().isEmpty()) {
+
+				if (TextUtils.isEmpty(String.valueOf(content.getText())))
 					filter.setName(content.getHint().toString());
-				}
-				else {
-					filter.setName(content.getText().toString().trim());
-				}
-				listener.onFilterSave(filter);
+				else
+					filter.setName(String.valueOf(content.getText()).trim());
+
+				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
+				FilterDialogFragment.this.getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 			}
 		});
 
@@ -179,15 +170,6 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 
 		this.filter.setTypes(this.typologieListAdapter.getSelectedTypes());
 		this.filter.setSubTypes(this.typologieListAdapter.getSelectedSousTypes());
-	}
-
-	public interface FilterDialogListener {
-
-		void onFilterSave(@NonNull Filter filter);
-
-		void onFilterChange(@NonNull Filter filter);
-
-		void onFilterCancel();
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {

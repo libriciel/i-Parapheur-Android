@@ -29,14 +29,17 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
 import android.text.TextUtils;
-import android.util.Log;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -53,10 +56,13 @@ import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
+import org.adullact.iparapheur.controller.dossier.filter.FilterDialogFragment;
+import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -64,6 +70,7 @@ import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -92,6 +99,7 @@ public class MenuFragment extends Fragment {
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
 	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
+	private HashMap<MenuItem, Filter> mDisplayedFilters = new HashMap<>();
 	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
 	private Dossier mDisplayedDossier = null;                       // Which Dossier is displayed in the Pdf viewer fragment
 	private Bureau mDisplayedBureau = null;                         // Which Bureau is displayed in the Pdf viewer fragment
@@ -209,6 +217,15 @@ public class MenuFragment extends Fragment {
 
 		switch (requestCode) {
 
+			case FilterDialogFragment.REQUEST_CODE_FILTER:
+
+				if (resultCode == Activity.RESULT_OK) {
+					executeAsyncTask(new DossiersLoadingTask());
+					getActivity().supportInvalidateOptionsMenu();
+				}
+
+				break;
+
 			case VisaDialogFragment.REQUEST_CODE_VISA:
 			case RejectDialogFragment.REQUEST_CODE_REJECT:
 			case SignatureDialogFragment.REQUEST_CODE_SIGNATURE:
@@ -292,13 +309,14 @@ public class MenuFragment extends Fragment {
 	@Override public void onPrepareOptionsMenu(Menu menu) {
 		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 
-		// Compute filters visibility
+		// Compute main filters icon visibility
 
 		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
 		MenuItem filterItem = menu_toolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
 		filterItem.setVisible(isDossierList && isInLandscape);
+		filterItem.setIcon((MyFilters.INSTANCE.getSelectedFilter() != null) ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
 
 		// No filter button (if any filter is available)
 
@@ -342,15 +360,22 @@ public class MenuFragment extends Fragment {
 
 		switch (item.getItemId()) {
 
+			case R.id.action_no_filter:
+
+				MyFilters.INSTANCE.selectFilter(null);
+				getActivity().supportInvalidateOptionsMenu();
+				executeAsyncTask(new DossiersLoadingTask());
+				return true;
+
 			case R.id.action_add_filter:
 
 				Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 				if (filter == null)
 					filter = new Filter();
 
-				FilterDialog filterDialog = FilterDialog.newInstance(filter);
-				filterDialog.setTargetFragment(this, FilterDialog.REQUEST_CODE_FILTER);
-				filterDialog.show(getActivity().getSupportFragmentManager(), FilterDialog.FRAGMENT_TAG);
+				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter);
+				filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
+				filterDialog.show(getActivity().getSupportFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
 
 				return true;
 
@@ -359,6 +384,7 @@ public class MenuFragment extends Fragment {
 				Filter currentFilter = mDisplayedFilters.get(item);
 				if (currentFilter != null) {
 					MyFilters.INSTANCE.selectFilter(currentFilter);
+					getActivity().supportInvalidateOptionsMenu();
 					executeAsyncTask(new DossiersLoadingTask());
 				}
 

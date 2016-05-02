@@ -19,6 +19,7 @@ package org.adullact.iparapheur.controller.dossier.filter;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Filter;
@@ -73,10 +74,9 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 					}
 				}
 			}
-			if ((selectedFilter != null) && !filters.contains(selectedFilter)) {
+
+			if ((selectedFilter != null) && !filters.contains(selectedFilter))
 				filters.add(selectedFilter);
-			}
-			filters.add(new Filter()); // Filtre par défaut
 		}
 		return filters;
 	}
@@ -147,7 +147,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 		return selectedFilter;
 	}
 
-	public void selectFilter(Filter filter) {
+	public void selectFilter(@Nullable Filter filter) {
 		selectedFilter = filter;
 	}
 }

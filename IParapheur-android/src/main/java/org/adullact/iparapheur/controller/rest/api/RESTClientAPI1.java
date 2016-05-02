@@ -94,9 +94,10 @@ public class RESTClientAPI1 extends RESTClientAPI {
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 		String url = buildUrl(ACTION_GET_DOSSIERS);
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-		if (filter == null) {
+
+		if (filter == null)
 			filter = new Filter();
-		}
+
 		String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
 				"\"filters\": " + filter.getJSONFilter() + "," +
 				"\"page\": 0," +
