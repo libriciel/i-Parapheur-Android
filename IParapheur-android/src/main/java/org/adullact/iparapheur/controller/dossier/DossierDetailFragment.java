@@ -208,14 +208,14 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		documentSelectorItem.setVisible(hasMultipleDoc);
 
 		if (hasMultipleDoc) {
-			SubMenu documentSelectorSubMenu = documentSelectorItem.getSubMenu();
-			documentSelectorSubMenu.clear();
+			SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
+			docSelectorSubMenu.clear();
 
-			for (Document mainDocument : mDossier.getMainDocuments())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()).setIcon(R.drawable.ic_description_black_24dp);
+			for (Document mainDoc : mDossier.getMainDocuments())
+				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
 			for (Document annexe : mDossier.getAnnexes())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
+				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
 		//

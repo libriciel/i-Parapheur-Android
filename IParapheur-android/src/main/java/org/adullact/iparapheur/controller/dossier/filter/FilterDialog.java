@@ -40,7 +40,9 @@ import java.util.ArrayList;
 
 public class FilterDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
-	public static final String TAG = "filter_dialog";
+	public static final String FRAGMENT_TAG = "filter_dialog";
+	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
+
 	private FilterDialogListener listener;
 	private Filter filter;
 	private Filter originalFilter;
@@ -149,7 +151,7 @@ public class FilterDialog extends DialogFragment implements DialogInterface.OnCl
 
 		// CONTENT
 		final EditText content = new EditText(getActivity());
-		content.setHint(R.string.filtre_nom_hint);
+		content.setHint(R.string.Add_filter);
 		if (!originalFilter.getId().equals(Filter.DEFAULT_ID)) {
 			content.setText(filter.getName());
 		}

@@ -114,7 +114,7 @@
     <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
     <string name="enregistrer_filtre">Enregistrer</string>
     <string name="filtre_nom">Nom du filtre</string>
-    <string name="filtre_nom_hint">Nouveau filtre</string>
+    <string name="Add_filter">Ajouter un filtre</string>
 
     <string name="http_error_undefined">Une erreur est intervenue lors de l\'envoi de la requête</string>
     <string name="http_error_malformed_url">URL mal formée : %s</string>

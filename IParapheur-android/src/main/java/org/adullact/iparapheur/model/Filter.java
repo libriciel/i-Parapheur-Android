@@ -74,7 +74,7 @@ public class Filter implements Parcelable {
         statesTitles.put("Dossiers en délégation", "dossiers-delegues");
         statesTitles.put("Toutes les banettes", "no-corbeille");
         statesTitles.put("Tout i-P arapheur", "no-bureau");*/
-		statesTitles = new LinkedHashMap<String, String>();
+		statesTitles = new LinkedHashMap<>();
 		statesTitles.put("en-preparation", "À transmettre");
 		statesTitles.put("a-traiter", "À traiter");
 		statesTitles.put("a-archiver", "En fin de circuit");
@@ -100,14 +100,11 @@ public class Filter implements Parcelable {
 			return new Filter[size];
 		}
 	};
+
 	private String id;
-	/**
-	 * Nom du filtre sauvegardé
-	 */
 	private String name;
-	/**
-	 * Valeurs du filtre
-	 */
+
+	// Filter values
 	private String title;
 	private List<String> types;
 	private List<String> subTypes;
@@ -297,6 +294,6 @@ public class Filter implements Parcelable {
 	}
 
 	@Override public String toString() {
-		return name;
+		return "{Filter name=" + name + "}";
 	}
 }
