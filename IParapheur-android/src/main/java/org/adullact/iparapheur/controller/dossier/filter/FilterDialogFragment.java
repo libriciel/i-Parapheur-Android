@@ -50,7 +50,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	private Filter mFilter;
 	private Filter mOriginalFilter;
 	private EditText mTitleText;
-	private Spinner mSpinnerState;
+	private Spinner mStateSpinner;
 	private ExpandableListView mTypologieList;
 	private TypologieListAdapter mTypologieListAdapter;
 
@@ -70,32 +70,34 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	// <editor-fold desc="LifeCycle">
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+
 		mOriginalFilter = getArguments().getParcelable(PARCELABLE_FIELD_FILTER);
 		mFilter = new Filter(mOriginalFilter);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		// Retrieving views
 
-		builder.setTitle(mFilter.getName());
 		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View content = inflater.inflate(R.layout.filter_dialog, null);
+		View content = inflater.inflate(R.layout.filter_dialog_fragment, null);
 
-		// Folder title
 		mTitleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
+		mStateSpinner = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
+		mTypologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology);
+		View label = content.findViewById(R.id.filter_dialog_titre_label);
+
+		// Setting values
+
+		label.requestFocus(); // Prevents keyboard popping
 		mTitleText.setText(mOriginalFilter.getTitle());
 
-		// FolderState
-		mSpinnerState = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
 		FilterStateSpinnerAdapter spinnerAdapterState = new FilterStateSpinnerAdapter(getActivity());
-		mSpinnerState.setAdapter(spinnerAdapterState);
-		mSpinnerState.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
+		mStateSpinner.setAdapter(spinnerAdapterState);
+		mStateSpinner.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
 
-		// Typologie
-		mTypologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology_list);
+		// Building dialog
 
-		// Inflate and set the layout for the dialog
-		// Pass null as the parent view because its going in the dialog layout
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle(mFilter.getName());
 		builder.setView(content);
-
 		builder.setPositiveButton(R.string.action_filtrer, this);
 		builder.setNeutralButton(R.string.enregistrer_filtre, this);
 		builder.setNegativeButton(android.R.string.cancel, this);
@@ -120,12 +122,12 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 				break;
 
 			case DialogInterface.BUTTON_NEUTRAL:
-				updateFilter();
+				saveFilter();
 				createTitleDialog();
 				break;
 
 			case DialogInterface.BUTTON_POSITIVE:
-				updateFilter();
+				saveFilter();
 
 				if (mOriginalFilter.getId().equals(Filter.DEFAULT_ID))
 					mFilter.setId(Filter.DEFAULT_ID);
@@ -137,7 +139,6 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 	private void createTitleDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		// TITLE
 		builder.setTitle(R.string.filtre_nom);
 
 		// CONTENT
@@ -158,7 +159,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 				else
 					mFilter.setName(String.valueOf(content.getText()).trim());
 
-				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
+				saveFilter();
 				FilterDialogFragment.this.getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
 			}
 		});
@@ -166,12 +167,15 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		builder.create().show();
 	}
 
-	private void updateFilter() {
+	private void saveFilter() {
+
 		mFilter.setTitle(mTitleText.getText().toString());
-		mFilter.setState(Filter.states.get(mSpinnerState.getSelectedItemPosition()));
+		mFilter.setState(Filter.states.get(mStateSpinner.getSelectedItemPosition()));
 
 		mFilter.setTypes(mTypologieListAdapter.getSelectedTypes());
 		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
+
+		MyFilters.INSTANCE.save(mFilter);
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {

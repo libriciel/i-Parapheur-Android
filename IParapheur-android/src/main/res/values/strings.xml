@@ -23,7 +23,7 @@
     <string name="filter_selection">Sélection du filtre</string>
     <string name="password">Mot de passe</string>
     <string name="mandatory">Obligatoire</string>
-    <string name="optional">Facultatif</string>
+    <string name="Optional">Facultatif</string>
 
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
@@ -111,7 +111,9 @@
     <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
-    <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
+    <string name="Title_search">Titre à rechercher</string>
+    <string name="Current_state">Étape courante</string>
+    <string name="Typology">Typologie</string>
     <string name="enregistrer_filtre">Enregistrer</string>
     <string name="filtre_nom">Nom du filtre</string>
     <string name="Add_filter">Ajouter un filtre</string>
