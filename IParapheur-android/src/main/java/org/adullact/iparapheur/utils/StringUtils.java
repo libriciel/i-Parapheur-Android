@@ -297,4 +297,12 @@ public class StringUtils {
 			return false;
 		}
 	}
+
+	public static @Nullable Boolean nullableBooleanValueOf(@NonNull Map<String, String> map, @NonNull String key) {
+
+		if (map.containsKey(key) && (map.get(key) != null))
+			return Boolean.valueOf(map.get(key));
+
+		return null;
+	}
 }

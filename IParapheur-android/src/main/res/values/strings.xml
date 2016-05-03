@@ -22,8 +22,9 @@
     <string name="document_selection">Sélection du document</string>
     <string name="filter_selection">Sélection du filtre</string>
     <string name="password">Mot de passe</string>
-    <string name="mandatory">Obligatoire</string>
+    <string name="Mandatory">Obligatoire</string>
     <string name="Optional">Facultatif</string>
+    <string name="Indeterminate">Indéterminé</string>
 
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>

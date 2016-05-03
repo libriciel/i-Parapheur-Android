@@ -22,22 +22,33 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class FilterDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
@@ -46,13 +57,19 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
 
 	private static final String PARCELABLE_FIELD_FILTER = "filter";
+	private static final String EXPANDABLE_LIST_ADAPTER_NAME = "name";
+	private static final String EXPANDABLE_LIST_ADAPTER_IS_CHECKED = "checked";
 
+	// Views
 	private Filter mFilter;
 	private Filter mOriginalFilter;
 	private EditText mTitleText;
 	private Spinner mStateSpinner;
-	private ExpandableListView mTypologieList;
-	private TypologieListAdapter mTypologieListAdapter;
+	private ExpandableListView mTypologyListView;
+
+	// Data
+	List<Map<String, String>> mTypologyListGroupData = new ArrayList<>();
+	List<List<Map<String, String>>> mTypologyListChildData = new ArrayList<>();
 
 	public FilterDialogFragment() {}
 
@@ -84,7 +101,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		mTitleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
 		mStateSpinner = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
-		mTypologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology);
+		mTypologyListView = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology);
 		View label = content.findViewById(R.id.filter_dialog_titre_label);
 
 		// Inflate values
@@ -92,9 +109,11 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		label.requestFocus(); // Prevents keyboard popping
 		mTitleText.setText(mOriginalFilter.getTitle());
 
-		FilterStateSpinnerAdapter spinnerAdapterState = new FilterStateSpinnerAdapter(getActivity());
-		mStateSpinner.setAdapter(spinnerAdapterState);
+		FilterStateSpinnerAdapter spinnerStateAdapter = new FilterStateSpinnerAdapter(getActivity());
+		mStateSpinner.setAdapter(spinnerStateAdapter);
 		mStateSpinner.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
+
+		mTypologyListView.setAdapter(new TypologyGroupAdapter());
 
 		// Build dialog
 
@@ -184,7 +203,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {
 
 		public FilterStateSpinnerAdapter(Context context) {
-			super(context, R.layout.filter_state_spinner, R.id.filter_state_spinner_text);
+			super(context, R.layout.filter_dialog_fragment_spinner, R.id.filter_state_spinner_text);
 		}
 
 		@Override public int getCount() {
@@ -200,4 +219,92 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 			return values.indexOf(item);
 		}
 	}
+
+	private class TypologyGroupAdapter extends SimpleExpandableListAdapter {
+
+		public TypologyGroupAdapter() {
+			super(
+					getActivity(),
+					mTypologyListGroupData,
+					R.layout.filter_dialog_fragment_expandablelistview_type,
+					new String[]{EXPANDABLE_LIST_ADAPTER_NAME},
+					new int[]{R.id.filter_dialog_fragment_expandablelistview_type_title},
+					mTypologyListChildData,
+					R.layout.filter_dialog_fragment_expandablelistview_subtype,
+					new String[]{EXPANDABLE_LIST_ADAPTER_NAME},
+					new int[]{R.id.filter_dialog_fragment_expandablelistview_subtype_title}
+			);
+		}
+
+		@Override public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, final ViewGroup parent) {
+			View content = super.getGroupView(groupPosition, isExpanded, convertView, parent);
+
+			View checkboxIndeterminate = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox_indeterminate);
+			CheckBox checkbox = (CheckBox) content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox);
+			Boolean isChecked = StringUtils.nullableBooleanValueOf(mTypologyListGroupData.get(groupPosition), EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
+
+			checkbox.setOnCheckedChangeListener(null);
+			checkbox.setChecked((isChecked != null) && isChecked);
+			checkboxIndeterminate.setVisibility((isChecked == null) ? View.VISIBLE : View.GONE);
+			checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+					mTypologyListGroupData.get(groupPosition).put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, String.valueOf(isChecked));
+
+					// Expand positive checked state
+
+					for (Map<String, String> childData : mTypologyListChildData.get(groupPosition))
+						childData.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, String.valueOf(isChecked));
+
+					((TypologyGroupAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
+				}
+			});
+
+			content.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					if (mTypologyListView.isGroupExpanded(groupPosition))
+						mTypologyListView.collapseGroup(groupPosition);
+					else
+						mTypologyListView.expandGroup(groupPosition);
+				}
+			});
+
+			return content;
+		}
+
+		@Override public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+			View content = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
+
+			CheckBox checkbox = (CheckBox) content.findViewById(R.id.filter_dialog_fragment_expandablelistview_subtype_checkbox);
+			boolean isChecked = Boolean.valueOf(mTypologyListChildData.get(groupPosition).get(childPosition).get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED));
+
+			checkbox.setOnCheckedChangeListener(null);
+			checkbox.setChecked(isChecked);
+			checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					mTypologyListChildData.get(groupPosition).get(childPosition).put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, String.valueOf(isChecked));
+
+					// Expand checked state to parent
+
+					boolean isEntireGroupChecked = true;
+					boolean isEntireGroupNotChecked = true;
+
+					for (Map<String, String> groupData : mTypologyListChildData.get(groupPosition)) {
+						isEntireGroupChecked = isEntireGroupChecked && Boolean.valueOf(groupData.get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED));
+						isEntireGroupNotChecked = isEntireGroupNotChecked && !Boolean.valueOf(groupData.get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED));
+					}
+
+					if (isEntireGroupChecked || isEntireGroupNotChecked)
+						mTypologyListGroupData.get(groupPosition).put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, String.valueOf(isEntireGroupChecked));
+					else
+						mTypologyListGroupData.get(groupPosition).remove(EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
+
+					((TypologyGroupAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
+				}
+			});
+
+			return content;
+		}
+	}
+
 }
