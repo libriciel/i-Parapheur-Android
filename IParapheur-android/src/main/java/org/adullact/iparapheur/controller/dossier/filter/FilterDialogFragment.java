@@ -40,12 +40,16 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +62,8 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
 
 	private static final String PARCELABLE_FIELD_FILTER = "filter";
+	private static final String BUNDLE_INSTANCE_STATE_GROUP_DATA = "group_data";
+	private static final String BUNDLE_INSTANCE_STATE_CHILD_DATA = "child_data";
 	private static final String EXPANDABLE_LIST_ADAPTER_NAME = "name";
 	private static final String EXPANDABLE_LIST_ADAPTER_IS_CHECKED = "checked";
 
@@ -75,14 +81,16 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	public FilterDialogFragment() {}
 
 	public static FilterDialogFragment newInstance(Filter filter) {
-		FilterDialogFragment f = new FilterDialogFragment();
+
+		FilterDialogFragment fragment = new FilterDialogFragment();
 
 		// Supply parameters as an arguments.
+
 		Bundle args = new Bundle();
 		args.putParcelable(PARCELABLE_FIELD_FILTER, filter);
-		f.setArguments(args);
+		fragment.setArguments(args);
 
-		return f;
+		return fragment;
 	}
 
 	// <editor-fold desc="LifeCycle">
@@ -92,6 +100,18 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		mOriginalFilter = getArguments().getParcelable(PARCELABLE_FIELD_FILTER);
 		mFilter = new Filter(mOriginalFilter);
+
+		if (savedInstanceState != null) {
+
+			String groupDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_GROUP_DATA);
+			String childpDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_CHILD_DATA);
+
+			Gson gson = new Gson();
+			Type groupDataType = new TypeToken<ArrayList<Map<String, String>>>() {}.getType();
+			Type childDataType = new TypeToken<ArrayList<List<Map<String, String>>>>() {}.getType();
+			mTypologyListGroupData = gson.fromJson(groupDataJson, groupDataType);
+			mTypologyListChildData = gson.fromJson(childpDataJson, childDataType);
+		}
 	}
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -114,7 +134,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		mStateSpinner.setAdapter(spinnerStateAdapter);
 		mStateSpinner.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
 
-		mTypologyListView.setAdapter(new TypologyGroupAdapter());
+		mTypologyListView.setAdapter(new TypologySimpleExpandableListAdapter());
 
 		// Build dialog
 
@@ -133,6 +153,14 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		if (mTypologyListGroupData.isEmpty() && mTypologyListChildData.isEmpty())
 			new TypologyLoadingTask().execute();
+	}
+
+	@Override public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		Gson gson = new Gson();
+		outState.putString(BUNDLE_INSTANCE_STATE_GROUP_DATA, gson.toJson(mTypologyListGroupData));
+		outState.putString(BUNDLE_INSTANCE_STATE_CHILD_DATA, gson.toJson(mTypologyListChildData));
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -196,8 +224,8 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		mFilter.setTitle(mTitleText.getText().toString());
 		mFilter.setState(Filter.states.get(mStateSpinner.getSelectedItemPosition()));
 
-		mFilter.setTypes(mTypologieListAdapter.getSelectedTypes());
-		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
+//		mFilter.setTypes(mTypologieListAdapter.getSelectedTypes());
+//		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
 
 		MyFilters.INSTANCE.save(mFilter);
 	}
@@ -271,9 +299,9 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		}
 	}
 
-	private class TypologyGroupAdapter extends SimpleExpandableListAdapter {
+	private class TypologySimpleExpandableListAdapter extends SimpleExpandableListAdapter {
 
-		public TypologyGroupAdapter() {
+		public TypologySimpleExpandableListAdapter() {
 			super(
 					getActivity(),
 					mTypologyListGroupData,
@@ -307,7 +335,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 					for (Map<String, String> childData : mTypologyListChildData.get(groupPosition))
 						childData.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, String.valueOf(isChecked));
 
-					((TypologyGroupAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
+					((TypologySimpleExpandableListAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
 				}
 			});
 
@@ -350,7 +378,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 					else
 						mTypologyListGroupData.get(groupPosition).remove(EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
 
-					((TypologyGroupAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
+					((TypologySimpleExpandableListAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
 				}
 			});
 
