@@ -692,7 +692,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if ((!success) || TextUtils.isEmpty(mNewId)) {
-				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
 			}
 			else {
 				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null, null);
@@ -725,7 +725,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if (!success)
-				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -753,7 +753,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if (!success)
-				Toast.makeText(getActivity(), R.string.error_annotation_delete, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_delete, Toast.LENGTH_LONG).show();
 		}
 	}
 }

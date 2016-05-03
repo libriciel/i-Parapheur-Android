@@ -285,7 +285,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		RequestResponse response = RESTUtils.put(url, annotationJson.toString(), true);
 
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
-			throw new IParapheurException(R.string.error_annotation_update, "");
+			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 	}
 
 	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,

@@ -191,7 +191,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 
 		RequestResponse response = RESTUtils.post(url, annot.toString());
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
-			throw new IParapheurException(R.string.error_annotation_update, "");
+			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 		}
 	}
 
@@ -203,7 +203,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 				"\"uuid\": \"" + annotationId + "\"}";
 		RequestResponse response = RESTUtils.post(url, body);
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
-			throw new IParapheurException(R.string.error_annotation_delete, "");
+			throw new IParapheurException(R.string.Error_on_annotation_delete, "");
 		}
 	}
 

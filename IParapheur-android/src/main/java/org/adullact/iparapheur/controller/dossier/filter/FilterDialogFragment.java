@@ -29,7 +29,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -39,8 +38,10 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -127,10 +128,11 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		return builder.create();
 	}
 
-	@Override public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		mTypologieListAdapter = new TypologieListAdapter(getActivity(), mOriginalFilter);
-		mTypologieList.setAdapter(mTypologieListAdapter);
+	@Override public void onStart() {
+		super.onStart();
+
+		if (mTypologyListGroupData.isEmpty() && mTypologyListChildData.isEmpty())
+			new TypologyLoadingTask().execute();
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -198,6 +200,55 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
 
 		MyFilters.INSTANCE.save(mFilter);
+	}
+
+	private class TypologyLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
+
+		@Override protected IParapheurException doInBackground(Void... params) {
+
+			mTypologyListGroupData.clear();
+			mTypologyListChildData.clear();
+
+			// Retrieve data
+
+			HashMap<String, ArrayList<String>> retrievedTypology = new HashMap<>();
+			try { retrievedTypology.putAll(RESTClient.INSTANCE.getTypologie()); }
+			catch (IParapheurException e) { return e; }
+
+			// Populate values
+
+			for (Map.Entry<String, ArrayList<String>> type : retrievedTypology.entrySet()) {
+
+				// SubType parse
+
+				List<Map<String, String>> subTypeMapList = new ArrayList<>();
+				for (String subTypeName : type.getValue()) {
+					HashMap<String, String> subTypeMap = new HashMap<>();
+					subTypeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, subTypeName);
+					subTypeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
+					subTypeMapList.add(subTypeMap);
+				}
+				mTypologyListChildData.add(subTypeMapList);
+
+				// Type parse
+
+				HashMap<String, String> typeMap = new HashMap<>();
+				typeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, type.getKey());
+				typeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
+				mTypologyListGroupData.add(typeMap);
+			}
+
+			return null;
+		}
+
+		@Override protected void onPostExecute(IParapheurException e) {
+			super.onPostExecute(e);
+
+			((SimpleExpandableListAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
+
+			if (e != null)
+				Toast.makeText(getActivity(), R.string.Error_on_typology_update, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {

@@ -148,9 +148,10 @@
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
     <string name="action_mode_nb_dossiers">%d dossier(s)</string>
-    <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
-    <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
-    <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
+    <string name="Error_on_typology_update">Erreur à la récupération de la typologie du dossier</string>
+    <string name="Error_on_annotation_update">Impossible d\'enregistrer l\'annotation</string>
+    <string name="Error_on_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
+    <string name="Error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
     <string name="action_settings">Settings</string>
     <string name="Settings">Réglages</string>
 
