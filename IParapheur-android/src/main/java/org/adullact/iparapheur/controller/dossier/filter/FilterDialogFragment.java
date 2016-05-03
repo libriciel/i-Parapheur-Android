@@ -22,13 +22,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -44,6 +43,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFragment;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FilterDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
+public class FilterDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "filter_dialog";
 	public static final int REQUEST_CODE_FILTER = 6091220;       // Because F-I-L-T-E-R = 06-09-12-20
@@ -69,7 +69,6 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 	// Views
 	private Filter mFilter;
-	private Filter mOriginalFilter;
 	private EditText mTitleText;
 	private Spinner mStateSpinner;
 	private ExpandableListView mTypologyListView;
@@ -98,8 +97,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 	@Override public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		mOriginalFilter = getArguments().getParcelable(PARCELABLE_FIELD_FILTER);
-		mFilter = new Filter(mOriginalFilter);
+		mFilter = new Filter();
 
 		if (savedInstanceState != null) {
 
@@ -127,23 +125,34 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		// Inflate values
 
-		label.requestFocus(); // Prevents keyboard popping
-		mTitleText.setText(mOriginalFilter.getTitle());
-
 		FilterStateSpinnerAdapter spinnerStateAdapter = new FilterStateSpinnerAdapter(getActivity());
 		mStateSpinner.setAdapter(spinnerStateAdapter);
-		mStateSpinner.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
+		mStateSpinner.setSelection(Filter.states.indexOf("a-traiter"), false); // TODO : Enum that shit
 
 		mTypologyListView.setAdapter(new TypologySimpleExpandableListAdapter());
 
 		// Build dialog
 
+		label.requestFocus(); // Prevents keyboard popping
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(mFilter.getName());
+		builder.setTitle(R.string.New_filter);
 		builder.setView(content);
-		builder.setPositiveButton(R.string.action_filtrer, this);
-		builder.setNeutralButton(R.string.enregistrer_filtre, this);
-		builder.setNegativeButton(android.R.string.cancel, this);
+		builder.setPositiveButton(R.string.action_filtrer, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onFilterButtonClicked();
+			}
+		});
+		builder.setNeutralButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onSaveButtonClicked();
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				onNegativeButtonClicked();
+			}
+		});
 
 		return builder.create();
 	}
@@ -153,6 +162,17 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 		if (mTypologyListGroupData.isEmpty() && mTypologyListChildData.isEmpty())
 			new TypologyLoadingTask().execute();
+	}
+
+	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		if ((requestCode == ChooseFilterNameDialogFragment.REQUEST_CODE_FILTER_NAME) && (resultCode == Activity.RESULT_OK)) {
+			String name = data.getStringExtra(ChooseFilterNameDialogFragment.RESULT_BUNDLE_TITLE);
+			saveFilter(name);
+			return;
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 	@Override public void onSaveInstanceState(Bundle outState) {
@@ -165,68 +185,59 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 	// </editor-fold desc="LifeCycle">
 
-	@Override public void onClick(DialogInterface dialog, int which) {
-		switch (which) {
-
-			case DialogInterface.BUTTON_NEGATIVE:
-				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_CANCELED, null);
-				dismiss();
-				break;
-
-			case DialogInterface.BUTTON_NEUTRAL:
-				saveFilter();
-				createTitleDialog();
-				break;
-
-			case DialogInterface.BUTTON_POSITIVE:
-				saveFilter();
-
-				if (mOriginalFilter.getId().equals(Filter.DEFAULT_ID))
-					mFilter.setId(Filter.DEFAULT_ID);
-
-				getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
-				break;
-		}
+	private void onNegativeButtonClicked() {
+		getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_CANCELED, null);
+		dismiss();
 	}
 
-	private void createTitleDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(R.string.filtre_nom);
+	private void onSaveButtonClicked() {
 
-		// CONTENT
-		final EditText content = new EditText(getActivity());
-		content.setHint(R.string.Add_filter);
-		content.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black));
-		if (!mOriginalFilter.getId().equals(Filter.DEFAULT_ID)) {
-			content.setText(mFilter.getName());
-		}
-		builder.setView(content);
-
-		// Enregistrer
-		builder.setPositiveButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
-			@Override public void onClick(DialogInterface dialog, int which) {
-
-				if (TextUtils.isEmpty(String.valueOf(content.getText())))
-					mFilter.setName(content.getHint().toString());
-				else
-					mFilter.setName(String.valueOf(content.getText()).trim());
-
-				saveFilter();
-				FilterDialogFragment.this.getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
-			}
-		});
-
-		builder.create().show();
+//		if (TextUtils.isEmpty(mFilter.getName()))
+		showChooseNameDialog();
+//		else
+//			saveFilter(mFilter.getName());
 	}
 
-	private void saveFilter() {
+	private void onFilterButtonClicked() {
+
+		refreshCurrentFilter(null);
+		MyFilters.INSTANCE.selectFilter(mFilter);
+
+		getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
+	}
+
+	private void showChooseNameDialog() {
+
+		ChooseFilterNameDialogFragment chooseNameDialogFragment = ChooseFilterNameDialogFragment.newInstance();
+		chooseNameDialogFragment.setTargetFragment(this, ChooseFilterNameDialogFragment.REQUEST_CODE_FILTER_NAME);
+//		chooseNameDialogFragment.show(getActivity().getSupportFragmentManager(), ChooseFilterNameDialogFragment.FRAGMENT_TAG);
+	}
+
+	private void refreshCurrentFilter(@Nullable String name) {
+
+		if (name != null)
+			mFilter.setName(name);
 
 		mFilter.setTitle(mTitleText.getText().toString());
 		mFilter.setState(Filter.states.get(mStateSpinner.getSelectedItemPosition()));
 
-//		mFilter.setTypes(mTypologieListAdapter.getSelectedTypes());
-//		mFilter.setSubTypes(mTypologieListAdapter.getSelectedSousTypes());
+		ArrayList<String> selectedTypes = new ArrayList<>();
+		for (Map<String, String> typeData : mTypologyListGroupData)
+			if (Boolean.valueOf(typeData.get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED)))
+				selectedTypes.add(typeData.get(EXPANDABLE_LIST_ADAPTER_NAME));
 
+		ArrayList<String> selectedSubTypes = new ArrayList<>();
+		for (List<Map<String, String>> subtypeDataList : mTypologyListChildData)
+			for (Map<String, String> subtypeData : subtypeDataList)
+				if (Boolean.valueOf(subtypeData.get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED)))
+					selectedSubTypes.add(subtypeData.get(EXPANDABLE_LIST_ADAPTER_NAME));
+
+		mFilter.setTypes(selectedTypes);
+		mFilter.setSubTypes(selectedSubTypes);
+	}
+
+	private void saveFilter(@NonNull String name) {
+		refreshCurrentFilter(name);
 		MyFilters.INSTANCE.save(mFilter);
 	}
 

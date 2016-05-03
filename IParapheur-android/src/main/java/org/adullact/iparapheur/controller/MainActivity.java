@@ -46,9 +46,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -63,9 +61,6 @@ import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.TdtActesDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
-import org.adullact.iparapheur.controller.dossier.filter.FilterAdapter;
-import org.adullact.iparapheur.controller.dossier.filter.FilterDialog;
-import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
@@ -101,7 +96,7 @@ import java.util.Set;
  * to listen for item selections.
  */
 public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountFragmentListener,
-		AdapterView.OnItemSelectedListener, FilterDialog.FilterDialogListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
@@ -115,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private DrawerLayout mRightDrawerLayout;
 	private FrameLayout mLeftDrawerMenu;
 	private ActionBarDrawerToggle mLeftDrawerToggle;
-	private FilterAdapter mFilterAdapter;                      // Adapter for action bar, used to display user's filters
-	private Spinner mFiltersSpinner;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
 	// <editor-fold desc="LifeCycle">
@@ -136,10 +129,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
 		mRightDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_right_drawer_layout);
 		mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
-		mFiltersSpinner = (Spinner) findViewById(R.id.activity_dossiers_toolbar_spinner);
-
-		if (mFiltersSpinner != null)
-			mFiltersSpinner.setOnItemSelectedListener(this);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 		setSupportActionBar(toolbar);
@@ -342,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		if (actions_toolbar != null) {
 			actions_toolbar.getMenu().clear();
-			actions_toolbar.inflateMenu(R.menu.dossiers_menu);
+			actions_toolbar.inflateMenu(R.menu.main_activity);
 			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 				@Override public boolean onMenuItemClick(MenuItem item) {
 					return onOptionsItemSelected(item);
@@ -392,26 +381,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		}
 	}
 
-	@Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-		if (position < mFilterAdapter.getCount() - 1) {
-			Filter filter = mFilterAdapter.getItem(position);
-			if (!filter.equals(MyFilters.INSTANCE.getSelectedFilter())) {
-				MyFilters.INSTANCE.selectFilter(filter);
-				// TODO onDataChanged();
-			}
-		}
-		else {
-			Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-			if (filter == null)
-				filter = new Filter();
-
-			FilterDialog.newInstance(filter).show(getSupportFragmentManager(), FilterDialog.TAG);
-		}
-	}
-
-	@Override public void onNothingSelected(AdapterView<?> parent) { }
-
 	// </editor-fold desc="ActionBar">
 
 	// <editor-fold desc="ActionMode">
@@ -419,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	@Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 		actionMode.setTitleOptionalHint(true);
 		MenuInflater inflater = actionMode.getMenuInflater();
-		inflater.inflate(R.menu.dossiers_list_menu_actions, menu);
+		inflater.inflate(R.menu.dossier_details_fragment_actions, menu);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
@@ -708,32 +677,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	}
 
 	// </editor-fold desc="MenuFragment">
-
-	// <editor-fold desc="FilterDialogListener">
-
-	public void onFilterSave(@NonNull Filter filter) {
-		MyFilters.INSTANCE.selectFilter(filter);
-		MyFilters.INSTANCE.save(filter);
-
-		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter), true);
-
-		mFilterAdapter.notifyDataSetChanged();
-		// TODO onDataChanged();
-	}
-
-	public void onFilterChange(@NonNull Filter filter) {
-
-		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(filter));
-
-		MyFilters.INSTANCE.selectFilter(filter);
-		// TODO onDataChanged();
-	}
-
-	public void onFilterCancel() {
-		mFiltersSpinner.setSelection(mFilterAdapter.getPosition(MyFilters.INSTANCE.getSelectedFilter()));
-	}
-
-	// </editor-fold desc="FilterDialogListener">
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
 

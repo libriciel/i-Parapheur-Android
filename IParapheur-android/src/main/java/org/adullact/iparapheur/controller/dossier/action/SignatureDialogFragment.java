@@ -231,16 +231,12 @@ public class SignatureDialogFragment extends DialogFragment {
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		if ((requestCode == AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD) && (resultCode == Activity.RESULT_OK)) {
-
 			String password = data.getStringExtra(AskPasswordDialogFragment.RESULT_BUNDLE_EXTRA_PASSWORD);
 			new SignTask().execute(password);
-
 			return;
 		}
 		else if ((requestCode == SignaturePapierConfirmDialogFragment.REQUEST_CODE_SIGN_PAPIER) && (resultCode == Activity.RESULT_OK)) {
-
 			new SignPapierTask().execute();
-
 			return;
 		}
 

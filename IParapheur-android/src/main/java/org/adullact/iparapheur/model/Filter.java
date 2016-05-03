@@ -47,7 +47,7 @@ public class Filter implements Parcelable {
 	public static final HashMap<String, String> statesTitles;
 
 	static {
-		states = new ArrayList<String>(12);
+		states = new ArrayList<>();
 		states.add("en-preparation");
 		states.add("a-traiter");
 		states.add("a-archiver");
