@@ -78,8 +78,11 @@ import java.util.UUID;
 
 /**
  * This fragment manages {@link Bureau} and {@link Dossier} lists on the left panel.
+ *
  * Both lists are pretty much the same, but some actions on the {@link Dossier} needs to be helded by the parent list.
  * That's a mess with two separate {@link Fragment}s, that's why we have an easiest {@link ViewSwitcher}.
+ *
+ * The ActionBar editor-fold manages pretty much everything about {@link Filter}s.
  */
 public class MenuFragment extends Fragment {
 

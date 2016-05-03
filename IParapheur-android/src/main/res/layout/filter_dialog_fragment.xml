@@ -39,7 +39,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:baselineAligned="true"
         android:orientation="horizontal">
 
         <TextView
@@ -54,7 +53,9 @@
             android:id="@+id/filter_dialog_state_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:spinnerMode="dialog" />
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:spinnerMode="dropdown" />
     </LinearLayout>
 
 
@@ -62,7 +63,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:baselineAligned="true"
         android:orientation="horizontal">
 
         <TextView

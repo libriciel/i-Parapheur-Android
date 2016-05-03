@@ -24,10 +24,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -69,22 +69,25 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 
 	// <editor-fold desc="LifeCycle">
 
-	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+	@Override public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
 		mOriginalFilter = getArguments().getParcelable(PARCELABLE_FIELD_FILTER);
 		mFilter = new Filter(mOriginalFilter);
+	}
 
-		// Retrieving views
+	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View content = inflater.inflate(R.layout.filter_dialog_fragment, null);
+		// Creating views
+
+		View content = View.inflate(getActivity(), R.layout.filter_dialog_fragment, null);
 
 		mTitleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
 		mStateSpinner = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
 		mTypologieList = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology);
 		View label = content.findViewById(R.id.filter_dialog_titre_label);
 
-		// Setting values
+		// Inflate values
 
 		label.requestFocus(); // Prevents keyboard popping
 		mTitleText.setText(mOriginalFilter.getTitle());
@@ -93,7 +96,7 @@ public class FilterDialogFragment extends DialogFragment implements DialogInterf
 		mStateSpinner.setAdapter(spinnerAdapterState);
 		mStateSpinner.setSelection(Filter.states.indexOf(mOriginalFilter.getState()), false);
 
-		// Building dialog
+		// Build dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(mFilter.getName());
