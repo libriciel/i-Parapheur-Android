@@ -59,8 +59,8 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 						filter.setName(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_NOM_SUFFIX, ""));
 						filter.setTitle(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX, ""));
 						filter.setState(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX, ""));
-						filter.setTypes(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
-						filter.setSubTypes(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>())));
+						filter.setTypeList(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
+						filter.setSubTypeList(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>())));
 
 						long debut = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX, 0L);
 						if (debut != 0L)
@@ -89,8 +89,8 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getName());
 		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitle());
 		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getState());
-		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, new HashSet<>(filter.getTypes()));
-		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<>(filter.getSubTypes()));
+		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, new HashSet<>(filter.getTypeList()));
+		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<>(filter.getSubTypeList()));
 
 		if (filter.getBeginDate() != null)
 			editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEDEBUT_SUFFIX, filter.getBeginDate().getTime());

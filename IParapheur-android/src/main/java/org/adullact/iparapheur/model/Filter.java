@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.UUID;
 
 
 public class Filter implements Parcelable {
@@ -101,62 +100,62 @@ public class Filter implements Parcelable {
 		}
 	};
 
-	private String id;
-	private String name;
+	private String mId;
+	private String mName;
 
 	// Filter values
-	private String title;
-	private List<String> types;
-	private List<String> subTypes;
-	private String state;
-	private Date beginDate;
-	private Date endDate;
+	private String mTitle;
+	private List<String> mTypeList;
+	private List<String> mSubTypeList;
+	private String mState;
+	private Date mBeginDate;
+	private Date mEndDate;
 
 	public Filter() {
-		this.id = DEFAULT_ID;
-		this.name = DEFAULT_NOM;
-		this.state = DEFAULT_ETAT;
-		this.types = new ArrayList<String>();
-		this.subTypes = new ArrayList<String>();
+		mId = DEFAULT_ID;
+		mName = DEFAULT_NOM;
+		mState = DEFAULT_ETAT;
+		mTypeList = new ArrayList<>();
+		mSubTypeList = new ArrayList<>();
 	}
 
 	public Filter(String id) {
-		this.id = id;
-		this.name = DEFAULT_NOM;
-		this.state = DEFAULT_ETAT;
-		this.types = new ArrayList<String>();
-		this.subTypes = new ArrayList<String>();
+		mId = id;
+		mName = DEFAULT_NOM;
+		mState = DEFAULT_ETAT;
+		mTypeList = new ArrayList<>();
+		mSubTypeList = new ArrayList<>();
 	}
 
-	public Filter(Filter filter) {
-		if (filter.id.equals(DEFAULT_ID) || filter.id.equals(EDIT_FILTER_ID)) {
-			this.id = UUID.randomUUID().toString();
-		}
-		else {
-			this.id = filter.id;
-		}
-		this.name = filter.name;
-		this.title = filter.title;
-		this.state = filter.state;
-		this.types = filter.types;
-		this.subTypes = filter.subTypes;
-		this.beginDate = filter.beginDate;
-		this.endDate = filter.endDate;
-	}
+//	public Filter(Filter filter) {
+//		if (filter.mId.equals(DEFAULT_ID) || filter.mId.equals(EDIT_FILTER_ID)) {
+//			mId = UUID.randomUUID().toString();
+//		}
+//		else {
+//			mId = filter.mId;
+//		}
+//		mName = filter.mName;
+//		mTitle = filter.mTitle;
+//		mState = filter.mState;
+//		mTypeList = filter.mTypeList;
+//		mSubTypeList = filter.mSubTypeList;
+//		mBeginDate = filter.mBeginDate;
+//		mEndDate = filter.mEndDate;
+//	}
 
 	private Filter(Parcel in) {
-		this.id = in.readString();
-		this.name = in.readString();
-		this.title = in.readString();
-		this.types = new ArrayList<String>();
-		in.readList(this.types, String.class.getClassLoader());
-		this.subTypes = new ArrayList<String>();
-		in.readList(this.subTypes, String.class.getClassLoader());
-		this.state = in.readString();
+		mId = in.readString();
+		mName = in.readString();
+		mTitle = in.readString();
+		mTypeList = new ArrayList<>();
+		in.readList(mTypeList, String.class.getClassLoader());
+		mSubTypeList = new ArrayList<>();
+		in.readList(mSubTypeList, String.class.getClassLoader());
+		mState = in.readString();
 		long tmpDateDebut = in.readLong();
-		this.beginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
+		mBeginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
 		long tmpDateFin = in.readLong();
-		this.endDate = tmpDateFin == -1 ? null : new Date(tmpDateFin);
+		mEndDate = tmpDateFin == -1 ? null : new Date(tmpDateFin);
 	}
 
 	public String getJSONFilter() {
@@ -166,23 +165,23 @@ public class Filter implements Parcelable {
 
 			// TYPES
 			JSONArray jsonTypes = new JSONArray();
-			if (types != null) {
-				for (String type : types) {
+			if (mTypeList != null) {
+				for (String type : mTypeList) {
 					jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringUtils.urlEncode(type)));
 				}
 			}
 			// SOUSTYPES
 			JSONArray jsonSousTypes = new JSONArray();
-			if (subTypes != null) {
-				for (String sousType : subTypes) {
+			if (mSubTypeList != null) {
+				for (String sousType : mSubTypeList) {
 					jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringUtils.urlEncode(sousType)));
 				}
 			}
 			//TITRE
 
 			JSONArray jsonTitre = new JSONArray();
-			if ((title != null) && (!title.trim().isEmpty())) {
-				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + title.trim() + "*"));
+			if ((mTitle != null) && (!mTitle.trim().isEmpty())) {
+				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + mTitle.trim() + "*"));
 			}
 
 			// FILTRE FINAL
@@ -201,67 +200,67 @@ public class Filter implements Parcelable {
 	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
-		return id;
+		return mId;
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		mId = id;
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		mName = name;
 	}
 
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		mTitle = title;
 	}
 
-	public List<String> getTypes() {
-		return types;
+	public List<String> getTypeList() {
+		return mTypeList;
 	}
 
-	public void setTypes(List<String> types) {
-		this.types = types;
+	public void setTypeList(List<String> typeList) {
+		mTypeList = typeList;
 	}
 
-	public List<String> getSubTypes() {
-		return subTypes;
+	public List<String> getSubTypeList() {
+		return mSubTypeList;
 	}
 
-	public void setSubTypes(List<String> subTypes) {
-		this.subTypes = subTypes;
+	public void setSubTypeList(List<String> subTypeList) {
+		mSubTypeList = subTypeList;
 	}
 
 	public String getState() {
-		return state;
+		return mState;
 	}
 
 	public void setState(String state) {
-		this.state = state;
+		mState = state;
 	}
 
 	public Date getBeginDate() {
-		return beginDate;
+		return mBeginDate;
 	}
 
 	public void setBeginDate(long beginDate) {
-		this.beginDate = new Date(beginDate);
+		mBeginDate = new Date(beginDate);
 	}
 
 	public Date getEndDate() {
-		return endDate;
+		return mEndDate;
 	}
 
 	public void setEndDate(long endDate) {
-		this.endDate = new Date(endDate);
+		mEndDate = new Date(endDate);
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -271,29 +270,29 @@ public class Filter implements Parcelable {
 	}
 
 	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.id);
-		dest.writeString(this.name);
-		dest.writeString(this.title);
-		dest.writeList(this.types);
-		dest.writeList(this.subTypes);
-		dest.writeString(this.state);
-		dest.writeLong(beginDate != null ? beginDate.getTime() : -1);
-		dest.writeLong(endDate != null ? endDate.getTime() : -1);
+		dest.writeString(mId);
+		dest.writeString(mName);
+		dest.writeString(mTitle);
+		dest.writeList(mTypeList);
+		dest.writeList(mSubTypeList);
+		dest.writeString(mState);
+		dest.writeLong(mBeginDate != null ? mBeginDate.getTime() : -1);
+		dest.writeLong(mEndDate != null ? mEndDate.getTime() : -1);
 	}
 
 	@Override public boolean equals(Object o) {
 		if (o instanceof Filter) {
 			Filter toCompare = (Filter) o;
-			return this.id.equals(toCompare.id);
+			return mId.equals(toCompare.mId);
 		}
 		return false;
 	}
 
 	@Override public int hashCode() {
-		return id.hashCode();
+		return mId.hashCode();
 	}
 
 	@Override public String toString() {
-		return "{Filter name=" + name + "}";
+		return "{Filter name=" + mName + "}";
 	}
 }

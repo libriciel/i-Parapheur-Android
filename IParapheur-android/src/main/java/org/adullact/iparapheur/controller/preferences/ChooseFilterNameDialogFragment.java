@@ -19,11 +19,11 @@ package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.DialogFragment;
 import android.view.View;
 import android.widget.EditText;
 
@@ -62,7 +62,6 @@ public class ChooseFilterNameDialogFragment extends DialogFragment {
 				onCancelButtonClicked();
 			}
 		});
-		builder.create().show();
 		return builder.create();
 	}
 

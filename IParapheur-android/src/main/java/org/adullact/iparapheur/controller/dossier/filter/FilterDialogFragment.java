@@ -19,13 +19,13 @@ package org.adullact.iparapheur.controller.dossier.filter;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
@@ -178,7 +178,9 @@ public class FilterDialogFragment extends DialogFragment {
 		});
 		builder.setNeutralButton(R.string.enregistrer_filtre, new DialogInterface.OnClickListener() {
 			@Override public void onClick(DialogInterface dialog, int which) {
-				onSaveButtonClicked();
+				// Do nothing here because we override this button in the onStart() to change the close behaviour.
+				// However, we still need this because on older versions of Android :
+				// unless we pass a handler the button doesn't get instantiated
 			}
 		});
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -190,11 +192,29 @@ public class FilterDialogFragment extends DialogFragment {
 		return builder.create();
 	}
 
+	@Override public void onStart() {
+		super.onStart();
+
+		// Overriding the AlertDialog.Builder#setPositiveButton
+		// To be able to manage a click without dismissing the popup.
+
+		android.support.v7.app.AlertDialog dialog = (android.support.v7.app.AlertDialog) getDialog();
+		if (dialog == null)
+			return;
+
+		Button signButton = dialog.getButton(Dialog.BUTTON_NEUTRAL);
+		signButton.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onSaveButtonClicked();
+			}
+		});
+	}
+
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		if ((requestCode == ChooseFilterNameDialogFragment.REQUEST_CODE_FILTER_NAME) && (resultCode == Activity.RESULT_OK)) {
 			String name = data.getStringExtra(ChooseFilterNameDialogFragment.RESULT_BUNDLE_TITLE);
-			saveFilter(name);
+			saveFilterAndDimsiss(name);
 			return;
 		}
 
@@ -236,7 +256,7 @@ public class FilterDialogFragment extends DialogFragment {
 
 		ChooseFilterNameDialogFragment chooseNameDialogFragment = ChooseFilterNameDialogFragment.newInstance();
 		chooseNameDialogFragment.setTargetFragment(this, ChooseFilterNameDialogFragment.REQUEST_CODE_FILTER_NAME);
-//		chooseNameDialogFragment.show(getActivity().getSupportFragmentManager(), ChooseFilterNameDialogFragment.FRAGMENT_TAG);
+		chooseNameDialogFragment.show(getActivity().getFragmentManager(), ChooseFilterNameDialogFragment.FRAGMENT_TAG);
 	}
 
 	private void refreshCurrentFilter(@Nullable String name) {
@@ -258,13 +278,18 @@ public class FilterDialogFragment extends DialogFragment {
 				if (Boolean.valueOf(subtypeData.get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED)))
 					selectedSubTypes.add(subtypeData.get(EXPANDABLE_LIST_ADAPTER_NAME));
 
-		mFilter.setTypes(selectedTypes);
-		mFilter.setSubTypes(selectedSubTypes);
+		mFilter.setTypeList(selectedTypes);
+		mFilter.setSubTypeList(selectedSubTypes);
 	}
 
-	private void saveFilter(@NonNull String name) {
+	private void saveFilterAndDimsiss(@NonNull String name) {
+
 		refreshCurrentFilter(name);
 		MyFilters.INSTANCE.save(mFilter);
+		MyFilters.INSTANCE.selectFilter(mFilter);
+
+		getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);
+		dismiss();
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {

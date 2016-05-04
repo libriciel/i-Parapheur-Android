@@ -257,7 +257,7 @@ public class ModelMapper {
 	}
 
 	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
-		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<String, ArrayList<String>>();
+		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
 		if (response.getResponse() != null) {
 			JSONObject data = response.getResponse().optJSONObject("data");
 			if (data != null) {
@@ -268,7 +268,7 @@ public class ModelMapper {
 						String type = (String) types.next();
 						JSONArray jsonSousTypes = typology.optJSONArray(type);
 						if (jsonSousTypes != null) {
-							ArrayList<String> sousTypes = new ArrayList<String>(jsonSousTypes.length());
+							ArrayList<String> sousTypes = new ArrayList<>(jsonSousTypes.length());
 							for (int i = 0; i < jsonSousTypes.length(); i++) {
 								String sousType = jsonSousTypes.optString(i);
 								if (!sousType.isEmpty()) {
