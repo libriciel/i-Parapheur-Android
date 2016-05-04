@@ -17,12 +17,12 @@
  */
 package org.adullact.iparapheur.controller.preferences;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -77,7 +77,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 			// Clear BackStack before restoring existing fragment (everything over the Menu),
 			// because a wrong BackStack can stay after rotation.
 			String retainedFragmentTag = fragmentsTagsMap.get(retainedFragment.getClass());
-			getSupportFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			getFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
 			// Rebuild stack
 			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
@@ -116,7 +116,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	private @Nullable Fragment getRetainedFragmentInstance() {
 
-		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentManager fragmentManager = getFragmentManager();
 		for (Map.Entry<Class<? extends Fragment>, String> fragmentTagEntry : fragmentsTagsMap.entrySet())
 			if ((fragmentManager.findFragmentByTag(fragmentTagEntry.getValue())) != null)
 				return fragmentManager.findFragmentByTag(fragmentTagEntry.getValue());
@@ -126,7 +126,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag, boolean addToBackStack) {
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.replace(R.id.preferences_activity_main_layout, fragment, tag);
 
 		if (addToBackStack)
