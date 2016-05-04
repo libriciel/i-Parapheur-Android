@@ -19,6 +19,7 @@ package org.adullact.iparapheur.controller;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -28,7 +29,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
@@ -225,7 +225,7 @@ public class MenuFragment extends Fragment {
 
 				if (resultCode == Activity.RESULT_OK) {
 					executeAsyncTask(new DossiersLoadingTask());
-					getActivity().supportInvalidateOptionsMenu();
+					getActivity().invalidateOptionsMenu();
 				}
 
 				break;
@@ -276,7 +276,7 @@ public class MenuFragment extends Fragment {
 	 */
 	public boolean onBackPressed() {
 
-		getActivity().supportInvalidateOptionsMenu();
+		getActivity().invalidateOptionsMenu();
 
 		if (mViewSwitcher.getDisplayedChild() == 1) {
 
@@ -367,7 +367,7 @@ public class MenuFragment extends Fragment {
 			case R.id.action_no_filter:
 
 				MyFilters.INSTANCE.selectFilter(null);
-				getActivity().supportInvalidateOptionsMenu();
+				getActivity().invalidateOptionsMenu();
 				executeAsyncTask(new DossiersLoadingTask());
 				return true;
 
@@ -379,7 +379,7 @@ public class MenuFragment extends Fragment {
 
 				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology);
 				filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
-				filterDialog.show(getActivity().getSupportFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
+				filterDialog.show(getActivity().getFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
 
 				return true;
 
@@ -388,7 +388,7 @@ public class MenuFragment extends Fragment {
 				Filter currentFilter = mDisplayedFilters.get(item);
 				if (currentFilter != null) {
 					MyFilters.INSTANCE.selectFilter(currentFilter);
-					getActivity().supportInvalidateOptionsMenu();
+					getActivity().invalidateOptionsMenu();
 					executeAsyncTask(new DossiersLoadingTask());
 				}
 
@@ -427,7 +427,7 @@ public class MenuFragment extends Fragment {
 
 	private void onBureauClicked(int position) {
 
-		getActivity().supportInvalidateOptionsMenu();
+		getActivity().invalidateOptionsMenu();
 
 		// Faking the Bureau list selection, by selecting the previous one (or -1 if any).
 		// We want to have a selected state only on the selected Dossier's Bureau.

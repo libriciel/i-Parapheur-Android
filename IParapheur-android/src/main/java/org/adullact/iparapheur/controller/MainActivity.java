@@ -27,10 +27,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -69,7 +69,6 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -158,27 +157,27 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		if (!certificatesFoundList.isEmpty()) {
 			File certificateFound = certificatesFoundList.get(0);
 			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
-			actionDialog.show(getSupportFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+			actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
 		}
 
 		// Clear backStack (wrong backStack can stay after rotation)
 
-		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
 		// ContentView Fragment restore
 
-		Fragment contentFragment = getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if (contentFragment == null)
 			contentFragment = new DossierDetailFragment();
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
 		transaction.commit();
 
 		// Right menu Fragment restore
 
-		MenuFragment fragmentToDisplay = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment fragmentToDisplay = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (fragmentToDisplay == null)
 			fragmentToDisplay = new MenuFragment();
 
@@ -245,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Restoring proper Drawer state on selected dossiers
 
-		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
 			mActionMode = startSupportActionMode(this);
 
@@ -269,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
 			// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getSupportFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+			AccountListFragment accountListFragment = (AccountListFragment) getFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
 			if (accountListFragment != null) {
 				accountListFragment.accountsChanged();
@@ -283,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 			// First, try to pop backStack (and open the drawer to show it)
 
-			MenuFragment bureauxFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+			MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null) {
 				if (bureauxFragment.onBackPressed()) {
 
@@ -312,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 			// Then, try to pop backstack
 
-			MenuFragment bureauxFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+			MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null)
 				if (bureauxFragment.onBackPressed())
 					return;
@@ -402,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 
-		MenuFragment fragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 
 		// Default cases
 
@@ -464,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (menuFragment == null)
 			return false;
 
@@ -479,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public void onDestroyActionMode(ActionMode actionMode) {
 
-		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (menuFragment != null)
 			menuFragment.clearCheckSelection();
 
@@ -506,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 //		int enter = animated ? R.anim.slide_in_right : 0;
 //		int exit = animated ? R.anim.slide_out_right : 0;
@@ -523,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Replace whatever is in the fragment_container view with this fragment.
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 //		int enter = animated ? R.anim.slide_in_right : 0;
 //		int exit = animated ? R.anim.slide_out_right : 0;
@@ -572,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 					}
 					else {
 						DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(new File(certificateLocalPath));
-						actionDialog.show(getSupportFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+						actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
 					}
 				}
 				else {
@@ -587,37 +586,37 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
-		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		DialogFragment actionDialog;
 		ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
 
 		if (action == Action.REJET) {
 			actionDialog = RejectDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
-			actionDialog.show(getSupportFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
+			actionDialog.show(getFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.VISA) {
 			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
-			actionDialog.show(getSupportFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+			actionDialog.show(getFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.SIGNATURE) {
 			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
-			actionDialog.show(getSupportFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
+			actionDialog.show(getFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.MAILSEC) {
 			actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.show(getSupportFragmentManager(), "MailSecDialogFragment");
+			actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
 		}
 		else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
 			actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
-			actionDialog.show(getSupportFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
+			actionDialog.show(getFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.ARCHIVAGE) {
 			actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.show(getSupportFragmentManager(), "ArchivageDialogFragment");
+			actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
 		}
 		else {
 			Log.e("Adrien", "UNKNOWN ACTION : " + action);
@@ -639,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		// We'll want to pop the BackStack to get on the Bureau list
 		// Then , we just update the Bureau with the accurate Account
 
-		MenuFragment menuFragment = (MenuFragment) getSupportFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 		if (menuFragment != null) {
 			menuFragment.onBackPressed();
 			menuFragment.updateBureaux(true);
@@ -661,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
-		DossierDetailFragment fragment = (DossierDetailFragment) getSupportFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null)) {
 			fragment.showProgressLayout();
 			fragment.update(dossier, bureauId);
@@ -703,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		launchActionPopup(CollectionUtils.asSet(dossier), bureauId, action);
 	}
 
-// </editor-fold desc="DossierDetailsFragmentListener">
+	// </editor-fold desc="DossierDetailsFragmentListener">
 
 	/**
 	 * Listener used on the Drawer Layout used to control the Action Bar content depending

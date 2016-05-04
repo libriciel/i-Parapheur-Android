@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -253,7 +253,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		AskPasswordDialogFragment askFragment = AskPasswordDialogFragment.newInstance(mAliasesSpinner.getSelectedItem().toString());
 		askFragment.setTargetFragment(this, AskPasswordDialogFragment.REQUEST_CODE_ASK_PASSWORD);
-		askFragment.show(getActivity().getSupportFragmentManager(), AskPasswordDialogFragment.FRAGMENT_TAG);
+		askFragment.show(getActivity().getFragmentManager(), AskPasswordDialogFragment.FRAGMENT_TAG);
 
 		// See #onActivityResult() for password retrieval
 		// and SignTask#onPostExecute for popup dismiss.
@@ -268,7 +268,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 		SignaturePapierConfirmDialogFragment confirmationDialog = SignaturePapierConfirmDialogFragment.newInstance();
 		confirmationDialog.setTargetFragment(this, SignaturePapierConfirmDialogFragment.REQUEST_CODE_SIGN_PAPIER);
-		confirmationDialog.show(getActivity().getSupportFragmentManager(), SignaturePapierConfirmDialogFragment.FRAGMENT_TAG);
+		confirmationDialog.show(getActivity().getFragmentManager(), SignaturePapierConfirmDialogFragment.FRAGMENT_TAG);
 	}
 
 	private void refreshCertificatesSpinner() {
