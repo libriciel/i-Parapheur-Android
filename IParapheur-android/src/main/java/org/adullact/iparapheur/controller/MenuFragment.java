@@ -101,6 +101,7 @@ public class MenuFragment extends Fragment {
 	private MenuFragmentListener mListener;
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
+	private HashMap<String, ArrayList<String>> mTypology = new HashMap<>();
 	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
 	private HashMap<MenuItem, Filter> mDisplayedFilters = new HashMap<>();
 	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
@@ -376,7 +377,7 @@ public class MenuFragment extends Fragment {
 				if (filter == null)
 					filter = new Filter();
 
-				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter);
+				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology);
 				filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
 				filterDialog.show(getActivity().getSupportFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
 
@@ -556,11 +557,16 @@ public class MenuFragment extends Fragment {
 		}
 
 		@Override protected IParapheurException doInBackground(Void... params) {
+
 			mDossierList.clear();
+			mTypology.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
 				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
 				catch (IParapheurException exception) { return exception; }
+
+				try { mTypology.putAll(RESTClient.INSTANCE.getTypologie()); }
+				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
 			else {
 				Dossier dossier1 = new Dossier("1", "Test 01", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);

@@ -23,7 +23,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,16 +36,13 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFragment;
-import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Filter;
-import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.lang.reflect.Type;
@@ -79,14 +75,42 @@ public class FilterDialogFragment extends DialogFragment {
 
 	public FilterDialogFragment() {}
 
-	public static FilterDialogFragment newInstance(Filter filter) {
+	public static FilterDialogFragment newInstance(Filter filter, HashMap<String, ArrayList<String>> typology) {
 
 		FilterDialogFragment fragment = new FilterDialogFragment();
+		List<Map<String, String>> typologyListGroupData = new ArrayList<>();
+		List<List<Map<String, String>>> typologyListChildData = new ArrayList<>();
+
+		// Parse Typology
+
+		for (Map.Entry<String, ArrayList<String>> type : typology.entrySet()) {
+
+			// SubType parse
+
+			List<Map<String, String>> subTypeMapList = new ArrayList<>();
+			for (String subTypeName : type.getValue()) {
+				HashMap<String, String> subTypeMap = new HashMap<>();
+				subTypeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, subTypeName);
+				subTypeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
+				subTypeMapList.add(subTypeMap);
+			}
+			typologyListChildData.add(subTypeMapList);
+
+			// Type parse
+
+			HashMap<String, String> typeMap = new HashMap<>();
+			typeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, type.getKey());
+			typeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
+			typologyListGroupData.add(typeMap);
+		}
 
 		// Supply parameters as an arguments.
 
+		Gson gson = new Gson();
 		Bundle args = new Bundle();
 		args.putParcelable(PARCELABLE_FIELD_FILTER, filter);
+		args.putString(BUNDLE_INSTANCE_STATE_GROUP_DATA, gson.toJson(typologyListGroupData));
+		args.putString(BUNDLE_INSTANCE_STATE_CHILD_DATA, gson.toJson(typologyListChildData));
 		fragment.setArguments(args);
 
 		return fragment;
@@ -99,17 +123,25 @@ public class FilterDialogFragment extends DialogFragment {
 
 		mFilter = new Filter();
 
+		// Retrieve Typology
+
+		String groupDataJson;
+		String childpDataJson;
+
 		if (savedInstanceState != null) {
-
-			String groupDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_GROUP_DATA);
-			String childpDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_CHILD_DATA);
-
-			Gson gson = new Gson();
-			Type groupDataType = new TypeToken<ArrayList<Map<String, String>>>() {}.getType();
-			Type childDataType = new TypeToken<ArrayList<List<Map<String, String>>>>() {}.getType();
-			mTypologyListGroupData = gson.fromJson(groupDataJson, groupDataType);
-			mTypologyListChildData = gson.fromJson(childpDataJson, childDataType);
+			groupDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_GROUP_DATA);
+			childpDataJson = savedInstanceState.getString(BUNDLE_INSTANCE_STATE_CHILD_DATA);
 		}
+		else {
+			groupDataJson = getArguments().getString(BUNDLE_INSTANCE_STATE_GROUP_DATA);
+			childpDataJson = getArguments().getString(BUNDLE_INSTANCE_STATE_CHILD_DATA);
+		}
+
+		Gson gson = new Gson();
+		Type groupDataType = new TypeToken<ArrayList<Map<String, String>>>() {}.getType();
+		Type childDataType = new TypeToken<ArrayList<List<Map<String, String>>>>() {}.getType();
+		mTypologyListGroupData = gson.fromJson(groupDataJson, groupDataType);
+		mTypologyListChildData = gson.fromJson(childpDataJson, childDataType);
 	}
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -155,13 +187,6 @@ public class FilterDialogFragment extends DialogFragment {
 		});
 
 		return builder.create();
-	}
-
-	@Override public void onStart() {
-		super.onStart();
-
-		if (mTypologyListGroupData.isEmpty() && mTypologyListChildData.isEmpty())
-			new TypologyLoadingTask().execute();
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -239,55 +264,6 @@ public class FilterDialogFragment extends DialogFragment {
 	private void saveFilter(@NonNull String name) {
 		refreshCurrentFilter(name);
 		MyFilters.INSTANCE.save(mFilter);
-	}
-
-	private class TypologyLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
-
-		@Override protected IParapheurException doInBackground(Void... params) {
-
-			mTypologyListGroupData.clear();
-			mTypologyListChildData.clear();
-
-			// Retrieve data
-
-			HashMap<String, ArrayList<String>> retrievedTypology = new HashMap<>();
-			try { retrievedTypology.putAll(RESTClient.INSTANCE.getTypologie()); }
-			catch (IParapheurException e) { return e; }
-
-			// Populate values
-
-			for (Map.Entry<String, ArrayList<String>> type : retrievedTypology.entrySet()) {
-
-				// SubType parse
-
-				List<Map<String, String>> subTypeMapList = new ArrayList<>();
-				for (String subTypeName : type.getValue()) {
-					HashMap<String, String> subTypeMap = new HashMap<>();
-					subTypeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, subTypeName);
-					subTypeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
-					subTypeMapList.add(subTypeMap);
-				}
-				mTypologyListChildData.add(subTypeMapList);
-
-				// Type parse
-
-				HashMap<String, String> typeMap = new HashMap<>();
-				typeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, type.getKey());
-				typeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
-				mTypologyListGroupData.add(typeMap);
-			}
-
-			return null;
-		}
-
-		@Override protected void onPostExecute(IParapheurException e) {
-			super.onPostExecute(e);
-
-			((SimpleExpandableListAdapter) mTypologyListView.getExpandableListAdapter()).notifyDataSetChanged();
-
-			if (e != null)
-				Toast.makeText(getActivity(), R.string.Error_on_typology_update, Toast.LENGTH_LONG).show();
-		}
 	}
 
 	private class FilterStateSpinnerAdapter extends ArrayAdapter<String> {
