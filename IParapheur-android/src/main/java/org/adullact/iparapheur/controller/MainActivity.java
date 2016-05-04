@@ -349,11 +349,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Show or hide specific menu actions depending on Drawer state.
 
-		if ((mLeftDrawerLayout != null) && (mLeftDrawerMenu != null)) {
-			boolean actionsVisibility = !mLeftDrawerLayout.isDrawerVisible(mLeftDrawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
-			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
-			return super.onPrepareOptionsMenu(menu);
-		}
+//		if ((mLeftDrawerLayout != null) && (mLeftDrawerMenu != null)) {
+//			boolean actionsVisibility = !mLeftDrawerLayout.isDrawerVisible(mLeftDrawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
+//			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
+//			return super.onPrepareOptionsMenu(menu);
+//		}
 
 		return false;
 	}
