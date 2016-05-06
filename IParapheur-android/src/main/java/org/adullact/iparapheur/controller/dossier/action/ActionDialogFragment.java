@@ -38,7 +38,6 @@ import java.util.ArrayList;
 
 public abstract class ActionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
-	protected LoadingTask.DataChangeListener listener;
 	protected ArrayList<Dossier> dossiers;
 	protected String bureauId;
 
@@ -61,22 +60,6 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		});
 
 		return builder.create();
-	}
-
-	@Override public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof LoadingTask.DataChangeListener))
-			throw new IllegalStateException("Activity must implement DataChangeListener.");
-
-		listener = (LoadingTask.DataChangeListener) activity;
-	}
-
-	@Override public void onDetach() {
-		super.onDetach();
-
-		// Reset the active callbacks interface.
-		listener = null;
 	}
 
 	// </editor-fold desc="LifeCycle">

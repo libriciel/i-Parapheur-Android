@@ -99,7 +99,6 @@ public class MenuFragment extends Fragment {
 	private View mDossierEmptyView;
 
 	// Data
-	private MenuFragmentListener mListener;
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
 	private HashMap<String, ArrayList<String>> mTypology = new HashMap<>();
@@ -111,16 +110,6 @@ public class MenuFragment extends Fragment {
 	private AsyncTask<Void, ?, ?> mPendingAsyncTask = null;
 
 	// <editor-fold desc="LifeCycle">
-
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		// Activities containing this fragment must implement its callbacks.
-		if (!(context instanceof MenuFragmentListener))
-			throw new IllegalStateException("Activity must implement BureauSelectedListener.");
-
-		mListener = (MenuFragmentListener) context;
-	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.menu_fragment, container, false);
@@ -268,8 +257,7 @@ public class MenuFragment extends Fragment {
 
 							executeAsyncTask(new DossiersLoadingTask());
 
-							if (mListener != null)
-								mListener.onDossierCheckedChanged(true);
+							((MenuFragmentListener) getActivity()).onDossierCheckedChanged(true);
 						}
 					}, 1500L);
 				}
@@ -285,11 +273,6 @@ public class MenuFragment extends Fragment {
 
 		if (mBureauList.isEmpty())
 			updateBureaux(true);
-	}
-
-	@Override public void onDetach() {
-		super.onDetach();
-		mListener = null;
 	}
 
 	/**
@@ -510,7 +493,7 @@ public class MenuFragment extends Fragment {
 		// Callback
 
 		Dossier selectedDossier = ((DossierListAdapter) mDossierListView.getAdapter()).getItem(position);
-		mListener.onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
+		((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
 	}
 
 	private void executeAsyncTask(@NonNull AsyncTask<Void, ?, ?> task) {
@@ -807,7 +790,8 @@ public class MenuFragment extends Fragment {
 
 					@Override public void onAnimationStart(Animator animator) { }
 
-					@Override public void onAnimationEnd(Animator animator) { mListener.onDossierCheckedChanged(mCheckedDossiers.isEmpty()); }
+					@Override public void onAnimationEnd(
+							Animator animator) { ((MenuFragmentListener) getActivity()).onDossierCheckedChanged(mCheckedDossiers.isEmpty()); }
 
 					@Override public void onAnimationCancel(Animator animator) { }
 
@@ -817,7 +801,7 @@ public class MenuFragment extends Fragment {
 			else {
 				mCheckedDossiers.add(dossier);
 				ViewUtils.flip(getActivity(), mainView, selectorView, null);
-				mListener.onDossierCheckedChanged(mCheckedDossiers.isEmpty());
+				((MenuFragmentListener) getActivity()).onDossierCheckedChanged(mCheckedDossiers.isEmpty());
 			}
 		}
 	}

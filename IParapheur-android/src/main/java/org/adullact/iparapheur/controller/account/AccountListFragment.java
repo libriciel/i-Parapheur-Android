@@ -43,7 +43,6 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	public static final String FRAGMENT_TAG = "account_list_fragment";
 
-	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account
 	private AccountListAdapter mAccountListAdapter;
@@ -55,16 +54,6 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		setRetainInstance(true);
 
 		mAccounts = new ArrayList<>();
-	}
-
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		// Activities containing this fragment must implement its callbacks.
-		if (!(context instanceof AccountFragmentListener))
-			throw new IllegalStateException("Activity must implement AccountFragmentListener.");
-
-		mListener = (AccountFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,8 +75,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
 		footerView.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				if (mListener != null)
-					mListener.onCreateAccountInvoked();
+				((AccountFragmentListener) getActivity()).onCreateAccountInvoked();
 			}
 		});
 		mListView.addFooterView(footerView, null, false);
@@ -142,9 +130,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	// <editor-fold desc="OnItemClickListener">
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-		if (mListener != null)
-			mListener.onAccountSelected(mAccounts.get(position));
+		((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">

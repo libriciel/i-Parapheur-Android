@@ -40,7 +40,6 @@ import org.adullact.iparapheur.R;
 public class PreferencesMenuFragment extends Fragment implements View.OnClickListener {
 
 	public static final String FRAGMENT_TAG = "preferences_menu_fragment";
-	private PreferenceMenuFragmentListener mListener;
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -69,15 +68,6 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		return v;
 	}
 
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		try { mListener = (PreferenceMenuFragmentListener) context; }
-		catch (ClassCastException e) {
-			throw new ClassCastException(context.toString() + " must implement OnFragmentInteractionListener");
-		}
-	}
-
 	@Override public void onResume() {
 		super.onResume();
 
@@ -88,19 +78,11 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		}
 	}
 
-	@Override public void onDetach() {
-		super.onDetach();
-		mListener = null;
-	}
-
 	// </editor-fold desc="LifeCycle">
 
 	// <editor-fold desc="OnClickListener">
 
 	@Override public void onClick(View v) {
-
-		if (mListener == null)
-			return;
 
 		// Determine which Fragment was clicked
 
@@ -124,7 +106,7 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		// throw exception to parent activity
 
 		if (clickedFragment != null)
-			mListener.onMenuElementClicked(clickedFragment);
+			((PreferenceMenuFragmentListener) getActivity()).onMenuElementClicked(clickedFragment);
 	}
 
 	// </editor-fold desc="OnClickListener">
