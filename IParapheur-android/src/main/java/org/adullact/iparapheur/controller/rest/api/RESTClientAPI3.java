@@ -34,6 +34,7 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -115,13 +116,10 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 
-		if (filter == null)
-			filter = new Filter();
-
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
-				"&corbeilleName=" + filter.getState() +
-				"&filter=" + filter.getJSONFilter() +
+				"&corbeilleName=" + ((filter != null) ? filter.getState() : State.A_TRAITER.getServerValue()) +
+				((filter != null) ? "&filter=" + filter.getJSONFilter() : "") +
 				"&metas={}" +
 				"&page=0" +
 				"&pageSize=25" +
