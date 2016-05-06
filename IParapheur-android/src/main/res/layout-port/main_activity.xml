@@ -63,8 +63,7 @@
                 android:id="@+id/activity_dossiers_right_drawer"
                 android:layout_width="320dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
+                android:layout_gravity="end">
 
                 <include layout="@layout/dossiers_info" />
 

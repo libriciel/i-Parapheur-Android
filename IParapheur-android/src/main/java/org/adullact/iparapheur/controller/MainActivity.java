@@ -679,6 +679,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
+	@Override public boolean isAnyDrawerOpened() {
+		return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));
+	}
+
 	@Override public void toggleInfoDrawer() {
 
 		if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))

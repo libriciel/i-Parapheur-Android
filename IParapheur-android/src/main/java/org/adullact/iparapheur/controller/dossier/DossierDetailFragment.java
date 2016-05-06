@@ -252,6 +252,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// <editor-fold desc="MuPdfFragment">
 
+	@Override protected boolean areGesturesLocked() {
+		return ((DossierDetailsFragmentListener) getActivity()).isAnyDrawerOpened();
+	}
+
 	@Override public void showProgressLayout() {
 
 		if (getView() != null)
@@ -289,11 +293,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			new UpdateAnnotationAsyncTask().execute(newStickyNote);
 	}
 
-	@NonNull @Override protected String getStickyNoteAuthorName() {
+	@Override protected @NonNull String getStickyNoteAuthorName() {
 		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
 	}
 
-	@NonNull @Override protected String generateNewStickyNoteId() {
+	@Override protected @NonNull String generateNewStickyNoteId() {
 		return "new_" + UUID.randomUUID();
 	}
 
@@ -580,6 +584,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
 	public interface DossierDetailsFragmentListener {
+
+		boolean isAnyDrawerOpened();
 
 		void toggleInfoDrawer();
 
