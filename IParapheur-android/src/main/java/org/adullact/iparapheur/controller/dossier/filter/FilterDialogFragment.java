@@ -44,6 +44,7 @@ import com.google.gson.reflect.TypeToken;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFragment;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.lang.reflect.Type;
@@ -160,7 +161,7 @@ public class FilterDialogFragment extends DialogFragment {
 
 		FilterStateSpinnerAdapter spinnerStateAdapter = new FilterStateSpinnerAdapter(getActivity());
 		mStateSpinner.setAdapter(spinnerStateAdapter);
-		mStateSpinner.setSelection(Filter.states.indexOf("a-traiter"), false); // TODO : Enum that shit
+		mStateSpinner.setSelection(State.A_TRAITER.ordinal(), false);
 
 		mTypologyListView.setAdapter(new TypologySimpleExpandableListAdapter());
 
@@ -265,7 +266,7 @@ public class FilterDialogFragment extends DialogFragment {
 			mFilter.setName(name);
 
 		mFilter.setTitle(mTitleText.getText().toString());
-		mFilter.setState(Filter.states.get(mStateSpinner.getSelectedItemPosition()));
+		mFilter.setState(State.values()[mStateSpinner.getSelectedItemPosition()]);
 
 		ArrayList<String> selectedTypes = new ArrayList<>();
 		for (Map<String, String> typeData : mTypologyListGroupData)
@@ -299,16 +300,16 @@ public class FilterDialogFragment extends DialogFragment {
 		}
 
 		@Override public int getCount() {
-			return Filter.states.size();
+			return State.values().length;
 		}
 
 		@Override public String getItem(int position) {
-			return Filter.statesTitles.get(Filter.states.get(position));
+			return getString(State.values()[position].getNameRes());
 		}
 
 		@Override public int getPosition(String item) {
-			ArrayList<String> values = new ArrayList<>(Filter.statesTitles.values());
-			return values.indexOf(item);
+			State state = State.fromName(getActivity(), item);
+			return (state != null) ? state.ordinal() : Spinner.INVALID_POSITION;
 		}
 	}
 

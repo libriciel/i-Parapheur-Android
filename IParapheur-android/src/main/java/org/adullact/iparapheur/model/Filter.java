@@ -27,8 +27,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -42,54 +40,8 @@ public class Filter implements Parcelable {
 
 	public static final String DEFAULT_ID = "default-filter";
 	public static final String EDIT_FILTER_ID = "edit-filter";
-	public static final ArrayList<String> states;
-	public static final HashMap<String, String> statesTitles;
 
-	static {
-		states = new ArrayList<>();
-		states.add("en-preparation");
-		states.add("a-traiter");
-		states.add("a-archiver");
-		states.add("retournes");
-		states.add("en-cours");
-		states.add("a-venir");
-		states.add("recuperables");
-		states.add("en-retard");
-		states.add("traites");
-		states.add("dossiers-delegues");
-		states.add("no-corbeille");
-		states.add("no-bureau");
-
-        /*statesTitles = new HashMap<String, String>();
-		statesTitles.put("À transmettre", "en-preparation");
-        statesTitles.put("À traiter", "a-traiter");
-        statesTitles.put("En fin de circuit", "a-archiver");
-        statesTitles.put("Retournés", "retournes");
-        statesTitles.put("En cours", "en-cours");
-        statesTitles.put("À venir", "a-venir");
-        statesTitles.put("Récupérables", "recuperables");
-        statesTitles.put("En retard", "en-retard");
-        statesTitles.put("Traités", "traites");
-        statesTitles.put("Dossiers en délégation", "dossiers-delegues");
-        statesTitles.put("Toutes les banettes", "no-corbeille");
-        statesTitles.put("Tout i-P arapheur", "no-bureau");*/
-		statesTitles = new LinkedHashMap<>();
-		statesTitles.put("en-preparation", "À transmettre");
-		statesTitles.put("a-traiter", "À traiter");
-		statesTitles.put("a-archiver", "En fin de circuit");
-		statesTitles.put("retournes", "Retournés");
-		statesTitles.put("en-cours", "En cours");
-		statesTitles.put("a-venir", "À venir");
-		statesTitles.put("recuperables", "Récupérables");
-		statesTitles.put("en-retard", "En retard");
-		statesTitles.put("traites", "Traités");
-		statesTitles.put("dossiers-delegues", "Dossiers en délégation");
-		statesTitles.put("no-corbeille", "Toutes les banettes");
-		statesTitles.put("no-bureau", "Tout i-Parapheur");
-	}
-
-	private static final String DEFAULT_ETAT = "a-traiter";
-	private static final String DEFAULT_NOM = "Dossiers à traiter";
+	private static final State DEFAULT_STATE = State.A_TRAITER;
 	public static Parcelable.Creator<Filter> CREATOR = new Parcelable.Creator<Filter>() {
 		public Filter createFromParcel(Parcel source) {
 			return new Filter(source);
@@ -107,22 +59,22 @@ public class Filter implements Parcelable {
 	private String mTitle;
 	private List<String> mTypeList;
 	private List<String> mSubTypeList;
-	private String mState;
+	private State mState;
 	private Date mBeginDate;
 	private Date mEndDate;
 
 	public Filter() {
 		mId = DEFAULT_ID;
-		mName = DEFAULT_NOM;
-		mState = DEFAULT_ETAT;
+		mName = null;
+		mState = DEFAULT_STATE;
 		mTypeList = new ArrayList<>();
 		mSubTypeList = new ArrayList<>();
 	}
 
 	public Filter(String id) {
 		mId = id;
-		mName = DEFAULT_NOM;
-		mState = DEFAULT_ETAT;
+		mName = null;
+		mState = DEFAULT_STATE;
 		mTypeList = new ArrayList<>();
 		mSubTypeList = new ArrayList<>();
 	}
@@ -151,7 +103,7 @@ public class Filter implements Parcelable {
 		in.readList(mTypeList, String.class.getClassLoader());
 		mSubTypeList = new ArrayList<>();
 		in.readList(mSubTypeList, String.class.getClassLoader());
-		mState = in.readString();
+		mState = State.values()[in.readInt()];
 		long tmpDateDebut = in.readLong();
 		mBeginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
 		long tmpDateFin = in.readLong();
@@ -239,11 +191,11 @@ public class Filter implements Parcelable {
 		mSubTypeList = subTypeList;
 	}
 
-	public String getState() {
+	public State getState() {
 		return mState;
 	}
 
-	public void setState(String state) {
+	public void setState(State state) {
 		mState = state;
 	}
 
@@ -275,7 +227,7 @@ public class Filter implements Parcelable {
 		dest.writeString(mTitle);
 		dest.writeList(mTypeList);
 		dest.writeList(mSubTypeList);
-		dest.writeString(mState);
+		dest.writeInt(mState.ordinal());
 		dest.writeLong(mBeginDate != null ? mBeginDate.getTime() : -1);
 		dest.writeLong(mEndDate != null ? mEndDate.getTime() : -1);
 	}
