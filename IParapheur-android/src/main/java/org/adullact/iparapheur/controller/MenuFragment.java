@@ -304,27 +304,28 @@ public class MenuFragment extends Fragment {
 	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 
-		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 
-		if (menu_toolbar != null)
-			menu_toolbar.inflateMenu(R.menu.menu_fragment);
+		if (menuToolbar != null)
+			menuToolbar.inflateMenu(R.menu.menu_fragment);
 	}
 
 	@Override public void onPrepareOptionsMenu(Menu menu) {
-		Toolbar menu_toolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 
 		// Compute main filters icon visibility
 
 		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
-		MenuItem filterItem = menu_toolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
+		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+		MenuItem filterItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
 		filterItem.setVisible(isDossierList && isInLandscape);
 		filterItem.setIcon((MyFilters.INSTANCE.getSelectedFilter() != null) ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
 
 		// No filter button (if any filter is available)
 
 		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+//		ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
 		SubMenu filterSubMenu = filterItem.getSubMenu();
 		filterSubMenu.clear();
 

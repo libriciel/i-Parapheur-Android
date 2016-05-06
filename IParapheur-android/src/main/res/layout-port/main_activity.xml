@@ -99,14 +99,35 @@
                     android:layout_height="178dp"
                     android:background="@drawable/navigation_drawer_header_gradient" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:padding="25dp"
-                    android:text="@string/parapheurs"
-                    android:textColor="@color/text_white"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal"
+                    android:padding="25dp">
+
+                    <TextView
+                        android:id="@+id/navigation_drawer_filters_menu_header_title"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="bottom"
+                        android:maxLines="1"
+                        android:text="@string/parapheurs"
+                        android:textColor="@color/text_white"
+                        android:textSize="14sp" />
+
+                    <ImageButton
+                        android:id="@+id/navigation_drawer_filters_menu_header_filters_imagebutton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/Filter_selection"
+                        android:src="@drawable/ic_filter_list_white_24dp" />
+                </LinearLayout>
 
                 <View
                     android:id="@+id/navigation_drawer_fake_status_bar"

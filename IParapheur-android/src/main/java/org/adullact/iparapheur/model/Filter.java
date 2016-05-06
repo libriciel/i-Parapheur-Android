@@ -38,8 +38,6 @@ public class Filter implements Parcelable {
 	public static final String REQUEST_JSON_FILTER_TITLE = "cm:title";
 	public static final String REQUEST_JSON_FILTER_AND = "and";
 	public static final String REQUEST_JSON_FILTER_OR = "or";
-
-	public static final String DEFAULT_ID = "default-filter";
 	public static final String EDIT_FILTER_ID = "edit-filter";
 
 	private static final State DEFAULT_STATE = State.A_TRAITER;
@@ -79,22 +77,6 @@ public class Filter implements Parcelable {
 		mTypeList = new ArrayList<>();
 		mSubTypeList = new ArrayList<>();
 	}
-
-//	public Filter(Filter filter) {
-//		if (filter.mId.equals(DEFAULT_ID) || filter.mId.equals(EDIT_FILTER_ID)) {
-//			mId = UUID.randomUUID().toString();
-//		}
-//		else {
-//			mId = filter.mId;
-//		}
-//		mName = filter.mName;
-//		mTitle = filter.mTitle;
-//		mState = filter.mState;
-//		mTypeList = filter.mTypeList;
-//		mSubTypeList = filter.mSubTypeList;
-//		mBeginDate = filter.mBeginDate;
-//		mEndDate = filter.mEndDate;
-//	}
 
 	private Filter(Parcel in) {
 		mId = in.readString();
