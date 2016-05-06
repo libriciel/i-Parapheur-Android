@@ -126,7 +126,6 @@ public class RESTClientAPI3 extends RESTClientAPI {
 				"&pendingFile=0" +
 				"&skipped=0" +
 				"&sort=cm:created";
-
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		RequestResponse response = RESTUtils.get(url);

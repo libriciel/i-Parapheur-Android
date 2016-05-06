@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 public class Filter implements Parcelable {
@@ -64,7 +65,7 @@ public class Filter implements Parcelable {
 	private Date mEndDate;
 
 	public Filter() {
-		mId = DEFAULT_ID;
+		mId = UUID.randomUUID().toString();
 		mName = null;
 		mState = DEFAULT_STATE;
 		mTypeList = new ArrayList<>();
