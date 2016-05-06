@@ -31,6 +31,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -39,12 +40,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -212,6 +213,20 @@ public class MenuFragment extends Fragment {
 	@Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setHasOptionsMenu(true);
+
+		// This button is not in this Fragment directly,
+		// it's in the navigation drawer. But we need to inflate it anyway.
+
+		final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+		if (filterListPortraitButton != null) {
+			filterListPortraitButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					PopupMenu popup = new PopupMenu(getActivity(), filterListPortraitButton);
+					inflateFilterSubMenu(popup.getMenu());
+					popup.show();
+				}
+			});
+		}
 	}
 
 	@Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -305,7 +320,6 @@ public class MenuFragment extends Fragment {
 		super.onCreateOptionsMenu(menu, inflater);
 
 		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
-
 		if (menuToolbar != null)
 			menuToolbar.inflateMenu(R.menu.menu_fragment);
 	}
@@ -316,43 +330,22 @@ public class MenuFragment extends Fragment {
 
 		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+		boolean isListFiltered = (MyFilters.INSTANCE.getSelectedFilter() != null);
+
+		// Refreshing navigation drawer filter button (visible in portrait)
+
+		final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+		filterListPortraitButton.setImageResource(isListFiltered ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
+		filterListPortraitButton.setVisibility((isDossierList && !isInLandscape) ? View.VISIBLE : View.GONE);
+
+		// Refreshing toolbar filter button (visible in landscape)
 
 		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 		MenuItem filterItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
+		filterItem.setIcon(isListFiltered ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
 		filterItem.setVisible(isDossierList && isInLandscape);
-		filterItem.setIcon((MyFilters.INSTANCE.getSelectedFilter() != null) ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
 
-		// No filter button (if any filter is available)
-
-		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
-//		ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-		SubMenu filterSubMenu = filterItem.getSubMenu();
-		filterSubMenu.clear();
-
-		if (!filterList.isEmpty()) {
-			MenuItem item = filterSubMenu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter);
-			item.setIcon(R.drawable.ic_no_filter_black_24dp);
-		}
-
-		// Inflate Filters
-
-		mDisplayedFilters.clear();
-
-		for (Filter filter : filterList) {
-
-			MenuItem item = filterSubMenu.add(Menu.NONE, R.id.action_filter, 2, filter.getName());
-			item.setIcon(R.drawable.ic_filter_list_black_24dp);
-
-			mDisplayedFilters.put(item, filter);
-		}
-
-		// Add a Filter button (greyed)
-
-		MenuItem addMenuItem = filterSubMenu.add(Menu.NONE, R.id.action_add_filter, 3, R.string.Add_filter);
-		SpannableString addMenuItemString = new SpannableString(addMenuItem.getTitle());
-		addMenuItemString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.grey_600)), 0, addMenuItemString.length(), 0);
-		addMenuItem.setTitle(addMenuItemString);
-		addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
+		inflateFilterSubMenu(filterItem.getSubMenu());
 
 		//
 
@@ -401,6 +394,39 @@ public class MenuFragment extends Fragment {
 	}
 
 	// </editor-fold desc="ActionBar">
+
+	private void inflateFilterSubMenu(@NonNull Menu menu) {
+
+		// No filter button (if any filter is available)
+
+		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+		menu.clear();
+
+		if (!filterList.isEmpty()) {
+			MenuItem item = menu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter);
+			item.setIcon(R.drawable.ic_no_filter_black_24dp);
+		}
+
+		// Inflate Filters
+
+		mDisplayedFilters.clear();
+
+		for (Filter filter : filterList) {
+
+			MenuItem item = menu.add(Menu.NONE, R.id.action_filter, 2, filter.getName());
+			item.setIcon(R.drawable.ic_filter_list_black_24dp);
+
+			mDisplayedFilters.put(item, filter);
+		}
+
+		// Add a Filter button (greyed)
+
+		MenuItem addMenuItem = menu.add(Menu.NONE, R.id.action_add_filter, 3, R.string.Add_filter);
+		SpannableString addMenuItemString = new SpannableString(addMenuItem.getTitle());
+		addMenuItemString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.grey_600)), 0, addMenuItemString.length(), 0);
+		addMenuItem.setTitle(addMenuItemString);
+		addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
+	}
 
 	public Bureau getSelectedBureau() {
 		return mSelectedBureau;
