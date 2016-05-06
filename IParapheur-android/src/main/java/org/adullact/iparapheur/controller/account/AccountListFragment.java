@@ -17,11 +17,11 @@
  */
 package org.adullact.iparapheur.controller.account;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,7 +129,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 				if (account.isActivated())
 					mAccounts.add(account);
 
-		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getContext()));
+		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
 
 		if (mAccountListAdapter != null)
 			mAccountListAdapter.notifyDataSetChanged();
