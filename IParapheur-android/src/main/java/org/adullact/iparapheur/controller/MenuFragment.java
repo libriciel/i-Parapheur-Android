@@ -31,7 +31,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -48,6 +47,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -221,8 +221,16 @@ public class MenuFragment extends Fragment {
 		if (filterListPortraitButton != null) {
 			filterListPortraitButton.setOnClickListener(new View.OnClickListener() {
 				@Override public void onClick(View v) {
+
 					PopupMenu popup = new PopupMenu(getActivity(), filterListPortraitButton);
 					inflateFilterSubMenu(popup.getMenu());
+					ViewUtils.setForceShowIcon(popup);
+
+					popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+						@Override public boolean onMenuItemClick(MenuItem item) {
+							return onFilterItemSelected(item);
+						}
+					});
 					popup.show();
 				}
 			});
@@ -353,44 +361,7 @@ public class MenuFragment extends Fragment {
 	}
 
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
-
-		// Handle presses on the action bar items
-
-		switch (item.getItemId()) {
-
-			case R.id.action_no_filter:
-
-				MyFilters.INSTANCE.selectFilter(null);
-				getActivity().invalidateOptionsMenu();
-				executeAsyncTask(new DossiersLoadingTask());
-				return true;
-
-			case R.id.action_add_filter:
-
-				Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-				if (filter == null)
-					filter = new Filter();
-
-				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology);
-				filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
-				filterDialog.show(getActivity().getFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
-
-				return true;
-
-			case R.id.action_filter:
-
-				Filter currentFilter = mDisplayedFilters.get(item);
-				if (currentFilter != null) {
-					MyFilters.INSTANCE.selectFilter(currentFilter);
-					getActivity().invalidateOptionsMenu();
-					executeAsyncTask(new DossiersLoadingTask());
-				}
-
-				return true;
-
-			default:
-				return getActivity().onOptionsItemSelected(item);
-		}
+		return onFilterItemSelected(item) || getActivity().onOptionsItemSelected(item);
 	}
 
 	// </editor-fold desc="ActionBar">
@@ -426,6 +397,44 @@ public class MenuFragment extends Fragment {
 		addMenuItemString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.grey_600)), 0, addMenuItemString.length(), 0);
 		addMenuItem.setTitle(addMenuItemString);
 		addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
+	}
+
+	private boolean onFilterItemSelected(@NonNull MenuItem item) {
+
+		switch (item.getItemId()) {
+
+			case R.id.action_no_filter:
+
+				MyFilters.INSTANCE.selectFilter(null);
+				getActivity().invalidateOptionsMenu();
+				executeAsyncTask(new DossiersLoadingTask());
+				return true;
+
+			case R.id.action_add_filter:
+
+				Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+				if (filter == null)
+					filter = new Filter();
+
+				FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology);
+				filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
+				filterDialog.show(getActivity().getFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
+
+				return true;
+
+			case R.id.action_filter:
+
+				Filter currentFilter = mDisplayedFilters.get(item);
+				if (currentFilter != null) {
+					MyFilters.INSTANCE.selectFilter(currentFilter);
+					getActivity().invalidateOptionsMenu();
+					executeAsyncTask(new DossiersLoadingTask());
+				}
+
+				return true;
+		}
+
+		return false;
 	}
 
 	public Bureau getSelectedBureau() {
