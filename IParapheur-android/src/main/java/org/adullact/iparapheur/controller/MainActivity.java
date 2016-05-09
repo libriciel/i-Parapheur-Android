@@ -20,7 +20,6 @@ package org.adullact.iparapheur.controller;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -141,6 +140,28 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
 		mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+		// ContentView Fragment restore
+
+		Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		if (contentFragment == null)
+			contentFragment = new DossierDetailFragment();
+		contentFragment.setRetainInstance(true);
+
+		FragmentTransaction contenttransaction = getFragmentManager().beginTransaction();
+		contenttransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
+		contenttransaction.commit();
+
+		// Menu Fragment restore
+
+		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+		if (menuFragment == null)
+			menuFragment = new MenuFragment();
+		menuFragment.setRetainInstance(true);
+
+		FragmentTransaction menuTransaction = getFragmentManager().beginTransaction();
+		menuTransaction.replace(R.id.menu_layout, menuFragment, MenuFragment.FRAGMENT_TAG);
+		menuTransaction.commit();
 	}
 
 	@Override protected void onPostCreate(Bundle savedInstanceState) {
@@ -160,33 +181,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
 			actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
 		}
-
-		// Clear backStack (wrong backStack can stay after rotation)
-
-		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-		// ContentView Fragment restore
-
-		Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		if (contentFragment == null)
-			contentFragment = new DossierDetailFragment();
-
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
-		transaction.commit();
-
-		// Right menu Fragment restore
-
-		MenuFragment fragmentToDisplay = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if (fragmentToDisplay == null)
-			fragmentToDisplay = new MenuFragment();
-
-		// Replace whatever is in the fragment_container view with this fragment.
-
-		fragmentToDisplay.setRetainInstance(true);
-		if (findViewById(R.id.left_fragment) != null)
-			replaceLeftFragment(fragmentToDisplay, MenuFragment.FRAGMENT_TAG, false);
 
 		// Selecting the first account by default, the demo one
 
@@ -327,12 +321,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
 
-		Toolbar actions_toolbar = (Toolbar) findViewById(R.id.actions_toolbar);
-		if (actions_toolbar != null) {
+		Toolbar actionsToolbar = (Toolbar) findViewById(R.id.actions_toolbar);
+		if (actionsToolbar != null) {
 
-			actions_toolbar.getMenu().clear();
-			actions_toolbar.inflateMenu(R.menu.main_activity);
-			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+			actionsToolbar.getMenu().clear();
+			actionsToolbar.inflateMenu(R.menu.main_activity);
+			actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 				@Override public boolean onMenuItemClick(MenuItem item) {
 					return onOptionsItemSelected(item);
 				}
@@ -344,17 +338,18 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public boolean onPrepareOptionsMenu(Menu menu) {
 
-		// Show or hide specific menu actions depending on displayed fragment
+		// Check Share button visibility
 
-		// TODO mFiltersSpinner.setVisibility((dossierFragment == null) ? View.GONE : View.VISIBLE);
+		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		Dossier dossier = fragment.getDossier();
+		String documentId = fragment.getDocumentId();
+		Document document = Dossier.findCurrentDocument(dossier, documentId);
+		boolean isShareable = document != null;
 
-		// Show or hide specific menu actions depending on Drawer state.
+		if (menu.findItem(R.id.menu_item_share) != null)
+			menu.findItem(R.id.menu_item_share).setVisible(isShareable);
 
-//		if ((mLeftDrawerLayout != null) && (mLeftDrawerMenu != null)) {
-//			boolean actionsVisibility = !mLeftDrawerLayout.isDrawerVisible(mLeftDrawerMenu) && (MyAccounts.INSTANCE.getSelectedAccount() != null);
-//			menu.setGroupVisible(R.id.dossiers_menu_actions, actionsVisibility);
-//			return super.onPrepareOptionsMenu(menu);
-//		}
+		//
 
 		return false;
 	}
@@ -498,47 +493,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	}
 
 	// </editor-fold desc="ActionMode">
-
-	private void replaceLeftFragment(@NonNull Fragment fragment, @NonNull String tag, boolean animated) {
-
-		// Bypass and send to the Drawer, if there isn't any left panel
-
-		if (findViewById(R.id.left_fragment) == null) {
-			replaceDrawerFragment(fragment, tag, animated);
-			return;
-		}
-
-		// Replace whatever is in the fragment_container view with this fragment.
-
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-//		int enter = animated ? R.anim.slide_in_right : 0;
-//		int exit = animated ? R.anim.slide_out_right : 0;
-//		transaction.setCustomAnimations(enter, exit, R.anim.slide_out_left, R.anim.slide_in_left);
-		transaction.replace(R.id.left_fragment, fragment, tag);
-
-		if (animated)
-			transaction.addToBackStack(null);
-
-		transaction.commit();
-	}
-
-	private void replaceDrawerFragment(@NonNull Fragment fragment, @NonNull String tag, boolean animated) {
-
-		// Replace whatever is in the fragment_container view with this fragment.
-
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-
-//		int enter = animated ? R.anim.slide_in_right : 0;
-//		int exit = animated ? R.anim.slide_out_right : 0;
-//		transaction.setCustomAnimations(enter, exit, R.anim.slide_out_left, R.anim.slide_in_left);
-		transaction.replace(R.id.drawer_panel, fragment, tag);
-
-		if (animated)
-			transaction.addToBackStack(null);
-
-		transaction.commit();
-	}
 
 	private void importCertificate(@NonNull final String url, @Nullable final String password) {
 
@@ -711,6 +665,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	// </editor-fold desc="MenuFragment">
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
+
+	@Override public void onDocumentSelected(@NonNull Dossier dossier, @Nullable Document document) {
+		invalidateOptionsMenu();
+	}
 
 	@Override public boolean isAnyDrawerOpened() {
 		return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));

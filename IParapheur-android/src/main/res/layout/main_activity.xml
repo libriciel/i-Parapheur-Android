@@ -27,45 +27,7 @@
             android:divider="@android:drawable/divider_horizontal_bright"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:baselineAligned="false"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:id="@+id/left_fragment"
-                        android:layout_width="@dimen/left_menu_size"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/background_light"
-                        android:elevation="2dp" />
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/grey_500" />
-
-                    <FrameLayout
-                        android:id="@+id/dossier_detail_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                </LinearLayout>
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:visibility="invisible" />
-
-            </FrameLayout>
+            <include layout="@layout/main_activity_main_content" />
 
             <!-- The right drawer -->
             <!-- For some reason, you can't put it directly in the dossier_detail_fragment... -->
@@ -74,8 +36,7 @@
                 android:id="@+id/activity_dossiers_right_drawer"
                 android:layout_width="320dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:orientation="horizontal">
+                android:layout_gravity="end">
 
                 <include layout="@layout/dossiers_info" />
 
@@ -104,20 +65,7 @@
 
             <include layout="@layout/activity_toolbar_header" />
 
-            <FrameLayout
-                android:id="@+id/drawer_panel"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <fragment
-                    android:id="@+id/activity_dossiers_bureaux_fragment"
-                    android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:tag="account_list_fragment"
-                    tools:layout="@layout/account_list_fragment" />
-
-            </FrameLayout>
+            <include layout="@layout/main_activity_drawer_content" />
 
         </LinearLayout>
     </FrameLayout>
