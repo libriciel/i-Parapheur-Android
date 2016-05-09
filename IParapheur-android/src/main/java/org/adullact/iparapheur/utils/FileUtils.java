@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheurApplication;
+import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,8 +51,8 @@ public class FileUtils {
 
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
 
-	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
-		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
+	public static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
+		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossier.getId());
 
 		if (!directory.mkdirs())
 			if (!directory.exists())
@@ -61,11 +63,11 @@ public class FileUtils {
 		return directory;
 	}
 
-	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull String dossierId,
-																						   @NonNull String documentId) {
+	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier,
+																						   @NonNull Document document) {
 
 		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
+			return new File(FileUtils.getDirectoryForDossier(dossier), document.getName());
 		else
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}

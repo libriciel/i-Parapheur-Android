@@ -68,6 +68,7 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
@@ -327,8 +328,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	@Override public boolean onCreateOptionsMenu(Menu menu) {
 
 		Toolbar actions_toolbar = (Toolbar) findViewById(R.id.actions_toolbar);
-
 		if (actions_toolbar != null) {
+
 			actions_toolbar.getMenu().clear();
 			actions_toolbar.inflateMenu(R.menu.main_activity);
 			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -373,6 +374,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 			case R.id.action_settings:
 				startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
+				return true;
+
+			case R.id.menu_item_share:
+				startShareIntent();
 				return true;
 
 			default:
@@ -621,6 +626,32 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		else {
 			Log.e("Adrien", "UNKNOWN ACTION : " + action);
 		}
+	}
+
+	private void startShareIntent() {
+
+		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+		Dossier dossier = fragment.getDossier();
+		String documentId = fragment.getDocumentId();
+		Document document = Dossier.findCurrentDocument(dossier, documentId);
+
+		// Default cases
+
+		if (document == null)
+			return;
+
+		File documentFile = new File(document.getPath());
+		if (!documentFile.exists())
+			return;
+
+		// Start share
+
+		Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+		intentShareFile.setType("application/pdf");
+		intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
+		intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), dossier.getName()));
+		intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
+		startActivity(Intent.createChooser(intentShareFile, "plop"));
 	}
 
 	// <editor-fold desc="AccountFragmentListener">

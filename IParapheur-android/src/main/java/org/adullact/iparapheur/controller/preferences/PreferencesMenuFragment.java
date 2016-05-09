@@ -74,7 +74,7 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		if (getActivity() instanceof AppCompatActivity) {
 			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
 			if (parentActivity.getSupportActionBar() != null)
-				parentActivity.getSupportActionBar().setTitle(R.string.settings);
+				parentActivity.getSupportActionBar().setTitle(R.string.Settings);
 		}
 	}
 

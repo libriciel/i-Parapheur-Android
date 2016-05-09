@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -303,11 +304,25 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// </editor-fold desc="MuPdfFragment">
 
+	// <editor-fold desc="Getters / Setters">
+
+	public Dossier getDossier() {
+		return mDossier;
+	}
+
+	public String getDocumentId() {
+		return mDocumentId;
+	}
+
+	// </editor-fold desc="Getters / Setters">
+
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		update(dossier, bureauId, null);
 	}
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
+
+		Log.w("Adrien", "update : " + dossier + " " + documentId);
 
 		mBureauId = bureauId;
 		mDossier = dossier;
@@ -342,12 +357,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		//Adrien - TODO - Error messages
 
 		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
-		if (document == null)
+		if (document == null) {
+			((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, null);
 			return;
+		}
 
-		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), document.getId());
-		if (!documentFile.exists())
+		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier, document);
+		if (!documentFile.exists()) {
+			((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, null);
 			return;
+		}
 
 		openFile(documentFile.getAbsolutePath());
 
@@ -360,43 +379,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (getView() != null)
 			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setVisibility(areAnnotationAvailable ? View.VISIBLE : View.GONE);
 
-		//
+		// Callback to main activity
 
-//		if (document != null) {
-//			if (isReaderEnabled && (document.getPath() != null)) {
-//				mViewPager.post(
-//						new Runnable() {
-//							@Override public void run() {
-//								try {
-//									((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(document);
-//									mViewPager.setCurrentItem(0, false);
-//									ViewUtils.crossfade(getActivity(), mViewPager, mLoadingSpinner);
-//								}
-//								catch (Exception e) {
-//									e.printStackTrace();
-//									Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-//								}
-//							}
-//						}
-//				);
-//			}
-//		}
-//		else {
-//			mViewPager.post(
-//					new Runnable() {
-//						@Override public void run() {
-//							try {
-//								((DocumentPagerAdapter) mViewPager.getAdapter()).setDocument(null);
-//								//mViewPager.setCurrentItem(0, false);
-//							}
-//							catch (Exception e) {
-//								//e.printStackTrace();
-//								Toast.makeText(getActivity(), R.string.error_reading_document, Toast.LENGTH_LONG).show();
-//							}
-//						}
-//					}
-//			);
-//		}
+		((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, document);
 	}
 
 	private void updateCircuitInfoDrawerContent() {
@@ -585,6 +570,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	public interface DossierDetailsFragmentListener {
 
+		void onDocumentSelected(@NonNull Dossier dossier, @Nullable Document document);
+
 		boolean isAnyDrawerOpened();
 
 		void toggleInfoDrawer();
@@ -636,7 +623,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return null;
 
 			showSpinnerOnUiThread();
-			File file = FileUtils.getFileForDocument(getActivity(), mDossier.getId(), currentDocument.getId());
+			File file = FileUtils.getFileForDocument(getActivity(), mDossier, currentDocument);
 			currentDocument.setPath(file.getAbsolutePath());
 
 			if (!file.exists()) {
