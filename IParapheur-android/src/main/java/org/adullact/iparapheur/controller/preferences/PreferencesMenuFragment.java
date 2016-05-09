@@ -17,10 +17,9 @@
  */
 package org.adullact.iparapheur.controller.preferences;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,6 +63,7 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		v.findViewById(R.id.preferences_certificates).setOnClickListener(this);
 		v.findViewById(R.id.preferences_about).setOnClickListener(this);
 		v.findViewById(R.id.preferences_licenses).setOnClickListener(this);
+		v.findViewById(R.id.preferences_filters).setOnClickListener(this);
 
 		return v;
 	}
@@ -100,6 +100,9 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 				break;
 			case R.id.preferences_licenses:
 				clickedFragment = PreferencesLicencesFragment.newInstance();
+				break;
+			case R.id.preferences_filters:
+				clickedFragment = PreferencesFiltersFragment.newInstance();
 				break;
 		}
 

@@ -11,6 +11,7 @@
     <string name="pref_header_legal">Informations légales</string>
     <string name="pref_header_licenses">Licenses tierces</string>
     <string name="pref_header_certificates">Certificats</string>
+    <string name="pref_header_filters">Filtres</string>
 
     <!-- Account -->
 
@@ -31,5 +32,7 @@
     <string name="pref_certificates_message_delete_success">Certificat supprimé</string>
     <string name="pref_certificates_message_delete_failed">Le certificat n\'a pas pu être supprimé</string>
     <string name="pref_certificates_expiration_date">exp. -date-</string>
+
+    <string name="pref_filters_message_delete_success">Filtre supprimé</string>
 
 </resources>

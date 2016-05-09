@@ -275,6 +275,11 @@ public class MenuFragment extends Fragment {
 			updateBureaux(true);
 	}
 
+	@Override public void onResume() {
+		getActivity().invalidateOptionsMenu();
+		super.onResume();
+	}
+
 	/**
 	 * Called manually from parent Activity.
 	 *
