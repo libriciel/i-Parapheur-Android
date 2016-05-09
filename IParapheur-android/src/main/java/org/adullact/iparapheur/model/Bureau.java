@@ -19,6 +19,7 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 
 public class Bureau implements Parcelable {
@@ -78,6 +79,10 @@ public class Bureau implements Parcelable {
 
 	@Override public String toString() {
 		return mTitle;
+	}
+
+	@Override public boolean equals(Object o) {
+		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
 	}
 
 	// <editor-fold desc="Parcelable">

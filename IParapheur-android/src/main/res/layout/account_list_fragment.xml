@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/no_bureaux"
-                android:id="@+id/textView"
+                android:id="@+id/dossiers_list_no_dossier_textview"
                 android:textColor="@android:color/darker_gray"
                 android:textStyle="bold"
                 android:layout_margin="8dp"

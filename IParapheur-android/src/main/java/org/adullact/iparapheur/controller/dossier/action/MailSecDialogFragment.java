@@ -27,6 +27,7 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class MailSecDialogFragment extends ActionDialogFragment {
 	private class MailsecTask extends LoadingWithProgressTask {
 
 		public MailsecTask(Activity activity) {
-			super(activity, listener);
+			super(activity, (LoadingTask.DataChangeListener) getActivity());
 		}
 
 		@Override protected void load(String... params) throws IParapheurException {

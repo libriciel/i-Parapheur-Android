@@ -25,8 +25,12 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.PopupMenu;
 
 import org.adullact.iparapheur.R;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 
 public class ViewUtils {
@@ -94,6 +98,32 @@ public class ViewUtils {
 
 		if (animationListener != null)
 			inAnim.addListener(animationListener);
+	}
+
+	/**
+	 * Popup menu doesn't show any icons (in Lollipop),
+	 * but an hidden method can be called reflectively to force it.
+	 * Maybe some day, in a future Android version, it woudn't be necessary.
+	 *
+	 * That's not very pretty, but it is in a try/catch, so... Why not.
+	 */
+	public static void setForceShowIcon(@NonNull PopupMenu popupMenu) {
+		try {
+			Field[] fields = popupMenu.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if ("mPopup".equals(field.getName())) {
+					field.setAccessible(true);
+					Object menuPopupHelper = field.get(popupMenu);
+					Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+					Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+					setForceIcons.invoke(menuPopupHelper, true);
+					break;
+				}
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 }

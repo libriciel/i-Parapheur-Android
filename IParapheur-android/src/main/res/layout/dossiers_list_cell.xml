@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<FrameLayout android:id="@+id/dossiers_list_item_selectable_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dossiers_list_item_selectable_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_background_main_secondary_color">
+    android:background="@drawable/list_background_secondary100">
 
     <FrameLayout
         android:id="@+id/dossiers_list_item_checkable_layout"
-        android:layout_gravity="center_vertical"
-        android:layout_width="56dp"
+        android:layout_width="72dp"
         android:layout_height="56dp"
-        android:duplicateParentState="true">
+        android:layout_gravity="center_vertical"
+        android:duplicateParentState="true"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp">
 
         <FrameLayout
             android:id="@+id/dossiers_list_item_image_main_container"
@@ -28,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/etape_courante"
-                android:src="@drawable/ic_sign_24dp"/>
+                android:src="@drawable/ic_sign_24dp" />
         </FrameLayout>
 
         <FrameLayout
@@ -44,40 +47,42 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:contentDescription="@string/etape_courante"
-                android:src="@drawable/ic_done_white_24dp"/>
+                android:src="@drawable/ic_done_white_24dp" />
         </FrameLayout>
 
     </FrameLayout>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_marginLeft="56dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="72dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/dossiers_list_item_title"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeightSmall"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:ellipsize="end"
             android:gravity="bottom"
             android:maxLines="1"
-            android:ellipsize="end"
+            android:text="@string/mockup_dossier_title"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:textColor="@color/text_black"
-            android:text="@string/mockup_dossier_title"/>
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/dossiers_list_item_extras"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeightSmall"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:maxLines="1"
             android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/mockup_dossier_subtitle"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/text_black_secondary"
-            android:text="@string/mockup_dossier_subtitle"/>
+            android:textSize="14sp" />
     </LinearLayout>
 
 </FrameLayout>

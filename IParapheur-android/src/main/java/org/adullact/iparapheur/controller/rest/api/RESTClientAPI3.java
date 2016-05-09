@@ -34,6 +34,7 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -115,20 +116,16 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 
-		if (filter == null)
-			filter = new Filter();
-
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
-				"&corbeilleName=" + filter.getState() +
-				"&filter=" + filter.getJSONFilter() +
+				"&corbeilleName=" + ((filter != null) ? filter.getState().getServerValue() : State.A_TRAITER.getServerValue()) +
+				((filter != null) ? "&filter=" + filter.getJSONFilter() : "") +
 				"&metas={}" +
 				"&page=0" +
 				"&pageSize=25" +
 				"&pendingFile=0" +
 				"&skipped=0" +
 				"&sort=cm:created";
-
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		RequestResponse response = RESTUtils.get(url);
@@ -285,7 +282,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		RequestResponse response = RESTUtils.put(url, annotationJson.toString(), true);
 
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
-			throw new IParapheurException(R.string.error_annotation_update, "");
+			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 	}
 
 	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,

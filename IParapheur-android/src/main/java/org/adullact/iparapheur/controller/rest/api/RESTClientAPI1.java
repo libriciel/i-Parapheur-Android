@@ -94,9 +94,10 @@ public class RESTClientAPI1 extends RESTClientAPI {
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
 		String url = buildUrl(ACTION_GET_DOSSIERS);
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-		if (filter == null) {
+
+		if (filter == null)
 			filter = new Filter();
-		}
+
 		String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
 				"\"filters\": " + filter.getJSONFilter() + "," +
 				"\"page\": 0," +
@@ -190,7 +191,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 
 		RequestResponse response = RESTUtils.post(url, annot.toString());
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
-			throw new IParapheurException(R.string.error_annotation_update, "");
+			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 		}
 	}
 
@@ -202,7 +203,7 @@ public class RESTClientAPI1 extends RESTClientAPI {
 				"\"uuid\": \"" + annotationId + "\"}";
 		RequestResponse response = RESTUtils.post(url, body);
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK) {
-			throw new IParapheurException(R.string.error_annotation_delete, "");
+			throw new IParapheurException(R.string.Error_on_annotation_delete, "");
 		}
 	}
 

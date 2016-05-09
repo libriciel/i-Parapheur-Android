@@ -153,7 +153,7 @@ public enum RESTClient implements IParapheurAPI {
 		IParapheurAPI apiClient;
 
 		if (apiVersion > API_VERSION_MAX)
-			throw new IParapheurException(R.string.error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			throw new IParapheurException(R.string.Error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
 
 		switch (apiVersion) {
 			case 1:

@@ -21,15 +21,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -39,6 +38,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.MainActivity;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -95,10 +95,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 //			mBureauId = getArguments().getString(BUREAU_ID);
 //			mDossier = getArguments().getParcelable(DOSSIER);
 //		}
-	}
-
-	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -183,31 +179,43 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.dossier_details_menu, menu);
+
+		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+
+		if (actions_toolbar != null) {
+			actions_toolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
+			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+				@Override public boolean onMenuItemClick(MenuItem item) {
+					return onOptionsItemSelected(item);
+				}
+			});
+		}
 	}
 
 	@Override public void onPrepareOptionsMenu(Menu menu) {
 
+		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+
 		// Info item
 
-		MenuItem infoItem = menu.findItem(R.id.action_details);
+		MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
 		infoItem.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
 
 		// Document selector
 
-		MenuItem documentSelectorItem = menu.findItem(R.id.action_document_selection);
+		MenuItem documentSelectorItem = actions_toolbar.getMenu().findItem(R.id.action_document_selection);
 		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getMainDocuments().size() > 1) || (!mDossier.getAnnexes().isEmpty()));
 		documentSelectorItem.setVisible(hasMultipleDoc);
 
 		if (hasMultipleDoc) {
-			SubMenu documentSelectorSubMenu = documentSelectorItem.getSubMenu();
-			documentSelectorSubMenu.clear();
+			SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
+			docSelectorSubMenu.clear();
 
-			for (Document mainDocument : mDossier.getMainDocuments())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, mainDocument.getName()).setIcon(R.drawable.ic_description_black_24dp);
+			for (Document mainDoc : mDossier.getMainDocuments())
+				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
 			for (Document annexe : mDossier.getAnnexes())
-				documentSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, 0, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
+				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
 		//
@@ -236,13 +244,17 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return true;
 
 			default:
-				return super.onOptionsItemSelected(item);
+				return getActivity().onOptionsItemSelected(item);
 		}
 	}
 
 	// </editor-fold desc="ActionBar">
 
 	// <editor-fold desc="MuPdfFragment">
+
+	@Override protected boolean areGesturesLocked() {
+		return ((DossierDetailsFragmentListener) getActivity()).isAnyDrawerOpened();
+	}
 
 	@Override public void showProgressLayout() {
 
@@ -281,11 +293,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			new UpdateAnnotationAsyncTask().execute(newStickyNote);
 	}
 
-	@NonNull @Override protected String getStickyNoteAuthorName() {
+	@Override protected @NonNull String getStickyNoteAuthorName() {
 		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
 	}
 
-	@NonNull @Override protected String generateNewStickyNoteId() {
+	@Override protected @NonNull String generateNewStickyNoteId() {
 		return "new_" + UUID.randomUUID();
 	}
 
@@ -341,6 +353,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
 		updateStickyNotes(muPdfStickyNotes);
+
+		// Set FAB annotation button visibility
+
+		boolean areAnnotationAvailable = document.isMainDocument();
+		if (getView() != null)
+			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setVisibility(areAnnotationAvailable ? View.VISIBLE : View.GONE);
 
 		//
 
@@ -567,6 +585,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	public interface DossierDetailsFragmentListener {
 
+		boolean isAnyDrawerOpened();
+
 		void toggleInfoDrawer();
 
 		void lockInfoDrawer(boolean lock);
@@ -627,14 +647,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Loading user data and annotations
 
 			SparseArray<PageAnnotations> annotations = new SparseArray<>();
-			try {
-				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
-				if (TextUtils.isEmpty(currentAccount.getUserName()))
-					RESTClient.INSTANCE.updateAccountInformations(currentAccount);
-
-				annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId());
+			Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+			if (TextUtils.isEmpty(currentAccount.getUserName())) {
+				try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
+				catch (IParapheurException e) { e.printStackTrace(); }
 			}
-			catch (IParapheurException e) { e.printStackTrace(); }
+
+			if (currentDocument.isMainDocument()) {
+				try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
+				catch (IParapheurException e) { e.printStackTrace(); }
+			}
 			currentDocument.setPagesAnnotations(annotations);
 
 			return null;
@@ -676,7 +698,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if ((!success) || TextUtils.isEmpty(mNewId)) {
-				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
 			}
 			else {
 				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null, null);
@@ -709,7 +731,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if (!success)
-				Toast.makeText(getActivity(), R.string.error_annotation_update, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -737,7 +759,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			super.onPostExecute(success);
 
 			if (!success)
-				Toast.makeText(getActivity(), R.string.error_annotation_delete, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.Error_on_annotation_delete, Toast.LENGTH_LONG).show();
 		}
 	}
 }

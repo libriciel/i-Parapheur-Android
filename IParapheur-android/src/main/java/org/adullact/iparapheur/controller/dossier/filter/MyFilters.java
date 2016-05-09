@@ -19,9 +19,11 @@ package org.adullact.iparapheur.controller.dossier.filter;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.State;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 
 	public List<Filter> getFilters() {
 		if (filters == null) {
-			filters = new ArrayList<Filter>();
+			filters = new ArrayList<>();
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 
 			for (String pref : sharedPreferences.getAll().keySet()) {
@@ -57,60 +59,70 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 					if (!filters.contains(filter)) {
 						filter.setName(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_NOM_SUFFIX, ""));
 						filter.setTitle(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX, ""));
-						filter.setState(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX, ""));
-						filter.setTypes(new ArrayList<String>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
-						filter.setSubTypes(new ArrayList<String>(sharedPreferences.getStringSet(
-								PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX,
-								new HashSet<String>()
+						filter.setState(State.fromServerValue(sharedPreferences.getString(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX,
+																						  State.A_TRAITER.getServerValue()
 						)));
+						filter.setTypeList(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX, new HashSet<String>())));
+						filter.setSubTypeList(new ArrayList<>(sharedPreferences.getStringSet(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX,
+																							 new HashSet<String>()
+						)));
+
 						long debut = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX, 0L);
-						if (debut != 0L) {
+						if (debut != 0L)
 							filter.setBeginDate(debut);
-						}
+
 						long fin = sharedPreferences.getLong(PREFS_PREFIX + id + PREFS_DATEFIN_SUFFIX, 0L);
-						if (fin != 0L) {
+						if (fin != 0L)
 							filter.setEndDate(fin);
-						}
+
 						filters.add(filter);
 					}
 				}
 			}
-			if ((selectedFilter != null) && !filters.contains(selectedFilter)) {
+
+			if ((selectedFilter != null) && !filters.contains(selectedFilter))
 				filters.add(selectedFilter);
-			}
-			filters.add(new Filter()); // Filtre par défaut
 		}
 		return filters;
 	}
 
 	public void save(Filter filter) {
+
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
-		SharedPreferences.Editor editor = sharedPreferences.edit().putString(PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getName()).putString(
-				PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX,
-				filter.getTitle()
-		).putString(PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getState()).putStringSet(
-				PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX,
-				new HashSet<String>(filter.getTypes())
-		).putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<String>(filter.getSubTypes()));
-		if (filter.getBeginDate() != null) {
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getName());
+		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_TITRE_SUFFIX, filter.getTitle());
+		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_ETAT_SUFFIX, filter.getState().getServerValue());
+		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_TYPES_SUFFIX, new HashSet<>(filter.getTypeList()));
+		editor.putStringSet(PREFS_PREFIX + filter.getId() + PREFS_SOUSTYPES_SUFFIX, new HashSet<>(filter.getSubTypeList()));
+
+		if (filter.getBeginDate() != null)
 			editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEDEBUT_SUFFIX, filter.getBeginDate().getTime());
-		}
-		if (filter.getEndDate() != null) {
+
+		if (filter.getEndDate() != null)
 			editor.putLong(PREFS_PREFIX + filter.getId() + PREFS_DATEFIN_SUFFIX, filter.getEndDate().getTime());
-		}
+
 		editor.apply();
 		filters = null;
 		getFilters();
 	}
 
 	public void delete(Filter filter) {
+
 		String id = filter.getId();
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 		Set<String> keySet = sharedPreferences.getAll().keySet();
+
 		if (keySet.contains(PREFS_PREFIX + id + PREFS_NOM_SUFFIX)) {
-			SharedPreferences.Editor editor = sharedPreferences.edit().remove(PREFS_PREFIX + id + PREFS_NOM_SUFFIX).remove(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX).remove(
-					PREFS_PREFIX + id + PREFS_ETAT_SUFFIX).remove(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX).remove(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX).remove(
-					PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX).remove(PREFS_PREFIX + id + PREFS_DATEFIN_SUFFIX);
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.remove(PREFS_PREFIX + id + PREFS_NOM_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_TITRE_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_ETAT_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_TYPES_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_SOUSTYPES_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_DATEDEBUT_SUFFIX);
+			editor.remove(PREFS_PREFIX + id + PREFS_DATEFIN_SUFFIX);
 			editor.apply();
 		}
 		if ((selectedFilter != null) && (selectedFilter.getId().equals(id))) {
@@ -124,10 +136,10 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 		if (s.startsWith(PREFS_PREFIX)) {
 			filters = null;
 			getFilters();
+
 			// if an Account was previously selected, update it with the new one
-			if (selectedFilter != null) {
+			if (selectedFilter != null)
 				selectedFilter = getFilter(selectedFilter.getId());
-			}
 		}
 	}
 
@@ -140,7 +152,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 		return selectedFilter;
 	}
 
-	public void selectFilter(Filter filter) {
+	public void selectFilter(@Nullable Filter filter) {
 		selectedFilter = filter;
 	}
 }

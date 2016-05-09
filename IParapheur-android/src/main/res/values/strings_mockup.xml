@@ -10,6 +10,8 @@
     <string name="mockup_certificate_name">Certificat.bks</string>
     <string name="mockup_certificate_expiration_date">exp. 16/02/15</string>
 
+    <string name="mockup_filter_name">Mon filtre</string>
+
     <!-- Default Account -->
 
     <string name="demo_account_id">AccountTest0</string>
