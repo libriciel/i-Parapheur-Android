@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/background_light">
@@ -8,7 +9,8 @@
     <ViewSwitcher
         android:id="@+id/menu_fragment_viewswitcher"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:ignore="UselessParent">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/menu_fragment_bureaux_swiperefreshlayout"
@@ -100,7 +102,19 @@
                         android:clickable="true"
                         android:gravity="center"
                         android:text="@string/no_dossiers"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/menu_fragment_dossier_empty_filter_alert_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:gravity="center_horizontal"
+                        android:text="@string/no_dossiers_filter_alert"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@android:color/darker_gray"
                         android:textStyle="bold" />
                 </LinearLayout>

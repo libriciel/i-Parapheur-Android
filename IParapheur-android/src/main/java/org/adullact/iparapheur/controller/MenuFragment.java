@@ -97,6 +97,7 @@ public class MenuFragment extends Fragment {
 	private SwipeRefreshLayout mDossierSwipeRefreshLayout;
 	private View mBureauEmptyView;
 	private View mDossierEmptyView;
+	private View mDossierEmptyFiltersAlertView;
 
 	// Data
 	private List<Bureau> mBureauList = new ArrayList<>();
@@ -123,6 +124,7 @@ public class MenuFragment extends Fragment {
 		mDossierListView = (ListView) view.findViewById(R.id.menu_fragment_dossier_listview);
 		mBureauEmptyView = view.findViewById(R.id.menu_fragment_bureaux_empty);
 		mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
+		mDossierEmptyFiltersAlertView = view.findViewById(R.id.menu_fragment_dossier_empty_filter_alert_textview);
 
 		// Setting up listeners, etc
 
@@ -345,6 +347,7 @@ public class MenuFragment extends Fragment {
 
 		//
 
+		mDossierEmptyFiltersAlertView.setVisibility(isListFiltered ? View.VISIBLE : View.INVISIBLE);
 		super.onPrepareOptionsMenu(menu);
 	}
 
@@ -396,6 +399,7 @@ public class MenuFragment extends Fragment {
 				MyFilters.INSTANCE.selectFilter(null);
 				getActivity().invalidateOptionsMenu();
 				executeAsyncTask(new DossiersLoadingTask());
+
 				return true;
 
 			case R.id.action_add_filter:

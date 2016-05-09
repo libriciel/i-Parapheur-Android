@@ -161,6 +161,7 @@
     <string name="action_transfert">Transfert d\'action</string>
     <string name="no_content">Pas de contenu</string>
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
+    <string name="no_dossiers_filter_alert">Désactivez le filtre pour obtenir plus de résultats</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
     <string name="action_mode_nb_dossiers">%d dossier(s)</string>
     <string name="Error_on_typology_update">Erreur à la récupération de la typologie du dossier</string>
