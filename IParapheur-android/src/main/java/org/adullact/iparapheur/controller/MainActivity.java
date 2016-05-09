@@ -67,7 +67,6 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
@@ -337,20 +336,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	}
 
 	@Override public boolean onPrepareOptionsMenu(Menu menu) {
-
-		// Check Share button visibility
-
-		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		Dossier dossier = fragment.getDossier();
-		String documentId = fragment.getDocumentId();
-		Document document = Dossier.findCurrentDocument(dossier, documentId);
-		boolean isShareable = document != null;
-
-		if (menu.findItem(R.id.menu_item_share) != null)
-			menu.findItem(R.id.menu_item_share).setVisible(isShareable);
-
-		//
-
 		return false;
 	}
 
@@ -369,10 +354,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 			case R.id.action_settings:
 				startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
-				return true;
-
-			case R.id.menu_item_share:
-				startShareIntent();
 				return true;
 
 			default:
@@ -582,34 +563,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		}
 	}
 
-	private void startShareIntent() {
-
-		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		Dossier dossier = fragment.getDossier();
-		String documentId = fragment.getDocumentId();
-		Document document = Dossier.findCurrentDocument(dossier, documentId);
-
-		// Default cases
-
-		if (document == null)
-			return;
-
-		File documentFile = new File(document.getPath());
-		if (!documentFile.exists())
-			return;
-
-		// Start share
-
-		Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-		intentShareFile.setType("application/pdf");
-		intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
-		intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), dossier.getName()));
-		// FIXME : uncomment this when Dropbox will fix its API.
-		// FIXME : dropboxforum.com/hc/en-us/community/posts/203352359-Dropbox-should-respond-to-Android-Intent-ACTION-SEND
-		// intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
-		startActivity(Intent.createChooser(intentShareFile, getString(R.string.Choose_an_app)));
-	}
-
 	// <editor-fold desc="AccountFragmentListener">
 
 	@Override public void onAccountSelected(@NonNull Account account) {
@@ -665,10 +618,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	// </editor-fold desc="MenuFragment">
 
 	// <editor-fold desc="DossierDetailsFragmentListener">
-
-	@Override public void onDocumentSelected(@NonNull Dossier dossier, @Nullable Document document) {
-		invalidateOptionsMenu();
-	}
 
 	@Override public boolean isAnyDrawerOpened() {
 		return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));

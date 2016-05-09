@@ -17,6 +17,8 @@
  */
 package org.adullact.iparapheur.controller.dossier;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -219,6 +221,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
+		// Share
+
+		MenuItem shareItem = actions_toolbar.getMenu().findItem(R.id.action_share);
+		shareItem.setVisible((mDossier != null));
+
 		//
 
 		super.onPrepareOptionsMenu(menu);
@@ -242,6 +249,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 					if (!TextUtils.equals(mDocumentId, documentId))
 						update(mDossier, mBureauId, documentId);
 
+				return true;
+
+			case R.id.action_share:
+				startShareIntent();
 				return true;
 
 			default:
@@ -304,18 +315,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// </editor-fold desc="MuPdfFragment">
 
-	// <editor-fold desc="Getters / Setters">
-
-	public Dossier getDossier() {
-		return mDossier;
-	}
-
-	public String getDocumentId() {
-		return mDocumentId;
-	}
-
-	// </editor-fold desc="Getters / Setters">
-
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
 		update(dossier, bureauId, null);
 	}
@@ -357,16 +356,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		//Adrien - TODO - Error messages
 
 		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
-		if (document == null) {
-			((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, null);
+		if (document == null)
 			return;
-		}
 
 		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier, document);
-		if (!documentFile.exists()) {
-			((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, null);
+		if (!documentFile.exists())
 			return;
-		}
 
 		openFile(documentFile.getAbsolutePath());
 
@@ -378,10 +373,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		boolean areAnnotationAvailable = document.isMainDocument();
 		if (getView() != null)
 			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setVisibility(areAnnotationAvailable ? View.VISIBLE : View.GONE);
-
-		// Callback to main activity
-
-		((DossierDetailsFragmentListener) getActivity()).onDocumentSelected(mDossier, document);
 	}
 
 	private void updateCircuitInfoDrawerContent() {
@@ -508,6 +499,31 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		updateReader();
 	}
 
+	private void startShareIntent() {
+
+		Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+
+		// Default cases
+
+		if (document == null)
+			return;
+
+		File documentFile = new File(document.getPath());
+		if (!documentFile.exists())
+			return;
+
+		// Start share
+
+		Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+		intentShareFile.setType("application/pdf");
+		intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
+		intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), mDossier.getName()));
+		// FIXME : uncomment this when Dropbox will fix its API.
+		// FIXME : dropboxforum.com/hc/en-us/community/posts/203352359-Dropbox-should-respond-to-Android-Intent-ACTION-SEND
+		// intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
+		startActivity(Intent.createChooser(intentShareFile, getString(R.string.Choose_an_app)));
+	}
+
 	/**
 	 * Returns the main negative {@link Action} available, by coherent priority.
 	 */
@@ -569,8 +585,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	// <editor-fold desc="DossierDetailsFragmentListener">
 
 	public interface DossierDetailsFragmentListener {
-
-		void onDocumentSelected(@NonNull Dossier dossier, @Nullable Document document);
 
 		boolean isAnyDrawerOpened();
 
