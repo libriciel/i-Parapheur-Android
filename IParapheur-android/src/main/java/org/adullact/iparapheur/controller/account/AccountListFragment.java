@@ -130,7 +130,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	// <editor-fold desc="OnItemClickListener">
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
+		if (isAdded())
+			((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">

@@ -5,7 +5,6 @@
     <string name="title_dossier_detail">Dossier Detail</string>
     <string name="account_new">Nouveau compte</string>
     <string name="search">Rechercher</string>
-    <string name="Share">Partager</string>
     <string name="about">À propos</string>
     <string name="media_not_mounted">Aucun stockage disponible, les documents ne seront pas visualisables.</string>
     <string name="type">Type</string>
@@ -34,6 +33,8 @@
     <string name="no_dossier">Aucun dossier</string>
 
     <!-- Share -->
+    <string name="Share">Partager</string>
+    <string name="Choose_an_app">Choisissez une application</string>
     <string name="action_share_subject">iParapheur - %s</string>
     <string name="action_share_text">Ci-joint, le document "%1$s" du dossier "%2$s"</string>
 

@@ -650,8 +650,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		intentShareFile.setType("application/pdf");
 		intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
 		intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), dossier.getName()));
-		intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
-		startActivity(Intent.createChooser(intentShareFile, "plop"));
+		// FIXME : uncomment this when Dropbox will fix its API.
+		// FIXME : dropboxforum.com/hc/en-us/community/posts/203352359-Dropbox-should-respond-to-Android-Intent-ACTION-SEND
+		// intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
+		startActivity(Intent.createChooser(intentShareFile, getString(R.string.Choose_an_app)));
 	}
 
 	// <editor-fold desc="AccountFragmentListener">
