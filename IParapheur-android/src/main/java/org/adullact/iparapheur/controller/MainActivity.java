@@ -147,20 +147,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			contentFragment = new DossierDetailFragment();
 		contentFragment.setRetainInstance(true);
 
-		FragmentTransaction contenttransaction = getFragmentManager().beginTransaction();
-		contenttransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
-		contenttransaction.commit();
+		FragmentTransaction contentTransaction = getFragmentManager().beginTransaction();
+		contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
+		contentTransaction.commit();
 
 		// Menu Fragment restore
 
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if (menuFragment == null)
-			menuFragment = new MenuFragment();
-		menuFragment.setRetainInstance(true);
-
-		FragmentTransaction menuTransaction = getFragmentManager().beginTransaction();
-		menuTransaction.replace(R.id.menu_layout, menuFragment, MenuFragment.FRAGMENT_TAG);
-		menuTransaction.commit();
 	}
 
 	@Override protected void onPostCreate(Bundle savedInstanceState) {
