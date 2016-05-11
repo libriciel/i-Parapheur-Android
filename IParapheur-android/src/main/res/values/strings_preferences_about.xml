@@ -14,7 +14,7 @@
     <string name="about_library_license_mupdf_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
 
     <string name="about_library_license_mupdffragment_title">MuPDF Fragment</string>
-    <string name="about_library_license_mupdffragment_copyright">Original work © 2006–2013 Artifex Software, Inc.\nModified work © 2016 Adullact-Projet.</string>
+    <string name="about_library_license_mupdffragment_copyright">v1.01 - Original work © 2006–2013 Artifex Software, Inc.\nModified work © 2016 Adullact-Projet.</string>
     <string name="about_library_license_mupdffragment_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
 
     <string name="about_library_license_spongy_title">SpongyCastle</string>
