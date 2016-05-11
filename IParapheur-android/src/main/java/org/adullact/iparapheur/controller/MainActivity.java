@@ -46,7 +46,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -108,6 +111,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private DrawerLayout mRightDrawerLayout;
 	private FrameLayout mLeftDrawerMenu;
 	private ActionBarDrawerToggle mLeftDrawerToggle;
+	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
+	private View mNavigationDrawerFilterContainer;
+
+	private boolean mSouldOpenDrawerOnRestore = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
 	// <editor-fold desc="LifeCycle">
@@ -140,6 +147,28 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
+		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
+		mNavigationDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_filters_container);
+		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
+		if (drawerAccountImageButton != null) {
+			drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+
+					if (mNavigationDrawerAccountViewSwitcher == null)
+						return;
+
+					boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
+					if (switchToAccountView)
+						mNavigationDrawerAccountViewSwitcher.showNext();
+					else
+						mNavigationDrawerAccountViewSwitcher.showPrevious();
+
+					if (mNavigationDrawerFilterContainer != null)
+						mNavigationDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
+				}
+			});
+		}
+
 		// ContentView Fragment restore
 
 		Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
@@ -150,15 +179,13 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		FragmentTransaction contentTransaction = getFragmentManager().beginTransaction();
 		contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
 		contentTransaction.commit();
-
-		// Menu Fragment restore
-
 	}
 
 	@Override protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
 		mLeftDrawerToggle.syncState();
+		refreshNavigationDrawerHeader();
 	}
 
 	@Override protected void onStart() {
@@ -217,15 +244,25 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-		if ((!isDrawerKnown) && isDeviceInPortrait) {
-
+		if (!isDrawerKnown) {
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
 			// Registering the fact that the user knows the drawer
-
 			SharedPreferences.Editor editor = settings.edit();
 			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
 			editor.apply();
+		}
+		else if (mSouldOpenDrawerOnRestore) {
+
+			mSouldOpenDrawerOnRestore = false;
+			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+
+			if (isDeviceInPortrait)
+				if (mNavigationDrawerAccountViewSwitcher != null)
+					mNavigationDrawerAccountViewSwitcher.showNext();
+		}
+		else {
+			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 		}
 
 		// Restoring proper Drawer state on selected dossiers
@@ -243,6 +280,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override protected void onPause() {
 		super.onPause();
+
+		boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
+		boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
+		mSouldOpenDrawerOnRestore = (isDrawerOpened && isAccountViewSelected);
 
 		// Save accounts state for later use. In our case, the latest selected account
 		// will be automatically selected if the application is killed and relaunched.
@@ -266,7 +307,14 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-			// First, try to pop backStack (and open the drawer to show it)
+			// Drawer account back
+
+			if (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1) {
+				mNavigationDrawerAccountViewSwitcher.showPrevious();
+				return;
+			}
+
+			// Menu back
 
 			MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 			if (bureauxFragment != null) {
@@ -467,6 +515,21 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	// </editor-fold desc="ActionMode">
 
+	private void refreshNavigationDrawerHeader() {
+
+		Account account = MyAccounts.INSTANCE.getSelectedAccount();
+
+		TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
+		TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
+
+		if (navigationDrawerAccountTitle != null)
+			navigationDrawerAccountTitle.setText(account.getTitle());
+
+		if (navigationDrawerAccountSubTitle != null)
+			navigationDrawerAccountSubTitle.setText(account.getLogin());
+
+	}
+
 	private void importCertificate(@NonNull final String url, @Nullable final String password) {
 
 		String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
@@ -560,6 +623,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	@Override public void onAccountSelected(@NonNull Account account) {
 
 		MyAccounts.INSTANCE.selectAccount(account.getId());
+		refreshNavigationDrawerHeader();
 
 		// Close the drawer
 

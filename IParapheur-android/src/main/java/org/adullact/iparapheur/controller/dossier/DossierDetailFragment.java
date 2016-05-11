@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -320,8 +319,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
-
-		Log.w("Adrien", "update : " + dossier + " " + documentId);
 
 		mBureauId = bureauId;
 		mDossier = dossier;
