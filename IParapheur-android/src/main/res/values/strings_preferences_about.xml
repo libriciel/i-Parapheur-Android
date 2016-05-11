@@ -10,12 +10,20 @@
     <string name="about_library_licenses_title">Licences Open Sources</string>
 
     <string name="about_library_license_mupdf_title">MuPDF</string>
-    <string name="about_library_license_mupdf_copyright">Copyright 2006–2013 Artifex Software, Inc.</string>
+    <string name="about_library_license_mupdf_copyright">v1.8 © 2006–2013 Artifex Software, Inc.</string>
     <string name="about_library_license_mupdf_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
+
+    <string name="about_library_license_mupdffragment_title">MuPDF Fragment</string>
+    <string name="about_library_license_mupdffragment_copyright">Original work © 2006–2013 Artifex Software, Inc.\nModified work © 2016 Adullact-Projet.</string>
+    <string name="about_library_license_mupdffragment_license">Licensed under the terms of the Affero GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</string>
 
     <string name="about_library_license_spongy_title">SpongyCastle</string>
     <string name="about_library_license_spongy_copyright">Copyright © 2000–2015 The Legion of the Bouncy Castle Inc.</string>
     <string name="about_library_license_spongy_license">Licensed under the terms of the MIT Licence (the "Software").</string>
+
+    <string name="about_library_license_fab_title">FloatingActionButton</string>
+    <string name="about_library_license_fab_copyright">Copyright © 2014 Jerzy Chalupski</string>
+    <string name="about_library_license_fab_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
 
     <string name="about_library_license_sun_title">Zip-Signer / Android-sun-jarsign-support</string>
     <string name="about_library_license_sun_copyright">https://code.google.com/p/zip-signer/</string>

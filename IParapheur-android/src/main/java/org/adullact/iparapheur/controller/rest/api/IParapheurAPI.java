@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
@@ -66,6 +83,8 @@ public interface IParapheurAPI {
 
 	void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException;
 
+	boolean updateAccountInformations(@NonNull Account account) throws IParapheurException;
+
 	boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException;
 
 	boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException;
@@ -80,9 +99,11 @@ public interface IParapheurAPI {
 
 	boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+						  String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
+	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet,
+						 String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
 
 	boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 }

@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
@@ -8,6 +25,7 @@ import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
@@ -16,7 +34,10 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -51,8 +72,11 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	private static final String RESOURCE_TYPES = "/parapheur/types";
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/annotations/%s";
+	private static final String RESOURCE_USER_INFO = "/webframework/content/metadata2";
 	// private static final String RESOURCE_DELEGATIONS = "/parapheur/delegations";
 
+	private static final String USER_INFO_FIRST_NAME = "{http://www.alfresco.org/model/content/1.0}firstName";
+	private static final String USER_INFO_LAST_NAME = "{http://www.alfresco.org/model/content/1.0}lastName";
 	/* Ressources secondaires */
 	// private static final String RESOURCE_ANNEXES = "/parapheur/dossiers/%s/annexes";
 	// private static final String RESOURCE_CONSECUTIVE_STEPS = "/parapheur/dossiers/%s/consecutiveSteps";
@@ -92,20 +116,16 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 
-		if (filter == null)
-			filter = new Filter();
-
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
-				"&corbeilleName=" + filter.getState() +
-				"&filter=" + filter.getJSONFilter() +
+				"&corbeilleName=" + ((filter != null) ? filter.getState().getServerValue() : State.A_TRAITER.getServerValue()) +
+				((filter != null) ? "&filter=" + filter.getJSONFilter() : "") +
 				"&metas={}" +
 				"&page=0" +
 				"&pageSize=25" +
 				"&pendingFile=0" +
 				"&skipped=0" +
 				"&sort=cm:created";
-
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		RequestResponse response = RESTUtils.get(url);
@@ -129,6 +149,25 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getSignInfo(response);
 	}
 
+	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+
+		String params = "user=" + account.getLogin();
+		String url = buildUrl(account, RESOURCE_USER_INFO, params, true);
+		RequestResponse response = RESTUtils.get(url);
+
+		if (response.getResponse() != null) {
+
+			JsonExplorer json = new JsonExplorer(response.getResponse());
+			String firstName = json.findObject("data").findObject("properties").optString(USER_INFO_FIRST_NAME);
+			String lastName = json.findObject("data").findObject("properties").optString(USER_INFO_LAST_NAME);
+
+			if (StringUtils.areNotEmpty(firstName, lastName))
+				account.setName(firstName + " " + lastName);
+		}
+
+		return true;
+	}
+
 	// <editor-fold desc="Annotations">
 
 	protected @NonNull String getAnnotationsUrlSuffix(@NonNull String dossierId, @NonNull String documentId) {
@@ -144,7 +183,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+											 int page) throws IParapheurException {
 
 		// Build json object
 
@@ -172,8 +212,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 				annotationJson.key("author").value(annotation.getAuthor());
 				annotationJson.key("date").value(annotation.getDate());
 				annotationJson.key("page").value(page);
-				annotationJson.key("text").value(annotation.getText());
-				annotationJson.key("type").value("rect");
+				annotationJson.key("text").value(annotation.getText() != null ? annotation.getText() : "");
+				annotationJson.key("type").value("rect"); //TODO
 			}
 			annotationJson.endObject();
 		}
@@ -196,7 +236,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return null;
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+										   int page) throws IParapheurException {
 
 		// Build Json object
 
@@ -224,7 +265,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 				annotationJson.key("author").value(annotation.getAuthor());
 				annotationJson.key("date").value(annotation.getDate());
 				annotationJson.key("page").value(page);
-				annotationJson.key("text").value(annotation.getText());
+				annotationJson.key("text").value(annotation.getText() != null ? annotation.getText() : "");
 				annotationJson.key("type").value("rect");
 				annotationJson.key("id").value(annotation.getUuid());
 				annotationJson.key("uuid").value(annotation.getUuid());
@@ -241,10 +282,12 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		RequestResponse response = RESTUtils.put(url, annotationJson.toString(), true);
 
 		if (response == null || response.getCode() != HttpURLConnection.HTTP_OK)
-			throw new IParapheurException(R.string.error_annotation_update, "");
+			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+										   int page) throws IParapheurException {
+
 		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
 		RESTUtils.delete(url, true);
 	}
@@ -340,7 +383,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+										   String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -361,7 +405,9 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		}
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
+										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+										  String bureauId) throws IParapheurException {
 
 		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
 		try {

@@ -1,10 +1,27 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.account;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +43,6 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	public static final String FRAGMENT_TAG = "account_list_fragment";
 
-	private AccountFragmentListener mListener;
 	private List<Account> mAccounts;                // List of accounts displayed in the spinner
 	private ListView mListView;                     // ListView used to show the bureaux of the currently selected account
 	private AccountListAdapter mAccountListAdapter;
@@ -38,16 +54,6 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		setRetainInstance(true);
 
 		mAccounts = new ArrayList<>();
-	}
-
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		// Activities containing this fragment must implement its callbacks.
-		if (!(context instanceof AccountFragmentListener))
-			throw new IllegalStateException("Activity must implement AccountFragmentListener.");
-
-		mListener = (AccountFragmentListener) context;
 	}
 
 	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,14 +73,11 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		mListView.addFooterView(separatorView, null, false);
 
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
-		footerView.setOnClickListener(
-				new View.OnClickListener() {
-					@Override public void onClick(View v) {
-						if (mListener != null)
-							mListener.onCreateAccountInvoked();
-					}
-				}
-		);
+		footerView.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				((AccountFragmentListener) getActivity()).onCreateAccountInvoked();
+			}
+		});
 		mListView.addFooterView(footerView, null, false);
 
 		return content;
@@ -111,9 +114,10 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		for (Account account : MyAccounts.INSTANCE.getAccounts())
 			if (account.isValid())
-				mAccounts.add(account);
+				if (account.isActivated())
+					mAccounts.add(account);
 
-		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getContext()));
+		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
 
 		if (mAccountListAdapter != null)
 			mAccountListAdapter.notifyDataSetChanged();
@@ -126,9 +130,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	// <editor-fold desc="OnItemClickListener">
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-		if (mListener != null)
-			mListener.onAccountSelected(mAccounts.get(position));
+		if (isAdded())
+			((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">

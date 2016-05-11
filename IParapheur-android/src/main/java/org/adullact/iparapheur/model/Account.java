@@ -1,23 +1,36 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 public class Account implements Serializable {
 
-	public static final long _serialVersionUID = 1L;
-
 	private final String mId;
 	private String mTitle;
+	private String mName;
 	private String mServerBaseUrl;
 	private String mLogin;
 	private String mTenant;
@@ -25,6 +38,7 @@ public class Account implements Serializable {
 	private String mTicket;
 	private Integer mApiVersion;
 	private Long mLastRequest;
+	private boolean mActivated;
 
 	public Account(String id) {
 		mId = id;
@@ -34,6 +48,7 @@ public class Account implements Serializable {
 		mPassword = "";
 		mTenant = null;
 		mLastRequest = 0L;
+		mActivated = true;
 	}
 
 	// <editor-fold desc="Getters / Setters">
@@ -106,28 +121,30 @@ public class Account implements Serializable {
 		mLastRequest = lastRequest;
 	}
 
-	// </editor-fold desc="Getters / Setters">
-
-	private static boolean isURLValid(@Nullable String url) {
-
-		if (TextUtils.isEmpty(url))
-			return false;
-
-		try {
-			new URL(IParapheurAPI.BASE_PATH + url);
-			return true;
-		}
-		catch (MalformedURLException ignored) {
-			return false;
-		}
+	public String getUserName() {
+		return mName;
 	}
+
+	public void setName(String name) {
+		mName = name;
+	}
+
+	public boolean isActivated() {
+		return mActivated;
+	}
+
+	public void setActivated(boolean activated) {
+		mActivated = activated;
+	}
+
+	// </editor-fold desc="Getters / Setters">
 
 	public boolean isValid() {
 		return validateAccount(mTitle, mLogin, mPassword, mServerBaseUrl);
 	}
 
 	public static boolean validateAccount(String title, String url, String login, String password) {
-		return StringUtils.areNotEmpty(title, login, password) && isURLValid(url);
+		return StringUtils.areNotEmpty(title, login, password) && StringUtils.isUrlValid(url);
 	}
 
 	@Override public boolean equals(Object o) {

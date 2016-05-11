@@ -1,10 +1,27 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -90,8 +107,11 @@ public class PreferencesCertificatesFragment extends Fragment {
 				R.id.preferences_certificates_fragment_cell_title_textview, R.id.preferences_certificates_fragment_cell_expiration_textview
 		};
 
-		SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(
-				getActivity(), mCertificatesData, R.layout.preferences_certificates_fragment_cell, orderedFieldNames, orderedFieldIds
+		SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(getActivity(),
+																		 mCertificatesData,
+																		 R.layout.preferences_certificates_fragment_cell,
+																		 orderedFieldNames,
+																		 orderedFieldIds
 		);
 		mCertificatesList.setAdapter(certificatesAdapter);
 
@@ -151,25 +171,24 @@ public class PreferencesCertificatesFragment extends Fragment {
 			String certificatePassword = settings.getString(certificate.getName(), "");
 			PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
 
-			Date certificateExpirationDate = null;
+			Date certifExpDate = null;
 			try {
 				signer.loadKeyStore();
-				certificateExpirationDate = signer.getCertificateExpirationDate();
+				certifExpDate = signer.getCertificateExpirationDate();
 			}
 			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
 				Crashlytics.logException(e);
 				e.printStackTrace();
 			}
 
-			String expirationDateString = getString(R.string.pref_certificates_expiration_date);
-			expirationDateString = expirationDateString.replaceAll("-date-", StringUtils.getLocalizedSmallDate(certificateExpirationDate));
-			Boolean isExpired = (certificateExpirationDate == null) || (certificateExpirationDate.before(new Date()));
+			String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringUtils.getLocalizedSmallDate(certifExpDate));
+			Boolean isExpired = (certifExpDate == null) || (certifExpDate.before(new Date()));
 
 			// Mapping results
 
 			Map<String, Object> certificateData = new HashMap<>();
 			certificateData.put(LIST_FIELD_TITLE, certificate.getName());
-			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expirationDateString);
+			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expString);
 			certificateData.put(LIST_FIELD_IS_EXPIRED, isExpired);
 			mCertificatesData.add(certificateData);
 		}
@@ -213,13 +232,11 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 			// Cell buttons listener
 
-			deleteButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View arg0) {
-							onDeleteButtonClicked(position);
-						}
-					}
-			);
+			deleteButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View arg0) {
+					onDeleteButtonClicked(position);
+				}
+			});
 
 			// Warns expiration date
 

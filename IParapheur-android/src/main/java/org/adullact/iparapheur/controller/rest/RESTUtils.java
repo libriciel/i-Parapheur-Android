@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest;
 
 import android.support.annotation.NonNull;
@@ -90,8 +107,10 @@ public class RESTUtils {
 		OutputStream output;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			if (connection instanceof HttpsURLConnection)
+				((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+
 			connection.setDoOutput(true); // Triggers POST.
 			connection.setChunkedStreamingMode(0);
 			connection.setConnectTimeout(10000);
@@ -156,13 +175,14 @@ public class RESTUtils {
 		return res;
 	}
 
-	public static RequestResponse get(String url) throws IParapheurException {
+	public static RequestResponse get(@NonNull String url) throws IParapheurException {
 		Log.d(LOG_TAG, "GET request on : " + url);
 		RequestResponse res;
 
 		try {
-			HttpURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-			((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			if (connection instanceof HttpsURLConnection)
+				((HttpsURLConnection) connection).setSSLSocketFactory(getSSLSocketFactory());
 
 			connection.setRequestMethod("GET");
 			connection.setDoOutput(false);
@@ -300,29 +320,21 @@ public class RESTUtils {
 			return new IParapheurException(R.string.http_error_explicit, message);
 
 		IParapheurException exception;
-		switch (code) {
-			case 400:
-				exception = new IParapheurException(R.string.http_error_400, null);
-				break;
-			case 401:
-				exception = new IParapheurException(R.string.http_error_401, null);
-				break;
-			case 403:
-				exception = new IParapheurException(R.string.http_error_403, null);
-				break;
-			case 404:
-				exception = new IParapheurException(R.string.http_error_404, null);
-				break;
-			case 405:
-				exception = new IParapheurException(R.string.http_error_405, null);
-				break;
-			case 503:
-				exception = new IParapheurException(R.string.http_error_503, null);
-				break;
-			default:
-				exception = new IParapheurException(R.string.http_error_undefined, null);
-				break;
-		}
+		if (code == 400)
+			exception = new IParapheurException(R.string.http_error_400, null);
+		else if (code == 401)
+			exception = new IParapheurException(R.string.http_error_401, null);
+		else if (code == 403)
+			exception = new IParapheurException(R.string.http_error_403, null);
+		else if (code == 404)
+			exception = new IParapheurException(R.string.http_error_404, null);
+		else if (code == 405)
+			exception = new IParapheurException(R.string.http_error_405, null);
+		else if (code == 503)
+			exception = new IParapheurException(R.string.http_error_503, null);
+		else
+			exception = new IParapheurException(R.string.http_error_undefined, null);
+
 		return exception;
 	}
 }

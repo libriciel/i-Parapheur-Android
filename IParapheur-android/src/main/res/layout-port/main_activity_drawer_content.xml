@@ -1,0 +1,24 @@
+<ViewSwitcher android:id="@+id/navigation_drawer_viewswitcher"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="vertical">
+
+    <fragment
+        android:id="@+id/menu_fragment"
+        android:name="org.adullact.iparapheur.controller.MenuFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="menu_fragment" />
+
+    <fragment
+        android:id="@+id/account_list_fragment"
+        android:name="org.adullact.iparapheur.controller.account.AccountListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="account_list_fragment"
+        tools:layout="@layout/account_list_fragment" />
+
+</ViewSwitcher>

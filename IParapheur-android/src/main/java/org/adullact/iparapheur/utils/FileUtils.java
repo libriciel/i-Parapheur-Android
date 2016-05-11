@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.utils;
 
 import android.app.Activity;
@@ -7,10 +24,13 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.IParapheurApplication;
+import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,21 +46,30 @@ import java.util.List;
 
 public class FileUtils {
 
+	public static final String LOG = "FileUtils";
 	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
 
-	public static @Nullable File getDirectoryForDossier(@NonNull String dossierId) {
-		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossierId);
-		directory.mkdirs();
+	public static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
+		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossier.getId());
+
+		if (!directory.mkdirs())
+			if (!directory.exists())
+				Log.e(LOG, "getDirectoryForDossier failed");
+
+		Log.e(LOG, "directory : " + directory.getAbsolutePath() + " " + directory.exists());
 
 		return directory;
 	}
 
-	public static @Nullable File getFileForDocument(@NonNull Context context, @NonNull String dossierId, @NonNull String documentId) {
+	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier,
+																						   @NonNull Document document) {
+
+		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
 
 		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(dossierId), documentId);
+			return new File(FileUtils.getDirectoryForDossier(dossier), documentName);
 		else
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}

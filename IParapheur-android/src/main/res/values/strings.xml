@@ -5,7 +5,6 @@
     <string name="title_dossier_detail">Dossier Detail</string>
     <string name="account_new">Nouveau compte</string>
     <string name="search">Rechercher</string>
-    <string name="settings">Préférences</string>
     <string name="about">À propos</string>
     <string name="media_not_mounted">Aucun stockage disponible, les documents ne seront pas visualisables.</string>
     <string name="type">Type</string>
@@ -20,16 +19,24 @@
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
     <string name="document_selection">Sélection du document</string>
+    <string name="Filter_selection">Sélection du filtre</string>
     <string name="password">Mot de passe</string>
-    <string name="mandatory">Obligatoire</string>
-    <string name="optional">Facultatif</string>
+    <string name="Mandatory">Obligatoire</string>
+    <string name="Optional">Facultatif</string>
+    <string name="Indeterminate">Indéterminé</string>
 
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
 
     <string name="one_dossier">1 dossier</string>
-    <string name="nb_dossiers">-number- dossiers</string>
+    <string name="nb_dossiers">%d dossiers</string>
     <string name="no_dossier">Aucun dossier</string>
+
+    <!-- Share -->
+    <string name="Share">Partager</string>
+    <string name="Choose_an_app">Choisissez une application</string>
+    <string name="action_share_subject">iParapheur - %s</string>
+    <string name="action_share_text">Ci-joint, le document "%1$s" du dossier "%2$s"</string>
 
     <!-- Actions sur un dossier -->
     <string name="action_valider">Valider</string>
@@ -64,6 +71,20 @@
     <string name="justify_reject">Merci de saisir votre motif de rejet</string>
     <string name="etape_courante">Étape courante</string>
 
+    <!-- Tray -->
+    <string name="en_preparation">À transmettre</string>
+    <string name="a_traiter">À traiter</string>
+    <string name="a_archiver">En fin de circuit</string>
+    <string name="retournes">Retournés</string>
+    <string name="en_cours">En cours</string>
+    <string name="a_venir">"À venir</string>
+    <string name="recuperables">Récupérables</string>
+    <string name="en_retard">En retard</string>
+    <string name="traites">Traités</string>
+    <string name="dossiers_delegues">Dossiers en délégation</string>
+    <string name="no_corbeille">Toutes les banettes</string>
+    <string name="no_bureau">Tout i-Parapheur</string>
+
     <!-- Dialogs -->
     <string name="import_title">Importer un certificat BKS</string>
     <string name="import_certificate">Importer</string>
@@ -97,6 +118,8 @@
     <string name="visa_error_message_unknown_error">Erreur inconnue lors du visa.</string>
 
     <!-- MuPDF strings -->
+    <string name="add_annotation">Annoter</string>
+
     <string name="cannot_open_file_Path">Impossible d\'ouvrir le fichier : %1$s</string>
     <string name="cannot_open_buffer">Impossible d\'ouvrir le buffer</string>
     <string name="not_supported">Non compatible</string>
@@ -108,10 +131,14 @@
     <string name="pref_account_test">Tester</string>
     <string name="no_details">Aucun détail disponible</string>
     <string name="error_reading_document">Impossible de lire le document</string>
-    <string name="filter_title_hint">Texte contenu dans le titre du dossier</string>
+    <string name="Title_search">Titre à rechercher</string>
+    <string name="Current_state">Étape courante</string>
+    <string name="Typology">Typologie</string>
     <string name="enregistrer_filtre">Enregistrer</string>
     <string name="filtre_nom">Nom du filtre</string>
-    <string name="filtre_nom_hint">Nouveau filtre</string>
+    <string name="Add_filter">Ajouter un filtre</string>
+    <string name="No_filter">Aucun filtre</string>
+    <string name="New_filter">Nouveau filtre</string>
 
     <string name="http_error_undefined">Une erreur est intervenue lors de l\'envoi de la requête</string>
     <string name="http_error_malformed_url">URL mal formée : %s</string>
@@ -136,13 +163,16 @@
     <string name="error_server_not_configured_for_tenant">Le serveur ne permet pas l\'accès à cette collectivité.</string>
     <string name="action_non_implementee">non implémenté</string>
     <string name="action_journal">Journal d\'événements</string>
+    <string name="action_transfert">Transfert d\'action</string>
     <string name="no_content">Pas de contenu</string>
     <string name="no_dossiers">Vos dossiers s\'afficheront ici</string>
+    <string name="no_dossiers_filter_alert">Désactivez le filtre pour obtenir plus de résultats</string>
     <string name="no_bureaux">Vos bureaux s\'afficheront ici</string>
-    <string name="action_mode_nb_dossiers">-number- dossier(s)</string>
-    <string name="error_annotation_update">Impossible d\'enregistrer l\'annotation</string>
-    <string name="error_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
-    <string name="error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
+    <string name="action_mode_nb_dossiers">%d dossier(s)</string>
+    <string name="Error_on_typology_update">Erreur à la récupération de la typologie du dossier</string>
+    <string name="Error_on_annotation_update">Impossible d\'enregistrer l\'annotation</string>
+    <string name="Error_on_annotation_delete">Erreur lors de la suppression de l\'annotation</string>
+    <string name="Error_forward_parapheur_version">La version du i-Parapheur associé à ce compte est trop récente pour cette application.\nVeuillez mettre à jour votre application.</string>
     <string name="action_settings">Settings</string>
     <string name="Settings">Réglages</string>
 

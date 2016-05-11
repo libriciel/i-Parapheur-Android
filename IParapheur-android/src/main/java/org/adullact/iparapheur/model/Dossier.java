@@ -1,15 +1,33 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
 
 public class Dossier implements Parcelable {
@@ -25,130 +43,106 @@ public class Dossier implements Parcelable {
 		}
 	};
 
-	private final String id;
-	private final String name;
-	private final Action actionDemandee;
-	private final String type;
-	private final String sousType;
-	private final Date dateCreation;
-	private final Date dateLimite;
-	private final List<Document> mainDocuments = new ArrayList<Document>();
-	private final List<Document> annexes = new ArrayList<Document>();
-	private List<Action> actions;
-	private Circuit circuit;
-	private boolean isSignPapier;
+	private final String mId;
+	private final String mName;
+	private final Action mActionDemandee;
+	private final String mType;
+	private final String mSousType;
+	private final Date mDateCreation;
+	private final Date mDateLimite;
+	private final List<Document> mMainDocuments = new ArrayList<>();
+	private final List<Document> mAnnexes = new ArrayList<>();
+	private Set<Action> mActions;
+	private Circuit mCircuit;
+	private boolean mIsSignPapier;
 
-	// TODO : remove
-	public Dossier(int i) {
-		this(
-				UUID.randomUUID().toString(),
-				"Dossier " + i,
-				Action.VISA,
-				new ArrayList<Action>(),
-				"Type",
-				"SousType",
-				Calendar.getInstance().getTime(),
-				Calendar.getInstance().getTime(),
-				false
-		);
-		getActions().add(Action.VISA);
-	}
-
-	/**
-	 * Constructor used to search a dossier in a list (only the id is used for comparisons).
-	 *
-	 * @param id
-	 */
-	public Dossier(String id) {
-		this.id = id;
-		this.name = this.type = this.sousType = null;
-		this.dateCreation = this.dateLimite = null;
-		this.actionDemandee = null;
-		this.actions = new ArrayList<>();
-	}
-
-	public Dossier(String id, String name, Action actionDemandee, List<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite, boolean isSignPapier) {
-		this.id = id;
-		this.name = name;
-		this.actionDemandee = actionDemandee;
-		this.actions = actions;
-		this.type = type;
-		this.sousType = sousType;
-		this.dateCreation = dateCreation;
-		this.dateLimite = dateLimite;
-		this.isSignPapier = isSignPapier;
+	public Dossier(String id, String name, Action actionDemandee, Set<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
+				   boolean isSignPapier) {
+		mId = id;
+		mName = name;
+		mActionDemandee = actionDemandee;
+		mActions = actions;
+		mType = type;
+		mSousType = sousType;
+		mDateCreation = dateCreation;
+		mDateLimite = dateLimite;
+		mIsSignPapier = isSignPapier;
 	}
 
 	private Dossier(Parcel in) {
-		this.id = in.readString();
-		this.name = in.readString();
+		mId = in.readString();
+		mName = in.readString();
 		int tmpActionDemandee = in.readInt();
-		this.actionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
+		mActionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
+
+		List<Action> actions = new ArrayList<>();
 		in.readTypedList(actions, Action.CREATOR);
-		this.type = in.readString();
-		this.sousType = in.readString();
+		mActions = new HashSet<>(actions);
+
+		mType = in.readString();
+		mSousType = in.readString();
 		long tmpDateCreation = in.readLong();
-		this.dateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
+		mDateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
 		long tmpDateLimite = in.readLong();
-		this.dateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-		in.readTypedList(mainDocuments, Document.CREATOR);
-		in.readTypedList(annexes, Document.CREATOR);
-		this.circuit = in.readParcelable(Circuit.class.getClassLoader());
-		this.isSignPapier = in.readByte() != 0;
+		mDateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
+		in.readTypedList(mMainDocuments, Document.CREATOR);
+		in.readTypedList(mAnnexes, Document.CREATOR);
+		mCircuit = in.readParcelable(Circuit.class.getClassLoader());
+		mIsSignPapier = in.readByte() != 0;
 	}
 
 	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
-		return id;
+		return mId;
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
-	public List<Action> getActions() {
-		return actions;
+	public Set<Action> getActions() {
+		return mActions;
 	}
 
 	public String getType() {
-		return type;
+		return mType;
 	}
 
 	public String getSousType() {
-		return sousType;
+		return mSousType;
 	}
 
 	public String getDateCreation() {
-		return DateFormat.getDateInstance().format(dateCreation);
+		return DateFormat.getDateInstance().format(mDateCreation);
 	}
 
 	public String getDateLimite() {
-		return (dateLimite == null) ? "" : DateFormat.getDateInstance().format(dateLimite);
+		return (mDateLimite == null) ? "" : DateFormat.getDateInstance().format(mDateLimite);
 	}
 
 	public List<Document> getMainDocuments() {
-		return mainDocuments;
+		return mMainDocuments;
 	}
 
 	public List<Document> getAnnexes() {
-		return annexes;
+		return mAnnexes;
 	}
 
 	public Circuit getCircuit() {
-		return circuit;
+		return mCircuit;
 	}
 
 	public void setCircuit(Circuit circuit) {
-		this.circuit = circuit;
+		mCircuit = circuit;
 	}
 
 	public Action getActionDemandee() {
-		return actionDemandee;
+		return mActionDemandee;
 	}
 
 	public boolean isSignPapier() {
-		return isSignPapier;
+		return mIsSignPapier;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -159,29 +153,54 @@ public class Dossier implements Parcelable {
 			return;
 
 		if (document.isMainDocument())
-			mainDocuments.add(document);
+			mMainDocuments.add(document);
 		else
-			annexes.add(document);
+			mAnnexes.add(document);
 	}
 
 	public void saveDetails(Dossier dossier) {
-		this.mainDocuments.addAll(dossier.getMainDocuments());
-		this.annexes.addAll(dossier.getAnnexes());
+		mMainDocuments.addAll(dossier.getMainDocuments());
+		mAnnexes.addAll(dossier.getAnnexes());
 	}
 
 	public void clearDetails() {
-		this.mainDocuments.clear();
-		this.annexes.clear();
-		this.circuit = null;
+		mMainDocuments.clear();
+		mAnnexes.clear();
+		mCircuit = null;
 	}
 
 	public boolean isDetailsAvailable() {
-		return (circuit != null) && (circuit.getEtapeCircuitList() != null) && (!circuit.getEtapeCircuitList().isEmpty()) && (!mainDocuments.isEmpty());
+		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mMainDocuments.isEmpty());
 	}
 
 	public boolean hasActions() {
-		return ((actions != null) && (actions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
+		return ((mActions != null) && (mActions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
 	}
+
+	// <editor-fold desc="Static utils">
+
+	public static @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
+
+		// Default case
+
+		if (dossier == null)
+			return null;
+
+		// Finding doc
+
+		List<Document> documents = new ArrayList<>();
+		documents.addAll(dossier.getMainDocuments());
+		documents.addAll(dossier.getAnnexes());
+
+		if (!TextUtils.isEmpty(documentId))
+			for (Document document : documents)
+				if (TextUtils.equals(document.getId(), documentId))
+					return document;
+
+		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+	}
+
+	// </editor-fold desc="Static utils">
 
 	// <editor-fold desc="Parcelable">
 
@@ -190,41 +209,41 @@ public class Dossier implements Parcelable {
 	}
 
 	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.id);
-		dest.writeString(this.name);
-		dest.writeInt(this.actionDemandee == null ? -1 : this.actionDemandee.ordinal());
-		dest.writeTypedList(actions);
-		dest.writeString(this.type);
-		dest.writeString(this.sousType);
-		dest.writeLong(dateCreation != null ? dateCreation.getTime() : -1);
-		dest.writeLong(dateLimite != null ? dateLimite.getTime() : -1);
-		dest.writeTypedList(mainDocuments);
-		dest.writeTypedList(annexes);
-		dest.writeParcelable(circuit, 0);
-		dest.writeByte(isSignPapier ? (byte) 1 : (byte) 0);
+		dest.writeString(mId);
+		dest.writeString(mName);
+		dest.writeInt(mActionDemandee == null ? -1 : mActionDemandee.ordinal());
+		dest.writeTypedList(new ArrayList<Parcelable>(mActions));
+		dest.writeString(mType);
+		dest.writeString(mSousType);
+		dest.writeLong(mDateCreation != null ? mDateCreation.getTime() : -1);
+		dest.writeLong(mDateLimite != null ? mDateLimite.getTime() : -1);
+		dest.writeTypedList(mMainDocuments);
+		dest.writeTypedList(mAnnexes);
+		dest.writeParcelable(mCircuit, 0);
+		dest.writeByte(mIsSignPapier ? (byte) 1 : (byte) 0);
 	}
 
 	// </editor-fold desc="Parcelable">
 
-	/**
-	 * Equals and hashCode overriding, so we can find dossier with its id.
-	 */
 	@Override public boolean equals(Object o) {
-		if (o instanceof Dossier) {
-			Dossier toCompare = (Dossier) o;
-			return this.id.equals(toCompare.id);
-		}
-		else if (o instanceof String) {
-			return this.id.equals(o);
-		}
+
+		if (o == null)
+			return false;
+
+		if (o instanceof Dossier)
+			return TextUtils.equals(mId, ((Dossier) o).getId());
+
+		else if (o instanceof String)
+			return TextUtils.equals(mId, (String) o);
+
 		return false;
 	}
 
 	@Override public String toString() {
-		return name;
+		return mName;
 	}
 
 	@Override public int hashCode() {
-		return id.hashCode();
+		return mId.hashCode();
 	}
 }

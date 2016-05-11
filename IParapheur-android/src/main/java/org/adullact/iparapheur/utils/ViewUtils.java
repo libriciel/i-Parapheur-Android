@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.utils;
 
 import android.animation.Animator;
@@ -8,8 +25,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.PopupMenu;
 
 import org.adullact.iparapheur.R;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 
 public class ViewUtils {
 
@@ -44,8 +66,7 @@ public class ViewUtils {
 		// set its visibility to GONE as an optimization step (it won't
 		// participate in layout passes, etc.)
 		spinnerView.animate().alpha(0f).setDuration(mShortAnimationDuration).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
+			@Override public void onAnimationEnd(Animator animation) {
 				spinnerView.setVisibility(View.GONE);
 				spinnerView.setAlpha(1f);
 			}
@@ -78,4 +99,31 @@ public class ViewUtils {
 		if (animationListener != null)
 			inAnim.addListener(animationListener);
 	}
+
+	/**
+	 * Popup menu doesn't show any icons (in Lollipop),
+	 * but an hidden method can be called reflectively to force it.
+	 * Maybe some day, in a future Android version, it woudn't be necessary.
+	 *
+	 * That's not very pretty, but it is in a try/catch, so... Why not.
+	 */
+	public static void setForceShowIcon(@NonNull PopupMenu popupMenu) {
+		try {
+			Field[] fields = popupMenu.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if ("mPopup".equals(field.getName())) {
+					field.setAccessible(true);
+					Object menuPopupHelper = field.get(popupMenu);
+					Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+					Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+					setForceIcons.invoke(menuPopupHelper, true);
+					break;
+				}
+			}
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
 }

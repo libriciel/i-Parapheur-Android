@@ -6,6 +6,7 @@
     <color name="text_black_secondary">#8A000000</color>
     <color name="text_black_disabled">#42000000</color>
     <color name="text_black_divider">#1F000000</color>
+    <color name="text_black_divider_opaque">#313131</color>
     <color name="text_white">#FFFFFFFF</color>
     <color name="text_white_secondary70">#B3FFFFFF</color>
     <color name="text_white_disabled30">#4DFFFFFF</color>

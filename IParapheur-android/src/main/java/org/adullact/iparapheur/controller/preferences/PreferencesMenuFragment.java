@@ -1,9 +1,25 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.preferences;
 
-import android.content.Context;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +39,6 @@ import org.adullact.iparapheur.R;
 public class PreferencesMenuFragment extends Fragment implements View.OnClickListener {
 
 	public static final String FRAGMENT_TAG = "preferences_menu_fragment";
-	private PreferenceMenuFragmentListener mListener;
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -48,19 +63,9 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		v.findViewById(R.id.preferences_certificates).setOnClickListener(this);
 		v.findViewById(R.id.preferences_about).setOnClickListener(this);
 		v.findViewById(R.id.preferences_licenses).setOnClickListener(this);
+		v.findViewById(R.id.preferences_filters).setOnClickListener(this);
 
 		return v;
-	}
-
-	@Override public void onAttach(Context context) {
-		super.onAttach(context);
-
-		try { mListener = (PreferenceMenuFragmentListener) context; }
-		catch (ClassCastException e) {
-			throw new ClassCastException(
-					context.toString() + " must implement OnFragmentInteractionListener"
-			);
-		}
 	}
 
 	@Override public void onResume() {
@@ -69,13 +74,8 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 		if (getActivity() instanceof AppCompatActivity) {
 			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
 			if (parentActivity.getSupportActionBar() != null)
-				parentActivity.getSupportActionBar().setTitle(R.string.settings);
+				parentActivity.getSupportActionBar().setTitle(R.string.Settings);
 		}
-	}
-
-	@Override public void onDetach() {
-		super.onDetach();
-		mListener = null;
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -83,9 +83,6 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 	// <editor-fold desc="OnClickListener">
 
 	@Override public void onClick(View v) {
-
-		if (mListener == null)
-			return;
 
 		// Determine which Fragment was clicked
 
@@ -104,12 +101,15 @@ public class PreferencesMenuFragment extends Fragment implements View.OnClickLis
 			case R.id.preferences_licenses:
 				clickedFragment = PreferencesLicencesFragment.newInstance();
 				break;
+			case R.id.preferences_filters:
+				clickedFragment = PreferencesFiltersFragment.newInstance();
+				break;
 		}
 
 		// throw exception to parent activity
 
 		if (clickedFragment != null)
-			mListener.onMenuElementClicked(clickedFragment);
+			((PreferenceMenuFragmentListener) getActivity()).onMenuElementClicked(clickedFragment);
 	}
 
 	// </editor-fold desc="OnClickListener">

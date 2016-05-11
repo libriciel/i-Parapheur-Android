@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView android:id="@+id/filter_state_spinner_text"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_gravity="center_horizontal"
+    android:ellipsize="end"
+    android:gravity="center_vertical"
+    android:paddingEnd="24dp"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:paddingStart="24dp"
+    android:textColor="@color/text_black"
+    android:textSize="16sp" />

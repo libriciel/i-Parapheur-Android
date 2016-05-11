@@ -1,12 +1,34 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import org.adullact.iparapheur.R;
 
 
 public enum Action implements Parcelable {
+
 	// TODO : all possible actions (secretariat, supprimer, ...)
 	VISA(R.string.action_viser, R.id.action_visa, R.drawable.iw_visa, R.drawable.ip_visa),
 	SIGNATURE(R.string.action_signer, R.id.action_signature, R.drawable.iw_signature, R.drawable.ip_signature),
@@ -25,13 +47,16 @@ public enum Action implements Parcelable {
 	ENREGISTRER(R.string.action_enregistrer, R.id.action_enregistrer, -1, -1),
 	SUPPRESSION(R.string.action_supprimer, R.id.action_supprimer, -1, -1),
 	JOURNAL(R.string.action_journal, R.id.action_journal, -1, -1),
-	GET_ATTEST(-1, -1, -1, -1), // TODO : WTF
+	TRANSFERT_ACTION(R.string.action_transfert, R.id.action_avis, -1, -1), // TODO
 
 	//non implementées :
+	GET_ATTEST,
 	RAZ,
 	EDITION,
 	ENCHAINER_CIRCUIT;
+
 	public static final Creator<Action> CREATOR = new Creator<Action>() {
+
 		@Override public Action createFromParcel(final Parcel source) {
 			return Action.values()[source.readInt()];
 		}
@@ -40,35 +65,45 @@ public enum Action implements Parcelable {
 			return new Action[size];
 		}
 	};
-	private final int icon;
-	private final int approvedIcon;
-	private final int title;
-	private final int menuItemId;
 
-	Action(int title, int menuItemId, int icon, int approvedIcon) {
-		this.title = title;
-		this.menuItemId = menuItemId;
-		this.icon = icon;
-		this.approvedIcon = approvedIcon;
+	private final int mIcon;
+	private final int mApprovedIcon;
+	private final int mTitle;
+	private final int mMenuItemId;
+
+	Action(@StringRes int title, @IdRes int menuItemId, @DrawableRes int icon, @DrawableRes int approvedIcon) {
+		mTitle = title;
+		mMenuItemId = menuItemId;
+		mIcon = icon;
+		mApprovedIcon = approvedIcon;
 	}
 
 	Action() {
-		this.title = R.string.action_non_implementee;
-		this.menuItemId = -1;
-		this.icon = -1;
-		this.approvedIcon = -1;
+		mTitle = R.string.action_non_implementee;
+		mMenuItemId = -1;
+		mIcon = -1;
+		mApprovedIcon = -1;
 	}
 
-	public int getIcon(boolean approved) {
-		return approved ? approvedIcon : icon;
+	public @DrawableRes int getIcon(boolean approved) {
+		return approved ? mApprovedIcon : mIcon;
 	}
 
-	public int getTitle() {
-		return title;
+	public @StringRes int getTitle() {
+		return mTitle;
 	}
 
-	public int getMenuItemId() {
-		return menuItemId;
+	public @IdRes int getMenuItemId() {
+		return mMenuItemId;
+	}
+
+	public static @Nullable Action fromId(@IdRes int id) {
+
+		for (Action action : Action.values())
+			if (action.getMenuItemId() == id)
+				return action;
+
+		return null;
 	}
 
 	@Override public int describeContents() {

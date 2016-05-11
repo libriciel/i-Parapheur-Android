@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
@@ -6,7 +23,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -79,43 +96,34 @@ public class VisaDialogFragment extends DialogFragment {
 
 		// Set listeners
 
-		mPublicAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPublicAnnotationLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPublicAnnotationLabel.setActivated(hasFocus);
+			}
+		});
 
-		mPrivateAnnotationEditText.setOnFocusChangeListener(
-				new View.OnFocusChangeListener() {
-					@Override public void onFocusChange(View v, boolean hasFocus) {
-						mPrivateAnnotationLabel.setActivated(hasFocus);
-					}
-				}
-		);
+		mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override public void onFocusChange(View v, boolean hasFocus) {
+				mPrivateAnnotationLabel.setActivated(hasFocus);
+			}
+		});
 
 		// Build Dialog
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
-		builder.setPositiveButton(
-				R.string.action_viser, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-
-						// Do nothing here because we override this button in the onStart() to change the close behaviour.
-						// However, we still need this because on older versions of Android :
-						// unless we pass a handler the button doesn't get instantiated
-					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						onCancelButtonClicked();
-					}
-				}
-		);
+		builder.setPositiveButton(R.string.action_viser, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				// Do nothing here because we override this button in the onStart() to change the close behaviour.
+				// However, we still need this because on older versions of Android :
+				// unless we pass a handler the button doesn't get instantiated
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				onCancelButtonClicked();
+			}
+		});
 
 		return builder.create();
 	}
@@ -129,13 +137,11 @@ public class VisaDialogFragment extends DialogFragment {
 		AlertDialog dialog = (AlertDialog) getDialog();
 		if (dialog != null) {
 			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-			positiveButton.setOnClickListener(
-					new View.OnClickListener() {
-						@Override public void onClick(View v) {
-							onVisaButtonClicked();
-						}
-					}
-			);
+			positiveButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					onVisaButtonClicked();
+				}
+			});
 		}
 	}
 
@@ -198,9 +204,7 @@ public class VisaDialogFragment extends DialogFragment {
 				dismiss();
 			}
 			else if (getActivity() != null) {
-				Toast.makeText(
-						getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.visa_error_message_unknown_error), Toast.LENGTH_SHORT
-				).show();
+				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.visa_error_message_unknown_error), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
@@ -5,7 +22,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
@@ -31,20 +48,16 @@ public class SignaturePapierConfirmDialogFragment extends DialogFragment {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
 		builder.setView(view);
-		builder.setPositiveButton(
-				R.string.signature_papier_transform, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-					}
-				}
-		);
-		builder.setNegativeButton(
-				android.R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override public void onClick(DialogInterface dialog, int which) {
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
-					}
-				}
-		);
+		builder.setPositiveButton(R.string.signature_papier_transform, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
+			}
+		});
+		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override public void onClick(DialogInterface dialog, int which) {
+				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+			}
+		});
 
 		return builder.create();
 	}

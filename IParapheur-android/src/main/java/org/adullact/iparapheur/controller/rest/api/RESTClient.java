@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
@@ -119,6 +136,10 @@ public enum RESTClient implements IParapheurAPI {
 		return null;
 	}
 
+	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+		return getRESTClient(account).updateAccountInformations(account);
+	}
+
 	@Override public List<Bureau> getBureaux() throws IParapheurException {
 		return getRESTClient().getBureaux();
 	}
@@ -132,7 +153,7 @@ public enum RESTClient implements IParapheurAPI {
 		IParapheurAPI apiClient;
 
 		if (apiVersion > API_VERSION_MAX)
-			throw new IParapheurException(R.string.error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			throw new IParapheurException(R.string.Error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
 
 		switch (apiVersion) {
 			case 1:
@@ -175,15 +196,18 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+											 int page) throws IParapheurException {
 		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+										   int page) throws IParapheurException {
 		getRESTClient().updateAnnotation(dossierId, documentId, annotation, page);
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException {
+	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+										   int page) throws IParapheurException {
 		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
 	}
 
@@ -215,14 +239,25 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().envoiTdtHelios(dossierId, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
+										   String annotPriv, String bureauId) throws IParapheurException {
 		return getRESTClient().envoiTdtActes(dossierId, nature, classification, numero, dateActes, objet, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
+										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+										  String bureauId) throws IParapheurException {
 		// TODO : manage annexes
-		return getRESTClient().envoiMailSec(
-				dossierId, destinataires, destinatairesCC, destinatairesCCI, sujet, message, password, showPassword, annexesIncluded, bureauId
+		return getRESTClient().envoiMailSec(dossierId,
+											destinataires,
+											destinatairesCC,
+											destinatairesCCI,
+											sujet,
+											message,
+											password,
+											showPassword,
+											annexesIncluded,
+											bureauId
 		);
 	}
 

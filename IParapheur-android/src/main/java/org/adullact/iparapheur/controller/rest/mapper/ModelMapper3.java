@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.rest.mapper;
 
 import android.support.annotation.NonNull;
@@ -18,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 
@@ -50,23 +68,41 @@ public class ModelMapper3 extends ModelMapper {
 
 		JsonExplorer jsonExplorer = new JsonExplorer(jsonObject);
 		String dossierId = jsonExplorer.optString(DOSSIER_ID);
-		ArrayList<Action> actions = getActionsForDossier(jsonObject);
+		HashSet<Action> actions = getActionsForDossier(jsonObject);
+		Action actionDemandée = Action.valueOf(jsonExplorer.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString()));
+
+		// Patching weird Signature case :
+		// "actionDemandee" can have any "actions" value...
+		// ... Except when "actionDemandee=SIGNATURE", where "actions" only contains VISA, for some reason
+		// A SIGNATURE action is acceptable in VISA too...
+
+		if (actionDemandée == Action.SIGNATURE) {
+			actions.remove(Action.VISA);
+			actions.add(Action.SIGNATURE);
+		}
+
+		if (actionDemandée == Action.VISA)
+			actions.add(Action.SIGNATURE);
+
+		// Actions patch end
 
 		Dossier dossier = new Dossier(
 				jsonExplorer.optString(DOSSIER_ID, ""),
 				jsonExplorer.optString(DOSSIER_TITLE, ""),
-				Action.valueOf(jsonExplorer.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
+				actionDemandée,
 				actions,
 				jsonExplorer.optString(DOSSIER_TYPE, ""),
 				jsonExplorer.optString(DOSSIER_SUBTYPE, ""),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
-				StringUtils.parseISO8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_EMISSION_DATE)),
+				StringUtils.parseIso8601Date(jsonExplorer.optString(DOSSIER_DATE_LIMITE)),
 				jsonExplorer.optBoolean(DOSSIER_IS_SIGN_PAPIER, false)
 		);
 
 		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_DOCUMENTS).getCurrentArraySize(); index++) {
 			JsonObject doc = jsonExplorer.findArray(DOSSIER_DOCUMENTS).find(index).optCurrentJsonObject();
-			dossier.addDocument(parseDocument(doc, dossierId, index));
+
+			if (dossierId != null)
+				dossier.addDocument(parseDocument(doc, dossierId, index));
 		}
 
 		return dossier;
@@ -94,14 +130,14 @@ public class ModelMapper3 extends ModelMapper {
 		);
 	}
 
-	@Override protected ArrayList<Action> getActionsForDossier(JSONObject dossier) {
+	@Override protected HashSet<Action> getActionsForDossier(JSONObject dossier) {
 		JsonObject actionsJsonObject = new JsonExplorer(dossier).optCurrentJsonObject();
 		return getActionsForDossier(actionsJsonObject);
 	}
 
-	protected ArrayList<Action> getActionsForDossier(JsonObject dossier) {
+	protected HashSet<Action> getActionsForDossier(JsonObject dossier) {
 
-		ArrayList<Action> actions = new ArrayList<>();
+		HashSet<Action> actions = new HashSet<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(dossier);
 
 		for (int index = 0; index < jsonExplorer.findArray("actions").getCurrentArraySize(); index++) {
@@ -137,7 +173,7 @@ public class ModelMapper3 extends ModelMapper {
 
 		// Parsing root fields
 
-		boolean isDigitSigeMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
+		boolean isDigitSignMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
 		boolean hasSelectionScript = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_HAS_SELECTION_SCRIPT, false);
 		String signatureFormat = jsonExplorer.findObject(DOSSIER_CIRCUIT).optString(CIRCUIT_SIG_FORMAT, "");
 
@@ -161,7 +197,7 @@ public class ModelMapper3 extends ModelMapper {
 			etapes.add(currentEtape);
 		}
 
-		return new Circuit(etapes, signatureFormat, isDigitSigeMandatory, hasSelectionScript);
+		return new Circuit(etapes, signatureFormat, isDigitSignMandatory, hasSelectionScript);
 	}
 
 	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {

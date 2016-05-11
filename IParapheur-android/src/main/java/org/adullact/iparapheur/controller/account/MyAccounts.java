@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.account;
 
 import android.content.SharedPreferences;
@@ -24,6 +41,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	public static final String PREFS_URL_SUFFIX = "_url";
 	public static final String PREFS_LOGIN_SUFFIX = "_login";
 	public static final String PREFS_PASSWORD_SUFFIX = "_password";
+	public static final String PREFS_ACTIVATED_SUFFIX = "_activated";
 	public static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
 	private ArrayList<Account> mAccounts = null;
@@ -46,6 +64,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 						account.setLogin(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX, ""));
 						account.setServerBaseUrl(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX, ""));
 						account.setPassword(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX, ""));
+						account.setActivated(sharedPreferences.getBoolean(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX, true));
 						mAccounts.add(account);
 					}
 				}
@@ -77,6 +96,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_URL_SUFFIX, account.getServerBaseUrl());
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_LOGIN_SUFFIX, account.getLogin());
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_PASSWORD_SUFFIX, account.getPassword());
+		editor.putBoolean(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_ACTIVATED_SUFFIX, account.isActivated());
 		editor.apply();
 	}
 
@@ -92,6 +112,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX);
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX);
 			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX);
+			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX);
 			editor.apply();
 		}
 
@@ -120,7 +141,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		return (index != -1) ? mAccounts.get(index) : null;
 	}
 
-	public @Nullable Account getSelectedAccount() {
+	public Account getSelectedAccount() {
 		return mSelectedAccount;
 	}
 

@@ -1,3 +1,20 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.utils;
 
 import android.content.Context;
@@ -9,6 +26,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 import org.adullact.iparapheur.model.Account;
 
 import java.io.BufferedReader;
@@ -16,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +51,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+@SuppressWarnings("unused")
 public class StringUtils {
+
+	private static String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
 
@@ -49,7 +72,7 @@ public class StringUtils {
 		};
 	}
 
-	@SuppressWarnings("unused") public static @NonNull String bundleToString(@Nullable Bundle bundle) {
+	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)
 			return "(Bundle null)";
 
@@ -104,19 +127,20 @@ public class StringUtils {
 		return total.toString();
 	}
 
-	public static @Nullable Date parseISO8601Date(@Nullable String iso8601Date) {
-		if ((iso8601Date == null) || iso8601Date.isEmpty())
+	public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
+
+		if (TextUtils.isEmpty(iso8601Date))
 			return null;
 
-		try {
-			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.FRENCH).parse(iso8601Date);
-		}
-		catch (ParseException ex) {
-			return null;
-		}
+		try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); }
+		catch (ParseException ex) { return null; }
 	}
 
-	@SuppressWarnings("unused") public static boolean areNotEmpty(@Nullable String... strings) {
+	public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
+		return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
+	}
+
+	public static boolean areNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return false;
@@ -128,7 +152,7 @@ public class StringUtils {
 		return true;
 	}
 
-	@SuppressWarnings("unused") public static String firstNotEmpty(@Nullable String... strings) {
+	public static String firstNotEmpty(@Nullable String... strings) {
 
 		if ((strings == null) || (strings.length == 0))
 			return null;
@@ -258,5 +282,46 @@ public class StringUtils {
 
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
 		return dateFormat.format(date);
+	}
+
+	public static boolean isUrlValid(@Nullable String url) {
+
+		if (TextUtils.isEmpty(url))
+			return false;
+
+		try {
+			new URL(IParapheurAPI.BASE_PATH + url);
+			return true;
+		}
+		catch (MalformedURLException ignored) {
+			return false;
+		}
+	}
+
+	public static @Nullable Boolean nullableBooleanValueOf(@NonNull Map<String, String> map, @NonNull String key) {
+
+		if (map.containsKey(key) && (map.get(key) != null))
+			return Boolean.valueOf(map.get(key));
+
+		return null;
+	}
+
+	/**
+	 * Helper functions to query a strings end portion. The comparison is case insensitive.
+	 *
+	 * @param base the base string.
+	 * @param end  the ending text.
+	 * @return true, if the string ends with the given ending text.
+	 */
+	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+
+		// Default case
+
+		if ((base == null) || (end == null))
+			return false;
+
+		//
+
+		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
 	}
 }

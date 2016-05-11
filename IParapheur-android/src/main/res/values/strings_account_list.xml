@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="parapheurs">Parapheurs</string>
+    <string name="Parapheurs">Parapheurs</string>
     <string name="add_parapheur">Ajouter un parapheur</string>
 
 </resources>

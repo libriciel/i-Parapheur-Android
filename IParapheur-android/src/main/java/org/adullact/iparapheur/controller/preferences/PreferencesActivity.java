@@ -1,12 +1,28 @@
+/*
+ * <p>iParapheur Android<br/>
+ * Copyright (C) 2016 Adullact-Projet.</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.controller.preferences;
 
-import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -14,13 +30,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.model.Account;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener, PreferencesAccountFragment.PreferencesAccountFragmentListener {
+public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener {
 
 	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
 	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
@@ -62,7 +77,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 			// Clear BackStack before restoring existing fragment (everything over the Menu),
 			// because a wrong BackStack can stay after rotation.
 			String retainedFragmentTag = fragmentsTagsMap.get(retainedFragment.getClass());
-			getSupportFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			getFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
 			// Rebuild stack
 			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
@@ -101,7 +116,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	private @Nullable Fragment getRetainedFragmentInstance() {
 
-		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentManager fragmentManager = getFragmentManager();
 		for (Map.Entry<Class<? extends Fragment>, String> fragmentTagEntry : fragmentsTagsMap.entrySet())
 			if ((fragmentManager.findFragmentByTag(fragmentTagEntry.getValue())) != null)
 				return fragmentManager.findFragmentByTag(fragmentTagEntry.getValue());
@@ -111,7 +126,7 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 
 	private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag, boolean addToBackStack) {
 
-		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 		transaction.replace(R.id.preferences_activity_main_layout, fragment, tag);
 
 		if (addToBackStack)
@@ -128,12 +143,4 @@ public class PreferencesActivity extends AppCompatActivity implements Preference
 	}
 
 	// </editor-fold desc="PreferenceMenuFragmentListener">
-
-	// <editor-fold desc="PreferencesAccountFragmentListener">
-
-	@Override public void onAccountModified(@NonNull Account account) {
-		setResult(Activity.RESULT_OK);
-	}
-
-	// </editor-fold desc="PreferencesAccountFragmentListener">
 }

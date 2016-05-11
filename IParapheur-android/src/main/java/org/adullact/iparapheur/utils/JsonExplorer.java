@@ -1,3 +1,19 @@
+/*
+ * <p>JsonExplorer</p>
+ *
+ * <p>This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.</p>
+ *
+ * <p>This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.</p>
+ *
+ * <p>You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ */
 package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
@@ -142,7 +158,11 @@ public class JsonExplorer {
 	// <editor-fold desc="Primitive types">
 
 	public @Nullable JsonObject optCurrentJsonObject() {
-		JsonObject result = null;
+		return optCurrentJsonObject(null);
+	}
+
+	public JsonObject optCurrentJsonObject(JsonObject defaultValue) {
+		JsonObject result = defaultValue;
 
 		if ((_currentObject != null) && (_currentObject.isJsonObject()))
 			result = (JsonObject) _currentObject;
@@ -161,7 +181,7 @@ public class JsonExplorer {
 		return result;
 	}
 
-	public String optString(@NonNull String fieldName) {
+	public @Nullable String optString(@NonNull String fieldName) {
 		return optString(fieldName, null);
 	}
 
