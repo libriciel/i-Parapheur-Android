@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_inbox_24dp"
-        android:contentDescription="@string/parapheurs"/>
+        android:contentDescription="@string/Parapheurs"/>
 
     <TextView
         android:id="@android:id/text1"

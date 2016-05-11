@@ -1,32 +1,70 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="178dp"
+              android:background="@drawable/navigation_drawer_header_gradient"
+              android:orientation="vertical">
 
     <View
+        android:id="@+id/navigation_drawer_fake_status_bar"
         android:layout_width="match_parent"
-        android:layout_height="178dp"
-        android:background="@drawable/navigation_drawer_header_gradient" />
+        android:layout_height="24dp"
+        android:background="@color/secondary_700"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp">
+
+        <ImageButton
+            android:id="@+id/navigation_drawer_filters_menu_header_account_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/pref_account_title"
+            android:src="@drawable/ic_account_circle_white_72dp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="25dp">
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/navigation_drawer_filters_menu_header_title"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ellipsize="end"
-            android:gravity="bottom"
-            android:maxLines="1"
-            android:text="@string/parapheurs"
-            android:textColor="@color/text_white"
-            android:textSize="14sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/navigation_drawer_filters_menu_header_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/Parapheurs"
+                android:textColor="@color/text_white"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/navigation_drawer_filters_menu_header_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/Parapheurs"
+                android:textColor="@color/text_white"
+                android:textSize="14sp"/>
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/navigation_drawer_filters_menu_header_filters_imagebutton"
@@ -34,13 +72,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:contentDescription="@string/Filter_selection"
-            android:src="@drawable/ic_filter_list_white_24dp" />
+            android:src="@drawable/ic_filter_list_white_24dp"/>
     </LinearLayout>
 
-    <View
-        android:id="@+id/navigation_drawer_fake_status_bar"
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:background="@color/secondary_700" />
-
-</FrameLayout>
+</LinearLayout>
