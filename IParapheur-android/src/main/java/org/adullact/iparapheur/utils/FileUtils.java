@@ -66,8 +66,10 @@ public class FileUtils {
 	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier,
 																						   @NonNull Document document) {
 
+		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
+
 		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(dossier), document.getName());
+			return new File(FileUtils.getDirectoryForDossier(dossier), documentName);
 		else
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}

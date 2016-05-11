@@ -305,4 +305,23 @@ public class StringUtils {
 
 		return null;
 	}
+
+	/**
+	 * Helper functions to query a strings end portion. The comparison is case insensitive.
+	 *
+	 * @param base the base string.
+	 * @param end  the ending text.
+	 * @return true, if the string ends with the given ending text.
+	 */
+	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+
+		// Default case
+
+		if ((base == null) || (end == null))
+			return false;
+
+		//
+
+		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
+	}
 }
