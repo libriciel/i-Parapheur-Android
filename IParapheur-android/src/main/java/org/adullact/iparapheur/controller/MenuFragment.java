@@ -67,7 +67,6 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -113,9 +112,9 @@ public class MenuFragment extends Fragment {
 
 	// <editor-fold desc="LifeCycle">
 
-    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.menu_fragment, container, false);
-        setRetainInstance(true);
+		setRetainInstance(true);
 
 		// Retrieve Views
 
@@ -444,8 +443,9 @@ public class MenuFragment extends Fragment {
 	}
 
 	public void updateBureaux(boolean forceReload) {
+
 		if (forceReload)
-			this.mBureauList.clear();
+			mBureauList.clear();
 
 		if ((mBureauList.isEmpty()) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);

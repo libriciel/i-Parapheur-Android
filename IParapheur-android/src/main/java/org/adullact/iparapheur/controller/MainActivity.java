@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
 	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
+	private static final String SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION = "should_show_account_after_rotation";
 
 	private static final String SCHEME_URI = "iparapheur";
 	private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
 	private View mNavigationDrawerFilterContainer;
 
-	private boolean mSouldOpenDrawerOnRestore = false;
+	private boolean mSouldShowAccountAfterRotation = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
 	// <editor-fold desc="LifeCycle">
@@ -159,9 +160,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 					boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
 					if (switchToAccountView)
-						mNavigationDrawerAccountViewSwitcher.showNext();
+						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
 					else
-						mNavigationDrawerAccountViewSwitcher.showPrevious();
+						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
 					if (mNavigationDrawerFilterContainer != null)
 						mNavigationDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
@@ -186,6 +187,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		// Sync the toggle state after onRestoreInstanceState has occurred.
 		mLeftDrawerToggle.syncState();
 		refreshNavigationDrawerHeader();
+
+		if (savedInstanceState != null)
+			mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
 	}
 
 	@Override protected void onStart() {
@@ -244,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
+		Log.i("Adrien", "" + isDrawerKnown + " " + mSouldShowAccountAfterRotation);
+
 		if (!isDrawerKnown) {
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
@@ -252,14 +258,14 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
 			editor.apply();
 		}
-		else if (mSouldOpenDrawerOnRestore) {
+		else if (mSouldShowAccountAfterRotation) {
 
-			mSouldOpenDrawerOnRestore = false;
+			mSouldShowAccountAfterRotation = false;
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
 			if (isDeviceInPortrait)
 				if (mNavigationDrawerAccountViewSwitcher != null)
-					mNavigationDrawerAccountViewSwitcher.showNext();
+					mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
 		}
 		else {
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
@@ -276,18 +282,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			else
 				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 		}
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-
-		boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
-		boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
-		mSouldOpenDrawerOnRestore = (isDrawerOpened && isAccountViewSelected);
-
-		// Save accounts state for later use. In our case, the latest selected account
-		// will be automatically selected if the application is killed and relaunched.
-		MyAccounts.INSTANCE.saveState();
 	}
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -310,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			// Drawer account back
 
 			if (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1) {
-				mNavigationDrawerAccountViewSwitcher.showPrevious();
+				mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 				return;
 			}
 
@@ -352,6 +346,26 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		}
 
 		super.onBackPressed();
+	}
+
+	@Override protected void onPause() {
+		super.onPause();
+
+		// Save accounts state for later use. In our case, the latest selected account
+		// will be automatically selected if the application is killed and relaunched.
+		MyAccounts.INSTANCE.saveState();
+	}
+
+	@Override protected void onSaveInstanceState(Bundle outState) {
+
+		boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
+		boolean isInLandscape = mNavigationDrawerAccountViewSwitcher == null;
+		boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
+		boolean isAccountShown = isDrawerOpened && (isInLandscape || isAccountViewSelected);
+
+		outState.putBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION, isAccountShown);
+
+		super.onSaveInstanceState(outState);
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -629,6 +643,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
 			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+		else if (mNavigationDrawerAccountViewSwitcher != null)
+			mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
 		// If we selected a new account, and we have a Dossier list displayed
 		// We'll want to pop the BackStack to get on the Bureau list
@@ -721,6 +737,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 				if (selectedAccount != null)
 					getSupportActionBar().setTitle(selectedAccount.getTitle());
 			}
+
+			if (mNavigationDrawerAccountViewSwitcher != null)
+				mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
 			// calls onPrepareOptionMenu to show context specific actions
 			invalidateOptionsMenu();
