@@ -36,9 +36,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.MainActivity;
 import org.adullact.iparapheur.controller.account.MyAccounts;
@@ -81,9 +78,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
 	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
+	private android.support.design.widget.FloatingActionButton mMainMenuFab;
+	private android.support.design.widget.FloatingActionButton mValidateFab;
+	private android.support.design.widget.FloatingActionButton mCancelFab;
+	private android.support.design.widget.FloatingActionButton mAnnotationFab;
+
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
 	private String mDocumentId;              // The Document this fragment is presenting.
+	private boolean mIsAnnotable;
 	private int mCurrentPage;
 	private boolean mShouldReload = false;
 
@@ -92,58 +95,48 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-
-//		if (getArguments() != null) {
-//			mBureauId = getArguments().getString(BUREAU_ID);
-//			mDossier = getArguments().getParcelable(DOSSIER);
-//		}
 	}
 
 	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		// Retrieve views
+
+		mMainMenuFab = (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.mupdf_main_menu_fabbutton);
+		mValidateFab = (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.mupdf_main_validate_fabbutton);
+		mCancelFab = (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
+		mAnnotationFab = (android.support.design.widget.FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
+
 		// Set listeners
 
-		if (getView() != null) {
+		mValidateFab.setVisibility(View.GONE);
 
-			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
+		mAnnotationFab.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+//				mMainMenuFab.collapse();
+				startCreateStickyNoteOnNextMove(true);
+			}
+		});
 
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-					startCreateStickyNoteOnNextMove(true);
-				}
-			});
+		mValidateFab.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+//				mMainMenuFab.collapse();
 
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_validate).setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
+				Action positiveAction = getPositiveAction(mDossier);
+				if (positiveAction != null)
+					((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
+			}
+		});
 
-					Action positiveAction = getPositiveAction(mDossier);
-					if (positiveAction != null)
-						((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
-				}
-			});
+		mCancelFab.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+//				mMainMenuFab.collapse();
 
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel).setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					((FloatingActionsMenu) getView().findViewById(R.id.mupdffragment_main_fabbutton)).collapse();
-
-					Action negativeAction = getNegativeAction(mDossier);
-					if (negativeAction != null)
-						((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
-				}
-			});
-		}
-
-		//
-
-//		isReaderEnabled = true;
-//		/*this.seekBar = (SeekBar) view.findViewById(R.id.fragment_dossier_detail_seekbar);
-//		seekBar.setVisibility(View.INVISIBLE);
-//        seekBar.setOnSeekBarChangeListener(this);*/
-//		mViewPager = (ViewPager) view.findViewById(R.id.fragment_dossier_detail_pager);
-//		mLoadingSpinner = view.findViewById(android.R.id.progress);
+				Action negativeAction = getNegativeAction(mDossier);
+				if (negativeAction != null)
+					((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
+			}
+		});
 
 		// Reload data after rotation
 
@@ -268,27 +261,18 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@Override public void showProgressLayout() {
-
-		if (getView() != null)
-			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
-
+		mMainMenuFab.setVisibility(View.GONE);
 		super.showProgressLayout();
 
 	}
 
 	@Override public void showContentLayout() {
-
-		if (getView() != null)
-			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.VISIBLE);
-
+		mMainMenuFab.setVisibility(View.VISIBLE);
 		super.showContentLayout();
 	}
 
 	@Override public void showErrorLayout() {
-
-		if (getView() != null)
-			getView().findViewById(R.id.mupdffragment_main_fabbutton).setVisibility(View.GONE);
-
+		mMainMenuFab.setVisibility(View.GONE);
 		super.showErrorLayout();
 	}
 
@@ -365,11 +349,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
 		updateStickyNotes(muPdfStickyNotes);
 
-		// Set FAB annotation button visibility
-
-		boolean areAnnotationAvailable = document.isMainDocument();
-		if (getView() != null)
-			getView().findViewById(R.id.mupdffragment_main_fabbutton_annotation).setVisibility(areAnnotationAvailable ? View.VISIBLE : View.GONE);
+		mIsAnnotable = document.isMainDocument();
 	}
 
 	private void updateCircuitInfoDrawerContent() {
@@ -407,16 +387,13 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		//
 
-		FloatingActionButton positiveButton = (FloatingActionButton) getView().findViewById(R.id.mupdffragment_main_fabbutton_validate);
-		FloatingActionButton negativeButton = (FloatingActionButton) getView().findViewById(R.id.mupdffragment_main_fabbutton_cancel);
-
 		Action positiveAction = getPositiveAction(dossier);
-		positiveButton.setVisibility((positiveAction != null) ? View.VISIBLE : View.GONE);
-		positiveButton.setTitle(getString((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee));
+//		mValidateFab.setVisibility((positiveAction != null) ? View.VISIBLE : View.GONE);
+//		positiveButton.setTitle(getString((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee));
 
 		Action negativeAction = getNegativeAction(dossier);
-		negativeButton.setVisibility((negativeAction != null) ? View.VISIBLE : View.GONE);
-		negativeButton.setTitle(getString((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee));
+//		mCancelFab.setVisibility((negativeAction != null) ? View.VISIBLE : View.GONE);
+//		negativeButton.setTitle(getString((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee));
 	}
 
 	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
