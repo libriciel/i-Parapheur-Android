@@ -40,32 +40,32 @@ public class ViewUtils {
 	 * <br/>
 	 * Code source : http://developer.android.com/training/animation/crossfade.html
 	 *
-	 * @param context     needed to load some resources
 	 * @param contentView should be invisible on start
 	 * @param spinnerView will be set to Visibility.GONE at the end
 	 */
-	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
+	public static void crossfade(@NonNull View contentView, @NonNull final View spinnerView) {
 
 		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
 		contentView.animate().cancel();
 		spinnerView.animate().cancel();
-
-		// System default length
-		int mShortAnimationDuration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
 
 		// Set the content view to 0% opacity but visible, so that it is visible
 		// (but fully transparent) during the animation.
 		contentView.setAlpha(0f);
 		contentView.setVisibility(View.VISIBLE);
 
+		// Hardcoded android.R.integer.config_shortAnimTime
+		// We had some NPE on weird tablets that doesn't have this value set.
+		int sShortAnimDurationTime = 200;
+
 		// Animate the content view to 100% opacity, and clear any animation
 		// listener set on the view.
-		contentView.animate().alpha(1f).setDuration(mShortAnimationDuration).setListener(null);
+		contentView.animate().alpha(1f).setDuration(sShortAnimDurationTime).setListener(null);
 
 		// Animate the loading view to 0% opacity. After the animation ends,
 		// set its visibility to GONE as an optimization step (it won't
 		// participate in layout passes, etc.)
-		spinnerView.animate().alpha(0f).setDuration(mShortAnimationDuration).setListener(new AnimatorListenerAdapter() {
+		spinnerView.animate().alpha(0f).setDuration(sShortAnimDurationTime).setListener(new AnimatorListenerAdapter() {
 			@Override public void onAnimationEnd(Animator animation) {
 				spinnerView.setVisibility(View.GONE);
 				spinnerView.setAlpha(1f);

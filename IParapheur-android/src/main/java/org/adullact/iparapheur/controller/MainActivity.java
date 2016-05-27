@@ -248,8 +248,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
 		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-		Log.i("Adrien", "" + isDrawerKnown + " " + mSouldShowAccountAfterRotation);
-
 		if (!isDrawerKnown) {
 			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 

@@ -567,7 +567,7 @@ public class MenuFragment extends Fragment {
 			mBureauSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty())
-				ViewUtils.crossfade(getActivity(), mBureauListView, mBureauEmptyView);
+				ViewUtils.crossfade(mBureauListView, mBureauEmptyView);
 
 			// Error management
 
@@ -626,7 +626,7 @@ public class MenuFragment extends Fragment {
 			mDossierSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty())
-				ViewUtils.crossfade(getActivity(), mDossierListView, mDossierEmptyView);
+				ViewUtils.crossfade(mDossierListView, mDossierEmptyView);
 
 			// Error management
 
