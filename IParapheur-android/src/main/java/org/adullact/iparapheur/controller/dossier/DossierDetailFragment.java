@@ -78,6 +78,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
 	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
+	private View mFabWhiteBackground;
 	private ViewSwitcher mMainButtonViewSwitcher;
 	private FloatingActionButton mMainMenuFab;
 	private FloatingActionButton mCancelFab;
@@ -112,6 +113,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		mValidateLabel = view.findViewById(R.id.mupdf_main_fab_viewswitcher_label);
 		mCancelLabel = view.findViewById(R.id.mupdf_main_cancel_fabbutton_label);
 		mAnnotationLabel = view.findViewById(R.id.mupdf_main_annotation_fabbutton_label);
+		mFabWhiteBackground = view.findViewById(R.id.mupdf_main_fabbutton_white_background);
 		FloatingActionButton validateFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_validate_fabbutton);
 
 		// Default state
@@ -353,6 +355,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		int cancelRank = 1;
 		int annotationRank = 1 + ((Dossier.getNegativeAction(mDossier) != null) ? 1 : 0);
 
+		ViewUtils.showAfterDelay(mFabWhiteBackground, 0);
 		ViewUtils.showAfterDelay(mValidateLabel, mainRank * 75);
 		ViewUtils.showAfterDelay(mCancelFab, cancelRank * 75);
 		ViewUtils.showAfterDelay(mCancelLabel, cancelRank * 75);
@@ -368,6 +371,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
 		int annotationReverseRank = 0;
 
+		ViewUtils.hideAfterDelay(mFabWhiteBackground, maxRank * 75);
 		ViewUtils.hideAfterDelay(mValidateLabel, maxRank * 75);
 		ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * 75);
 		ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * 75);

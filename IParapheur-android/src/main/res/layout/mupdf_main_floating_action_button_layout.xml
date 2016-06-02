@@ -10,7 +10,7 @@
     <!-- We didn't have much choice here -->
 
     <View
-        android:id="@+id/mupdffragment_fabbutton_white_background"
+        android:id="@+id/mupdf_main_fabbutton_white_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/activated_fab_white_background"
