@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <!-- RelativeLayout are really messy, -->
+    <!-- but shadows are mostly cropped with regular LinearLayout/FrameLayout... -->
+    <!-- We didn't have much choice here -->
 
     <View
         android:id="@+id/mupdffragment_fabbutton_white_background"
@@ -12,169 +16,177 @@
         android:background="@color/activated_fab_white_background"
         android:visibility="gone" />
 
-    <TableLayout
+    <!-- Main button -->
+
+    <ViewSwitcher
+        android:id="@+id/mupdf_main_fab_viewswitcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:clipToPadding="false"
-        android:gravity="bottom|center_horizontal"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <TableRow
-            android:id="@+id/mupdf_main_annotation_row"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/mupdf_main_menu_fabbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:padding="8dp">
+            android:src="@drawable/ic_add_white_24dp"
+            app:backgroundTint="@color/brown_500"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:fabSize="normal"
+            app:pressedTranslationZ="12dp"
+            app:rippleColor="@color/brown_700" />
 
-            <android.support.v7.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:elevation="2dp"
-                app:cardCornerRadius="4dp"
-                tools:ignore="UnusedAttribute">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    android:text="@string/add_annotation"
-                    android:textColor="@color/text_black"
-                    android:textStyle="bold" />
-
-            </android.support.v7.widget.CardView>
-
-            <View
-                android:layout_width="16dp"
-                android:layout_height="match_parent" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/mupdf_main_annotation_fabbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_speaker_notes_black_24dp"
-                android:visibility="visible"
-                app:backgroundTint="@color/grey_200"
-                app:borderWidth="0dp"
-                app:elevation="6dp"
-                app:fabSize="mini"
-                app:pressedTranslationZ="12dp"
-                app:rippleColor="@color/grey_400" />
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/mupdf_main_cancel_row"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/mupdf_main_validate_fabbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:padding="8dp">
+            android:src="@drawable/ic_done_white_24dp"
+            app:backgroundTint="@color/green_500"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:fabSize="normal"
+            app:pressedTranslationZ="12dp"
+            app:rippleColor="@color/green_700" />
 
-            <android.support.v7.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:elevation="2dp"
-                app:cardCornerRadius="4dp"
-                tools:ignore="UnusedAttribute">
+    </ViewSwitcher>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    android:text="@string/cancel"
-                    android:textColor="@color/text_black"
-                    android:textStyle="bold" />
+    <FrameLayout
+        android:id="@+id/mupdf_main_fab_viewswitcher_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mupdf_main_fab_viewswitcher"
+        android:layout_alignTop="@id/mupdf_main_fab_viewswitcher"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toLeftOf="@id/mupdf_main_fab_viewswitcher"
+        android:layout_toStartOf="@id/mupdf_main_fab_viewswitcher">
 
-            </android.support.v7.widget.CardView>
-
-            <View
-                android:layout_width="16dp"
-                android:layout_height="match_parent" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/mupdf_main_cancel_fabbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_clear_white_24dp"
-                android:visibility="visible"
-                app:backgroundTint="@color/red_500"
-                app:borderWidth="0dp"
-                app:elevation="6dp"
-                app:fabSize="mini"
-                app:pressedTranslationZ="12dp"
-                app:rippleColor="@color/red_700" />
-
-        </TableRow>
-
-        <TableRow
+        <android.support.v7.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:padding="8dp">
+            android:layout_gravity="center_vertical|end"
+            android:elevation="2dp"
+            app:cardCornerRadius="4dp"
+            tools:ignore="UnusedAttribute">
 
-            <android.support.v7.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:elevation="2dp"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:padding="8dp"
-                app:cardCornerRadius="4dp"
-                tools:ignore="UnusedAttribute">
+                android:text="@string/action_valider"
+                android:textColor="@color/text_black"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    android:text="@string/action_valider"
-                    android:textColor="@color/text_black"
-                    android:textStyle="bold" />
+        </android.support.v7.widget.CardView>
+    </FrameLayout>
 
-            </android.support.v7.widget.CardView>
+    <!--  Cancel button  -->
 
-            <View
-                android:layout_width="16dp"
-                android:layout_height="match_parent" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/mupdf_main_cancel_fabbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mupdf_main_fab_viewswitcher"
+        android:layout_alignLeft="@id/mupdf_main_fab_viewswitcher"
+        android:layout_alignStart="@id/mupdf_main_fab_viewswitcher"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_clear_white_24dp"
+        app:backgroundTint="@color/red_500"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        app:fabSize="mini"
+        app:pressedTranslationZ="12dp"
+        app:rippleColor="@color/red_700" />
 
-            <ViewSwitcher
-                android:id="@+id/mupdf_main_fab_viewswitcher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+    <FrameLayout
+        android:id="@+id/mupdf_main_cancel_fabbutton_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mupdf_main_cancel_fabbutton"
+        android:layout_alignTop="@id/mupdf_main_cancel_fabbutton"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@id/mupdf_main_cancel_fabbutton"
+        android:layout_toStartOf="@id/mupdf_main_cancel_fabbutton"
+        android:clipToPadding="false">
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/mupdf_main_menu_fabbutton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/ic_add_white_24dp"
-                    android:visibility="visible"
-                    app:backgroundTint="@color/brown_500"
-                    app:borderWidth="0dp"
-                    app:elevation="6dp"
-                    app:fabSize="normal"
-                    app:pressedTranslationZ="12dp"
-                    app:rippleColor="@color/brown_700" />
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:elevation="2dp"
+            app:cardCornerRadius="4dp"
+            tools:ignore="UnusedAttribute">
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/mupdf_main_validate_fabbutton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/ic_done_white_24dp"
-                    android:visibility="visible"
-                    app:backgroundTint="@color/green_500"
-                    app:borderWidth="0dp"
-                    app:elevation="6dp"
-                    app:fabSize="normal"
-                    app:pressedTranslationZ="12dp"
-                    app:rippleColor="@color/green_700" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:text="@string/cancel"
+                android:textColor="@color/text_black"
+                android:textStyle="bold" />
 
-            </ViewSwitcher>
+        </android.support.v7.widget.CardView>
 
-        </TableRow>
-    </TableLayout>
+    </FrameLayout>
 
-</FrameLayout>
+    <!--  Annotate button  -->
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/mupdf_main_annotation_fabbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mupdf_main_cancel_fabbutton"
+        android:layout_alignLeft="@id/mupdf_main_fab_viewswitcher"
+        android:layout_alignStart="@id/mupdf_main_fab_viewswitcher"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:src="@drawable/ic_speaker_notes_black_24dp"
+        app:backgroundTint="@color/grey_200"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        app:fabSize="mini"
+        app:pressedTranslationZ="12dp"
+        app:rippleColor="@color/grey_400" />
+
+    <FrameLayout
+        android:id="@+id/mupdf_main_annotation_fabbutton_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mupdf_main_annotation_fabbutton"
+        android:layout_alignTop="@id/mupdf_main_annotation_fabbutton"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@id/mupdf_main_annotation_fabbutton"
+        android:layout_toStartOf="@id/mupdf_main_annotation_fabbutton"
+        android:clipToPadding="false">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:elevation="2dp"
+            app:cardCornerRadius="4dp"
+            tools:ignore="UnusedAttribute">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:text="@string/add_annotation"
+                android:textColor="@color/text_black"
+                android:textStyle="bold" />
+
+        </android.support.v7.widget.CardView>
+
+    </FrameLayout>
+
+</RelativeLayout>

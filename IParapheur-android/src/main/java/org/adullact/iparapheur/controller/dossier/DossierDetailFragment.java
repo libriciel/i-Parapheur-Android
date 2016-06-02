@@ -34,7 +34,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -79,10 +78,13 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
 	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
-	private TableRow mAnnotationRow;
-	private TableRow mCancelRow;
 	private ViewSwitcher mMainButtonViewSwitcher;
 	private FloatingActionButton mMainMenuFab;
+	private FloatingActionButton mCancelFab;
+	private FloatingActionButton mAnnotationFab;
+	private View mValidateLabel;
+	private View mCancelLabel;
+	private View mAnnotationLabel;
 
 	private String mBureauId;                // The Bureau where the dossier belongs.
 	private Dossier mDossier;                // The Dossier this fragment is presenting.
@@ -103,19 +105,22 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Retrieve views
 
-		mAnnotationRow = (TableRow) view.findViewById(R.id.mupdf_main_annotation_row);
-		mCancelRow = (TableRow) view.findViewById(R.id.mupdf_main_cancel_row);
 		mMainButtonViewSwitcher = (ViewSwitcher) view.findViewById(R.id.mupdf_main_fab_viewswitcher);
 		mMainMenuFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_menu_fabbutton);
-
+		mCancelFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
+		mAnnotationFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
+		mValidateLabel = view.findViewById(R.id.mupdf_main_fab_viewswitcher_label);
+		mCancelLabel = view.findViewById(R.id.mupdf_main_cancel_fabbutton_label);
+		mAnnotationLabel = view.findViewById(R.id.mupdf_main_annotation_fabbutton_label);
 		FloatingActionButton validateFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_validate_fabbutton);
-		FloatingActionButton cancelFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
-		FloatingActionButton annotationFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
 
 		// Default state
 
-		mCancelRow.setVisibility(View.GONE);
-		mAnnotationRow.setVisibility(View.GONE);
+		mCancelFab.setVisibility(View.GONE);
+		mAnnotationFab.setVisibility(View.GONE);
+		mValidateLabel.setVisibility(View.GONE);
+		mCancelLabel.setVisibility(View.GONE);
+		mAnnotationLabel.setVisibility(View.GONE);
 
 		// Set listeners
 
@@ -125,7 +130,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			}
 		});
 
-		annotationFab.setOnClickListener(new View.OnClickListener() {
+		mAnnotationFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
 				collapseFabMenu();
 				startCreateStickyNoteOnNextMove(true);
@@ -142,7 +147,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			}
 		});
 
-		cancelFab.setOnClickListener(new View.OnClickListener() {
+		mCancelFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
 				collapseFabMenu();
 
@@ -344,11 +349,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		mMainButtonViewSwitcher.setDisplayedChild(1);
 
+		int mainRank = 0;
 		int cancelRank = 1;
 		int annotationRank = 1 + ((Dossier.getNegativeAction(mDossier) != null) ? 1 : 0);
 
-		ViewUtils.showAfterDelay(mCancelRow, 50 * cancelRank);
-		ViewUtils.showAfterDelay(mAnnotationRow, 50 * annotationRank);
+		ViewUtils.showAfterDelay(mValidateLabel, mainRank * 75);
+		ViewUtils.showAfterDelay(mCancelFab, cancelRank * 75);
+		ViewUtils.showAfterDelay(mCancelLabel, cancelRank * 75);
+		ViewUtils.showAfterDelay(mAnnotationFab, annotationRank * 75);
+		ViewUtils.showAfterDelay(mAnnotationLabel, annotationRank * 75);
 	}
 
 	private void collapseFabMenu() {
@@ -359,8 +368,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
 		int annotationReverseRank = 0;
 
-		ViewUtils.hideAfterDelay(mCancelRow, cancelReverseRank * 75);
-		ViewUtils.hideAfterDelay(mAnnotationRow, annotationReverseRank * 75);
+		ViewUtils.hideAfterDelay(mValidateLabel, maxRank * 75);
+		ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * 75);
+		ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * 75);
+		ViewUtils.hideAfterDelay(mAnnotationFab, annotationReverseRank * 75);
+		ViewUtils.hideAfterDelay(mAnnotationLabel, annotationReverseRank * 75);
 	}
 
 	private void updateFab(@Nullable Dossier dossier) {
