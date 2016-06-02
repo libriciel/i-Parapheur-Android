@@ -19,11 +19,13 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -198,6 +200,49 @@ public class Dossier implements Parcelable {
 					return document;
 
 		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+	}
+
+	/**
+	 * Returns the main negative {@link Action} available, by coherent priority.
+	 */
+	public static @Nullable Action getPositiveAction(@NonNull Dossier dossier) {
+
+		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+		actions.retainAll(dossier.getActions());
+
+		if (dossier.getActionDemandee() != null)
+			return dossier.getActionDemandee();
+
+		if (actions.contains(Action.SIGNATURE))
+			return Action.SIGNATURE;
+		else if (actions.contains(Action.VISA))
+			return Action.VISA;
+		else if (actions.contains(Action.ARCHIVAGE))
+			return Action.ARCHIVAGE;
+		else if (actions.contains(Action.MAILSEC))
+			return Action.MAILSEC;
+		else if (actions.contains(Action.TDT_ACTES))
+			return Action.TDT_ACTES;
+		else if (actions.contains(Action.TDT_HELIOS))
+			return Action.TDT_HELIOS;
+		else if (actions.contains(Action.TDT))
+			return Action.TDT;
+
+		return null;
+	}
+
+	/**
+	 * Returns the main negative {@link Action} available, by coherent priority.
+	 */
+	public static @Nullable Action getNegativeAction(@NonNull Dossier dossier) {
+
+		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+		actions.retainAll(dossier.getActions());
+
+		if (actions.contains(Action.REJET))
+			return Action.REJET;
+
+		return null;
 	}
 
 	// </editor-fold desc="Static utils">

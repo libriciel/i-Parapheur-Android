@@ -306,24 +306,42 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 				return;
 			}
 
-			// Menu back
+			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
 
-			MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-			if (bureauxFragment != null) {
-				if (bureauxFragment.onBackPressed()) {
+				// Menu back
 
-					if (!mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
-						mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+				MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+				if (bureauxFragment != null)
+					if (bureauxFragment.onBackPressed())
+						return;
 
+				// Close the drawer
+
+				if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
+					mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 					return;
 				}
+
 			}
+			else {
 
-			// Then, close the drawer
+				// Collapse the FAB
 
-			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
-				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-				return;
+				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+				if (dossierDetailFragment != null)
+					if (dossierDetailFragment.onBackPressed())
+						return;
+
+				// Menu back
+
+				MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+				if (bureauxFragment != null) {
+					if (bureauxFragment.onBackPressed()) {
+						mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+						return;
+					}
+				}
+
 			}
 		}
 		else {
@@ -334,6 +352,13 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 				return;
 			}
+
+			// Collapse the FAB
+
+			DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+			if (dossierDetailFragment != null)
+				if (dossierDetailFragment.onBackPressed())
+					return;
 
 			// Then, try to pop backstack
 

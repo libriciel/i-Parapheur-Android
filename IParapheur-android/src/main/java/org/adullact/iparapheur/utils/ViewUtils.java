@@ -19,6 +19,7 @@ package org.adullact.iparapheur.utils;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -87,4 +88,42 @@ public class ViewUtils extends coop.adullactprojet.mupdffragment.utils.ViewUtils
 		}
 	}
 
+	/**
+	 * Hide and show a view, executing Runnable on hide.
+	 *
+	 * @param contentView should be invisible on start
+	 */
+	public static void showAfterDelay(@NonNull final View contentView, long delay) {
+
+		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+		contentView.animate().cancel();
+
+		contentView.setAlpha(0f);
+		contentView.setVisibility(View.VISIBLE);
+
+		// Animate the content view to 100% opacity
+		contentView.animate().alpha(1f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(null);
+	}
+
+	/**
+	 * Hide and show a view, executing Runnable on hide.
+	 *
+	 * @param contentView should be invisible on start
+	 */
+	public static void hideAfterDelay(@NonNull final View contentView, long delay) {
+
+		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+		contentView.animate().cancel();
+
+		contentView.setAlpha(1f);
+
+		// Animate the content view to 0% opacity
+		contentView.animate().alpha(0f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(new AnimatorListenerAdapter() {
+
+			@Override public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
+				contentView.setVisibility(View.GONE);
+			}
+		});
+	}
 }

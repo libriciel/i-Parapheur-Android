@@ -22,6 +22,7 @@
         android:padding="16dp">
 
         <TableRow
+            android:id="@+id/mupdf_main_annotation_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -40,9 +41,14 @@
                     android:layout_height="match_parent"
                     android:padding="8dp"
                     android:text="@string/add_annotation"
-                    android:textColor="@color/text_black" />
+                    android:textColor="@color/text_black"
+                    android:textStyle="bold" />
 
             </android.support.v7.widget.CardView>
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/mupdf_main_annotation_fabbutton"
@@ -60,6 +66,7 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/mupdf_main_cancel_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -78,9 +85,14 @@
                     android:layout_height="match_parent"
                     android:padding="8dp"
                     android:text="@string/cancel"
-                    android:textColor="@color/text_black" />
+                    android:textColor="@color/text_black"
+                    android:textStyle="bold" />
 
             </android.support.v7.widget.CardView>
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/mupdf_main_cancel_fabbutton"
@@ -118,46 +130,49 @@
                     android:layout_height="match_parent"
                     android:padding="8dp"
                     android:text="@string/action_valider"
-                    android:textColor="@color/text_black" />
+                    android:textColor="@color/text_black"
+                    android:textStyle="bold" />
 
             </android.support.v7.widget.CardView>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/mupdf_main_validate_fabbutton"
+            <View
+                android:layout_width="16dp"
+                android:layout_height="match_parent" />
+
+            <ViewSwitcher
+                android:id="@+id/mupdf_main_fab_viewswitcher"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_done_white_24dp"
-                android:visibility="visible"
-                app:backgroundTint="@color/green_500"
-                app:borderWidth="0dp"
-                app:elevation="6dp"
-                app:fabSize="normal"
-                app:pressedTranslationZ="12dp"
-                app:rippleColor="@color/green_700" />
+                android:layout_height="wrap_content">
 
-        </TableRow>
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/mupdf_main_menu_fabbutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_add_white_24dp"
+                    android:visibility="visible"
+                    app:backgroundTint="@color/brown_500"
+                    app:borderWidth="0dp"
+                    app:elevation="6dp"
+                    app:fabSize="normal"
+                    app:pressedTranslationZ="12dp"
+                    app:rippleColor="@color/brown_700" />
 
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:padding="8dp">
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/mupdf_main_validate_fabbutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/ic_done_white_24dp"
+                    android:visibility="visible"
+                    app:backgroundTint="@color/green_500"
+                    app:borderWidth="0dp"
+                    app:elevation="6dp"
+                    app:fabSize="normal"
+                    app:pressedTranslationZ="12dp"
+                    app:rippleColor="@color/green_700" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/mupdf_main_menu_fabbutton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="1"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_add_white_24dp"
-                android:visibility="visible"
-                app:backgroundTint="@color/brown_500"
-                app:borderWidth="0dp"
-                app:elevation="6dp"
-                app:fabSize="normal"
-                app:pressedTranslationZ="12dp"
-                app:rippleColor="@color/brown_700" />
+            </ViewSwitcher>
 
         </TableRow>
     </TableLayout>
