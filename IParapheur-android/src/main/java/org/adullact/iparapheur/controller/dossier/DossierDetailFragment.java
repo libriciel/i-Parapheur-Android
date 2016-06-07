@@ -71,9 +71,9 @@ import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
  */
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	// public static final String LOG_TAG = "DossierDetailFragment";
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
 
+	private static final int FAB_ANIM_DELAY_IN_MS = 75;
 	private static final String ANNOTATION_PAYLOAD_STEP = "step";
 	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
 	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
@@ -83,6 +83,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private FloatingActionButton mMainMenuFab;
 	private FloatingActionButton mCancelFab;
 	private FloatingActionButton mAnnotationFab;
+	private TextView mValidateLabelTextView;
+	private TextView mCancelLabelTextView;
 	private View mValidateLabel;
 	private View mCancelLabel;
 	private View mAnnotationLabel;
@@ -110,6 +112,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		mMainMenuFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_menu_fabbutton);
 		mCancelFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
 		mAnnotationFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
+		mValidateLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_fab_viewswitcher_label_textview);
+		mCancelLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_cancel_fabbutton_label_textview);
 		mValidateLabel = view.findViewById(R.id.mupdf_main_fab_viewswitcher_label);
 		mCancelLabel = view.findViewById(R.id.mupdf_main_cancel_fabbutton_label);
 		mAnnotationLabel = view.findViewById(R.id.mupdf_main_annotation_fabbutton_label);
@@ -126,6 +130,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Set listeners
 
+		mFabWhiteBackground.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onWhiteBackgroundClicked();
+			}
+		});
+
 		mMainMenuFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
 				toggleFabMenuVisibility();
@@ -134,28 +144,34 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		mAnnotationFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				collapseFabMenu();
-				startCreateStickyNoteOnNextMove(true);
+				onAnnotationSelected();
+			}
+		});
+		mAnnotationLabel.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onAnnotationSelected();
 			}
 		});
 
 		validateFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				collapseFabMenu();
-
-				Action positiveAction = Dossier.getPositiveAction(mDossier);
-				if (positiveAction != null)
-					((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
+				onValidateSelected();
+			}
+		});
+		mValidateLabel.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onValidateSelected();
 			}
 		});
 
 		mCancelFab.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				collapseFabMenu();
-
-				Action negativeAction = Dossier.getNegativeAction(mDossier);
-				if (negativeAction != null)
-					((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
+				onCancelSelected();
+			}
+		});
+		mCancelLabel.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View v) {
+				onCancelSelected();
 			}
 		});
 
@@ -336,6 +352,31 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	// <editor-fold desc="FloatingActionButtons">
 
+	private void onWhiteBackgroundClicked() {
+		onBackPressed();
+	}
+
+	private void onValidateSelected() {
+		collapseFabMenu();
+
+		Action positiveAction = Dossier.getPositiveAction(mDossier);
+		if (positiveAction != null)
+			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
+	}
+
+	private void onCancelSelected() {
+		collapseFabMenu();
+
+		Action negativeAction = Dossier.getNegativeAction(mDossier);
+		if (negativeAction != null)
+			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
+	}
+
+	private void onAnnotationSelected() {
+		collapseFabMenu();
+		startCreateStickyNoteOnNextMove(true);
+	}
+
 	private void toggleFabMenuVisibility() {
 
 		if (mDossier == null)
@@ -349,34 +390,56 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private void expanseFabMenu() {
 
+		mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_clockwise_in);
+		mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_clockwise_out);
 		mMainButtonViewSwitcher.setDisplayedChild(1);
 
+		// Compute values
+
+		boolean hasNegativeAction = (Dossier.getNegativeAction(mDossier) != null);
 		int mainRank = 0;
 		int cancelRank = 1;
-		int annotationRank = 1 + ((Dossier.getNegativeAction(mDossier) != null) ? 1 : 0);
+		int annotationRank = 1 + (hasNegativeAction ? 1 : 0);
+
+		// Animate
 
 		ViewUtils.showAfterDelay(mFabWhiteBackground, 0);
-		ViewUtils.showAfterDelay(mValidateLabel, mainRank * 75);
-		ViewUtils.showAfterDelay(mCancelFab, cancelRank * 75);
-		ViewUtils.showAfterDelay(mCancelLabel, cancelRank * 75);
-		ViewUtils.showAfterDelay(mAnnotationFab, annotationRank * 75);
-		ViewUtils.showAfterDelay(mAnnotationLabel, annotationRank * 75);
+		ViewUtils.showAfterDelay(mValidateLabel, mainRank * FAB_ANIM_DELAY_IN_MS);
+
+		if (hasNegativeAction) {
+			ViewUtils.showAfterDelay(mCancelFab, cancelRank * FAB_ANIM_DELAY_IN_MS);
+			ViewUtils.showAfterDelay(mCancelLabel, cancelRank * FAB_ANIM_DELAY_IN_MS);
+		}
+
+		ViewUtils.showAfterDelay(mAnnotationFab, annotationRank * FAB_ANIM_DELAY_IN_MS);
+		ViewUtils.showAfterDelay(mAnnotationLabel, annotationRank * FAB_ANIM_DELAY_IN_MS);
 	}
 
 	private void collapseFabMenu() {
 
+		mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_anticlockwise_in);
+		mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_anticlockwise_out);
 		mMainButtonViewSwitcher.setDisplayedChild(0);
 
-		int maxRank = ((Dossier.getNegativeAction(mDossier) != null) ? 1 : 0) + (mIsAnnotable ? 1 : 0);
+		// Compute values
+
+		boolean hasNegativeAction = (Dossier.getNegativeAction(mDossier) != null);
+		int maxRank = (hasNegativeAction ? 1 : 0) + (mIsAnnotable ? 1 : 0);
 		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
 		int annotationReverseRank = 0;
 
-		ViewUtils.hideAfterDelay(mFabWhiteBackground, maxRank * 75);
-		ViewUtils.hideAfterDelay(mValidateLabel, maxRank * 75);
-		ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * 75);
-		ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * 75);
-		ViewUtils.hideAfterDelay(mAnnotationFab, annotationReverseRank * 75);
-		ViewUtils.hideAfterDelay(mAnnotationLabel, annotationReverseRank * 75);
+		// Animate
+
+		ViewUtils.hideAfterDelay(mFabWhiteBackground, 0);
+		ViewUtils.hideAfterDelay(mValidateLabel, maxRank * FAB_ANIM_DELAY_IN_MS);
+
+		if (hasNegativeAction) {
+			ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
+			ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
+		}
+
+		ViewUtils.hideAfterDelay(mAnnotationFab, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
+		ViewUtils.hideAfterDelay(mAnnotationLabel, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
 	}
 
 	private void updateFab(@Nullable Dossier dossier) {
@@ -389,12 +452,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		//
 
 		Action positiveAction = Dossier.getPositiveAction(dossier);
-//		mValidateFab.setVisibility((positiveAction != null) ? View.VISIBLE : View.GONE);
-//		positiveButton.setTitle(getString((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee));
+		mValidateLabelTextView.setText((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee);
 
 		Action negativeAction = Dossier.getNegativeAction(dossier);
-//		mCancelFab.setVisibility((negativeAction != null) ? View.VISIBLE : View.GONE);
-//		negativeButton.setTitle(getString((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee));
+		mCancelLabelTextView.setText((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee);
 	}
 
 	// </editor-fold desc="FloatingActionButtons">

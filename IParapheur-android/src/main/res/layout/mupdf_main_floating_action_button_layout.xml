@@ -26,6 +26,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:clipToPadding="false"
+        android:inAnimation="@anim/rotation_clockwise_in"
+        android:outAnimation="@anim/rotation_clockwise_out"
         android:padding="16dp">
 
         <android.support.design.widget.FloatingActionButton
@@ -69,16 +71,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:clickable="true"
             android:elevation="2dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/grey_600"
             app:cardCornerRadius="4dp"
             tools:ignore="UnusedAttribute">
 
             <TextView
+                android:id="@+id/mupdf_main_fab_viewswitcher_label_textview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:paddingBottom="8dp"
+                android:paddingEnd="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:text="@string/action_valider"
-                android:textColor="@color/text_black"
+                android:textColor="@color/text_white"
                 android:textStyle="bold" />
 
         </android.support.v7.widget.CardView>
@@ -121,16 +132,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:clickable="true"
             android:elevation="2dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/grey_600"
             app:cardCornerRadius="4dp"
             tools:ignore="UnusedAttribute">
 
             <TextView
+                android:id="@+id/mupdf_main_cancel_fabbutton_label_textview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:paddingBottom="8dp"
+                android:paddingEnd="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:text="@string/cancel"
-                android:textColor="@color/text_black"
+                android:textColor="@color/text_white"
                 android:textStyle="bold" />
 
         </android.support.v7.widget.CardView>
@@ -149,13 +169,13 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="24dp"
         android:layout_marginStart="24dp"
-        android:src="@drawable/ic_speaker_notes_black_24dp"
-        app:backgroundTint="@color/grey_200"
+        android:src="@drawable/ic_speaker_notes_white_24dp"
+        app:backgroundTint="@color/grey_600"
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:fabSize="mini"
         app:pressedTranslationZ="12dp"
-        app:rippleColor="@color/grey_400" />
+        app:rippleColor="@color/grey_800" />
 
     <FrameLayout
         android:id="@+id/mupdf_main_annotation_fabbutton_label"
@@ -173,16 +193,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:clickable="true"
             android:elevation="2dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/grey_600"
             app:cardCornerRadius="4dp"
             tools:ignore="UnusedAttribute">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:paddingBottom="8dp"
+                android:paddingEnd="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
                 android:text="@string/add_annotation"
-                android:textColor="@color/text_black"
+                android:textColor="@color/text_white"
                 android:textStyle="bold" />
 
         </android.support.v7.widget.CardView>
