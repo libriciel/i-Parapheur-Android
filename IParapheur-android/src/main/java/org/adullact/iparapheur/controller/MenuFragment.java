@@ -649,6 +649,7 @@ public class MenuFragment extends Fragment {
 
 			TextView lateBadgeTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_late);
 			TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo_count);
+			TextView bureauTitleTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_title);
 
 			Bureau currentBureau = getItem(position);
 			if (currentBureau != null) {
@@ -666,6 +667,7 @@ public class MenuFragment extends Fragment {
 
 				// Applies values
 
+				bureauTitleTextView.setText(currentBureau.getTitle());
 				todoCountTextView.setText(subtitle);
 				lateBadgeTextView.setText(String.valueOf(currentBureau.getLateCount()));
 				lateBadgeTextView.setVisibility((currentBureau.getLateCount() != 0 ? View.VISIBLE : View.INVISIBLE));
@@ -707,6 +709,7 @@ public class MenuFragment extends Fragment {
 
 			// FIXME : changement d'api avec toutes les actions.
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(String.format("%s / %s", dossier.getType(), dossier.getSousType()));
+			((TextView) cellView.findViewById(R.id.dossiers_list_item_title)).setText(dossier.getName());
 
 			// CheckBox
 

@@ -43,6 +43,7 @@ public class CircuitAdapter extends ArrayAdapter<EtapeCircuit> {
 
 		EtapeCircuit etape = getItem(position);
 		((ImageView) view.findViewById(R.id.etape_circuit_icon)).setImageResource(etape.getAction().getIcon(etape.isApproved()));
+		((TextView) view.findViewById(R.id.etape_circuit_bureau)).setText(etape.getBureauName());
 
 		if (etape.isApproved()) {
 			SimpleDateFormat df = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);

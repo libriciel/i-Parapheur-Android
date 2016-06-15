@@ -20,15 +20,17 @@ package org.adullact.iparapheur.controller.rest.mapper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
@@ -135,7 +137,7 @@ public class ModelMapper3 extends ModelMapper {
 		return getActionsForDossier(actionsJsonObject);
 	}
 
-	protected HashSet<Action> getActionsForDossier(JsonObject dossier) {
+	protected @NonNull HashSet<Action> getActionsForDossier(JsonObject dossier) {
 
 		HashSet<Action> actions = new HashSet<>();
 		JsonExplorer jsonExplorer = new JsonExplorer(dossier);
@@ -165,39 +167,6 @@ public class ModelMapper3 extends ModelMapper {
 		}
 
 		return dossiers;
-	}
-
-	@Override public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
-
-		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
-
-		// Parsing root fields
-
-		boolean isDigitSignMandatory = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY, true);
-		boolean hasSelectionScript = jsonExplorer.findObject(DOSSIER_CIRCUIT).optBoolean(CIRCUIT_HAS_SELECTION_SCRIPT, false);
-		String signatureFormat = jsonExplorer.findObject(DOSSIER_CIRCUIT).optString(CIRCUIT_SIG_FORMAT, "");
-
-		// Parsing Etapes
-
-		ArrayList<EtapeCircuit> etapes = new ArrayList<>();
-
-		jsonExplorer.findObject(DOSSIER_CIRCUIT).findArray(CIRCUIT_ETAPES).rebase();
-		for (int index = 0; index < jsonExplorer.getCurrentArraySize(); index++) {
-
-			EtapeCircuit currentEtape = new EtapeCircuit(
-					jsonExplorer.find(index).optLong(CIRCUIT_ETAPES_DATE_VALIDATION, -1),
-					jsonExplorer.find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
-					jsonExplorer.find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
-					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME),
-					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE),
-					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE, Action.VISA.toString()),
-					jsonExplorer.find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS)
-			);
-
-			etapes.add(currentEtape);
-		}
-
-		return new Circuit(etapes, signatureFormat, isDigitSignMandatory, hasSelectionScript);
 	}
 
 	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {

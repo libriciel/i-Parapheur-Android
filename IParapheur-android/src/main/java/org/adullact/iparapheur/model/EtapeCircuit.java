@@ -19,6 +19,9 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
+
+import com.google.gson.annotations.SerializedName;
 
 import org.adullact.iparapheur.utils.StringUtils;
 
@@ -38,34 +41,24 @@ public class EtapeCircuit implements Parcelable {
 		}
 	};
 
-	private final Date dateValidation;
-	private final boolean isApproved;
-	private final boolean isRejected;
-	private final String bureauName;
-	private final String signataire;
-	private final Action action;
-	private final String publicAnnotation;
+	@SerializedName("dateValidation") private final Date dateValidation;
+	@SerializedName("approved") private final boolean isApproved;
+	@SerializedName("rejected") private final boolean isRejected;
+	@SerializedName("parapheurName") private final String bureauName;
+	@SerializedName("signataire") private final String signataire;
+	@SerializedName("actionDemandee") private final Action action;
+	@SerializedName("annotPub") private final String publicAnnotation;
 
 	// <editor-fold desc="Setters / Getters">
 
-	public EtapeCircuit(Long dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
-						String publicAnnotation) {
-		this.dateValidation = new Date(dateValidation);
-		this.isApproved = isApproved;
-		this.isRejected = isRejected;
-		this.bureauName = bureauName;
-		this.signataire = signataire == null ? "" : signataire;
-		this.action = Action.valueOf(action);
-		this.publicAnnotation = publicAnnotation;
-	}
-
 	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
 						String publicAnnotation) {
-		this.dateValidation = StringUtils.parseIso8601Date(dateValidation);
+
+		this.dateValidation = TextUtils.isEmpty(dateValidation) ? null : StringUtils.parseIso8601Date(dateValidation);
 		this.isApproved = isApproved;
 		this.isRejected = isRejected;
 		this.bureauName = bureauName;
-		this.signataire = signataire == null ? "" : signataire;
+		this.signataire = signataire;
 		this.action = Action.valueOf(action);
 		this.publicAnnotation = publicAnnotation;
 	}
@@ -90,10 +83,6 @@ public class EtapeCircuit implements Parcelable {
 		return isApproved;
 	}
 
-	public boolean isRejected() {
-		return isRejected;
-	}
-
 	public String getBureauName() {
 		return bureauName;
 	}
@@ -106,14 +95,11 @@ public class EtapeCircuit implements Parcelable {
 		return action;
 	}
 
-	public String getPublicAnnotation() {
-		return publicAnnotation;
-	}
-
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return bureauName;
+		return "{EtapeCircuit dateValidation=" + dateValidation + " isApproved=" + isApproved + " isRejected=" + isRejected + " bureauName=" + bureauName //
+				+ " signataire=" + signataire + " action=" + action + " publicAnnot=" + publicAnnotation + "}";
 	}
 
 	@Override public int describeContents() {

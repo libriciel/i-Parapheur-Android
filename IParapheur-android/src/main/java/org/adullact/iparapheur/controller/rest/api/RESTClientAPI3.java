@@ -20,6 +20,9 @@ package org.adullact.iparapheur.controller.rest.api;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
@@ -35,6 +38,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.State;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -49,19 +53,6 @@ import java.util.Locale;
 import java.util.Map;
 
 
-/**
- * Created by jmaire on 09/06/2014.
- * API i-Parapheur version 3
- * <p/>
- * a partir de la v4.2.00 / v3.6.00 (comprise)
- * <p/>
- * Refonte totale de l'API.
- * On passe sur une API Restful CRUDL
- * <p/>
- * Il y a des sous ressources (ex. les bureaux de l'utilisateur),
- * et quelques action spécifiques qui ne suivent pas l'architecture CRUDL
- * (ex. mise à jour des classifications ACTES).
- */
 public class RESTClientAPI3 extends RESTClientAPI {
 
 	/* Ressources principales */
@@ -101,6 +92,7 @@ public class RESTClientAPI3 extends RESTClientAPI {
 	// private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
 	// private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
 
+	private Gson mGson = CollectionUtils.buildGsonWithLongToDate();
 	protected ModelMapper modelMapper = new ModelMapper3();
 
 	@Override public List<Bureau> getBureaux() throws IParapheurException {
@@ -139,7 +131,8 @@ public class RESTClientAPI3 extends RESTClientAPI {
 
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
-		return modelMapper.getCircuit(RESTUtils.get(url));
+		String response = String.valueOf(RESTUtils.get(url).getResponse());
+		return mGson.fromJson(new JsonParser().parse(response).getAsJsonObject().get("circuit"), Circuit.class);
 	}
 
 	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {

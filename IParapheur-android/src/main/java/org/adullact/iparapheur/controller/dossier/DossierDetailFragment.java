@@ -313,18 +313,18 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@Override public void showProgressLayout() {
-		mMainMenuFab.setVisibility(View.GONE);
+		mMainMenuFab.hide();
 		super.showProgressLayout();
 
 	}
 
 	@Override public void showContentLayout() {
-		mMainMenuFab.setVisibility(View.VISIBLE);
+		mMainMenuFab.show();
 		super.showContentLayout();
 	}
 
 	@Override public void showErrorLayout() {
-		mMainMenuFab.setVisibility(View.GONE);
+		mMainMenuFab.hide();
 		super.showErrorLayout();
 	}
 

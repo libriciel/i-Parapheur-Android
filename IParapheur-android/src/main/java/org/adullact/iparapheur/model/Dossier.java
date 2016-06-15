@@ -285,7 +285,9 @@ public class Dossier implements Parcelable {
 	}
 
 	@Override public String toString() {
-		return mName;
+		return "{Dossier id=" + mId + " name=" + mName + " actionsDemandees=" + mActionDemandee + " type=" + mType + " subType=" + mSousType     //
+				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " mainDocs=" + mMainDocuments + " annexes=" + mAnnexes           //
+				+ " actions=" + mActions + " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
 	}
 
 	@Override public int hashCode() {
