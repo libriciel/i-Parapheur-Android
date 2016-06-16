@@ -31,12 +31,11 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public enum RESTClient implements IParapheurAPI {
@@ -184,7 +183,7 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getDossiers(bureauId);
 	}
 
-	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
 		return getRESTClient().getTypologie();
 	}
 

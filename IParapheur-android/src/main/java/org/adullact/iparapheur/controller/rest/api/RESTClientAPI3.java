@@ -22,6 +22,7 @@ import android.util.SparseArray;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
@@ -38,6 +39,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.State;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
@@ -46,11 +48,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 
 public class RESTClientAPI3 extends RESTClientAPI {
@@ -124,9 +126,11 @@ public class RESTClientAPI3 extends RESTClientAPI {
 		return modelMapper.getDossiers(response);
 	}
 
-	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
 		String url = buildUrl(RESOURCE_TYPES);
-		return modelMapper.getTypologie(RESTUtils.get(url));
+		RequestResponse result = RESTUtils.get(url);
+		Type typologyType = new TypeToken<ArrayList<ParapheurType>>() {}.getType();
+		return mGson.fromJson(result.getResponseArray().toString(), typologyType);
 	}
 
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {

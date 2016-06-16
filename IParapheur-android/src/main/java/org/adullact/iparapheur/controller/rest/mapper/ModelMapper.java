@@ -41,7 +41,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -65,11 +64,6 @@ public class ModelMapper {
 	protected static String DOCUMENT_SIZE = "size";
 	protected static String DOCUMENT_IS_LOCKED = "isLocked";
 	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
-
-	protected static String CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY = "isDigitalSignatureMandatory";
-	protected static String CIRCUIT_HAS_SELECTION_SCRIPT = "hasSelectionScript";
-	protected static String CIRCUIT_SIG_FORMAT = "sigFormat";
-	protected static String CIRCUIT_ETAPES = "etapes";
 
 	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
 	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
@@ -254,34 +248,6 @@ public class ModelMapper {
 		result.setHash(hash);
 
 		return result;
-	}
-
-	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
-		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
-		if (response.getResponse() != null) {
-			JSONObject data = response.getResponse().optJSONObject("data");
-			if (data != null) {
-				JSONObject typology = data.optJSONObject("typology");
-				if (typology != null) {
-					Iterator types = typology.keys();
-					while (types.hasNext()) {
-						String type = (String) types.next();
-						JSONArray jsonSousTypes = typology.optJSONArray(type);
-						if (jsonSousTypes != null) {
-							ArrayList<String> sousTypes = new ArrayList<>(jsonSousTypes.length());
-							for (int i = 0; i < jsonSousTypes.length(); i++) {
-								String sousType = jsonSousTypes.optString(i);
-								if (!sousType.isEmpty()) {
-									sousTypes.add(sousType);
-								}
-							}
-							typologie.put(type, sousTypes);
-						}
-					}
-				}
-			}
-		}
-		return typologie;
 	}
 
 	public SparseArray<PageAnnotations> getAnnotations(RequestResponse response) {

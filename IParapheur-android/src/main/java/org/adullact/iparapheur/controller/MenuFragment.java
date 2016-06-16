@@ -64,6 +64,7 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -102,7 +103,7 @@ public class MenuFragment extends Fragment {
 	// Data
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
-	private HashMap<String, ArrayList<String>> mTypology = new HashMap<>();
+	private List<ParapheurType> mTypology = new ArrayList<>();
 	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
 	private HashMap<MenuItem, Filter> mDisplayedFilters = new HashMap<>();
 	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
@@ -591,10 +592,11 @@ public class MenuFragment extends Fragment {
 			mTypology.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
+
 				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
 				catch (IParapheurException exception) { return exception; }
 
-				try { mTypology.putAll(RESTClient.INSTANCE.getTypologie()); }
+				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
 			else {

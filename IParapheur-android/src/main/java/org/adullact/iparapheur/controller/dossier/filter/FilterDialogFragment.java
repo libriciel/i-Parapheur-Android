@@ -44,6 +44,7 @@ import com.google.gson.reflect.TypeToken;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFragment;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.StringUtils;
 
@@ -77,7 +78,7 @@ public class FilterDialogFragment extends DialogFragment {
 
 	public FilterDialogFragment() {}
 
-	public static FilterDialogFragment newInstance(Filter filter, HashMap<String, ArrayList<String>> typology) {
+	public static FilterDialogFragment newInstance(Filter filter, List<ParapheurType> typology) {
 
 		FilterDialogFragment fragment = new FilterDialogFragment();
 		List<Map<String, String>> typologyListGroupData = new ArrayList<>();
@@ -85,12 +86,12 @@ public class FilterDialogFragment extends DialogFragment {
 
 		// Parse Typology
 
-		for (Map.Entry<String, ArrayList<String>> type : typology.entrySet()) {
+		for (ParapheurType type : typology) {
 
 			// SubType parse
 
 			List<Map<String, String>> subTypeMapList = new ArrayList<>();
-			for (String subTypeName : type.getValue()) {
+			for (String subTypeName : type.getSubTypes()) {
 				HashMap<String, String> subTypeMap = new HashMap<>();
 				subTypeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, subTypeName);
 				subTypeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
@@ -101,7 +102,7 @@ public class FilterDialogFragment extends DialogFragment {
 			// Type parse
 
 			HashMap<String, String> typeMap = new HashMap<>();
-			typeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, type.getKey());
+			typeMap.put(EXPANDABLE_LIST_ADAPTER_NAME, type.getName());
 			typeMap.put(EXPANDABLE_LIST_ADAPTER_IS_CHECKED, Boolean.FALSE.toString());
 			typologyListGroupData.add(typeMap);
 		}

@@ -32,6 +32,7 @@ import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -40,9 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -109,10 +108,8 @@ public class RESTClientAPI1 extends RESTClientAPI {
 		return modelMapper.getDossiers(RESTUtils.post(url, body));
 	}
 
-	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
-		String url = buildUrl(ACTION_GET_TYPOLOGIE);
-		String body = "{\"getAll\": \"true\"}";
-		return modelMapper.getTypologie(RESTUtils.post(url, body));
+	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
+		return null;
 	}
 
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
@@ -141,12 +138,9 @@ public class RESTClientAPI1 extends RESTClientAPI {
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
 			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations",
-																			 new JSONArray().put(new JSONObject().put("author", annotation.getAuthor()).put(
-																					 "page",
-																					 page
-																			 ).put("rect", rect).put("text", annotation.getText()).put("type", "rect"))
-			);
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations", new JSONArray().put(new JSONObject().put("author",
+																																	 annotation.getAuthor()
+			).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect")));
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
@@ -179,11 +173,9 @@ public class RESTClientAPI1 extends RESTClientAPI {
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
 			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation",
-																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put("text",
-																																					  annotation.getText()
-																			 )
-			);
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation", new JSONObject().put("uuid", annotation.getUuid()).put("rect",
+																																				  rect
+			).put("text", annotation.getText()));
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);

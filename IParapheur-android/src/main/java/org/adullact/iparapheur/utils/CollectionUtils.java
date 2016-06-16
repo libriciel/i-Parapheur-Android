@@ -17,6 +17,8 @@
  */
 package org.adullact.iparapheur.utils;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -58,7 +60,7 @@ public class CollectionUtils {
 		return result;
 	}
 
-	public static Gson buildGsonWithLongToDate() {
+	public static @NonNull Gson buildGsonWithLongToDate() {
 
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {

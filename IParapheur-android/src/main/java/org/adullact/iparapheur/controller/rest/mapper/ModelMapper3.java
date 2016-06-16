@@ -19,18 +19,15 @@ package org.adullact.iparapheur.controller.rest.mapper;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.RequestResponse;
-import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
@@ -152,7 +149,7 @@ public class ModelMapper3 extends ModelMapper {
 		return actions;
 	}
 
-	@Override public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
+	@Override public @NonNull ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
 
 		ArrayList<Dossier> dossiers = new ArrayList<>();
 
@@ -169,7 +166,7 @@ public class ModelMapper3 extends ModelMapper {
 		return dossiers;
 	}
 
-	@Override public ArrayList<Bureau> getBureaux(RequestResponse response) {
+	@Override public @NonNull ArrayList<Bureau> getBureaux(RequestResponse response) {
 		ArrayList<Bureau> bureaux = new ArrayList<>();
 
 		if (response.getResponseArray() == null)
@@ -190,33 +187,4 @@ public class ModelMapper3 extends ModelMapper {
 		return bureaux;
 	}
 
-	@Override public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
-
-		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
-		JSONArray JSONTypes = response.getResponseArray();
-		if (JSONTypes != null) {
-
-			for (int i = 0; i < JSONTypes.length(); i++) {
-				JSONObject JSONType = JSONTypes.optJSONObject(i);
-
-				if (JSONType != null) {
-					String type = JSONType.optString("id");
-					JSONArray JSONSousTypes = JSONType.optJSONArray("sousTypes");
-
-					if (JSONSousTypes != null) {
-						ArrayList<String> sousTypes = new ArrayList<>(JSONSousTypes.length());
-
-						for (int j = 0; j < JSONSousTypes.length(); j++) {
-							String sousType = JSONSousTypes.optString(j);
-							if (sousType != null) {
-								sousTypes.add(sousType);
-							}
-						}
-						typologie.put(type, sousTypes);
-					}
-				}
-			}
-		}
-		return typologie;
-	}
 }
