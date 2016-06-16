@@ -319,6 +319,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@Override public void showContentLayout() {
+		mMainButtonViewSwitcher.setVisibility(View.VISIBLE);
 		mMainMenuFab.show();
 		super.showContentLayout();
 	}

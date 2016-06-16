@@ -74,10 +74,6 @@ public class Document implements Parcelable {
 		return mId;
 	}
 
-	public String getDossierId() {
-		return mDossierId;
-	}
-
 	public String getName() {
 		return mName;
 	}

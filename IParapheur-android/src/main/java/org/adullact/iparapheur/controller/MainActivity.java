@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -184,9 +185,24 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
+
 		// Sync the toggle state after onRestoreInstanceState has occurred.
+
 		mLeftDrawerToggle.syncState();
 		refreshNavigationDrawerHeader();
+
+		// Default FAB visibility
+
+		View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher);
+		FloatingActionButton mainFab = (FloatingActionButton) findViewById(R.id.mupdf_main_menu_fabbutton);
+
+		if (fabSwitcher != null)
+			fabSwitcher.setVisibility(View.GONE);
+
+		if (mainFab != null)
+			mainFab.hide();
+
+		//
 
 		if (savedInstanceState != null)
 			mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);

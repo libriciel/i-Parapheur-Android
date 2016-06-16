@@ -774,7 +774,7 @@ public class MenuFragment extends Fragment {
 		}
 
 		@Override public Dossier getItem(int position) {
-			return mDossierList.get(position);
+			return mDossierList.get(position); // FIXME = Adrien = OOB
 		}
 
 		@Override public int getPosition(Dossier item) {
