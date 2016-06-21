@@ -26,8 +26,8 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
-import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.ParapheurType;
+import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.util.List;

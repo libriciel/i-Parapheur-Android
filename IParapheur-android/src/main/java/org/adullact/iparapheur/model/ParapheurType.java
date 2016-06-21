@@ -27,6 +27,8 @@ public class ParapheurType {
 	@SerializedName("id") private String mName;
 	@SerializedName("sousTypes") List<String> mSubTypes;
 
+	public ParapheurType() {}
+
 	// <editor-fold desc="Setters / Getters">
 
 	public String getName() {

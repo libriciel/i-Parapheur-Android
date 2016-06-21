@@ -23,7 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.text.DateFormat;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,18 +46,35 @@ public class Dossier implements Parcelable {
 		}
 	};
 
-	private final String mId;
-	private final String mName;
-	private final Action mActionDemandee;
-	private final String mType;
-	private final String mSousType;
-	private final Date mDateCreation;
-	private final Date mDateLimite;
-	private final List<Document> mMainDocuments = new ArrayList<>();
-	private final List<Document> mAnnexes = new ArrayList<>();
-	private Set<Action> mActions;
+	@SerializedName("id") private String mId;
+	@SerializedName("title") private String mName;
+	@SerializedName("actionDemandee") private Action mActionDemandee;
+	@SerializedName("type") private String mType;
+	@SerializedName("sousType") private String mSousType;
+	@SerializedName("dateEmission") private Date mDateCreation;
+	@SerializedName("dateLimite") private Date mDateLimite;
+	@SerializedName("actions") private Set<Action> mActions;
+	@SerializedName("isSignPapier") private boolean mIsSignPapier;
+	//@SerializedName("documentPrincipal") private Document mMainDocument;
+	//@SerializedName("total") private int mTotal;
+	//@SerializedName("protocol") private String mProtocol;
+	//@SerializedName("isSent") private boolean mIsSent;
+	//@SerializedName("creator") private String mCreator;
+	//@SerializedName("bureauName") private String mBureauName;
+	//@SerializedName("pendingFile") private int mPendingFile;
+	//@SerializedName("banetteName") private String mBanetteName;
+	//@SerializedName("skipped") private int mSkipped;
+	//@SerializedName("isXemEnabled") private boolean mIsXemEnabled;
+	//@SerializedName("hasRead") private boolean mHasRead;
+	//@SerializedName("readingMandatory") private boolean mIsReadingMandatory;
+	//@SerializedName("isRead") private boolean mIsRead;
+	//@SerializedName("locked") private boolean mIsLocked;
+	//@SerializedName("includeAnnexes") private boolean mInclueAnnexes;
+	private List<Document> mMainDocuments = new ArrayList<>();
+	private List<Document> mAnnexes = new ArrayList<>();
 	private Circuit mCircuit;
-	private boolean mIsSignPapier;
+
+	public Dossier() {}
 
 	public Dossier(String id, String name, Action actionDemandee, Set<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
 				   boolean isSignPapier) {
@@ -113,14 +131,6 @@ public class Dossier implements Parcelable {
 
 	public String getSousType() {
 		return mSousType;
-	}
-
-	public String getDateCreation() {
-		return DateFormat.getDateInstance().format(mDateCreation);
-	}
-
-	public String getDateLimite() {
-		return (mDateLimite == null) ? "" : DateFormat.getDateInstance().format(mDateLimite);
 	}
 
 	public List<Document> getMainDocuments() {
@@ -243,6 +253,26 @@ public class Dossier implements Parcelable {
 			return Action.REJET;
 
 		return null;
+	}
+
+	/**
+	 * Patching a weird Signature case :
+	 * "actionDemandee" can have any "actions" value...
+	 * ... Except when "actionDemandee=SIGNATURE", where "actions" only contains VISA, for some reason
+	 *
+	 * A SIGNATURE action is acceptable in VISA too...
+	 *
+	 * @param dossier , the dossier to fix
+	 */
+	public static void fixActionsDemandees(@NonNull Dossier dossier) {
+
+		if (dossier.getActionDemandee() == Action.SIGNATURE) {
+			dossier.getActions().remove(Action.VISA);
+			dossier.getActions().add(Action.SIGNATURE);
+		}
+
+		if (dossier.getActionDemandee() == Action.VISA)
+			dossier.getActions().add(Action.SIGNATURE);
 	}
 
 	// </editor-fold desc="Static utils">

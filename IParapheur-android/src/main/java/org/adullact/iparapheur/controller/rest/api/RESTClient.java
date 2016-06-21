@@ -29,9 +29,9 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
-import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 
@@ -176,11 +176,11 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		return getRESTClient().getDossier(bureauId, dossierId);
+		return null;
 	}
 
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		return getRESTClient().getDossiers(bureauId);
+		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossiers(bureauId);
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {

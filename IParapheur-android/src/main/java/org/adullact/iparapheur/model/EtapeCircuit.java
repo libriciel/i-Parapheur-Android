@@ -41,13 +41,15 @@ public class EtapeCircuit implements Parcelable {
 		}
 	};
 
-	@SerializedName("dateValidation") private final Date dateValidation;
-	@SerializedName("approved") private final boolean isApproved;
-	@SerializedName("rejected") private final boolean isRejected;
-	@SerializedName("parapheurName") private final String bureauName;
-	@SerializedName("signataire") private final String signataire;
-	@SerializedName("actionDemandee") private final Action action;
-	@SerializedName("annotPub") private final String publicAnnotation;
+	@SerializedName("dateValidation") private Date dateValidation;
+	@SerializedName("approved") private boolean isApproved;
+	@SerializedName("rejected") private boolean isRejected;
+	@SerializedName("parapheurName") private String bureauName;
+	@SerializedName("signataire") private String signataire;
+	@SerializedName("actionDemandee") private Action action;
+	@SerializedName("annotPub") private String publicAnnotation;
+
+	public EtapeCircuit() {}
 
 	// <editor-fold desc="Setters / Getters">
 

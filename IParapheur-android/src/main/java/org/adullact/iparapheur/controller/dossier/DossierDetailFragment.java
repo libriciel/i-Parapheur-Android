@@ -694,7 +694,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Download the dossier Metadata (if missing, and according to the debug mode)
 
 			if (DeviceUtils.isDebugOffline()) {
-				mDossier.addDocument(new Document(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
+				mDossier.addDocument(new Document(UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 			else if (!mDossier.isDetailsAvailable()) {
 				showSpinnerOnUiThread();

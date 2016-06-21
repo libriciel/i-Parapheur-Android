@@ -44,6 +44,8 @@ public class Circuit implements Parcelable {
 	@SerializedName("hasSelectionScript") private boolean mHasSelectionScript;
 	@SerializedName("etapes") private List<EtapeCircuit> mEtapeCircuitList;
 
+	public Circuit() {}
+
 	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory, boolean hasSelectionScript) {
 		mEtapeCircuitList = etapeCircuitList;
 		mSigFormat = sigFormat;

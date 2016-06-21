@@ -18,12 +18,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
     }
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
@@ -33,8 +33,8 @@ android {
             enable true
             reset()
 //            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'// , 'mips', 'mips64'
-            include 'armeabi-v7a'    // OnePlus One
-//            include 'x86_64'            // Emulateur
+//            include 'armeabi-v7a'    // OnePlus One
+            include 'x86_64'            // Emulateur
             universalApk false
         }
     }
@@ -42,11 +42,11 @@ android {
 
 
 dependencies {
-    compile 'com.android.support:support-v13:23.4.0'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:support-v13:24.0.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:cardview-v7:24.0.0'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
+    compile 'com.android.support:design:24.0.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.madgag.spongycastle:core:1.53.0.0'
     compile 'com.madgag.spongycastle:pkix:1.53.0.0'

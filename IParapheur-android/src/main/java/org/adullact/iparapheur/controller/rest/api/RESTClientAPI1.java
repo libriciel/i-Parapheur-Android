@@ -20,6 +20,9 @@ package org.adullact.iparapheur.controller.rest.api;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
@@ -35,12 +38,16 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.model.State;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -55,6 +62,8 @@ import java.util.List;
  * compatible Android
  */
 public class RESTClientAPI1 extends RESTClientAPI {
+
+	protected static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
 
 	protected static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
 	private static final String ACTION_GET_DOSSIER = "/parapheur/api/getDossier";
@@ -83,29 +92,46 @@ public class RESTClientAPI1 extends RESTClientAPI {
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		String url = buildUrl(ACTION_GET_DOSSIER);
-		String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"," +
-				"\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"}";
-		//Log.d("debug", "body : " + body);
-		return modelMapper.getDossier(RESTUtils.post(url, body));
+
+		String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
+		String response = RESTUtils.get(url).getResponse().toString();
+		Dossier dossierParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
+
+		Dossier.fixActionsDemandees(dossierParsed);
+		return dossierParsed;
 	}
 
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		String url = buildUrl(ACTION_GET_DOSSIERS);
+
 		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
 
-		if (filter == null)
-			filter = new Filter();
+		String params = "asc=true" +
+				"&bureau=" + bureauId +
+				"&corbeilleName=" + ((filter != null) ? filter.getState().getServerValue() : State.A_TRAITER.getServerValue()) +
+				((filter != null) ? "&filter=" + filter.getJSONFilter() : "") +
+				"&metas={}" +
+				"&page=0" +
+				"&pageSize=25" +
+				"&pendingFile=0" +
+				"&skipped=0" +
+				"&sort=cm:created";
 
-		String body = "{\"bureauCourant\": \"workspace://SpacesStore/" + bureauId + "\"," +
-				"\"filters\": " + filter.getJSONFilter() + "," +
-				"\"page\": 0," +
-				"\"pageSize\": 15," +
-				"parent: \"" + filter.getState() + "\"," +
-				"asc: \"false\"," +
-				"propSort: \"cm:created\"}";
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
-		return modelMapper.getDossiers(RESTUtils.post(url, body));
+
+		String url = buildUrl(RESOURCE_DOSSIERS, params);
+		String response = RESTUtils.get(url).getResponse().toString();
+
+		// Parse
+
+		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(),
+																							   listDossierType
+		);
+
+		for (Dossier dossier : dossiersParsed)
+			Dossier.fixActionsDemandees(dossier);
+
+		return dossiersParsed;
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {

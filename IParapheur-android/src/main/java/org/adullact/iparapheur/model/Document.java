@@ -22,6 +22,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseArray;
 
+import com.google.gson.annotations.SerializedName;
+
 
 public class Document implements Parcelable {
 
@@ -35,19 +37,19 @@ public class Document implements Parcelable {
 		}
 	};
 
-	private final String mId;
-	private final String mDossierId;
-	private final String mName;
-	private final int mSize;                  // TODO : download image instead of too heavy files
-	private final String mUrl;                // URL of the document (its content)
+	@SerializedName("id") private String mId;
+	@SerializedName("name") private String mName;
+	@SerializedName("size") private int mSize;                        // TODO : download image instead of too heavy files
+	private String mUrl;                                              // URL of the document (its content)
 	private SparseArray<PageAnnotations> mPagesAnnotations;
-	private String mPath;                     // Path of the file (if downloaded) on the device's storage
+	private String mPath;                                             // Path of the file (if downloaded) on the device's storage
 	private boolean mIsLocked;
 	private boolean mIsMainDocument;
 
-	public Document(String id, String dossierId, String name, int size, String url, boolean isLocked, boolean isMainDocument) {
+	public Document() {}
+
+	public Document(String id, String name, int size, String url, boolean isLocked, boolean isMainDocument) {
 		mId = id;
-		mDossierId = dossierId;
 		mName = name;
 		mUrl = url;
 		mSize = size;
@@ -58,7 +60,6 @@ public class Document implements Parcelable {
 
 	@SuppressWarnings("unchecked") private Document(Parcel in) {
 		mId = in.readString();
-		mDossierId = in.readString();
 		mName = in.readString();
 		mPagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("mPagesAnnotations");
 		mUrl = in.readString();
@@ -130,7 +131,6 @@ public class Document implements Parcelable {
 		Bundle bundle = new Bundle();
 		bundle.putSparseParcelableArray("mPagesAnnotations", mPagesAnnotations);
 		dest.writeString(mId);
-		dest.writeString(mDossierId);
 		dest.writeString(mName);
 		dest.writeBundle(bundle);
 		dest.writeString(mUrl);
