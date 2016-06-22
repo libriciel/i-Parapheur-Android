@@ -15,8 +15,6 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="18dp"
-            android:layout_marginStart="18dp"
             android:contentDescription="@string/icon_action" />
 
         <ImageView
@@ -24,6 +22,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
             android:background="@drawable/icon_background_round_green50"
             android:contentDescription="@string/icon_action"
             android:scaleType="center"
@@ -35,6 +35,8 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
             android:background="@drawable/icon_background_round_red50"
             android:contentDescription="@string/icon_action"
             android:scaleType="center"
