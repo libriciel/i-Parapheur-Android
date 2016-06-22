@@ -42,8 +42,10 @@ public class CircuitAdapter extends ArrayAdapter<EtapeCircuit> {
 		View view = super.getView(position, convertView, parent);
 
 		EtapeCircuit etape = getItem(position);
-		((ImageView) view.findViewById(R.id.etape_circuit_icon)).setImageResource(etape.getAction().getIcon(etape.isApproved()));
+		((ImageView) view.findViewById(R.id.etape_circuit_icon_type)).setImageResource(etape.getAction().getIcon());
 		((TextView) view.findViewById(R.id.etape_circuit_bureau)).setText(etape.getBureauName());
+		view.findViewById(R.id.etape_circuit_icon_status_done).setVisibility(etape.isApproved() ? View.VISIBLE : View.INVISIBLE);
+		view.findViewById(R.id.etape_circuit_icon_status_reject).setVisibility(etape.isRejected() ? View.VISIBLE : View.INVISIBLE);
 
 		if (etape.isApproved()) {
 			SimpleDateFormat df = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);

@@ -85,6 +85,10 @@ public class EtapeCircuit implements Parcelable {
 		return isApproved;
 	}
 
+	public boolean isRejected() {
+		return isRejected;
+	}
+
 	public String getBureauName() {
 		return bureauName;
 	}
