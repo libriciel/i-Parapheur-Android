@@ -40,11 +40,13 @@ public class Document implements Parcelable {
 	@SerializedName("id") private String mId;
 	@SerializedName("name") private String mName;
 	@SerializedName("size") private int mSize;                        // TODO : download image instead of too heavy files
-	private String mUrl;                                              // URL of the document (its content)
+	@SerializedName("isLocked") private boolean mIsLocked;
+	//@SerializedName("visuelPdf") private boolean mIsPdfVisual;
+	//@SerializedName("canDelete") private boolean mCanDelete;
 	private SparseArray<PageAnnotations> mPagesAnnotations;
-	private String mPath;                                             // Path of the file (if downloaded) on the device's storage
-	private boolean mIsLocked;
 	private boolean mIsMainDocument;
+	private String mUrl;                                              // URL of the document (its content)
+	private String mPath;                                             // Path of the file (if downloaded) on the device's storage
 
 	public Document() {}
 

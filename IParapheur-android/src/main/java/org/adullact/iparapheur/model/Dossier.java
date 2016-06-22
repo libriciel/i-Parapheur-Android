@@ -55,9 +55,9 @@ public class Dossier implements Parcelable {
 	@SerializedName("dateLimite") private Date mDateLimite;
 	@SerializedName("actions") private Set<Action> mActions;
 	@SerializedName("isSignPapier") private boolean mIsSignPapier;
-	//@SerializedName("documentPrincipal") private Document mMainDocument;
+	@SerializedName("documents") private List<Document> mDocumentList = new ArrayList<>();
 	//@SerializedName("total") private int mTotal;
-	//@SerializedName("protocol") private String mProtocol;
+	//@SerializedName("protocol", alternate = {"protocole"}) private String mProtocol;
 	//@SerializedName("isSent") private boolean mIsSent;
 	//@SerializedName("creator") private String mCreator;
 	//@SerializedName("bureauName") private String mBureauName;
@@ -70,8 +70,12 @@ public class Dossier implements Parcelable {
 	//@SerializedName("isRead") private boolean mIsRead;
 	//@SerializedName("locked") private boolean mIsLocked;
 	//@SerializedName("includeAnnexes") private boolean mInclueAnnexes;
-	private List<Document> mMainDocuments = new ArrayList<>();
-	private List<Document> mAnnexes = new ArrayList<>();
+	//@SerializedName("nomTdT") private String mNomTDT;
+	//@SerializedName("visibility") private String mVisibility;
+	//@SerializedName("status") private String mStatus;
+	//@SerializedName("canAdd") private boolean mCanAdd;
+	//@SerializedName("metadatas") private HashMap<String, Object> mMetadataMap;
+	//@SerializedName("xPathSignature") private String mSignatureXPath;
 	private Circuit mCircuit;
 
 	public Dossier() {}
@@ -105,8 +109,6 @@ public class Dossier implements Parcelable {
 		mDateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
 		long tmpDateLimite = in.readLong();
 		mDateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-		in.readTypedList(mMainDocuments, Document.CREATOR);
-		in.readTypedList(mAnnexes, Document.CREATOR);
 		mCircuit = in.readParcelable(Circuit.class.getClassLoader());
 		mIsSignPapier = in.readByte() != 0;
 	}
@@ -133,14 +135,6 @@ public class Dossier implements Parcelable {
 		return mSousType;
 	}
 
-	public List<Document> getMainDocuments() {
-		return mMainDocuments;
-	}
-
-	public List<Document> getAnnexes() {
-		return mAnnexes;
-	}
-
 	public Circuit getCircuit() {
 		return mCircuit;
 	}
@@ -157,32 +151,23 @@ public class Dossier implements Parcelable {
 		return mIsSignPapier;
 	}
 
-	// </editor-fold desc="Setters / Getters">
-
-	public void addDocument(@Nullable Document document) {
-
-		if (document == null)
-			return;
-
-		if (document.isMainDocument())
-			mMainDocuments.add(document);
-		else
-			mAnnexes.add(document);
+	public List<Document> getDocumentList() {
+		return mDocumentList;
 	}
 
+	// </editor-fold desc="Setters / Getters">
+
 	public void saveDetails(Dossier dossier) {
-		mMainDocuments.addAll(dossier.getMainDocuments());
-		mAnnexes.addAll(dossier.getAnnexes());
+		mDocumentList.addAll(dossier.getDocumentList());
 	}
 
 	public void clearDetails() {
-		mMainDocuments.clear();
-		mAnnexes.clear();
+		mDocumentList.clear();
 		mCircuit = null;
 	}
 
 	public boolean isDetailsAvailable() {
-		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mMainDocuments.isEmpty());
+		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mDocumentList.isEmpty());
 	}
 
 	public boolean hasActions() {
@@ -200,16 +185,12 @@ public class Dossier implements Parcelable {
 
 		// Finding doc
 
-		List<Document> documents = new ArrayList<>();
-		documents.addAll(dossier.getMainDocuments());
-		documents.addAll(dossier.getAnnexes());
-
 		if (!TextUtils.isEmpty(documentId))
-			for (Document document : documents)
+			for (Document document : dossier.getDocumentList())
 				if (TextUtils.equals(document.getId(), documentId))
 					return document;
 
-		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+		return dossier.getDocumentList().isEmpty() ? null : dossier.getDocumentList().get(0);
 	}
 
 	/**
@@ -275,6 +256,40 @@ public class Dossier implements Parcelable {
 			dossier.getActions().add(Action.SIGNATURE);
 	}
 
+	public static @NonNull List<Document> getMainDocuments(@Nullable Dossier dossier) {
+
+		// Default case
+
+		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
+			return new ArrayList<>();
+
+		//
+
+		ArrayList<Document> result = new ArrayList<>();
+		for (Document document : dossier.getDocumentList())
+			if (document.isMainDocument())
+				result.add(document);
+
+		return result;
+	}
+
+	public static @NonNull List<Document> getAnnexes(@Nullable Dossier dossier) {
+
+		// Default case
+
+		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
+			return new ArrayList<>();
+
+		//
+
+		ArrayList<Document> result = new ArrayList<>();
+		for (Document document : dossier.getDocumentList())
+			if (!document.isMainDocument())
+				result.add(document);
+
+		return result;
+	}
+
 	// </editor-fold desc="Static utils">
 
 	// <editor-fold desc="Parcelable">
@@ -287,13 +302,11 @@ public class Dossier implements Parcelable {
 		dest.writeString(mId);
 		dest.writeString(mName);
 		dest.writeInt(mActionDemandee == null ? -1 : mActionDemandee.ordinal());
-		dest.writeTypedList(new ArrayList<Parcelable>(mActions));
+		dest.writeTypedList(new ArrayList<>(mActions));
 		dest.writeString(mType);
 		dest.writeString(mSousType);
 		dest.writeLong(mDateCreation != null ? mDateCreation.getTime() : -1);
 		dest.writeLong(mDateLimite != null ? mDateLimite.getTime() : -1);
-		dest.writeTypedList(mMainDocuments);
-		dest.writeTypedList(mAnnexes);
 		dest.writeParcelable(mCircuit, 0);
 		dest.writeByte(mIsSignPapier ? (byte) 1 : (byte) 0);
 	}
@@ -316,8 +329,8 @@ public class Dossier implements Parcelable {
 
 	@Override public String toString() {
 		return "{Dossier id=" + mId + " name=" + mName + " actionsDemandees=" + mActionDemandee + " type=" + mType + " subType=" + mSousType     //
-				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " mainDocs=" + mMainDocuments + " annexes=" + mAnnexes           //
-				+ " actions=" + mActions + " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
+				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " docs=" + mDocumentList + " actions=" + mActions                //
+				+ " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
 	}
 
 	@Override public int hashCode() {

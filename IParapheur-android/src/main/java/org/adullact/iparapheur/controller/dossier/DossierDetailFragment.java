@@ -251,17 +251,17 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// Document selector
 
 		MenuItem documentSelectorItem = actions_toolbar.getMenu().findItem(R.id.action_document_selection);
-		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getMainDocuments().size() > 1) || (!mDossier.getAnnexes().isEmpty()));
+		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getDocumentList().size() > 1));
 		documentSelectorItem.setVisible(hasMultipleDoc);
 
 		if (hasMultipleDoc) {
 			SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
 			docSelectorSubMenu.clear();
 
-			for (Document mainDoc : mDossier.getMainDocuments())
+			for (Document mainDoc : Dossier.getMainDocuments(mDossier))
 				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
-			for (Document annexe : mDossier.getAnnexes())
+			for (Document annexe : Dossier.getAnnexes(mDossier))
 				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
@@ -599,11 +599,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (dossier == null)
 			return null;
 
-		for (Document mainDocument : mDossier.getMainDocuments())
+		for (Document mainDocument : Dossier.getMainDocuments(mDossier))
 			if (TextUtils.equals(documentName, mainDocument.getName()))
 				return mainDocument.getId();
 
-		for (Document annexes : mDossier.getAnnexes())
+		for (Document annexes : Dossier.getAnnexes(mDossier))
 			if (TextUtils.equals(documentName, annexes.getName()))
 				return annexes.getId();
 
@@ -694,7 +694,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Download the dossier Metadata (if missing, and according to the debug mode)
 
 			if (DeviceUtils.isDebugOffline()) {
-				mDossier.addDocument(new Document(UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
+				mDossier.getDocumentList().add(new Document(UUID.randomUUID().toString(), "document par défaut", -1, "", false, true));
 			}
 			else if (!mDossier.isDetailsAvailable()) {
 				showSpinnerOnUiThread();

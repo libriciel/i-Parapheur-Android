@@ -176,7 +176,7 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		return null;
+		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossier(bureauId, dossierId);
 	}
 
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
