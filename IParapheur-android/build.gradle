@@ -32,7 +32,7 @@ android {
         abi {
             enable true
             reset()
-//            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'// , 'mips', 'mips64'
+//            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'//
 //            include 'armeabi-v7a'    // OnePlus One
             include 'x86_64'            // Emulateur
             universalApk false
@@ -42,11 +42,11 @@ android {
 
 
 dependencies {
-    compile 'com.android.support:support-v13:24.0.0'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:cardview-v7:24.0.0'
-    compile 'com.android.support:recyclerview-v7:24.0.0'
-    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:support-v13:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:cardview-v7:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.madgag.spongycastle:core:1.53.0.0'
     compile 'com.madgag.spongycastle:pkix:1.53.0.0'
