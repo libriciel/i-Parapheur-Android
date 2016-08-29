@@ -512,7 +512,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
 		updateStickyNotes(muPdfStickyNotes);
 
-		mIsAnnotable = document.isMainDocument();
+		mIsAnnotable = Document.isMainDocument(mDossier, document);
 	}
 
 	private void updateCircuitInfoDrawerContent() {
@@ -717,7 +717,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			currentDocument.setPath(file.getAbsolutePath());
 
 			if (!file.exists()) {
-				try { RESTClient.INSTANCE.downloadFile(currentDocument.getUrl(), file.getAbsolutePath()); }
+				try { RESTClient.INSTANCE.downloadFile(Document.generateContentUrl(currentDocument), file.getAbsolutePath()); }
 				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
@@ -730,7 +730,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				catch (IParapheurException e) { e.printStackTrace(); }
 			}
 
-			if (currentDocument.isMainDocument()) {
+			if (Document.isMainDocument(mDossier, currentDocument)) {
 				try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
 				catch (IParapheurException e) { e.printStackTrace(); }
 			}

@@ -267,7 +267,7 @@ public class Dossier implements Parcelable {
 
 		ArrayList<Document> result = new ArrayList<>();
 		for (Document document : dossier.getDocumentList())
-			if (document.isMainDocument())
+			if (Document.isMainDocument(dossier, document))
 				result.add(document);
 
 		return result;
@@ -284,7 +284,7 @@ public class Dossier implements Parcelable {
 
 		ArrayList<Document> result = new ArrayList<>();
 		for (Document document : dossier.getDocumentList())
-			if (!document.isMainDocument())
+			if (!Document.isMainDocument(dossier, document))
 				result.add(document);
 
 		return result;

@@ -20,6 +20,8 @@ package org.adullact.iparapheur.model;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
@@ -39,21 +41,40 @@ public class Document implements Parcelable {
 
 	@SerializedName("id") private String mId;
 	@SerializedName("name") private String mName;
-	@SerializedName("size") private int mSize;                        // TODO : download image instead of too heavy files
+	@SerializedName("size") private int mSize;                          // TODO : download image instead of too heavy files
 	@SerializedName("isLocked") private boolean mIsLocked;
-	//@SerializedName("visuelPdf") private boolean mIsPdfVisual;
-	//@SerializedName("canDelete") private boolean mCanDelete;
+	@SerializedName("visuelPdf") private boolean mIsPdfVisual;
+	@SerializedName("canDelete") private boolean mCanDelete;
+	@SerializedName("isMainDocument") private boolean mIsMainDocument;
+
+	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
 	private SparseArray<PageAnnotations> mPagesAnnotations;
-	private boolean mIsMainDocument;
-	private String mUrl;                                              // URL of the document (its content)
-	private String mPath;                                             // Path of the file (if downloaded) on the device's storage
+
+	// <editor-fold desc="Static methods">
+
+	public static @NonNull String generateContentUrl(@NonNull Document document) {
+
+		String downloadUrl = "/api/node/workspace/SpacesStore/" + document.getId() + "/content";
+		if (document.isPdfVisual())
+			downloadUrl += ";ph:visuel-pdf";
+
+		return downloadUrl;
+	}
+
+	public static boolean isMainDocument(@NonNull Dossier dossier, @NonNull Document document) {
+
+		return document.isMainDocument()                                                            // Api4 case
+				|| (dossier.getDocumentList().size() == 1)                                          // Api3 default case
+				|| TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId());    // Api3 other case
+	}
+
+	// </editor-fold desc="Static methods">
 
 	public Document() {}
 
 	public Document(String id, String name, int size, String url, boolean isLocked, boolean isMainDocument) {
 		mId = id;
 		mName = name;
-		mUrl = url;
 		mSize = size;
 		mPagesAnnotations = new SparseArray<>();
 		mIsLocked = isLocked;
@@ -64,7 +85,6 @@ public class Document implements Parcelable {
 		mId = in.readString();
 		mName = in.readString();
 		mPagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("mPagesAnnotations");
-		mUrl = in.readString();
 		mSize = in.readInt();
 		mPath = in.readString();
 		mIsLocked = (in.readByte() != 0);
@@ -79,10 +99,6 @@ public class Document implements Parcelable {
 
 	public String getName() {
 		return mName;
-	}
-
-	public String getUrl() {
-		return mUrl;
 	}
 
 	public int getSize() {
@@ -113,6 +129,10 @@ public class Document implements Parcelable {
 		mIsLocked = isLocked;
 	}
 
+	public boolean isPdfVisual() {
+		return mIsPdfVisual;
+	}
+
 	public SparseArray<PageAnnotations> getPagesAnnotations() {
 		return mPagesAnnotations;
 	}
@@ -135,7 +155,6 @@ public class Document implements Parcelable {
 		dest.writeString(mId);
 		dest.writeString(mName);
 		dest.writeBundle(bundle);
-		dest.writeString(mUrl);
 		dest.writeInt(mSize);
 		dest.writeString(mPath);
 		dest.writeByte((byte) (mIsLocked ? 1 : 0));

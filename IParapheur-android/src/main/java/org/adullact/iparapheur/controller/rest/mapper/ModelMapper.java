@@ -53,13 +53,6 @@ public class ModelMapper {
 	protected static String DOSSIER_CIRCUIT = "circuit";
 	protected static String DOSSIER_ACTIONS = "actions";
 
-	protected static String DOCUMENT_ID = "id";
-	protected static String DOCUMENT_NAME = "name";
-	protected static String DOCUMENT_VISUEL_PDF = "visuelPdf";
-	protected static String DOCUMENT_SIZE = "size";
-	protected static String DOCUMENT_IS_LOCKED = "isLocked";
-	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
-
 	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
 	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
 	protected static String CIRCUIT_ETAPES_REJECTED = "rejected";

@@ -175,7 +175,7 @@ public abstract class RESTClientAPI implements IParapheurAPI {
 			while ((bufferLength = response.read(buffer)) > 0)
 				fileOutput.write(buffer, 0, bufferLength);
 
-			//close the output stream when done
+			// Close the output stream when done
 			fileOutput.close();
 		}
 		catch (FileNotFoundException e) {
