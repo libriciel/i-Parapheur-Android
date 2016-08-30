@@ -1,0 +1,21 @@
+image: gitlab.libriciel.fr:4567/i-parapheur/iParapheur-Android
+
+before_script:
+  # Downloading Android SDK
+  - cd /opt
+  - wget https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
+  - tar -zxf *.tgz
+  - rm *.tgz
+  - export ANDROID_HOME="/opt/android-sdk-linux"
+  - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH"
+  - source /etc/profile
+  - android update sdk -u --filter platform-tools,android-24
+  - android list sdk --all
+
+build_apk_debug:
+  script:
+    - echo 1  
+
+build apk_release::
+  script:
+    - echo 1
