@@ -1,4 +1,4 @@
-image: gitlab.libriciel.fr:4567/i-parapheur/iParapheur-Android
+image: gitlab.libriciel.fr:4567/i-parapheur/iparapheur-android:latest
 
 before_script:
   # Downloading Android SDK
