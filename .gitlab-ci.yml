@@ -1,11 +1,11 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
-  - echo $CI_BUILD_REF_NAME
-  - [[ $CI_BUILD_REF_NAME = "continuous_integration" ]] && CURRENT_BRANCH="develop" || CURRENT_BRANCH=$CI_BUILD_REF_NAME
-  - echo $CURRENT_BRANCH
+  # Force submodule refresh
+  - [[ $CI_BUILD_REF_NAME = "master" ]] && BUILD_TYPE="master" || BUILD_TYPE="develop"
+  - rm -rf ./mudpffragment/*
+  - git clone -b BUILD_TYPE https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
 
 build_apk:
   script:
-    - git clone -b CURRENT_BRANCH https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
-    - [[ $CI_BUILD_REF_NAME = "master" ]] ./gradlew assembleRelease || ./gradlew assembleDebug
+    - [[ BUILD_TYPE = "master" ]] ./gradlew assembleRelease || ./gradlew assembleDebug
