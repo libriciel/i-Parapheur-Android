@@ -4,6 +4,6 @@ build_apk_debug:
   script:
     - echo 1  
 
-build apk_release::
+build apk_release:
   script:
     - echo 1
