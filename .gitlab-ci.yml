@@ -2,10 +2,10 @@ image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 build_apk_debug:
   script:
-    - ll .
+    - ls .
     - pwd
 
 build apk_release:
   script:
-    - ll .
+    - ls .
     - pwd
