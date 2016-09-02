@@ -1,5 +1,8 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
+before_script:
+  - git submodule update --recursive
+
 build_apk_debug:
   script:
     - ./gradlew assembleDebug
