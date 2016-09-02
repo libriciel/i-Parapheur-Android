@@ -2,8 +2,8 @@ image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 build_apk_debug:
   script:
-    - gradlew assembleDebug
+    - ./gradlew assembleDebug
 
 build apk_release:
   script:
-    - gradlew assembleRelease
+    - ./gradlew assembleRelease
