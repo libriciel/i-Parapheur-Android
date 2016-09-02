@@ -1,7 +1,4 @@
-image: gitlab.libriciel.fr:4567/i-parapheur/iparapheur-android:latest
-
-before_script:
-  - docker info
+image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 build_apk_debug:
   script:
