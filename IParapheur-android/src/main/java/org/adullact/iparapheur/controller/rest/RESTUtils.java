@@ -25,7 +25,7 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.rest.api.RESTClientAPI;
+import org.adullact.iparapheur.controller.rest.api.RestClientApi0;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -310,7 +310,7 @@ public class RESTUtils {
 		String ticket = account.getTicket();
 		Long time = new Date().getTime();
 
-		return ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < RESTClientAPI.SESSION_TIMEOUT));
+		return ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < RestClientApi0.SESSION_TIMEOUT));
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {

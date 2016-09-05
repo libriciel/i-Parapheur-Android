@@ -55,7 +55,7 @@ import java.util.Map;
  * La v4.0.00 est la première version i-Parapheur
  * compatible Android
  */
-public class RESTClientAPI1 extends RESTClientAPI {
+public class RestClientApi11 extends RestClientApi0 {
 
 	protected static final String ACTION_GET_BUREAUX = "/parapheur/api/getBureaux";
 	private static final String ACTION_GET_DOSSIER = "/parapheur/api/getDossier";

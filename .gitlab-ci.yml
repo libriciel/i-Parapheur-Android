@@ -10,7 +10,7 @@ build_apk_release:
     - master
   script:
     - git -C mupdffragment checkout master
-    #- ./gradlew testRelease
+    - ./gradlew testRelease
     - ./gradlew assembleRelease
 
 
@@ -19,5 +19,5 @@ build_apk_develop:
     - master
   script:
     - git -C mupdffragment checkout develop
-    #- ./gradlew testDebug
+    - ./gradlew testDebug
     - ./gradlew assembleDebug
