@@ -15,21 +15,26 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
-package org.adullact.iparapheur.utils;
+package org.adullact.iparapheur.controller.account;
 
-import junit.framework.Assert;
+import android.support.test.filters.MediumTest;
+import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 
-public class StringUtilsTest {
+@RunWith(AndroidJUnit4.class)
+@MediumTest
+public class MyAccountsTest {
 
-	@Test public void testFixIssuerDnX500NameStringOrder() throws Exception {
-
-		String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet g2,O=ADULLACT-Projet,ST=Herault,C=FR";
-		String value = StringUtils.fixIssuerDnX500NameStringOrder(input);
-		String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
-
-		Assert.assertEquals(value, expected);
+	@Before public void init() {
 	}
+
+	@Test public void demo_test() {
+		Log.v("Adrien", "here1");
+	}
+
 }

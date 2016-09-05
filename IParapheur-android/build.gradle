@@ -19,11 +19,12 @@ repositories {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.0'
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 24
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
@@ -32,9 +33,7 @@ android {
         abi {
             enable true
             reset()
-//            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'//
-//            include 'armeabi-v7a'    // OnePlus One
-            include 'x86_64'            // Emulateur
+            include 'x86_64' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
             universalApk false
         }
     }
@@ -42,6 +41,9 @@ android {
 
 
 dependencies {
+    androidTestCompile 'com.android.support:support-annotations:24.2.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:support-v13:24.2.0'
     compile 'com.android.support:appcompat-v7:24.2.0'

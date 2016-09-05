@@ -186,6 +186,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 	 *
 	 * @param issuerDnName DN name, with attributes in any order
 	 * @return fixed DN, that please OpenSSL
+	 * @coveredInLocalUnitTest
 	 */
 	public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 

@@ -139,6 +139,11 @@ public class Account implements Serializable {
 
 	// </editor-fold desc="Getters / Setters">
 
+	/**
+	 *
+	 * @return
+	 * @coveredInInstrumentedUnitTest
+	 */
 	public boolean isValid() {
 		return validateAccount(mTitle, mLogin, mPassword, mServerBaseUrl);
 	}
