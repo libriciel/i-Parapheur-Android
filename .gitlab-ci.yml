@@ -12,7 +12,7 @@ stages:
 # Jobs fetch_submodules
 
 refresh_submodule_develop:
-  tage: submodules
+  stage: submodules
   except:
     - master
   script:
@@ -20,7 +20,7 @@ refresh_submodule_develop:
 
 
 refresh_submodule_master:
-  tage: submodules
+  stage: submodules
   only:
     - master
   script:
