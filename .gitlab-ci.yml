@@ -1,23 +1,54 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
-
 before_script:
   - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
 
-
-build_apk_release:
-  only:
-    - master
-  script:
-    - git -C mupdffragment checkout master
-    - ./gradlew testRelease
-    - ./gradlew assembleRelease
+stages:
+  - submodules
+  - test
+  - build
 
 
-build_apk_develop:
+# Jobs fetch_submodules
+
+refresh_submodule_develop:
+  stage: submodules
   except:
     - master
   script:
     - git -C mupdffragment checkout develop
-    - ./gradlew testDebug
+
+
+refresh_submodule_master:
+  stage: submodules
+  only:
+    - master
+  script:
+    - git -C mupdffragment checkout master
+
+
+# Jobs test
+
+unittest:
+  stage: test
+  script:
+    - ./gradlew test
+
+
+# Jobs build
+
+build_develop:
+  stage: build
+  except:
+    - master
+  script:
     - ./gradlew assembleDebug
+
+
+build_release:
+  stage: build
+  only:
+    - master
+  script:
+    - ./gradlew assembleDebug
+
