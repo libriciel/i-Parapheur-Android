@@ -34,7 +34,7 @@ import java.util.ArrayList;
  * Quasiment la meme l'API 1, excepte la recuperation
  * des bureaux. On passe du POST au GET.
  */
-public class RESTClientAPI2 extends RESTClientAPI1 {
+public class RestClientApi22 extends RestClientApi11 {
 
 	@Override public ArrayList<Bureau> getBureaux() throws IParapheurException {
 		String url = buildUrl(ACTION_GET_BUREAUX);

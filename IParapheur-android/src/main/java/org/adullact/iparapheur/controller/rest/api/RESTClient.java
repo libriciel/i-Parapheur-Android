@@ -44,10 +44,10 @@ public enum RESTClient implements IParapheurAPI {
 	private static final String RESOURCE_API_VERSION = "/parapheur/api/getApiLevel";
 	private static final int API_VERSION_MAX = 4;
 
-	private final RESTClientAPI1 restClientAPI1 = new RESTClientAPI1();
-	private final RESTClientAPI2 restClientAPI2 = new RESTClientAPI2();
-	private final RESTClientAPI3 restClientAPI3 = new RESTClientAPI3();
-	private final RESTClientAPI3 restClientAPI4 = new RESTClientAPI4();
+	private final RestClientApi11 restClientAPI1 = new RestClientApi11();
+	private final RestClientApi22 restClientAPI2 = new RestClientApi22();
+	private final RestClientApi33 restClientAPI3 = new RestClientApi33();
+	private final RestClientApi33 restClientAPI4 = new RestClientApi44();
 
 	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
 		return getAPIVersion(account, true, false);

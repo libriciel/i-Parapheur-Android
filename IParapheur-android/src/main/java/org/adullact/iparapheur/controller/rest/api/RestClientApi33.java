@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -56,7 +55,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class RESTClientAPI3 extends RESTClientAPI {
+public class RestClientApi33 extends RestClientApi0 {
 
 	protected static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
 
