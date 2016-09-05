@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class RestClientApi33 extends RestClientApi0 {
+public class RestClientApi3 extends RestClientApi {
 
 	protected static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
 
