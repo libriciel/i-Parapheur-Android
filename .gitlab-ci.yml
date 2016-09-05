@@ -1,18 +1,23 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
+
 before_script:
-  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Repository already exists"
+  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
+
 
 build_apk_release:
   only:
     - master
   script:
     - git -C mupdffragment checkout master
+    #- ./gradlew testRelease
     - ./gradlew assembleRelease
+
 
 build_apk_develop:
   except:
     - master
   script:
     - git -C mupdffragment checkout develop
+    #- ./gradlew testDebug
     - ./gradlew assembleDebug
