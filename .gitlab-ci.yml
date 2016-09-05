@@ -1,11 +1,18 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
-  # Force submodule refresh
-  - [[ $CI_BUILD_REF_NAME = "master" ]] && BUILD_TYPE="master" || BUILD_TYPE="develop"
-  - rm -rf ./mudpffragment/*
-  - git clone -b BUILD_TYPE https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
+  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Repository already exists"
 
-build_apk:
+build_apk_release:
+  only:
+    - master
   script:
-    - [[ BUILD_TYPE = "master" ]] ./gradlew assembleRelease || ./gradlew assembleDebug
+    - git -C mupdffragment checkout master
+    - ./gradlew assembleRelease
+
+build_apk_develop:
+  except:
+    - master
+  script:
+    - git -C mupdffragment checkout develop
+    - ./gradlew assembleDebug
