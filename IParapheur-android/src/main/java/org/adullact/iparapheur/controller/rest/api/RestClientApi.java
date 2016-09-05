@@ -44,7 +44,7 @@ import java.net.URL;
 import java.util.Date;
 
 
-public abstract class RestClientApi0 implements IParapheurAPI {
+public abstract class RestClientApi implements IParapheurAPI {
 
 	public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
 

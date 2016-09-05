@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
 import java.util.Locale;
 
 
-public class RestClientApi44 extends RestClientApi33 {
+public class RestClientApi4 extends RestClientApi3 {
 
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/%s/annotations/%s";
