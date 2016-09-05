@@ -1,21 +1,23 @@
-image: gitlab.libriciel.fr:4567/i-parapheur/iParapheur-Android
+image: gitlab.libriciel.fr:4567/docker/android-builder:latest
+
 
 before_script:
-  # Downloading Android SDK
-  - cd /opt
-  - wget https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
-  - tar -zxf *.tgz
-  - rm *.tgz
-  - export ANDROID_HOME="/opt/android-sdk-linux"
-  - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$PATH"
-  - source /etc/profile
-  - android update sdk -u --filter platform-tools,android-24
-  - android list sdk --all
+  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
 
-build_apk_debug:
-  script:
-    - echo 1  
 
-build apk_release::
+build_apk_release:
+  only:
+    - master
   script:
-    - echo 1 
+    - git -C mupdffragment checkout master
+    #- ./gradlew testRelease
+    - ./gradlew assembleRelease
+
+
+build_apk_develop:
+  except:
+    - master
+  script:
+    - git -C mupdffragment checkout develop
+    #- ./gradlew testDebug
+    - ./gradlew assembleDebug
