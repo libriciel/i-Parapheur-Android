@@ -2,6 +2,7 @@ image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
   - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
+  - git remote update
 
 stages:
   - submodules
