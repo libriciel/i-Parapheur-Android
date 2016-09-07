@@ -1,8 +1,5 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
-before_script:
-  - rm -rf ./mupdffragment
-
 stages:
   - submodules
   - test
@@ -16,6 +13,7 @@ refresh_submodule_develop:
   except:
     - master
   script:
+    - rm -rf ./mupdffragment
     - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
 
 
@@ -24,6 +22,7 @@ refresh_submodule_master:
   only:
     - master
   script:
+    - rm -rf ./mupdffragment
     - git clone -b master https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
 
 
