@@ -2,7 +2,6 @@ image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
   - rm -rf ./mupdffragment
-  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
 
 stages:
   - submodules
@@ -17,7 +16,7 @@ refresh_submodule_develop:
   except:
     - master
   script:
-    - git -C mupdffragment checkout develop
+    - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
 
 
 refresh_submodule_master:
@@ -25,7 +24,7 @@ refresh_submodule_master:
   only:
     - master
   script:
-    - git -C mupdffragment checkout master
+    - git clone -b master https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
 
 
 # Jobs test

@@ -22,13 +22,16 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 
+/**
+ * @see org.adullact.iparapheur.utils.StringUtils
+ */
 public class StringUtilsTest {
 
 	@Test public void testFixIssuerDnX500NameStringOrder() throws Exception {
 
-		String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet g2,O=ADULLACT-Projet,ST=Herault,C=FR";
+		String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,O=ADULLACT-Projet,ST=Herault,C=FR";
 		String value = StringUtils.fixIssuerDnX500NameStringOrder(input);
-		String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
+		String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
 
 		Assert.assertEquals(value, expected);
 	}
