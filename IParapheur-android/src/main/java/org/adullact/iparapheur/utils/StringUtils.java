@@ -52,9 +52,9 @@ import java.util.regex.Pattern;
 
 
 @SuppressWarnings("unused")
-public class StringUtils {
+public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringUtils {
 
-	private static String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
 
@@ -152,18 +152,6 @@ public class StringUtils {
 		return true;
 	}
 
-	public static String firstNotEmpty(@Nullable String... strings) {
-
-		if ((strings == null) || (strings.length == 0))
-			return null;
-
-		for (String string : strings)
-			if (TextUtils.isEmpty(string))
-				return string;
-
-		return null;
-	}
-
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
 
 		// Default value
@@ -198,6 +186,7 @@ public class StringUtils {
 	 *
 	 * @param issuerDnName DN name, with attributes in any order
 	 * @return fixed DN, that please OpenSSL
+	 * @coveredInLocalUnitTest
 	 */
 	public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 

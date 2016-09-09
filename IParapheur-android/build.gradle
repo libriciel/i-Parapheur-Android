@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
         //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -18,12 +18,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
@@ -32,9 +33,7 @@ android {
         abi {
             enable true
             reset()
-            include 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64'
-//            include 'armeabi-v7a'    // OnePlus One
-//            include 'x86_64'            // Emulateur
+            include 'x86_64' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
             universalApk false
         }
     }
@@ -42,15 +41,18 @@ android {
 
 
 dependencies {
-    compile 'com.android.support:support-v13:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
+    androidTestCompile 'com.android.support:support-annotations:24.2.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-v13:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:cardview-v7:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.madgag.spongycastle:core:1.53.0.0'
     compile 'com.madgag.spongycastle:pkix:1.53.0.0'
-    compile 'com.getbase:floatingactionbutton:1.10.1'
     compile files('libs/android-sun-jarsign-support-1.1.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;

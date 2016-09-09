@@ -20,6 +20,8 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,10 +39,12 @@ public class Circuit implements Parcelable {
 		}
 	};
 
-	private List<EtapeCircuit> mEtapeCircuitList;
-	private String mSigFormat;
-	private boolean mIsDigitalSignatureMandatory;
-	private boolean mHasSelectionScript;
+	@SerializedName("sigFormat") private String mSigFormat;
+	@SerializedName("isDigitalSignatureMandatory") private boolean mIsDigitalSignatureMandatory;
+	@SerializedName("hasSelectionScript") private boolean mHasSelectionScript;
+	@SerializedName("etapes") private List<EtapeCircuit> mEtapeCircuitList;
+
+	public Circuit() {}
 
 	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory, boolean hasSelectionScript) {
 		mEtapeCircuitList = etapeCircuitList;
@@ -76,6 +80,11 @@ public class Circuit implements Parcelable {
 	}
 
 	// </editor-fold desc="Setters / Getters">
+
+	@Override public String toString() {
+		return "{Circuit etapeCircuitList=" + mEtapeCircuitList + " sigFormat=" + mSigFormat + " isDigitalsignMandatory=" + isDigitalSignatureMandatory()  //
+				+ "hasSelectScript=" + mHasSelectionScript + "}";
+	}
 
 	@Override public int describeContents() {
 		return 0;

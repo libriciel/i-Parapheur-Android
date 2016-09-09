@@ -29,14 +29,13 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public enum RESTClient implements IParapheurAPI {
@@ -45,10 +44,10 @@ public enum RESTClient implements IParapheurAPI {
 	private static final String RESOURCE_API_VERSION = "/parapheur/api/getApiLevel";
 	private static final int API_VERSION_MAX = 4;
 
-	private final RESTClientAPI1 restClientAPI1 = new RESTClientAPI1();
-	private final RESTClientAPI2 restClientAPI2 = new RESTClientAPI2();
-	private final RESTClientAPI3 restClientAPI3 = new RESTClientAPI3();
-	private final RESTClientAPI3 restClientAPI4 = new RESTClientAPI4();
+	private final RestClientApi1 restClientAPI1 = new RestClientApi1();
+	private final RestClientApi2 restClientAPI2 = new RestClientApi2();
+	private final RestClientApi3 restClientAPI3 = new RestClientApi3();
+	private final RestClientApi3 restClientAPI4 = new RestClientApi4();
 
 	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
 		return getAPIVersion(account, true, false);
@@ -177,14 +176,14 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		return getRESTClient().getDossier(bureauId, dossierId);
+		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossier(bureauId, dossierId);
 	}
 
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		return getRESTClient().getDossiers(bureauId);
+		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossiers(bureauId);
 	}
 
-	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
+	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
 		return getRESTClient().getTypologie();
 	}
 

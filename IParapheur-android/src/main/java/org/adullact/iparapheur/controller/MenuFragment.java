@@ -64,6 +64,7 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -102,7 +103,7 @@ public class MenuFragment extends Fragment {
 	// Data
 	private List<Bureau> mBureauList = new ArrayList<>();
 	private List<Dossier> mDossierList = new ArrayList<>();
-	private HashMap<String, ArrayList<String>> mTypology = new HashMap<>();
+	private List<ParapheurType> mTypology = new ArrayList<>();
 	private HashSet<Dossier> mCheckedDossiers = new HashSet<>();
 	private HashMap<MenuItem, Filter> mDisplayedFilters = new HashMap<>();
 	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
@@ -567,7 +568,7 @@ public class MenuFragment extends Fragment {
 			mBureauSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty())
-				ViewUtils.crossfade(getActivity(), mBureauListView, mBureauEmptyView);
+				ViewUtils.crossfade(mBureauListView, mBureauEmptyView);
 
 			// Error management
 
@@ -591,10 +592,11 @@ public class MenuFragment extends Fragment {
 			mTypology.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
+
 				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
 				catch (IParapheurException exception) { return exception; }
 
-				try { mTypology.putAll(RESTClient.INSTANCE.getTypologie()); }
+				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
 			else {
@@ -626,7 +628,7 @@ public class MenuFragment extends Fragment {
 			mDossierSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty())
-				ViewUtils.crossfade(getActivity(), mDossierListView, mDossierEmptyView);
+				ViewUtils.crossfade(mDossierListView, mDossierEmptyView);
 
 			// Error management
 
@@ -649,6 +651,7 @@ public class MenuFragment extends Fragment {
 
 			TextView lateBadgeTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_late);
 			TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo_count);
+			TextView bureauTitleTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_title);
 
 			Bureau currentBureau = getItem(position);
 			if (currentBureau != null) {
@@ -666,6 +669,7 @@ public class MenuFragment extends Fragment {
 
 				// Applies values
 
+				bureauTitleTextView.setText(currentBureau.getTitle());
 				todoCountTextView.setText(subtitle);
 				lateBadgeTextView.setText(String.valueOf(currentBureau.getLateCount()));
 				lateBadgeTextView.setVisibility((currentBureau.getLateCount() != 0 ? View.VISIBLE : View.INVISIBLE));
@@ -707,6 +711,7 @@ public class MenuFragment extends Fragment {
 
 			// FIXME : changement d'api avec toutes les actions.
 			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(String.format("%s / %s", dossier.getType(), dossier.getSousType()));
+			((TextView) cellView.findViewById(R.id.dossiers_list_item_title)).setText(dossier.getName());
 
 			// CheckBox
 
@@ -769,7 +774,7 @@ public class MenuFragment extends Fragment {
 		}
 
 		@Override public Dossier getItem(int position) {
-			return mDossierList.get(position);
+			return mDossierList.get(position); // FIXME = Adrien = OOB
 		}
 
 		@Override public int getPosition(Dossier item) {

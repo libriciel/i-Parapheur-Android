@@ -33,45 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 
-public class ViewUtils {
-
-	/**
-	 * Swap smoothly between content and spinner, the Google way.
-	 * <br/>
-	 * Code source : http://developer.android.com/training/animation/crossfade.html
-	 *
-	 * @param context     needed to load some resources
-	 * @param contentView should be invisible on start
-	 * @param spinnerView will be set to Visibility.GONE at the end
-	 */
-	public static void crossfade(@NonNull Context context, @NonNull View contentView, @NonNull final View spinnerView) {
-
-		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
-		contentView.animate().cancel();
-		spinnerView.animate().cancel();
-
-		// System default length
-		int mShortAnimationDuration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-		// Set the content view to 0% opacity but visible, so that it is visible
-		// (but fully transparent) during the animation.
-		contentView.setAlpha(0f);
-		contentView.setVisibility(View.VISIBLE);
-
-		// Animate the content view to 100% opacity, and clear any animation
-		// listener set on the view.
-		contentView.animate().alpha(1f).setDuration(mShortAnimationDuration).setListener(null);
-
-		// Animate the loading view to 0% opacity. After the animation ends,
-		// set its visibility to GONE as an optimization step (it won't
-		// participate in layout passes, etc.)
-		spinnerView.animate().alpha(0f).setDuration(mShortAnimationDuration).setListener(new AnimatorListenerAdapter() {
-			@Override public void onAnimationEnd(Animator animation) {
-				spinnerView.setVisibility(View.GONE);
-				spinnerView.setAlpha(1f);
-			}
-		});
-	}
+public class ViewUtils extends coop.adullactprojet.mupdffragment.utils.ViewUtils {
 
 	/**
 	 * Animate a flip between two views, the Google way.
@@ -126,4 +88,42 @@ public class ViewUtils {
 		}
 	}
 
+	/**
+	 * Hide and show a view, executing Runnable on hide.
+	 *
+	 * @param contentView should be invisible on start
+	 */
+	public static void showAfterDelay(@NonNull final View contentView, long delay) {
+
+		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+		contentView.animate().cancel();
+
+		contentView.setAlpha(0f);
+		contentView.setVisibility(View.VISIBLE);
+
+		// Animate the content view to 100% opacity
+		contentView.animate().alpha(1f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(null);
+	}
+
+	/**
+	 * Hide and show a view, executing Runnable on hide.
+	 *
+	 * @param contentView should be invisible on start
+	 */
+	public static void hideAfterDelay(@NonNull final View contentView, long delay) {
+
+		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+		contentView.animate().cancel();
+
+		contentView.setAlpha(1f);
+
+		// Animate the content view to 0% opacity
+		contentView.animate().alpha(0f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(new AnimatorListenerAdapter() {
+
+			@Override public void onAnimationEnd(Animator animation) {
+				super.onAnimationEnd(animation);
+				contentView.setVisibility(View.GONE);
+			}
+		});
+	}
 }

@@ -1,9 +1,61 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
-build_apk_debug:
-  script:
-    - echo 1  
+stages:
+  - submodules
+  - test
+  - build
 
-build apk_release:
+
+# Jobs fetch_submodules
+
+refresh_submodule_develop:
+  stage: submodules
+  except:
+    - master
   script:
-    - echo 1
+    - rm -rf ./mupdffragment
+    - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
+
+
+refresh_submodule_master:
+  stage: submodules
+  only:
+    - master
+  script:
+    - rm -rf ./mupdffragment
+    - git clone -b master https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
+
+
+# Jobs test
+
+local_unit_test:
+  stage: test
+  allow_failure: true
+  script:
+    - ./gradlew test --continue
+
+
+instrumented_unit_test:
+  stage: test
+  allow_failure: true
+  script:
+    - ./gradlew connectedCheck --continue
+
+
+# Jobs build
+
+build_develop:
+  stage: build
+  except:
+    - master
+  script:
+    - ./gradlew assembleDebug
+
+
+build_release:
+  stage: build
+  only:
+    - master
+  script:
+    - ./gradlew assembleDebug
+

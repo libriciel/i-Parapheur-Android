@@ -19,11 +19,14 @@ package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.text.DateFormat;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -43,18 +46,39 @@ public class Dossier implements Parcelable {
 		}
 	};
 
-	private final String mId;
-	private final String mName;
-	private final Action mActionDemandee;
-	private final String mType;
-	private final String mSousType;
-	private final Date mDateCreation;
-	private final Date mDateLimite;
-	private final List<Document> mMainDocuments = new ArrayList<>();
-	private final List<Document> mAnnexes = new ArrayList<>();
-	private Set<Action> mActions;
+	@SerializedName("id") private String mId;
+	@SerializedName("title") private String mName;
+	@SerializedName("actionDemandee") private Action mActionDemandee;
+	@SerializedName("type") private String mType;
+	@SerializedName("sousType") private String mSousType;
+	@SerializedName("dateEmission") private Date mDateCreation;
+	@SerializedName("dateLimite") private Date mDateLimite;
+	@SerializedName("actions") private Set<Action> mActions;
+	@SerializedName("isSignPapier") private boolean mIsSignPapier;
+	@SerializedName("documents") private List<Document> mDocumentList = new ArrayList<>();
+	//@SerializedName("total") private int mTotal;
+	//@SerializedName("protocol", alternate = {"protocole"}) private String mProtocol;
+	//@SerializedName("isSent") private boolean mIsSent;
+	//@SerializedName("creator") private String mCreator;
+	//@SerializedName("bureauName") private String mBureauName;
+	//@SerializedName("pendingFile") private int mPendingFile;
+	//@SerializedName("banetteName") private String mBanetteName;
+	//@SerializedName("skipped") private int mSkipped;
+	//@SerializedName("isXemEnabled") private boolean mIsXemEnabled;
+	//@SerializedName("hasRead") private boolean mHasRead;
+	//@SerializedName("readingMandatory") private boolean mIsReadingMandatory;
+	//@SerializedName("isRead") private boolean mIsRead;
+	//@SerializedName("locked") private boolean mIsLocked;
+	//@SerializedName("includeAnnexes") private boolean mInclueAnnexes;
+	//@SerializedName("nomTdT") private String mNomTDT;
+	//@SerializedName("visibility") private String mVisibility;
+	//@SerializedName("status") private String mStatus;
+	//@SerializedName("canAdd") private boolean mCanAdd;
+	//@SerializedName("metadatas") private HashMap<String, Object> mMetadataMap;
+	//@SerializedName("xPathSignature") private String mSignatureXPath;
 	private Circuit mCircuit;
-	private boolean mIsSignPapier;
+
+	public Dossier() {}
 
 	public Dossier(String id, String name, Action actionDemandee, Set<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
 				   boolean isSignPapier) {
@@ -85,8 +109,6 @@ public class Dossier implements Parcelable {
 		mDateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
 		long tmpDateLimite = in.readLong();
 		mDateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-		in.readTypedList(mMainDocuments, Document.CREATOR);
-		in.readTypedList(mAnnexes, Document.CREATOR);
 		mCircuit = in.readParcelable(Circuit.class.getClassLoader());
 		mIsSignPapier = in.readByte() != 0;
 	}
@@ -113,22 +135,6 @@ public class Dossier implements Parcelable {
 		return mSousType;
 	}
 
-	public String getDateCreation() {
-		return DateFormat.getDateInstance().format(mDateCreation);
-	}
-
-	public String getDateLimite() {
-		return (mDateLimite == null) ? "" : DateFormat.getDateInstance().format(mDateLimite);
-	}
-
-	public List<Document> getMainDocuments() {
-		return mMainDocuments;
-	}
-
-	public List<Document> getAnnexes() {
-		return mAnnexes;
-	}
-
 	public Circuit getCircuit() {
 		return mCircuit;
 	}
@@ -145,32 +151,23 @@ public class Dossier implements Parcelable {
 		return mIsSignPapier;
 	}
 
-	// </editor-fold desc="Setters / Getters">
-
-	public void addDocument(@Nullable Document document) {
-
-		if (document == null)
-			return;
-
-		if (document.isMainDocument())
-			mMainDocuments.add(document);
-		else
-			mAnnexes.add(document);
+	public List<Document> getDocumentList() {
+		return mDocumentList;
 	}
 
+	// </editor-fold desc="Setters / Getters">
+
 	public void saveDetails(Dossier dossier) {
-		mMainDocuments.addAll(dossier.getMainDocuments());
-		mAnnexes.addAll(dossier.getAnnexes());
+		mDocumentList.addAll(dossier.getDocumentList());
 	}
 
 	public void clearDetails() {
-		mMainDocuments.clear();
-		mAnnexes.clear();
+		mDocumentList.clear();
 		mCircuit = null;
 	}
 
 	public boolean isDetailsAvailable() {
-		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mMainDocuments.isEmpty());
+		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mDocumentList.isEmpty());
 	}
 
 	public boolean hasActions() {
@@ -188,16 +185,109 @@ public class Dossier implements Parcelable {
 
 		// Finding doc
 
-		List<Document> documents = new ArrayList<>();
-		documents.addAll(dossier.getMainDocuments());
-		documents.addAll(dossier.getAnnexes());
-
 		if (!TextUtils.isEmpty(documentId))
-			for (Document document : documents)
+			for (Document document : dossier.getDocumentList())
 				if (TextUtils.equals(document.getId(), documentId))
 					return document;
 
-		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
+		return dossier.getDocumentList().isEmpty() ? null : dossier.getDocumentList().get(0);
+	}
+
+	/**
+	 * Returns the main negative {@link Action} available, by coherent priority.
+	 */
+	public static @Nullable Action getPositiveAction(@NonNull Dossier dossier) {
+
+		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+		actions.retainAll(dossier.getActions());
+
+		if (dossier.getActionDemandee() != null)
+			return dossier.getActionDemandee();
+
+		if (actions.contains(Action.SIGNATURE))
+			return Action.SIGNATURE;
+		else if (actions.contains(Action.VISA))
+			return Action.VISA;
+		else if (actions.contains(Action.ARCHIVAGE))
+			return Action.ARCHIVAGE;
+		else if (actions.contains(Action.MAILSEC))
+			return Action.MAILSEC;
+		else if (actions.contains(Action.TDT_ACTES))
+			return Action.TDT_ACTES;
+		else if (actions.contains(Action.TDT_HELIOS))
+			return Action.TDT_HELIOS;
+		else if (actions.contains(Action.TDT))
+			return Action.TDT;
+
+		return null;
+	}
+
+	/**
+	 * Returns the main negative {@link Action} available, by coherent priority.
+	 */
+	public static @Nullable Action getNegativeAction(@NonNull Dossier dossier) {
+
+		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+		actions.retainAll(dossier.getActions());
+
+		if (actions.contains(Action.REJET))
+			return Action.REJET;
+
+		return null;
+	}
+
+	/**
+	 * Patching a weird Signature case :
+	 * "actionDemandee" can have any "actions" value...
+	 * ... Except when "actionDemandee=SIGNATURE", where "actions" only contains VISA, for some reason
+	 *
+	 * A SIGNATURE action is acceptable in VISA too...
+	 *
+	 * @param dossier , the dossier to fix
+	 */
+	public static void fixActionsDemandees(@NonNull Dossier dossier) {
+
+		if (dossier.getActionDemandee() == Action.SIGNATURE) {
+			dossier.getActions().remove(Action.VISA);
+			dossier.getActions().add(Action.SIGNATURE);
+		}
+
+		if (dossier.getActionDemandee() == Action.VISA)
+			dossier.getActions().add(Action.SIGNATURE);
+	}
+
+	public static @NonNull List<Document> getMainDocuments(@Nullable Dossier dossier) {
+
+		// Default case
+
+		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
+			return new ArrayList<>();
+
+		//
+
+		ArrayList<Document> result = new ArrayList<>();
+		for (Document document : dossier.getDocumentList())
+			if (Document.isMainDocument(dossier, document))
+				result.add(document);
+
+		return result;
+	}
+
+	public static @NonNull List<Document> getAnnexes(@Nullable Dossier dossier) {
+
+		// Default case
+
+		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
+			return new ArrayList<>();
+
+		//
+
+		ArrayList<Document> result = new ArrayList<>();
+		for (Document document : dossier.getDocumentList())
+			if (!Document.isMainDocument(dossier, document))
+				result.add(document);
+
+		return result;
 	}
 
 	// </editor-fold desc="Static utils">
@@ -212,13 +302,11 @@ public class Dossier implements Parcelable {
 		dest.writeString(mId);
 		dest.writeString(mName);
 		dest.writeInt(mActionDemandee == null ? -1 : mActionDemandee.ordinal());
-		dest.writeTypedList(new ArrayList<Parcelable>(mActions));
+		dest.writeTypedList(new ArrayList<>(mActions));
 		dest.writeString(mType);
 		dest.writeString(mSousType);
 		dest.writeLong(mDateCreation != null ? mDateCreation.getTime() : -1);
 		dest.writeLong(mDateLimite != null ? mDateLimite.getTime() : -1);
-		dest.writeTypedList(mMainDocuments);
-		dest.writeTypedList(mAnnexes);
 		dest.writeParcelable(mCircuit, 0);
 		dest.writeByte(mIsSignPapier ? (byte) 1 : (byte) 0);
 	}
@@ -240,7 +328,9 @@ public class Dossier implements Parcelable {
 	}
 
 	@Override public String toString() {
-		return mName;
+		return "{Dossier id=" + mId + " name=" + mName + " actionsDemandees=" + mActionDemandee + " type=" + mType + " subType=" + mSousType     //
+				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " docs=" + mDocumentList + " actions=" + mActions                //
+				+ " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
 	}
 
 	@Override public int hashCode() {

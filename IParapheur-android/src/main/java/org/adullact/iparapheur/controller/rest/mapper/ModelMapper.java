@@ -27,21 +27,15 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
-import org.adullact.iparapheur.model.Document;
-import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.JsonExplorer;
-import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -59,18 +53,6 @@ public class ModelMapper {
 	protected static String DOSSIER_CIRCUIT = "circuit";
 	protected static String DOSSIER_ACTIONS = "actions";
 
-	protected static String DOCUMENT_ID = "id";
-	protected static String DOCUMENT_NAME = "name";
-	protected static String DOCUMENT_VISUEL_PDF = "visuelPdf";
-	protected static String DOCUMENT_SIZE = "size";
-	protected static String DOCUMENT_IS_LOCKED = "isLocked";
-	protected static String DOCUMENT_IS_MAIN_DOCUMENT = "isMainDocument";
-
-	protected static String CIRCUIT_IS_DIGITAL_SIGNATURE_MANDATORY = "isDigitalSignatureMandatory";
-	protected static String CIRCUIT_HAS_SELECTION_SCRIPT = "hasSelectionScript";
-	protected static String CIRCUIT_SIG_FORMAT = "sigFormat";
-	protected static String CIRCUIT_ETAPES = "etapes";
-
 	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
 	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
 	protected static String CIRCUIT_ETAPES_REJECTED = "rejected";
@@ -81,125 +63,6 @@ public class ModelMapper {
 
 	protected static String SIGN_INFO_SIGNATURE_INFORMATIONS = "signatureInformations";
 	protected static String SIGN_INFO_HASH = "hash";
-
-	public Dossier getDossier(RequestResponse requestResponse) throws RuntimeException {
-		Dossier dossier = null;
-
-		if (requestResponse.getResponse() != null)
-			dossier = getDossier(requestResponse.getResponse());
-
-		return dossier;
-	}
-
-	protected Dossier getDossier(JSONObject jsonObject) {
-
-		String dossierRef = jsonObject.optString("dossierRef");
-		if (dossierRef.contains("workspace://SpacesStore/")) {
-			dossierRef = dossierRef.substring("workspace://SpacesStore/".length());
-		}
-		HashSet<Action> actions = getActionsForDossier(jsonObject);
-		Dossier dossier = new Dossier(dossierRef,
-									  jsonObject.optString("titre"),
-									  Action.valueOf(jsonObject.optString(DOSSIER_ACTION_DEMANDEE, Action.VISA.toString())),
-									  actions,
-									  jsonObject.optString("type"),
-									  jsonObject.optString("sousType"),
-									  StringUtils.parseIso8601Date(jsonObject.optString("dateCreation")),
-									  StringUtils.parseIso8601Date(jsonObject.optString("dateLimite")),
-									  jsonObject.optBoolean("isSignPapier", false)
-		);
-
-		JSONArray documents = jsonObject.optJSONArray("documents");
-		if (documents != null) {
-
-			for (int index = 0; index < documents.length(); index++) {
-				JSONObject doc = documents.optJSONObject(index);
-
-				if (doc != null) {
-					String docRef = jsonObject.optString("dossierRef");
-					if (docRef.contains("workspace://SpacesStore/"))
-						docRef = dossierRef.substring("workspace://SpacesStore/".length());
-
-					String downloadUrl = doc.optString("downloadUrl");
-					if (doc.has("visuelPdfUrl")) {
-						downloadUrl += ";ph:visuel-pdf";
-					}
-
-					dossier.addDocument(new Document(docRef, dossierRef, doc.optString("name"), doc.optInt("size", -1), downloadUrl, false, (index == 0)));
-				}
-			}
-		}
-		return dossier;
-	}
-
-	protected HashSet<Action> getActionsForDossier(JSONObject dossier) {
-		HashSet<Action> actions = new HashSet<>();
-		boolean isActeurCourant = dossier.optBoolean("isActeurCourant", false);
-		if (isActeurCourant) {
-			actions.add(Action.EMAIL);
-			actions.add(Action.JOURNAL);
-			actions.add(Action.ENREGISTRER);
-		}
-		JSONObject returnedActions = dossier.optJSONObject(DOSSIER_ACTIONS);
-		String actionDemandee = dossier.optString("actionDemandee");
-		if (returnedActions != null) {
-			Iterator actionsIterator = returnedActions.keys();
-			while (actionsIterator.hasNext()) {
-				String action = (String) actionsIterator.next();
-				boolean isActionEnabled = returnedActions.optBoolean(action, false);
-				if (isActionEnabled) {
-					if (action.equals("archive")) {
-						if (actionDemandee.equals("ARCHIVAGE")) {
-							actions.add(Action.ARCHIVAGE);
-						}
-					}
-					else if (action.equals("delete")) {
-						actions.add(Action.SUPPRESSION);
-					}
-					else if (action.equals("reject")) {
-						actions.add(Action.REJET);
-					}
-					else if (action.equals("remorse")) {
-						actions.add(Action.REMORD);
-					}
-					else if (action.equals("secretary")) {
-						actions.add(Action.SECRETARIAT);
-					}
-					else if (action.equals("sign")) {
-						if (actionDemandee.equals("SIGNATURE")) {
-							actions.add(Action.SIGNATURE);
-						}
-						else if (actionDemandee.equals("VISA")) {
-							actions.add(Action.VISA);
-						}
-						else if (actionDemandee.equals("MAILSEC")) {
-							actions.add(Action.MAILSEC);
-						}
-					}
-				}
-			}
-		}
-		return actions;
-	}
-
-	public ArrayList<Dossier> getDossiers(RequestResponse requestResponse) {
-		ArrayList<Dossier> dossiers = new ArrayList<>();
-		if (requestResponse.getResponse() != null) {
-			JSONArray array = requestResponse.getResponse().optJSONArray("dossiers");
-			if (array != null) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject dossierJSON = array.optJSONObject(i);
-					if (dossierJSON != null) {
-						Dossier dossier = getDossier(dossierJSON);
-						if (dossier != null) {
-							dossiers.add(dossier);
-						}
-					}
-				}
-			}
-		}
-		return dossiers;
-	}
 
 	public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
 
@@ -254,34 +117,6 @@ public class ModelMapper {
 		result.setHash(hash);
 
 		return result;
-	}
-
-	public LinkedHashMap<String, ArrayList<String>> getTypologie(RequestResponse response) {
-		LinkedHashMap<String, ArrayList<String>> typologie = new LinkedHashMap<>();
-		if (response.getResponse() != null) {
-			JSONObject data = response.getResponse().optJSONObject("data");
-			if (data != null) {
-				JSONObject typology = data.optJSONObject("typology");
-				if (typology != null) {
-					Iterator types = typology.keys();
-					while (types.hasNext()) {
-						String type = (String) types.next();
-						JSONArray jsonSousTypes = typology.optJSONArray(type);
-						if (jsonSousTypes != null) {
-							ArrayList<String> sousTypes = new ArrayList<>(jsonSousTypes.length());
-							for (int i = 0; i < jsonSousTypes.length(); i++) {
-								String sousType = jsonSousTypes.optString(i);
-								if (!sousType.isEmpty()) {
-									sousTypes.add(sousType);
-								}
-							}
-							typologie.put(type, sousTypes);
-						}
-					}
-				}
-			}
-		}
-		return typologie;
 	}
 
 	public SparseArray<PageAnnotations> getAnnotations(RequestResponse response) {

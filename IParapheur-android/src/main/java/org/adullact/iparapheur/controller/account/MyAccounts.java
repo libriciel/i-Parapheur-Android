@@ -87,6 +87,9 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		return account;
 	}
 
+	/**
+	 * @coveredInInstrumentedUnitTest
+	 */
 	public void save(@NonNull Account account) {
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
@@ -100,6 +103,9 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		editor.apply();
 	}
 
+	/**
+	 * @coveredInInstrumentedUnitTest
+	 */
 	public void delete(@NonNull Account account) {
 
 		String id = account.getId();
@@ -122,20 +128,9 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			mSelectedAccount = null;
 	}
 
-	@Override public void onSharedPreferenceChanged(@NonNull SharedPreferences sharedPreferences, @NonNull String s) {
-
-		if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
-
-			mAccounts = null;
-			getAccounts();
-
-			// if an Account was previously selected, update it with the new one
-
-			if (mSelectedAccount != null)
-				mSelectedAccount = getAccount(mSelectedAccount.getId());
-		}
-	}
-
+	/**
+	 * @coveredInInstrumentedUnitTest
+	 */
 	public @Nullable Account getAccount(@NonNull String id) {
 		int index = mAccounts.indexOf(new Account(id));
 		return (index != -1) ? mAccounts.get(index) : null;
@@ -159,4 +154,22 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			editor.apply();
 		}
 	}
+
+	// <editor-fold desc="OnSharedPreferenceChangeListener">
+
+	@Override public void onSharedPreferenceChanged(@NonNull SharedPreferences sharedPreferences, @NonNull String s) {
+
+		if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
+
+			mAccounts = null;
+			getAccounts();
+
+			// if an Account was previously selected, update it with the new one
+
+			if (mSelectedAccount != null)
+				mSelectedAccount = getAccount(mSelectedAccount.getId());
+		}
+	}
+
+	// </editor-fold desc="OnSharedPreferenceChangeListener">
 }

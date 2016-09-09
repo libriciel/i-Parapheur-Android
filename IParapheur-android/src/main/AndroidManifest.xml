@@ -49,6 +49,7 @@
             android:label="@string/Settings"
             android:theme="@style/AppTheme.Settings"
             android:windowSoftInputMode="adjustResize" />
+
         <!--<activity-->
         <!--android:name="com.artifex.mupdfdemo.MuPDFActivity"-->
         <!--android:label="@string/app_name">-->

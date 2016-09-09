@@ -26,12 +26,11 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public interface IParapheurAPI {
@@ -61,7 +60,7 @@ public interface IParapheurAPI {
 
 	List<Dossier> getDossiers(String bureauId) throws IParapheurException;
 
-	Map<String, ArrayList<String>> getTypologie() throws IParapheurException;
+	List<ParapheurType> getTypologie() throws IParapheurException;
 
 	Circuit getCircuit(String dossierId) throws IParapheurException;
 
