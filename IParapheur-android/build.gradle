@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.1.3'
         //noinspection GradleDynamicVersion
         classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -29,27 +29,27 @@ android {
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
     // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'x86_64' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
-            universalApk false
-        }
-    }
+    // splits {
+    //    abi {
+    //        enable true
+    //        reset()
+    //        include 'armeabi-v7a' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+    //        universalApk false
+    //    }
+    // }
 }
 
 
 dependencies {
-    androidTestCompile 'com.android.support:support-annotations:24.2.0'
+    androidTestCompile 'com.android.support:support-annotations:24.2.1'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-v13:24.2.0'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:cardview-v7:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:support-v13:24.2.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.madgag.spongycastle:core:1.53.0.0'
     compile 'com.madgag.spongycastle:pkix:1.53.0.0'

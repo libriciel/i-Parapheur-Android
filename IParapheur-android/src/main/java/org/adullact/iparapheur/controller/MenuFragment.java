@@ -334,14 +334,14 @@ public class MenuFragment extends Fragment {
 		// Refreshing navigation drawer filter button (visible in portrait)
 
 		final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-		filterListPortraitButton.setImageResource(isListFiltered ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
+		filterListPortraitButton.setImageResource(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
 		filterListPortraitButton.setVisibility((isDossierList && !isInLandscape) ? View.VISIBLE : View.GONE);
 
 		// Refreshing toolbar filter button (visible in landscape)
 
 		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 		MenuItem filterItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
-		filterItem.setIcon(isListFiltered ? R.drawable.ic_filter_list_white_24dp : R.drawable.ic_no_filter_white_24dp);
+		filterItem.setIcon(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
 		filterItem.setVisible(isDossierList && isInLandscape);
 
 		inflateFilterSubMenu(filterItem.getSubMenu());
@@ -367,7 +367,7 @@ public class MenuFragment extends Fragment {
 
 		if (!filterList.isEmpty()) {
 			MenuItem item = menu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter);
-			item.setIcon(R.drawable.ic_no_filter_black_24dp);
+			item.setIcon(R.drawable.ic_filter_remove_outline_black_24dp);
 		}
 
 		// Inflate Filters
@@ -377,7 +377,7 @@ public class MenuFragment extends Fragment {
 		for (Filter filter : filterList) {
 
 			MenuItem item = menu.add(Menu.NONE, R.id.action_filter, 2, filter.getName());
-			item.setIcon(R.drawable.ic_filter_list_black_24dp);
+			item.setIcon(R.drawable.ic_filter_outline_black_24dp);
 
 			mDisplayedFilters.put(item, filter);
 		}
