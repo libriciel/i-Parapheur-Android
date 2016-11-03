@@ -17,17 +17,44 @@
  */
 package org.adullact.iparapheur.model;
 
-import com.google.gson.annotations.SerializedName;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class ParapheurType {
 
 	@SerializedName("id") private String mName;
-	@SerializedName("sousTypes") List<String> mSubTypes;
+	@SerializedName("sousTypes") private List<String> mSubTypes;
 
 	public ParapheurType() {}
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest ModelTest
+	 */
+	public static @Nullable List<ParapheurType> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		Type typologyType = new TypeToken<ArrayList<ParapheurType>>() {}.getType();
+
+		try {
+			return gson.fromJson(jsonArrayString, typologyType);
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
+	}
 
 	// <editor-fold desc="Setters / Getters">
 
@@ -35,8 +62,16 @@ public class ParapheurType {
 		return mName;
 	}
 
+	public void setName(String name) {
+		mName = name;
+	}
+
 	public List<String> getSubTypes() {
 		return mSubTypes;
+	}
+
+	public void setSubTypes(List<String> subTypes) {
+		mSubTypes = subTypes;
 	}
 
 	// </editor-fold desc="Setters / Getters">

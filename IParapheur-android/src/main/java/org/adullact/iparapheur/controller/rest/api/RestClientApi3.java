@@ -131,7 +131,9 @@ public class RestClientApi3 extends RestClientApi {
 		// Parse
 
 		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
-		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonArray(), listDossierType);
+		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonArray(),
+																							   listDossierType
+		);
 
 		for (Dossier dossier : dossiersParsed)
 			Dossier.fixActionsDemandees(dossier);
@@ -144,10 +146,11 @@ public class RestClientApi3 extends RestClientApi {
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
+
 		String url = buildUrl(RESOURCE_TYPES);
 		RequestResponse result = RESTUtils.get(url);
-		Type typologyType = new TypeToken<ArrayList<ParapheurType>>() {}.getType();
-		return mGson.fromJson(result.getResponseArray().toString(), typologyType);
+
+		return ParapheurType.fromJsonArray(result.getResponseArray().toString(), mGson);
 	}
 
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
