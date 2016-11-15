@@ -14,7 +14,7 @@ refresh_submodule_develop:
     - master
   script:
     - rm -rf ./mupdffragment
-    - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
+    - git clone -b develop https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
 
 
 refresh_submodule_master:
@@ -23,7 +23,7 @@ refresh_submodule_master:
     - master
   script:
     - rm -rf ./mupdffragment
-    - git clone -b master https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment
+    - git clone -b master https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
 
 
 # Jobs test
