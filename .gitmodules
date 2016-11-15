@@ -1,4 +1,3 @@
 [submodule "mupdffragment"]
 	path = mupdffragment
-	url = git+ssh://abricchi@scm.adullact.net//var/lib/gforge/chroot/scmrepos/git/mupdfandroid/mupdfandroid.git
-	branch = develop
+	url = https://gitlab.libriciel.fr/librairies/MupdfAndroid.git
