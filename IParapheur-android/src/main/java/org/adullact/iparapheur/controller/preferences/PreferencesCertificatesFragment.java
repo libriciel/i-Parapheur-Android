@@ -17,11 +17,13 @@
  */
 package org.adullact.iparapheur.controller.preferences;
 
+import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -29,6 +31,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -69,6 +72,8 @@ public class PreferencesCertificatesFragment extends Fragment {
 	private static final String LIST_FIELD_EXPIRATION_DATE_STRING = "list_field_expiration_date_string";
 
 	private ListView mCertificatesList;
+	private View mEmptyView;
+
 	private List<Map<String, Object>> mCertificatesData;
 
 	/**
@@ -99,6 +104,20 @@ public class PreferencesCertificatesFragment extends Fragment {
 		View v = inflater.inflate(R.layout.preferences_certificates_fragment, container, false);
 
 		mCertificatesList = (ListView) v.findViewById(R.id.preferences_certificates_fragment_main_list);
+		mEmptyView = v.findViewById(R.id.preferences_certificates_fragment_empty_view_linearlayout);
+		Button certificateTutoButton = (Button) v.findViewById(R.id.preferences_certificates_fragment_certificate_tuto_button);
+
+		// Buttons listeners
+
+		certificateTutoButton.setOnClickListener(new View.OnClickListener() {
+			@Override public void onClick(View view) {
+				File file = FileUtils.getCertificateTutoPdf(getActivity());
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
+			}
+		});
 
 		// Building ListAdapter
 
@@ -113,9 +132,12 @@ public class PreferencesCertificatesFragment extends Fragment {
 																		 orderedFieldNames,
 																		 orderedFieldIds
 		);
+
 		mCertificatesList.setAdapter(certificatesAdapter);
 
 		//
+
+		checkEmptyViewVisibility();
 
 		return v;
 	}
@@ -149,6 +171,8 @@ public class PreferencesCertificatesFragment extends Fragment {
 		if (success) {
 			Log.i(LOG_TAG, "Delete certificate " + currentFileName);
 			mCertificatesData.remove(position);
+			checkEmptyViewVisibility();
+
 			((SimpleAdapter) mCertificatesList.getAdapter()).notifyDataSetChanged();
 			Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_success, Toast.LENGTH_SHORT).show();
 		}
@@ -194,6 +218,13 @@ public class PreferencesCertificatesFragment extends Fragment {
 		}
 	}
 
+	private void checkEmptyViewVisibility() {
+		mCertificatesList.setVisibility(mCertificatesData.isEmpty() ? View.GONE : View.VISIBLE);
+		mEmptyView.setVisibility(mCertificatesData.isEmpty() ? View.VISIBLE : View.GONE);
+	}
+
+	//
+
 	private class CertificateSimpleAdapter extends SimpleAdapter {
 
 		private int mRegularColor;
@@ -213,7 +244,7 @@ public class PreferencesCertificatesFragment extends Fragment {
 		 * @param to       The views that should display column in the "from" parameter. These should all be
 		 *                 TextViews. The first N views in this list are given the values of the first N columns
 		 */
-		public CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+		/* package */ CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
 			super(context, data, resource, from, to);
 			mErrorColor = ContextCompat.getColor(context, R.color.red_500);
 			mRegularColor = ContextCompat.getColor(context, R.color.text_black_secondary);

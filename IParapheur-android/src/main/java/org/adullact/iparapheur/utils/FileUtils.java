@@ -46,12 +46,13 @@ import java.util.List;
 
 public class FileUtils {
 
-	public static final String LOG = "FileUtils";
+	private static final String LOG = "FileUtils";
 	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
+	private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
 
-	public static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
+	private static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
 		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossier.getId());
 
 		if (!directory.mkdirs())
@@ -63,18 +64,23 @@ public class FileUtils {
 		return directory;
 	}
 
-	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier,
-																						   @NonNull Document document) {
+	public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier, @NonNull Document document) {
 
 		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
 
 		if (!DeviceUtils.isDebugOffline())
 			return new File(FileUtils.getDirectoryForDossier(dossier), documentName);
 		else
+			//noinspection ConstantConditions
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}
 
-	public static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
+	public static @NonNull File getCertificateTutoPdf(@NonNull Context context) {
+		//noinspection ConstantConditions
+		return createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
+	}
+
+	private static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
 
 		boolean accessible = false;
 		File rootFolder = context.getExternalFilesDir(null);
@@ -98,7 +104,7 @@ public class FileUtils {
 		return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
 	}
 
-	public static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
+	private static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
 
 		List<File> jks = new ArrayList<>();
 
@@ -191,11 +197,12 @@ public class FileUtils {
 
 		try {
 			File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
+			//noinspection ResultOfMethodCallIgnored
 			file.delete(); // removing previous file, if exists.
 
 			OutputStream outputStream = new FileOutputStream(file);
 			byte buffer[] = new byte[1024];
-			int length = 0;
+			int length;
 
 			while ((length = inputStream.read(buffer)) > 0)
 				outputStream.write(buffer, 0, length);

@@ -29,14 +29,14 @@ android {
 
     // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
     // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'x86_64' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
-            universalApk false
-        }
-    }
+//    splits {
+//        abi {
+//            enable true
+//            reset()
+//            include 'x86_64' // 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+//            universalApk false
+//        }
+//    }
 }
 
 
