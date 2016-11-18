@@ -34,12 +34,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -65,7 +71,8 @@ public class RejectDialogFragment extends DialogFragment {
 		RejectDialogFragment fragment = new RejectDialogFragment();
 
 		Bundle args = new Bundle();
-		args.putParcelableArrayList(ARGUMENTS_DOSSIERS, dossiers);
+		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
 		fragment.setArguments(args);
@@ -79,7 +86,12 @@ public class RejectDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			mDossierList = getArguments().getParcelableArrayList(ARGUMENTS_DOSSIERS);
+			Gson gson = CollectionUtils.buildGsonWithLongToDate();
+			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+
+			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }
+			catch (JsonSyntaxException e) { mDossierList = new ArrayList<>(); }
+
 			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
 		}
 	}

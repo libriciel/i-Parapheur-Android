@@ -22,10 +22,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
@@ -45,7 +48,8 @@ public class MailSecDialogFragment extends ActionDialogFragment {
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
-		args.putParcelableArrayList("dossiers", dossiers);
+		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		args.putString("dossiers", gson.toJson(dossiers));
 		args.putString("bureauId", bureauId);
 		f.setArguments(args);
 
@@ -84,12 +88,12 @@ public class MailSecDialogFragment extends ActionDialogFragment {
 			String annotPub = annotationPublique.getText().toString();
 			String annotPriv = annotationPrivee.getText().toString();
 			int i = 0;
-			int total = dossiers.size();
+			int total = mDossiers.size();
 			publishProgress(i);
-			for (Dossier dossier : dossiers) {
+			for (Dossier dossier : mDossiers) {
 				if (isCancelled()) {return;}
 				//Log.d("debug", "Mailsec sur " + dossier.getName());
-				RESTClient.INSTANCE.envoiMailSec(dossier.getId(), null, null, null, "", "", "", false, true, bureauId);
+				RESTClient.INSTANCE.envoiMailSec(dossier.getId(), null, null, null, "", "", "", false, true, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

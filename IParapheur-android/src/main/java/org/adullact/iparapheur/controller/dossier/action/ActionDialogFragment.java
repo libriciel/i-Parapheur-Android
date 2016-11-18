@@ -17,7 +17,6 @@
  */
 package org.adullact.iparapheur.controller.dossier.action;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -29,17 +28,24 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.model.Dossier;
-import org.adullact.iparapheur.utils.LoadingTask;
+import org.adullact.iparapheur.utils.CollectionUtils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
 public abstract class ActionDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
-	protected ArrayList<Dossier> dossiers;
-	protected String bureauId;
+	private static final String ARGUMENTS_DOSSIERS = "dossiers";
+
+	protected ArrayList<Dossier> mDossiers;
+	protected String mBureauId;
 
 	public ActionDialogFragment() {}
 
@@ -47,8 +53,14 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getArguments() != null) {
-			this.dossiers = getArguments().getParcelableArrayList("dossiers");
-			this.bureauId = getArguments().getString("bureauId");
+
+			Gson gson = CollectionUtils.buildGsonWithLongToDate();
+			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+
+			try { mDossiers = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }
+			catch (JsonSyntaxException e) { mDossiers = new ArrayList<>(); }
+
+			mBureauId = getArguments().getString("bureauId");
 		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setView(createView())
@@ -74,7 +86,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 		View layout = inflater.inflate(getViewId(), null);
 
 		ListView dossiersView = (ListView) layout.findViewById(R.id.action_dialog_dossiers);
-		dossiersView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
+		dossiersView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, mDossiers));
 		dossiersView.setItemsCanFocus(false);
 		return layout;
 	}

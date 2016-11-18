@@ -22,10 +22,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
@@ -37,6 +40,7 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 
 	public static final int REQUEST_CODE_ACTES = 103200519;    // Because A-C-T-E-S = 1-03-20-05-19
 	public static final String FRAGMENT_TAG = "tdt_actes_dialog_fragment";
+	private static final String ARGUMENTS_DOSSIERS = "dossiers";
 
 	protected TextView annotationPublique;
 	protected TextView annotationPrivee;
@@ -48,7 +52,8 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
-		args.putParcelableArrayList("dossiers", dossiers);
+		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString("bureauId", bureauId);
 		f.setArguments(args);
 
@@ -87,13 +92,13 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 			String annotPub = annotationPublique.getText().toString();
 			String annotPriv = annotationPrivee.getText().toString();
 			int i = 0;
-			int total = dossiers.size();
+			int total = mDossiers.size();
 			publishProgress(i);
-			for (Dossier dossier : dossiers) {
+			for (Dossier dossier : mDossiers) {
 				if (isCancelled()) {return;}
 				// TODO : distinguer Actes et Helios
 				//Log.d("debug", "Mailsec sur " + dossier.getName());
-				RESTClient.INSTANCE.envoiTdtActes(dossier.getId(), "", "", "", 0L, "", annotPub, annotPriv, bureauId);
+				RESTClient.INSTANCE.envoiTdtActes(dossier.getId(), "", "", "", 0L, "", annotPub, annotPriv, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

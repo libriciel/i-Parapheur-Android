@@ -20,10 +20,13 @@ package org.adullact.iparapheur.controller.dossier.action;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.LoadingWithProgressTask;
@@ -33,6 +36,9 @@ import java.util.ArrayList;
 
 public class ArchivageDialogFragment extends ActionDialogFragment {
 
+	private static final String ARGUMENTS_DOSSIERS = "dossiers";
+	private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
+
 	public ArchivageDialogFragment() {}
 
 	public static ArchivageDialogFragment newInstance(ArrayList<Dossier> dossiers, String bureauId) {
@@ -40,7 +46,8 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
-		args.putParcelableArrayList("dossiers", dossiers);
+		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString("bureauId", bureauId);
 		f.setArguments(args);
 
@@ -61,19 +68,19 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
 
 	private class ArchivageTask extends LoadingWithProgressTask {
 
-		public ArchivageTask(Activity activity) {
+		private ArchivageTask(Activity activity) {
 			super(activity, (LoadingTask.DataChangeListener) getActivity());
 		}
 
 		@Override protected void load(String... params) throws IParapheurException {
 			if (isCancelled()) {return;}
 			int i = 0;
-			int total = dossiers.size();
+			int total = mDossiers.size();
 			publishProgress(i);
-			for (Dossier dossier : dossiers) {
+			for (Dossier dossier : mDossiers) {
 				if (isCancelled()) {return;}
 				//Log.d("debug", "Archivage du dossier " + dossier.getName());
-				RESTClient.INSTANCE.archiver(dossier.getId(), dossier.getName() + "pdf", false, bureauId);
+				RESTClient.INSTANCE.archiver(dossier.getId(), dossier.getName() + "pdf", false, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

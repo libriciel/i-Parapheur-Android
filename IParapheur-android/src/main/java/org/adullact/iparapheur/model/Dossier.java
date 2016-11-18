@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.model;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -33,18 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Dossier implements Parcelable {
-
-	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
-
-		public Dossier createFromParcel(Parcel source) {
-			return new Dossier(source);
-		}
-
-		public Dossier[] newArray(int size) {
-			return new Dossier[size];
-		}
-	};
+public class Dossier {
 
 	@SerializedName("id") private String mId;
 	@SerializedName("title") private String mName;
@@ -291,27 +279,6 @@ public class Dossier implements Parcelable {
 	}
 
 	// </editor-fold desc="Static utils">
-
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mId);
-		dest.writeString(mName);
-		dest.writeInt(mActionDemandee == null ? -1 : mActionDemandee.ordinal());
-		dest.writeTypedList(new ArrayList<>(mActions));
-		dest.writeString(mType);
-		dest.writeString(mSousType);
-		dest.writeLong(mDateCreation != null ? mDateCreation.getTime() : -1);
-		dest.writeLong(mDateLimite != null ? mDateLimite.getTime() : -1);
-		dest.writeParcelable(mCircuit, 0);
-		dest.writeByte(mIsSignPapier ? (byte) 1 : (byte) 0);
-	}
-
-	// </editor-fold desc="Parcelable">
 
 	@Override public boolean equals(Object o) {
 

@@ -25,6 +25,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -60,14 +63,39 @@ public class CollectionUtils {
 		return result;
 	}
 
+	/**
+	 * Server sends date in ms, so we have to customize the Gson object to parse them easily.
+	 * Since the parsing is waiting for long numbers, we customize the serialization too.
+	 *
+	 * @return {@link Gson} object
+	 * @coveredInLocalUnitTest
+	 */
 	public static @NonNull Gson buildGsonWithLongToDate() {
 
 		GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
-			public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return new Date(json.getAsJsonPrimitive().getAsLong());
+
+		builder.registerTypeAdapter(Date.class, new JsonSerializer<Date>() {
+
+			public JsonElement serialize(Date date, Type typeOfSrc, JsonSerializationContext context) {
+
+				if (date != null)
+					return new JsonPrimitive(date.getTime());
+
+				return null;
 			}
 		});
+
+		builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+
+			public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+				if (json.getAsJsonPrimitive().isNumber())
+					return new Date(json.getAsJsonPrimitive().getAsLong());
+
+				return null;
+			}
+		});
+
 		return builder.create();
 	}
 }
