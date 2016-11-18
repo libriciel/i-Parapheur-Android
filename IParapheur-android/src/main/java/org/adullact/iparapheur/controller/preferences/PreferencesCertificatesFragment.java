@@ -19,9 +19,7 @@ package org.adullact.iparapheur.controller.preferences;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -111,11 +109,7 @@ public class PreferencesCertificatesFragment extends Fragment {
 
 		certificateTutoButton.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View view) {
-				File file = FileUtils.getCertificateTutoPdf(getActivity());
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.fromFile(file), "application/pdf");
-				intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-				startActivity(intent);
+				FileUtils.launchCertificateTutoPdfIntent(getActivity());
 			}
 		});
 

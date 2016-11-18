@@ -19,8 +19,10 @@ package org.adullact.iparapheur.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,11 +30,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +45,8 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.adullact.iparapheur.controller.IParapheurApplication.getContext;
+
 
 public class FileUtils {
 
@@ -52,8 +56,28 @@ public class FileUtils {
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
 	private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
 
+	private static void copy(@NonNull File src, @NonNull File dst) {
+
+		try {
+			InputStream in = new FileInputStream(src);
+			OutputStream out = new FileOutputStream(dst);
+
+			// Transfer bytes from in to out
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+		catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	private static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
-		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossier.getId());
+		File directory = new File(getContext().getExternalCacheDir(), dossier.getId());
 
 		if (!directory.mkdirs())
 			if (!directory.exists())
@@ -75,9 +99,31 @@ public class FileUtils {
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}
 
-	public static @NonNull File getCertificateTutoPdf(@NonNull Context context) {
-		//noinspection ConstantConditions
-		return createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
+	public static void launchCertificateTutoPdfIntent(@NonNull Context context) {
+
+		File pdfFile = createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
+		File fileFolder = context.getExternalFilesDir(null);
+
+		// Default case
+		// Should never happen, but hides IDE warnings
+
+		if ((pdfFile == null) || (fileFolder == null))
+			return;
+
+		// The Asset file is in the internal folder, and cannot be shared directly.
+		// We have to declare a FileProvider, and manage exported files or not...
+		// Here, we simply move this asset into the external data folder.
+		// That's easier, and takes way less code to manage.
+
+		File exportablePdfFile = new File(fileFolder.getAbsolutePath() + File.separator + pdfFile.getName());
+		if (!exportablePdfFile.exists())
+			copy(pdfFile, exportablePdfFile);
+
+		// View Intent, calling any PDF viewer
+
+		Intent intentShareFile = new Intent(Intent.ACTION_VIEW);
+		intentShareFile.setDataAndType(Uri.fromFile(exportablePdfFile), "application/pdf");
+		context.startActivity(Intent.createChooser(intentShareFile, context.getString(R.string.Choose_an_app)));
 	}
 
 	private static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
@@ -218,5 +264,4 @@ public class FileUtils {
 
 		return null;
 	}
-
 }
