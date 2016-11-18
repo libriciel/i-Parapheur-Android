@@ -57,8 +57,15 @@ public class ParapheurTypeTest {
 
 		Assert.assertNull(incorrectArrayParsed);
 		Assert.assertNotNull(correctArrayParsed);
+
 		Assert.assertEquals(correctArrayParsed.get(0).toString(), type01.toString());
+		Assert.assertEquals(correctArrayParsed.get(0).getName(), type01.getName());
+		Assert.assertEquals(correctArrayParsed.get(0).getSubTypes().toString(), type01.getSubTypes().toString());
+
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), type02.toString());
+		Assert.assertEquals(correctArrayParsed.get(1).getName(), type02.getName());
+		Assert.assertEquals(correctArrayParsed.get(1).getSubTypes().toString(), type02.getSubTypes().toString());
+
 	}
 
 }
