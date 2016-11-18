@@ -17,10 +17,6 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.text.TextUtils;
-
 import com.google.gson.annotations.SerializedName;
 
 import org.adullact.iparapheur.utils.StringUtils;
@@ -28,97 +24,62 @@ import org.adullact.iparapheur.utils.StringUtils;
 import java.util.Date;
 
 
-public class EtapeCircuit implements Parcelable {
+public class EtapeCircuit {
 
-	public static Parcelable.Creator<EtapeCircuit> CREATOR = new Parcelable.Creator<EtapeCircuit>() {
-
-		public EtapeCircuit createFromParcel(Parcel source) {
-			return new EtapeCircuit(source);
-		}
-
-		public EtapeCircuit[] newArray(int size) {
-			return new EtapeCircuit[size];
-		}
-	};
-
-	@SerializedName("dateValidation") private Date dateValidation;
-	@SerializedName("approved") private boolean isApproved;
-	@SerializedName("rejected") private boolean isRejected;
-	@SerializedName("parapheurName") private String bureauName;
-	@SerializedName("signataire") private String signataire;
-	@SerializedName("actionDemandee") private Action action;
-	@SerializedName("annotPub") private String publicAnnotation;
-
-	public EtapeCircuit() {}
+	@SerializedName("dateValidation") private Date mDateValidation;
+	@SerializedName("approved") private boolean mIsApproved;
+	@SerializedName("rejected") private boolean mIsRejected;
+	@SerializedName("parapheurName") private String mBureauName;
+	@SerializedName("signataire") private String mSignataire;
+	@SerializedName("actionDemandee") private Action mAction;
+	@SerializedName("annotPub") private String mPublicAnnotation;
 
 	// <editor-fold desc="Setters / Getters">
 
 	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
 						String publicAnnotation) {
 
-		this.dateValidation = TextUtils.isEmpty(dateValidation) ? null : StringUtils.parseIso8601Date(dateValidation);
-		this.isApproved = isApproved;
-		this.isRejected = isRejected;
-		this.bureauName = bureauName;
-		this.signataire = signataire;
-		this.action = Action.valueOf(action);
-		this.publicAnnotation = publicAnnotation;
-	}
-
-	private EtapeCircuit(Parcel in) {
-		long tmpDateValidation = in.readLong();
-		this.dateValidation = tmpDateValidation == -1 ? null : new Date(tmpDateValidation);
-		this.isApproved = in.readByte() != 0;
-		this.isRejected = in.readByte() != 0;
-		this.bureauName = in.readString();
-		this.signataire = in.readString();
-		int tmpAction = in.readInt();
-		this.action = tmpAction == -1 ? null : Action.values()[tmpAction];
-		this.publicAnnotation = in.readString();
+		mDateValidation = StringUtils.parseIso8601Date(dateValidation);
+		mIsApproved = isApproved;
+		mIsRejected = isRejected;
+		mBureauName = bureauName;
+		mSignataire = signataire;
+		mAction = (action != null) ? Action.valueOf(action) : Action.VISA;
+		mPublicAnnotation = publicAnnotation;
 	}
 
 	public Date getDateValidation() {
-		return dateValidation;
+		return mDateValidation;
 	}
 
 	public boolean isApproved() {
-		return isApproved;
+		return mIsApproved;
 	}
 
 	public boolean isRejected() {
-		return isRejected;
+		return mIsRejected;
 	}
 
 	public String getBureauName() {
-		return bureauName;
+		return mBureauName;
 	}
 
 	public String getSignataire() {
-		return signataire;
+		return mSignataire;
 	}
 
 	public Action getAction() {
-		return action;
+		return mAction;
+	}
+
+	public void setAction(Action action) {
+		mAction = action;
 	}
 
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return "{EtapeCircuit dateValidation=" + dateValidation + " isApproved=" + isApproved + " isRejected=" + isRejected + " bureauName=" + bureauName //
-				+ " signataire=" + signataire + " action=" + action + " publicAnnot=" + publicAnnotation + "}";
-	}
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(dateValidation != null ? dateValidation.getTime() : -1);
-		dest.writeByte(isApproved ? (byte) 1 : (byte) 0);
-		dest.writeByte(isRejected ? (byte) 1 : (byte) 0);
-		dest.writeString(this.bureauName);
-		dest.writeString(this.signataire);
-		dest.writeInt(this.action == null ? -1 : this.action.ordinal());
-		dest.writeString(this.publicAnnotation);
+		return "{EtapeCircuit dateValidation=" + mDateValidation + "\nisApproved=" + mIsApproved + "\nisRejected=" + mIsRejected + //
+				"\nbureauName=" + mBureauName + "\nsignataire=" + mSignataire + "\naction=" + mAction + "\npublicAnnot=" + mPublicAnnotation + "}";
 	}
 }

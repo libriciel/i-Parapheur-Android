@@ -157,9 +157,12 @@ public class RestClientApi3 extends RestClientApi {
 	}
 
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
+
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
 		String response = String.valueOf(RESTUtils.get(url).getResponse());
-		return mGson.fromJson(new JsonParser().parse(response).getAsJsonObject().get("circuit"), Circuit.class);
+		String responseCircuit = new JsonParser().parse(response).getAsJsonObject().get("circuit").toString();
+
+		return Circuit.fromJsonObject(responseCircuit, mGson);
 	}
 
 	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {

@@ -129,7 +129,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
 
-		if (TextUtils.isEmpty(iso8601Date))
+		if ((iso8601Date == null) || (iso8601Date.length() == 0))
 			return null;
 
 		try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); }

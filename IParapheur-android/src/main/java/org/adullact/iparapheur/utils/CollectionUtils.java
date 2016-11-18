@@ -91,8 +91,8 @@ public class CollectionUtils {
 
 				if (json.getAsJsonPrimitive().isNumber())
 					return new Date(json.getAsJsonPrimitive().getAsLong());
-
-				return null;
+				else
+					return StringUtils.parseIso8601Date(json.getAsString());
 			}
 		});
 

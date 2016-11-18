@@ -17,6 +17,11 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -34,6 +39,32 @@ public class Circuit {
 		mSigFormat = sigFormat;
 		mIsDigitalSignatureMandatory = isDigitalSignatureMandatory;
 		mHasSelectionScript = hasSelectionScript;
+	}
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest Bureau
+	 */
+	public static @Nullable Circuit fromJsonObject(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		try {
+			Circuit circuit = gson.fromJson(jsonArrayString, Circuit.class);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (EtapeCircuit etape : circuit.getEtapeCircuitList())
+				if (etape.getAction() == null)
+					etape.setAction(Action.VISA);
+
+			return circuit;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
 
 	// <editor-fold desc="Setters / Getters">
