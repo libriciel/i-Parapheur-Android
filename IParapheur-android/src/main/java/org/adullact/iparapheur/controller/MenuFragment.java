@@ -542,7 +542,7 @@ public class MenuFragment extends Fragment {
 				catch (final IParapheurException exception) { return exception; }
 			}
 			else {
-				mBureauList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut"));
+				mBureauList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut", 0, 0));
 			}
 
 			return null;

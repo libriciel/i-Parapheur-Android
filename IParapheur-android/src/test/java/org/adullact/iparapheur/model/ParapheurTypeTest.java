@@ -20,19 +20,19 @@ package org.adullact.iparapheur.model;
 import com.google.gson.Gson;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 
-public class ParapheurTypeTest extends TestCase {
+public class ParapheurTypeTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
 
-	public void testFromJsonArray() throws Exception {
+	@Test public void fromJsonArray() throws Exception {
 
 		// Parsed data
 
@@ -50,13 +50,8 @@ public class ParapheurTypeTest extends TestCase {
 
 		// Valid types
 
-		ParapheurType type01 = new ParapheurType();
-		type01.setName("Value 01 \"\\/%@&éè");
-		type01.setSubTypes(Arrays.asList("Value 01-01", "Value 01-02"));
-
-		ParapheurType type02 = new ParapheurType();
-		type02.setName("Value 02 \"\\/%@&éè");
-		type02.setSubTypes(Arrays.asList("Value 02-01", "Value 02-02", "Value 02-03"));
+		ParapheurType type01 = new ParapheurType("Value 01 \"\\/%@&éè", Arrays.asList("Value 01-01", "Value 01-02"));
+		ParapheurType type02 = new ParapheurType("Value 02 \"\\/%@&éè", Arrays.asList("Value 02-01", "Value 02-02", "Value 02-03"));
 
 		// Checks
 

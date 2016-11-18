@@ -35,8 +35,6 @@ public class ParapheurType {
 	@SerializedName("id") private String mName;
 	@SerializedName("sousTypes") private List<String> mSubTypes;
 
-	public ParapheurType() {}
-
 	/**
 	 * Static parser, useful for Unit tests
 	 *
@@ -56,22 +54,19 @@ public class ParapheurType {
 		}
 	}
 
+	public ParapheurType(@NonNull String name, @NonNull List<String> subTypes) {
+		mName = name;
+		mSubTypes = subTypes;
+	}
+
 	// <editor-fold desc="Setters / Getters">
 
 	public String getName() {
 		return mName;
 	}
 
-	public void setName(String name) {
-		mName = name;
-	}
-
 	public List<String> getSubTypes() {
 		return mSubTypes;
-	}
-
-	public void setSubTypes(List<String> subTypes) {
-		mSubTypes = subTypes;
 	}
 
 	// </editor-fold desc="Setters / Getters">

@@ -31,7 +31,7 @@ public class BureauTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
 
-	@Test public void testfromJsonArray() throws Exception {
+	@Test public void fromJsonArray() throws Exception {
 
 		// Parsed data
 

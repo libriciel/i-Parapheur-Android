@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class StringUtilsTest {
 
-	@Test public void testFixIssuerDnX500NameStringOrder() throws Exception {
+	@Test public void fixIssuerDnX500NameStringOrder() throws Exception {
 
 		String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,O=ADULLACT-Projet,ST=Herault,C=FR";
 		String value = StringUtils.fixIssuerDnX500NameStringOrder(input);

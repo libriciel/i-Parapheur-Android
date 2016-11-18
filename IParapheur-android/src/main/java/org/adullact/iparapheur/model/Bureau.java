@@ -57,10 +57,6 @@ public class Bureau {
 		}
 	}
 
-	public Bureau(String id, String title) {
-		this(id, title, 0, 0);
-	}
-
 	public Bureau(String id, String title, int todo, int late) {
 
 		if (id.contains("workspace://SpacesStore/"))
