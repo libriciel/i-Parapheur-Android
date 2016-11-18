@@ -34,7 +34,7 @@ public class CircuitTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
 
-	@Test public void fromJsonArray() throws Exception {
+	@Test public void fromJsonObject() throws Exception {
 
 		// Parsed data
 
@@ -86,13 +86,17 @@ public class CircuitTest {
 		));
 		etapes01.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
 
-		Circuit circuit01 = new Circuit(etapes01, "PKCS#7\\/single", true, false);
+		Circuit circuit01 = new Circuit(etapes01, "PKCS#7\\/single", true);
 
 		// Checks
 
-		Assert.assertNotNull(correctObjectParsed);
 		Assert.assertNull(incorrectObjectParsed);
+		Assert.assertNotNull(correctObjectParsed);
+
 		Assert.assertEquals(correctObjectParsed.toString(), circuit01.toString());
+		Assert.assertEquals(correctObjectParsed.getEtapeCircuitList().toString(), circuit01.getEtapeCircuitList().toString());
+		Assert.assertEquals(correctObjectParsed.getSigFormat(), circuit01.getSigFormat());
+		Assert.assertEquals(correctObjectParsed.isDigitalSignatureMandatory(), circuit01.isDigitalSignatureMandatory());
 	}
 
 }

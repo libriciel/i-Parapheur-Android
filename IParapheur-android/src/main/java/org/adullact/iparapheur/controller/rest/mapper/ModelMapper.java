@@ -82,7 +82,7 @@ public class ModelMapper {
 			circuit.add(etapeCircuit);
 		}
 
-		return new Circuit(circuit, null, true, false);
+		return new Circuit(circuit, null, true);
 	}
 
 	public @NonNull SignInfo getSignInfo(RequestResponse response) {

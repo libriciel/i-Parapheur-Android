@@ -79,7 +79,7 @@ public class EtapeCircuit {
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return "{EtapeCircuit dateValidation=" + mDateValidation + "\nisApproved=" + mIsApproved + "\nisRejected=" + mIsRejected + //
-				"\nbureauName=" + mBureauName + "\nsignataire=" + mSignataire + "\naction=" + mAction + "\npublicAnnot=" + mPublicAnnotation + "}";
+		return "{EtapeCircuit dateValidation=" + mDateValidation + " isApproved=" + mIsApproved + " isRejected=" + mIsRejected + //
+				" bureauName=" + mBureauName + " signataire=" + mSignataire + " action=" + mAction + " publicAnnot=" + mPublicAnnotation + "}";
 	}
 }

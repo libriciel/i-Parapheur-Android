@@ -31,14 +31,12 @@ public class Circuit {
 
 	@SerializedName("sigFormat") private String mSigFormat;
 	@SerializedName("isDigitalSignatureMandatory") private boolean mIsDigitalSignatureMandatory;
-	@SerializedName("hasSelectionScript") private boolean mHasSelectionScript;
 	@SerializedName("etapes") private List<EtapeCircuit> mEtapeCircuitList;
 
-	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory, boolean hasSelectionScript) {
+	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory) {
 		mEtapeCircuitList = etapeCircuitList;
 		mSigFormat = sigFormat;
 		mIsDigitalSignatureMandatory = isDigitalSignatureMandatory;
-		mHasSelectionScript = hasSelectionScript;
 	}
 
 	/**
@@ -46,7 +44,7 @@ public class Circuit {
 	 *
 	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson            passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest Bureau
+	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable Circuit fromJsonObject(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
@@ -81,15 +79,10 @@ public class Circuit {
 		return mIsDigitalSignatureMandatory;
 	}
 
-	public boolean hasSelectionScript() {
-		return mHasSelectionScript;
-	}
-
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return "{Circuit etapeCircuitList=" + mEtapeCircuitList + " sigFormat=" + mSigFormat + " isDigitalsignMandatory=" + isDigitalSignatureMandatory()  //
-				+ "hasSelectScript=" + mHasSelectionScript + "}";
+		return "{Circuit etapeList=" + mEtapeCircuitList + " sigFormat=" + mSigFormat + " isDigitalSignMandatory=" + isDigitalSignatureMandatory() + "}";
 	}
 
 }

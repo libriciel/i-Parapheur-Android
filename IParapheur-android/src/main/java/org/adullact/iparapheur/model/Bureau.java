@@ -19,12 +19,13 @@ package org.adullact.iparapheur.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+
+import org.adullact.iparapheur.utils.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Bureau {
 	 *
 	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson            passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest Bureau
+	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
@@ -93,6 +94,6 @@ public class Bureau {
 	}
 
 	@Override public boolean equals(Object o) {
-		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
+		return (o != null) && (o instanceof Bureau) && StringUtils.equals(mId, ((Bureau) o).getId());
 	}
 }

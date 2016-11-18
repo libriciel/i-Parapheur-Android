@@ -92,10 +92,23 @@ public class BureauTest {
 
 		// Checks
 
-		Assert.assertNotNull(correctArrayParsed);
 		Assert.assertNull(incorrectArrayParsed);
+		Assert.assertNotNull(correctArrayParsed);
+
 		Assert.assertEquals(correctArrayParsed.get(0).toString(), bureau01.toString());
+		Assert.assertEquals(correctArrayParsed.get(0).getId(), bureau01.getId());
+		Assert.assertEquals(correctArrayParsed.get(0).getTitle(), bureau01.getTitle());
+		Assert.assertEquals(correctArrayParsed.get(0).getLateCount(), bureau01.getLateCount());
+		Assert.assertEquals(correctArrayParsed.get(0).getTodoCount(), bureau01.getTodoCount());
+
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), bureau02.toString());
+		Assert.assertEquals(correctArrayParsed.get(1).getId(), bureau02.getId());
+		Assert.assertEquals(correctArrayParsed.get(1).getTitle(), bureau02.getTitle());
+		Assert.assertEquals(correctArrayParsed.get(1).getLateCount(), bureau02.getLateCount());
+		Assert.assertEquals(correctArrayParsed.get(1).getTodoCount(), bureau02.getTodoCount());
+
+		Assert.assertTrue(bureau01.equals(correctArrayParsed.get(0)));
+		Assert.assertTrue(bureau02.equals(correctArrayParsed.get(1)));
 	}
 
 }

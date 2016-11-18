@@ -313,4 +313,28 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
 	}
+
+	public static boolean equals(@Nullable CharSequence a, @Nullable CharSequence b) {
+
+		if (a == b)
+			return true;
+
+		int length;
+
+		if (a != null && b != null && (length = a.length()) == b.length()) {
+
+			if (a instanceof String && b instanceof String) {
+				return a.equals(b);
+			}
+			else {
+				for (int i = 0; i < length; i++)
+					if (a.charAt(i) != b.charAt(i))
+						return false;
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

@@ -55,8 +55,8 @@ public class ParapheurTypeTest {
 
 		// Checks
 
-		Assert.assertNotNull(correctArrayParsed);
 		Assert.assertNull(incorrectArrayParsed);
+		Assert.assertNotNull(correctArrayParsed);
 		Assert.assertEquals(correctArrayParsed.get(0).toString(), type01.toString());
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), type02.toString());
 	}
