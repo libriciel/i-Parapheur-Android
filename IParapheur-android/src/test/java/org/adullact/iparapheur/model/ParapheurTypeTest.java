@@ -37,8 +37,13 @@ public class ParapheurTypeTest extends TestCase {
 		// Parsed data
 
 		String incorrectArrayJsonString = "[[{]   \"id\": \"Value 01\" , \"sousTypes\": [\"Value 01-01\"  ]]";
-		String correctArrayJsonString = "[{\"id\": \"Value 01\", \"sousTypes\": [\"Value 01-01\", \"Value 01-02\"]}," //
-				+ "{\"id\": \"Value 02\",\"sousTypes\": [\"Value 02-01\", \"Value 02-02\", \"Value 02-03\"]}]";
+		String correctArrayJsonString = "[{" +
+				"    \"id\": \"Value 01 \\\"\\\\/%@&éè\"," +
+				"    \"sousTypes\": [\"Value 01-01\", \"Value 01-02\"]" +
+				"}, {" +
+				"    \"id\": \"Value 02 \\\"\\\\/%@&éè\"," +
+				"    \"sousTypes\": [\"Value 02-01\", \"Value 02-02\", \"Value 02-03\"]" +
+				"}]";
 
 		List<ParapheurType> incorrectArrayParsed = ParapheurType.fromJsonArray(incorrectArrayJsonString, sGson);
 		List<ParapheurType> correctArrayParsed = ParapheurType.fromJsonArray(correctArrayJsonString, sGson);
@@ -46,11 +51,11 @@ public class ParapheurTypeTest extends TestCase {
 		// Valid types
 
 		ParapheurType type01 = new ParapheurType();
-		type01.setName("Value 01");
+		type01.setName("Value 01 \"\\/%@&éè");
 		type01.setSubTypes(Arrays.asList("Value 01-01", "Value 01-02"));
 
 		ParapheurType type02 = new ParapheurType();
-		type02.setName("Value 02");
+		type02.setName("Value 02 \"\\/%@&éè");
 		type02.setSubTypes(Arrays.asList("Value 02-01", "Value 02-02", "Value 02-03"));
 
 		// Checks

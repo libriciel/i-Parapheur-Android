@@ -25,15 +25,12 @@ import com.google.gson.JsonObject;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
-import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.JsonExplorer;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -86,26 +83,6 @@ public class ModelMapper {
 		}
 
 		return new Circuit(circuit, null, true, false);
-	}
-
-	public ArrayList<Bureau> getBureaux(RequestResponse response) {
-		ArrayList<Bureau> bureaux = new ArrayList<Bureau>();
-		if (response.getResponse() != null) {
-			JSONArray array = response.getResponse().optJSONArray("bureaux");
-			if (array != null) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject bureau = array.optJSONObject(i);
-					if (bureau != null) {
-						String bureauRef = bureau.optString("nodeRef");
-						if (bureauRef.contains("workspace://SpacesStore/")) {
-							bureauRef = bureauRef.substring("workspace://SpacesStore/".length());
-						}
-						bureaux.add(new Bureau(bureauRef, bureau.optString("name")));
-					}
-				}
-			}
-		}
-		return bureaux;
 	}
 
 	public @NonNull SignInfo getSignInfo(RequestResponse response) {

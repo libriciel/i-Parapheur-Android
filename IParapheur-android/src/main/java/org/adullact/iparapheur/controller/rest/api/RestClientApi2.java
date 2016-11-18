@@ -17,7 +17,6 @@
  */
 package org.adullact.iparapheur.controller.rest.api;
 
-import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.utils.IParapheurException;
 
@@ -37,11 +36,7 @@ import java.util.ArrayList;
 public class RestClientApi2 extends RestClientApi1 {
 
 	@Override public ArrayList<Bureau> getBureaux() throws IParapheurException {
-		String url = buildUrl(ACTION_GET_BUREAUX);
-		//String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
-		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
-		//return ModelMapper.getBureaux(RESTUtils.post(url, body));
-		return modelMapper.getBureaux(RESTUtils.get(url));
+		return null;
 	}
 
 }

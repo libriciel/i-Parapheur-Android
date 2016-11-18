@@ -17,27 +17,45 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
-public class Bureau implements Parcelable {
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
-	public static Parcelable.Creator<Bureau> CREATOR = new Parcelable.Creator<Bureau>() {
-		public Bureau createFromParcel(Parcel source) {
-			return new Bureau(source);
+
+public class Bureau {
+
+	@SerializedName(value = "id", alternate = {"nodeRef"}) private String mId;
+	@SerializedName("name") private String mTitle;
+	@SerializedName("a-traiter") private int mTodoCount;
+	@SerializedName("en-retard") private int mLateCount;
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest Bureau
+	 */
+	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
+
+		try {
+			return gson.fromJson(jsonArrayString, typologyType);
 		}
-
-		public Bureau[] newArray(int size) {
-			return new Bureau[size];
+		catch (JsonSyntaxException e) {
+			return null;
 		}
-	};
-
-	private String mId;
-	private String mTitle;
-	private int mTodoCount;
-	private int mLateCount;
+	}
 
 	public Bureau(String id, String title) {
 		this(id, title, 0, 0);
@@ -54,12 +72,7 @@ public class Bureau implements Parcelable {
 		mLateCount = late;
 	}
 
-	private Bureau(Parcel in) {
-		mId = in.readString();
-		mTitle = in.readString();
-		mTodoCount = in.readInt();
-		mLateCount = in.readInt();
-	}
+	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
 		return mId;
@@ -77,26 +90,13 @@ public class Bureau implements Parcelable {
 		return mLateCount;
 	}
 
+	// </editor-fold desc="Setters / Getters">
+
 	@Override public String toString() {
-		return mTitle;
+		return "{Bureau id=" + mId + " title=" + mTitle + " todo=" + mTodoCount + " late=" + mLateCount + "}";
 	}
 
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
 	}
-
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mId);
-		dest.writeString(mTitle);
-		dest.writeInt(mTodoCount);
-		dest.writeInt(mLateCount);
-	}
-
-	// </editor-fold desc="Parcelable">
 }

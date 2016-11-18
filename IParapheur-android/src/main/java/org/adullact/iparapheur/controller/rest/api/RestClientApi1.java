@@ -24,7 +24,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
@@ -86,9 +85,7 @@ public class RestClientApi1 extends RestClientApi {
 	protected ModelMapper modelMapper = new ModelMapper();
 
 	@Override public List<Bureau> getBureaux() throws IParapheurException {
-		String url = buildUrl(ACTION_GET_BUREAUX);
-		String body = "{\"username\": \"" + MyAccounts.INSTANCE.getSelectedAccount().getLogin() + "\"}";
-		return modelMapper.getBureaux(RESTUtils.post(url, body));
+		return null;
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
@@ -162,7 +159,16 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
+					)
+			);
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations", new JSONArray().put(new JSONObject().put("author",
 																																	 annotation.getAuthor()
@@ -197,7 +203,16 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
+					)
+			);
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation", new JSONObject().put("uuid", annotation.getUuid()).put("rect",
 																																				  rect

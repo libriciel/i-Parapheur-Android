@@ -28,7 +28,6 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
-import org.adullact.iparapheur.controller.rest.mapper.ModelMapper3;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
@@ -96,7 +95,7 @@ public class RestClientApi3 extends RestClientApi {
 	// private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
 
 	private Gson mGson = CollectionUtils.buildGsonWithLongToDate();
-	protected ModelMapper modelMapper = new ModelMapper3();
+	private ModelMapper modelMapper = new ModelMapper();
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
 
@@ -142,7 +141,11 @@ public class RestClientApi3 extends RestClientApi {
 	}
 
 	@Override public List<Bureau> getBureaux() throws IParapheurException {
-		return modelMapper.getBureaux(RESTUtils.get(buildUrl(RESOURCE_BUREAUX)));
+
+		String url = buildUrl(RESOURCE_BUREAUX);
+		RequestResponse result = RESTUtils.get(url);
+
+		return Bureau.fromJsonArray(result.getResponseArray().toString(), mGson);
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {

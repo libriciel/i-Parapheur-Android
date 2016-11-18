@@ -238,7 +238,7 @@ public class PreferencesCertificatesFragment extends Fragment {
 		 * @param to       The views that should display column in the "from" parameter. These should all be
 		 *                 TextViews. The first N views in this list are given the values of the first N columns
 		 */
-		/* package */ CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+		CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
 			super(context, data, resource, from, to);
 			mErrorColor = ContextCompat.getColor(context, R.color.red_500);
 			mRegularColor = ContextCompat.getColor(context, R.color.text_black_secondary);
