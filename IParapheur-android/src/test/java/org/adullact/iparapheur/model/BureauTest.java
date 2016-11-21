@@ -88,7 +88,7 @@ public class BureauTest {
 		// Valid types
 
 		Bureau bureau01 = new Bureau("id_01", "Name 01 \"/%@&éè", 10, 5);
-		Bureau bureau02 = new Bureau("id_02", "Name 02 \"/%@&éè", 0, 0);
+		Bureau bureau02 = new Bureau("workspace://SpacesStore/id_02", "Name 02 \"/%@&éè", 0, 0);
 
 		// Checks
 

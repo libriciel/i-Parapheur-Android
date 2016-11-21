@@ -17,11 +17,20 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.utils.StringUtils;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class EtapeCircuit {
@@ -34,8 +43,6 @@ public class EtapeCircuit {
 	@SerializedName("actionDemandee") private Action mAction;
 	@SerializedName("annotPub") private String mPublicAnnotation;
 
-	// <editor-fold desc="Setters / Getters">
-
 	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
 						String publicAnnotation) {
 
@@ -47,6 +54,36 @@ public class EtapeCircuit {
 		mAction = (action != null) ? Action.valueOf(action) : Action.VISA;
 		mPublicAnnotation = publicAnnotation;
 	}
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest
+	 */
+	public static @Nullable List<EtapeCircuit> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		Type typologyType = new TypeToken<ArrayList<EtapeCircuit>>() {}.getType();
+
+		try {
+			List<EtapeCircuit> etapeCircuitList = gson.fromJson(jsonArrayString, typologyType);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (EtapeCircuit etapeCircuit : etapeCircuitList)
+				if (etapeCircuit.getAction() == null)
+					etapeCircuit.setAction(Action.VISA);
+
+			return etapeCircuitList;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
+	}
+
+	// <editor-fold desc="Setters / Getters">
 
 	public Date getDateValidation() {
 		return mDateValidation;

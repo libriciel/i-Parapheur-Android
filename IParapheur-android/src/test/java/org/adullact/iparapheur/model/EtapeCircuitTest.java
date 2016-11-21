@@ -30,21 +30,20 @@ import java.util.Date;
 import java.util.List;
 
 
-public class CircuitTest {
+public class EtapeCircuitTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
 
-	@Test public void fromJsonObject() throws Exception {
+	@Test public void fromJsonArray() throws Exception {
 
 		// Parsed data
 
 		String incorrectArrayJsonString = "[[{]   \"id\": \"Value 01\" , \"collectivite\": [\"Value 01-01\"  ]]";
-		String correctArrayObjectString = "{" +
-				"    \"etapes\": [{" +
+		String correctArrayObjectString = "[{" +
 				"        \"approved\": true," +
 				"        \"signataire\": \"Signataire 01\"," +
 				"        \"rejected\": false," +
-				"        \"dateValidation\": 1478792085680," +
+				"        \"dateValidation\": 1478792085000," +
 				"        \"annotPub\": \"Annotation publique 01 \\\"\\/%@&éè\"," +
 				"        \"parapheurName\": \"Bureau 01\"," +
 				"        \"delegueName\": \"Delegue 01\"," +
@@ -62,21 +61,16 @@ public class CircuitTest {
 				"        \"id\": \"id_02\"," +
 				"        \"isCurrent\": false," +
 				"        \"signatureEtape\": null" +
-				"    }]," +
-				"    \"annotPriv\": \"Annotation privée \\\"\\/%@&éè\"," +
-				"    \"isDigitalSignatureMandatory\": true," +
-				"    \"hasSelectionScript\": false," +
-				"    \"sigFormat\": \"PKCS#7\\\\/single\"" +
-				"}";
+				"    }]";
 
-		Circuit incorrectObjectParsed = Circuit.fromJsonObject(incorrectArrayJsonString, sGson);
-		Circuit correctObjectParsed = Circuit.fromJsonObject(correctArrayObjectString, sGson);
+		List<EtapeCircuit> incorrectObjectParsed = EtapeCircuit.fromJsonArray(incorrectArrayJsonString, sGson);
+		List<EtapeCircuit> correctObjectParsed = EtapeCircuit.fromJsonArray(correctArrayObjectString, sGson);
 
 		// Valid types
 
-		List<EtapeCircuit> etapes01 = new ArrayList<>();
-		etapes01.add(new EtapeCircuit(
-				StringUtils.serializeToIso8601Date(new Date(1478792085680L)),
+		List<EtapeCircuit> etapesList01 = new ArrayList<>();
+		etapesList01.add(new EtapeCircuit(
+				StringUtils.serializeToIso8601Date(new Date(1478792085000L)),
 				true,
 				false,
 				"Bureau 01",
@@ -84,19 +78,27 @@ public class CircuitTest {
 				Action.SIGNATURE.toString(),
 				"Annotation publique 01 \"/%@&éè"
 		));
-		etapes01.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
-
-		Circuit circuit01 = new Circuit(etapes01, "PKCS#7\\/single", true);
+		etapesList01.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
 
 		// Checks
 
 		Assert.assertNull(incorrectObjectParsed);
 		Assert.assertNotNull(correctObjectParsed);
 
-		Assert.assertEquals(correctObjectParsed.toString(), circuit01.toString());
-		Assert.assertEquals(correctObjectParsed.getEtapeCircuitList().toString(), circuit01.getEtapeCircuitList().toString());
-		Assert.assertEquals(correctObjectParsed.getSigFormat(), circuit01.getSigFormat());
-		Assert.assertEquals(correctObjectParsed.isDigitalSignatureMandatory(), circuit01.isDigitalSignatureMandatory());
-	}
+		Assert.assertEquals(correctObjectParsed.get(0).toString(), etapesList01.get(0).toString());
+		Assert.assertEquals(correctObjectParsed.get(0).getAction(), etapesList01.get(0).getAction());
+		Assert.assertEquals(correctObjectParsed.get(0).getBureauName(), etapesList01.get(0).getBureauName());
+		Assert.assertEquals(correctObjectParsed.get(0).getSignataire(), etapesList01.get(0).getSignataire());
+		Assert.assertEquals(correctObjectParsed.get(0).isApproved(), etapesList01.get(0).isApproved());
+		Assert.assertEquals(correctObjectParsed.get(0).isRejected(), etapesList01.get(0).isRejected());
+		Assert.assertEquals(correctObjectParsed.get(0).getDateValidation().getTime(), etapesList01.get(0).getDateValidation().getTime());
 
+		Assert.assertEquals(correctObjectParsed.get(1).toString(), etapesList01.get(1).toString());
+		Assert.assertEquals(correctObjectParsed.get(1).getAction(), etapesList01.get(1).getAction());
+		Assert.assertEquals(correctObjectParsed.get(1).getBureauName(), etapesList01.get(1).getBureauName());
+		Assert.assertEquals(correctObjectParsed.get(1).getSignataire(), etapesList01.get(1).getSignataire());
+		Assert.assertEquals(correctObjectParsed.get(1).isApproved(), etapesList01.get(1).isApproved());
+		Assert.assertEquals(correctObjectParsed.get(1).isRejected(), etapesList01.get(1).isRejected());
+		Assert.assertNull(correctObjectParsed.get(1).getDateValidation());
+	}
 }
