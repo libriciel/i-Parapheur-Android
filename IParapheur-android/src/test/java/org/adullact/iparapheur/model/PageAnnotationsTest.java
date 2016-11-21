@@ -49,7 +49,7 @@ public class PageAnnotationsTest {
 		Mockito.when(mockedRect04.height()).thenReturn(20F);
 		Mockito.when(mockedRect04.width()).thenReturn(-20F);
 
-		// Build object, adding in random order
+		// Build objects
 
 		PageAnnotations pageAnnotationsRandomOrder = new PageAnnotations();
 		pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect03, "03", 0));

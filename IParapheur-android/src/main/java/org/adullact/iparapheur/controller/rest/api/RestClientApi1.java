@@ -138,7 +138,7 @@ public class RestClientApi1 extends RestClientApi {
 	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
 		String url = buildUrl(ACTION_GET_CIRCUIT);
 		String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"}";
-		return modelMapper.getCircuit(RESTUtils.post(url, body));
+		return null;
 	}
 
 	@Override public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
@@ -159,16 +159,7 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations", new JSONArray().put(new JSONObject().put("author",
 																																	 annotation.getAuthor()
@@ -203,16 +194,7 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation", new JSONObject().put("uuid", annotation.getUuid()).put("rect",
 																																				  rect

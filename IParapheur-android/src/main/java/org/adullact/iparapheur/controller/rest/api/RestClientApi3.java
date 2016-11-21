@@ -18,11 +18,11 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
@@ -47,9 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -127,17 +125,9 @@ public class RestClientApi3 extends RestClientApi {
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		String response = RESTUtils.get(url).getResponseArray().toString();
 
-		// Parse
+		Log.d("Adrien", "Dossiers : " + response);
 
-		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
-		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonArray(),
-																							   listDossierType
-		);
-
-		for (Dossier dossier : dossiersParsed)
-			Dossier.fixActionsDemandees(dossier);
-
-		return dossiersParsed;
+		return Dossier.fromJsonArray(response, mGson);
 	}
 
 	@Override public List<Bureau> getBureaux() throws IParapheurException {

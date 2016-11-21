@@ -23,32 +23,18 @@ import android.util.SparseArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
-import org.adullact.iparapheur.model.Circuit;
-import org.adullact.iparapheur.model.EtapeCircuit;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.JsonExplorer;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 
 public class ModelMapper {
 
-	protected static String DOSSIER_ID = "id";
-	protected static String DOSSIER_TITLE = "title";
-	protected static String DOSSIER_TYPE = "type";
-	protected static String DOSSIER_SUBTYPE = "sousType";
-	protected static String DOSSIER_ACTION_DEMANDEE = "actionDemandee";
-	protected static String DOSSIER_EMISSION_DATE = "dateEmission";
-	protected static String DOSSIER_DATE_LIMITE = "dateLimite";
-	protected static String DOSSIER_IS_SIGN_PAPIER = "isSignPapier";
-	protected static String DOSSIER_DOCUMENTS = "documents";
 	protected static String DOSSIER_CIRCUIT = "circuit";
-	protected static String DOSSIER_ACTIONS = "actions";
 
 	protected static String CIRCUIT_ETAPES_DATE_VALIDATION = "dateValidation";
 	protected static String CIRCUIT_ETAPES_APPROVED = "approved";
@@ -60,30 +46,6 @@ public class ModelMapper {
 
 	protected static String SIGN_INFO_SIGNATURE_INFORMATIONS = "signatureInformations";
 	protected static String SIGN_INFO_HASH = "hash";
-
-	public @NonNull Circuit getCircuit(@NonNull RequestResponse response) {
-
-		ArrayList<EtapeCircuit> circuit = new ArrayList<>();
-
-		JsonExplorer jsonExplorer = new JsonExplorer(response.getResponse());
-		for (int index = 0; index < jsonExplorer.findArray(DOSSIER_CIRCUIT).getCurrentArraySize(); index++) {
-
-			EtapeCircuit etapeCircuit = new EtapeCircuit(jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_DATE_VALIDATION),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_APPROVED, false),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optBoolean(CIRCUIT_ETAPES_REJECTED, false),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PARAPHEUR_NAME, ""),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_SIGNATAIRE, ""),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_ACTION_DEMANDEE,
-																													   Action.VISA.toString()
-														 ),
-														 jsonExplorer.findArray(DOSSIER_CIRCUIT).find(index).optString(CIRCUIT_ETAPES_PUBLIC_ANNOTATIONS, "")
-			);
-
-			circuit.add(etapeCircuit);
-		}
-
-		return new Circuit(circuit, null, true);
-	}
 
 	public @NonNull SignInfo getSignInfo(RequestResponse response) {
 		SignInfo result = new SignInfo();

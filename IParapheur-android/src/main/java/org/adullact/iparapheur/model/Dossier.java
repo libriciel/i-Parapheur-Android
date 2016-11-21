@@ -21,8 +21,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,26 +47,6 @@ public class Dossier {
 	@SerializedName("actions") private Set<Action> mActions;
 	@SerializedName("isSignPapier") private boolean mIsSignPapier;
 	@SerializedName("documents") private List<Document> mDocumentList = new ArrayList<>();
-	//@SerializedName("total") private int mTotal;
-	//@SerializedName("protocol", alternate = {"protocole"}) private String mProtocol;
-	//@SerializedName("isSent") private boolean mIsSent;
-	//@SerializedName("creator") private String mCreator;
-	//@SerializedName("bureauName") private String mBureauName;
-	//@SerializedName("pendingFile") private int mPendingFile;
-	//@SerializedName("banetteName") private String mBanetteName;
-	//@SerializedName("skipped") private int mSkipped;
-	//@SerializedName("isXemEnabled") private boolean mIsXemEnabled;
-	//@SerializedName("hasRead") private boolean mHasRead;
-	//@SerializedName("readingMandatory") private boolean mIsReadingMandatory;
-	//@SerializedName("isRead") private boolean mIsRead;
-	//@SerializedName("locked") private boolean mIsLocked;
-	//@SerializedName("includeAnnexes") private boolean mInclueAnnexes;
-	//@SerializedName("nomTdT") private String mNomTDT;
-	//@SerializedName("visibility") private String mVisibility;
-	//@SerializedName("status") private String mStatus;
-	//@SerializedName("canAdd") private boolean mCanAdd;
-	//@SerializedName("metadatas") private HashMap<String, Object> mMetadataMap;
-	//@SerializedName("xPathSignature") private String mSignatureXPath;
 	private Circuit mCircuit;
 
 	public Dossier() {}
@@ -80,6 +64,33 @@ public class Dossier {
 		mIsSignPapier = isSignPapier;
 	}
 
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest
+	 */
+	public static @Nullable List<Dossier> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+
+		try {
+			ArrayList<Dossier> dossiersParsed = gson.fromJson(jsonArrayString, listDossierType);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (Dossier dossier : dossiersParsed)
+				Dossier.fixActionsDemandees(dossier);
+
+			return dossiersParsed;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
+	}
+
 	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
@@ -92,6 +103,10 @@ public class Dossier {
 
 	public Set<Action> getActions() {
 		return mActions;
+	}
+
+	public void setActions(@NonNull Set<Action> actions) {
+		mActions = actions;
 	}
 
 	public String getType() {
@@ -114,12 +129,24 @@ public class Dossier {
 		return mActionDemandee;
 	}
 
+	public void setActionDemandee(@NonNull Action action) {
+		mActionDemandee = action;
+	}
+
 	public boolean isSignPapier() {
 		return mIsSignPapier;
 	}
 
 	public List<Document> getDocumentList() {
 		return mDocumentList;
+	}
+
+	public Date getDateLimite() {
+		return mDateLimite;
+	}
+
+	public Date getDateCreation() {
+		return mDateLimite;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -214,6 +241,22 @@ public class Dossier {
 	 */
 	public static void fixActionsDemandees(@NonNull Dossier dossier) {
 
+		// Default init
+		// (Useful after Gson parsing)
+
+		if (dossier.getActions() == null)
+			dossier.setActions(new HashSet<Action>());
+
+		if (dossier.getActionDemandee() == null)
+			dossier.setActionDemandee(Action.VISA);
+
+		// Yep, sometimes it happens
+
+		if (!dossier.getActions().contains(dossier.getActionDemandee()))
+			dossier.getActions().add(dossier.getActionDemandee());
+
+		// Fixing signature logic
+
 		if (dossier.getActionDemandee() == Action.SIGNATURE) {
 			dossier.getActions().remove(Action.VISA);
 			dossier.getActions().add(Action.SIGNATURE);
@@ -275,8 +318,8 @@ public class Dossier {
 
 	@Override public String toString() {
 		return "{Dossier id=" + mId + " name=" + mName + " actionsDemandees=" + mActionDemandee + " type=" + mType + " subType=" + mSousType     //
-				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " docs=" + mDocumentList + " actions=" + mActions                //
-				+ " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
+				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " docs=" + mDocumentList                                         //
+				+ " actions=" + (mActions == null ? "null" : mActions.size()) + " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
 	}
 
 	@Override public int hashCode() {

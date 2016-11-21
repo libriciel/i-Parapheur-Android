@@ -20,7 +20,7 @@ import android.support.annotation.Nullable;
 
 
 /**
- * Copy-pasted Android Utils, for Mockito/PowerMock.
+ * Copy-pasted Android Utils, for PowerMock.
  */
 @SuppressWarnings("RedundantIfStatement")
 public class TextUtils {
