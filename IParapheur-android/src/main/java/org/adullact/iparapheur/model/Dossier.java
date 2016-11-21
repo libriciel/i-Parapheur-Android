@@ -17,7 +17,6 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -79,26 +78,6 @@ public class Dossier {
 		mDateCreation = dateCreation;
 		mDateLimite = dateLimite;
 		mIsSignPapier = isSignPapier;
-	}
-
-	private Dossier(Parcel in) {
-		mId = in.readString();
-		mName = in.readString();
-		int tmpActionDemandee = in.readInt();
-		mActionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
-
-		List<Action> actions = new ArrayList<>();
-		in.readTypedList(actions, Action.CREATOR);
-		mActions = new HashSet<>(actions);
-
-		mType = in.readString();
-		mSousType = in.readString();
-		long tmpDateCreation = in.readLong();
-		mDateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
-		long tmpDateLimite = in.readLong();
-		mDateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-		mCircuit = in.readParcelable(Circuit.class.getClassLoader());
-		mIsSignPapier = in.readByte() != 0;
 	}
 
 	// <editor-fold desc="Setters / Getters">

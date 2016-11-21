@@ -30,11 +30,9 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,12 +47,6 @@ public class CollectionUtils {
 			return map.get(key);
 		else
 			return defaultValue;
-	}
-
-	@SafeVarargs public static <T> List<T> asList(T... objects) {
-		ArrayList<T> result = new ArrayList<>();
-		Collections.addAll(result, objects);
-		return result;
 	}
 
 	@SafeVarargs public static <T> Set<T> asSet(T... objects) {

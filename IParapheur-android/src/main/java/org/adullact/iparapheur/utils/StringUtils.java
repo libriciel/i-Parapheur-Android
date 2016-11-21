@@ -56,6 +56,46 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
+	// <editor-fold desc="TextUtils">
+
+	/**
+	 * Returns true every {@link String} given is not null or empty.
+	 *
+	 * @param strings a list of String instances.
+	 */
+	public static boolean areNotEmpty(@Nullable String... strings) {
+
+		if ((strings == null) || (strings.length == 0))
+			return false;
+
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return false;
+
+		return true;
+	}
+
+	/**
+	 * Helper functions to query a strings end portion. The comparison is case insensitive.
+	 *
+	 * @param base the base string.
+	 * @param end  the ending text.
+	 * @return true, if the string ends with the given ending text.
+	 */
+	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+
+		// Default case
+
+		if ((base == null) || (end == null))
+			return false;
+
+		//
+
+		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
+	}
+
+	// </editor-fold desc="TextUtils">
+
 	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
 
 		return new Comparator<Account>() {
@@ -138,18 +178,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
 		return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
-	}
-
-	public static boolean areNotEmpty(@Nullable String... strings) {
-
-		if ((strings == null) || (strings.length == 0))
-			return false;
-
-		for (String string : strings)
-			if (TextUtils.isEmpty(string))
-				return false;
-
-		return true;
 	}
 
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
@@ -295,46 +323,4 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		return null;
 	}
 
-	/**
-	 * Helper functions to query a strings end portion. The comparison is case insensitive.
-	 *
-	 * @param base the base string.
-	 * @param end  the ending text.
-	 * @return true, if the string ends with the given ending text.
-	 */
-	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
-
-		// Default case
-
-		if ((base == null) || (end == null))
-			return false;
-
-		//
-
-		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
-	}
-
-	public static boolean equals(@Nullable CharSequence a, @Nullable CharSequence b) {
-
-		if (a == b)
-			return true;
-
-		int length;
-
-		if (a != null && b != null && (length = a.length()) == b.length()) {
-
-			if (a instanceof String && b instanceof String) {
-				return a.equals(b);
-			}
-			else {
-				for (int i = 0; i < length; i++)
-					if (a.charAt(i) != b.charAt(i))
-						return false;
-
-				return true;
-			}
-		}
-
-		return false;
-	}
 }

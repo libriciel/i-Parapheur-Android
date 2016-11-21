@@ -140,7 +140,6 @@ public class Account implements Serializable {
 	// </editor-fold desc="Getters / Setters">
 
 	/**
-	 *
 	 * @return
 	 * @coveredInInstrumentedUnitTest
 	 */

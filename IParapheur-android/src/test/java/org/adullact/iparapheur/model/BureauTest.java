@@ -17,19 +17,51 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 
 import junit.framework.Assert;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
 
+import static org.mockito.Matchers.any;
 
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(TextUtils.class)
 public class BureauTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+
+	@Before public void setUp() throws Exception {
+		PowerMockito.mockStatic(TextUtils.class);
+
+		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				CharSequence b = (CharSequence) invocation.getArguments()[1];
+				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
+			}
+		});
+
+		PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				return org.adullact.iparapheur.mock.TextUtils.isEmpty(a);
+			}
+		});
+	}
 
 	@Test public void fromJsonArray() throws Exception {
 

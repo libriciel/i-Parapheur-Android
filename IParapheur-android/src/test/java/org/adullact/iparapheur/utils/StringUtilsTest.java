@@ -17,15 +17,70 @@
  */
 package org.adullact.iparapheur.utils;
 
+import android.text.TextUtils;
+
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.mockito.Matchers.any;
 
 
-/**
- * @see org.adullact.iparapheur.utils.StringUtils
- */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(TextUtils.class)
 public class StringUtilsTest {
+
+	@Before public void setUp() throws Exception {
+		PowerMockito.mockStatic(TextUtils.class);
+
+		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				CharSequence b = (CharSequence) invocation.getArguments()[1];
+				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
+			}
+		});
+
+		PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				return org.adullact.iparapheur.mock.TextUtils.isEmpty(a);
+			}
+		});
+	}
+
+	// <editor-fold desc="TextUtils">
+
+	@Test public void areNotEmpty() throws Exception {
+
+		Assert.assertTrue(StringUtils.areNotEmpty("Test"));
+
+		Assert.assertFalse(StringUtils.areNotEmpty(null, "Test"));
+		Assert.assertFalse(StringUtils.areNotEmpty("", "Test"));
+		Assert.assertFalse(StringUtils.areNotEmpty(""));
+		Assert.assertFalse(StringUtils.areNotEmpty(null, ""));
+	}
+
+	@Test public void endsWithIgnoreCase() throws Exception {
+
+		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "test 123"));
+		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "123"));
+		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", ""));
+
+		Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", "test 1234"));
+		Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", "2"));
+		Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", null));
+		Assert.assertFalse(StringUtils.endsWithIgnoreCase(null, null));
+	}
+
+	// </editor-fold desc="TextUtils">
 
 	@Test public void fixIssuerDnX500NameStringOrder() throws Exception {
 

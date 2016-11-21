@@ -17,8 +17,6 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -27,7 +25,7 @@ import android.support.annotation.StringRes;
 import org.adullact.iparapheur.R;
 
 
-public enum Action implements Parcelable {
+public enum Action {
 
 	// TODO : all possible actions (secretariat, supprimer, ...)
 	VISA(R.string.action_viser, R.id.action_visa, R.drawable.ic_visa_24dp),
@@ -54,17 +52,6 @@ public enum Action implements Parcelable {
 	RAZ,
 	EDITION,
 	ENCHAINER_CIRCUIT;
-
-	public static final Creator<Action> CREATOR = new Creator<Action>() {
-
-		@Override public Action createFromParcel(final Parcel source) {
-			return Action.values()[source.readInt()];
-		}
-
-		@Override public Action[] newArray(final int size) {
-			return new Action[size];
-		}
-	};
 
 	private final int mIcon;
 	private final int mTitle;
@@ -102,13 +89,4 @@ public enum Action implements Parcelable {
 
 		return null;
 	}
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(ordinal());
-	}
-
 }
