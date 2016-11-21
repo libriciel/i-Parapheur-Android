@@ -33,8 +33,8 @@ public class PageAnnotations {
 
 		@Override public int compare(Annotation lhs, Annotation rhs) {
 
-			int lhsArea = Math.round(lhs.getRect().width() * lhs.getRect().height());
-			int rhsArea = Math.round(rhs.getRect().width() * rhs.getRect().height());
+			int lhsArea = Math.round(Math.abs(lhs.getRect().width()) * Math.abs(lhs.getRect().height()));
+			int rhsArea = Math.round(Math.abs(rhs.getRect().width()) * Math.abs(rhs.getRect().height()));
 
 			return (rhsArea - lhsArea);
 		}

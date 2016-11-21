@@ -217,6 +217,6 @@ public class Annotation implements Parcelable {
 	// </editor-fold desc="Parcelable">
 
 	@Override public String toString() {
-		return "{Annotation uuid:" + uuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + "}";
+		return "{Annotation uuid:" + uuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + " text=" + text + "}";
 	}
 }
