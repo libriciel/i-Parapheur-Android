@@ -21,10 +21,6 @@
     <string name="about_library_license_spongy_copyright">Copyright © 2000–2015 The Legion of the Bouncy Castle Inc.</string>
     <string name="about_library_license_spongy_license">Licensed under the terms of the MIT Licence (the "Software").</string>
 
-    <string name="about_library_license_fab_title">FloatingActionButton</string>
-    <string name="about_library_license_fab_copyright">Copyright © 2014 Jerzy Chalupski</string>
-    <string name="about_library_license_fab_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
-
     <string name="about_library_license_sun_title">Zip-Signer / Android-sun-jarsign-support</string>
     <string name="about_library_license_sun_copyright">https://code.google.com/p/zip-signer/</string>
     <string name="about_library_license_sun_license">Licensed under the terms of the General Public License (GPL), version 2.</string>
@@ -40,5 +36,13 @@
     <string name="about_library_license_additional_icons_title">Templarian Material Icons</string>
     <string name="about_library_license_additional_icons_copyright">© Austin Andrews @Templarian</string>
     <string name="about_library_license_additional_icons_license">Licensed under the SIL Open Font Licence</string>
+
+    <string name="about_library_license_mockito_title">Mockito</string>
+    <string name="about_library_license_mockito_copyright">Copyright © 2007 Mockito contributors</string>
+    <string name="about_library_license_mockito_license">Licensed under the terms of the MIT Licence (the "Software").</string>
+
+    <string name="about_library_license_powermock_title">PowerMock</string>
+    <string name="about_library_license_powermock_copyright">https://github.com/jayway/powermock</string>
+    <string name="about_library_license_powermock_license">Licensed under the Apache License, Version 2.0 (the "License")</string>
 
 </resources>

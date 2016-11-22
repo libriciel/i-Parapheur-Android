@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -124,8 +123,6 @@ public class RestClientApi3 extends RestClientApi {
 
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		String response = RESTUtils.get(url).getResponseArray().toString();
-
-		Log.d("Adrien", "Dossiers : " + response);
 
 		return Dossier.fromJsonArray(response, mGson);
 	}
