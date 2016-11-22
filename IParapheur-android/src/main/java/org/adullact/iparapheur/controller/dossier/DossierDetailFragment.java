@@ -227,11 +227,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 
-		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+		Toolbar actionsToolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
 
-		if (actions_toolbar != null) {
-			actions_toolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
-			actions_toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+		if (actionsToolbar != null) {
+			actionsToolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
+			actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 				@Override public boolean onMenuItemClick(MenuItem item) {
 					return onOptionsItemSelected(item);
 				}
@@ -246,7 +246,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// Info item
 
 		MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
-		infoItem.setVisible((mDossier != null) && mDossier.isDetailsAvailable());
+		infoItem.setVisible((mDossier != null) && Dossier.areDetailsAvailable(mDossier));
 
 		// Document selector
 
@@ -698,7 +698,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			if (DeviceUtils.isDebugOffline()) {
 				mDossier.getDocumentList().add(new Document(UUID.randomUUID().toString(), "document par défaut", -1, false, true));
 			}
-			else if (!mDossier.isDetailsAvailable()) {
+			else if (!Dossier.areDetailsAvailable(mDossier)) {
 				showSpinnerOnUiThread();
 
 				try {

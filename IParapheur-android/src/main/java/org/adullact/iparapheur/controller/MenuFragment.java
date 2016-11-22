@@ -717,7 +717,7 @@ public class MenuFragment extends Fragment {
 
 			View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
 
-			if (mDossierList.get(position).hasActions()) {
+			if (Dossier.haveActions(mDossierList.get(position))) {
 				checkableLayout.setVisibility(View.VISIBLE);
 				checkableLayout.setTag(position);
 				checkableLayout.setOnClickListener(new View.OnClickListener() {

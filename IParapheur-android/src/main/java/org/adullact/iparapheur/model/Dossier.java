@@ -155,15 +155,29 @@ public class Dossier {
 
 	// </editor-fold desc="Setters / Getters">
 
-	public boolean isDetailsAvailable() {
-		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mDocumentList.isEmpty());
-	}
-
-	public boolean hasActions() {
-		return ((mActions != null) && (mActions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
-	}
-
 	// <editor-fold desc="Static utils">
+
+	public static boolean haveActions(@NonNull Dossier dossier) {
+
+		HashSet<Action> actionsAvailable = new HashSet<>();
+
+		if (dossier.getActions() != null)
+			actionsAvailable.addAll(dossier.getActions());
+
+		actionsAvailable.remove(Action.EMAIL);
+		actionsAvailable.remove(Action.JOURNAL);
+		actionsAvailable.remove(Action.ENREGISTRER);
+
+		return actionsAvailable.size() > 0;
+	}
+
+	public static boolean areDetailsAvailable(@NonNull Dossier dossier) {
+
+		return (dossier.getCircuit() != null)                                     //
+				&& (dossier.getCircuit().getEtapeCircuitList() != null)           //
+				&& (!dossier.getCircuit().getEtapeCircuitList().isEmpty())        //
+				&& (!dossier.getDocumentList().isEmpty());
+	}
 
 	public static @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
 
@@ -179,6 +193,8 @@ public class Dossier {
 				if (TextUtils.equals(document.getId(), documentId))
 					return document;
 
+		// Else, finding any document
+
 		return dossier.getDocumentList().isEmpty() ? null : dossier.getDocumentList().get(0);
 	}
 
@@ -186,6 +202,13 @@ public class Dossier {
 	 * Returns the main negative {@link Action} available, by coherent priority.
 	 */
 	public static @Nullable Action getPositiveAction(@NonNull Dossier dossier) {
+
+		// Default case
+
+		if (dossier.getActions() == null)
+			return null;
+
+		// Finding Action
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
 		actions.retainAll(dossier.getActions());
@@ -215,6 +238,13 @@ public class Dossier {
 	 * Returns the main negative {@link Action} available, by coherent priority.
 	 */
 	public static @Nullable Action getNegativeAction(@NonNull Dossier dossier) {
+
+		// Default case
+
+		if (dossier.getActions() == null)
+			return null;
+
+		// Finding Action
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
 		actions.retainAll(dossier.getActions());
@@ -318,6 +348,6 @@ public class Dossier {
 	}
 
 	@Override public int hashCode() {
-		return mId.hashCode();
+		return (mId != null) ? mId.hashCode() : -1;
 	}
 }

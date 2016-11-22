@@ -38,6 +38,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
+import static org.adullact.iparapheur.model.Action.EMAIL;
+import static org.adullact.iparapheur.model.Action.ENREGISTRER;
+import static org.adullact.iparapheur.model.Action.JOURNAL;
+import static org.adullact.iparapheur.model.Action.MAILSEC;
+import static org.adullact.iparapheur.model.Action.REJET;
+import static org.adullact.iparapheur.model.Action.SIGNATURE;
+import static org.adullact.iparapheur.model.Action.TDT;
+import static org.adullact.iparapheur.model.Action.TDT_ACTES;
+import static org.adullact.iparapheur.model.Action.TDT_HELIOS;
 import static org.adullact.iparapheur.model.Action.VISA;
 import static org.mockito.Matchers.any;
 
@@ -106,27 +116,18 @@ public class DossierTest {
 		// Valid types
 
 		Set<Action> dossier01ActionsSet = CollectionUtils.asSet(Action.ENREGISTRER,
-																Action.EMAIL,
-																Action.JOURNAL,
+																EMAIL,
+																JOURNAL,
 																Action.SECRETARIAT,
-																Action.REJET,
-																Action.SIGNATURE,
+																REJET,
+																SIGNATURE,
 																Action.TRANSFERT_SIGNATURE,
 																Action.AVIS_COMPLEMENTAIRE
 		);
 
-		Dossier dossier01 = new Dossier("id_01",
-										"Title 01",
-										Action.SIGNATURE,
-										dossier01ActionsSet,
-										"Type 01",
-										"Subtype 01",
-										new Date(1392829477205L),
-										null,
-										true
-		);
+		Dossier dossier01 = new Dossier("id_01", "Title 01", SIGNATURE, dossier01ActionsSet, "Type 01", "Subtype 01", new Date(1392829477205L), null, true);
 
-		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, CollectionUtils.asSet(VISA, Action.SIGNATURE), "Type 02", "Subtype 02", null, null, false);
+		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, CollectionUtils.asSet(VISA, SIGNATURE), "Type 02", "Subtype 02", null, null, false);
 
 		// Checks
 
@@ -158,37 +159,145 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getDateCreation(), dossier02.getDateCreation());
 	}
 
-//	@Test public void isDetailsAvailable() throws Exception {
-//
-//	}
-//
-//	@Test public void hasActions() throws Exception {
-//
-//	}
-
 	// <editor-fold desc="Static utils">
 
-//	@Test public void findCurrentDocument() throws Exception {
-//
-//	}
-//
-//	@Test public void getPositiveAction() throws Exception {
-//
-//	}
-//
-//	@Test public void getNegativeAction() throws Exception {
-//
-//	}
+	@Test public void areDetailsAvailable() throws Exception {
+
+		List<EtapeCircuit> etapes = new ArrayList<>();
+		etapes.add(new EtapeCircuit(null, true, false, "Bureau 01", "Signataire 01", Action.SIGNATURE.toString(), null));
+		etapes.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
+		Circuit circuit = new Circuit(etapes, "PKCS#7\\/single", true);
+
+		ArrayList<Document> documentList = new ArrayList<>();
+		documentList.add(new Document("id_01", null, 0, false, false));
+		documentList.add(new Document("id_02", null, 0, false, true));
+
+		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
+		dossier01.setCircuit(circuit);
+		dossier01.setDocumentList(documentList);
+
+		Dossier dossier02 = new Dossier(null, null, null, null, null, null, null, null, false);
+		dossier02.setCircuit(circuit);
+
+		Dossier dossier03 = new Dossier(null, null, null, null, null, null, null, null, false);
+		dossier03.setDocumentList(documentList);
+
+		// Checks
+
+		Assert.assertTrue(Dossier.areDetailsAvailable(dossier01));
+		Assert.assertFalse(Dossier.areDetailsAvailable(dossier02));
+		Assert.assertFalse(Dossier.areDetailsAvailable(dossier03));
+	}
+
+	@SuppressWarnings("ConstantConditions") @Test public void findCurrentDocument() throws Exception {
+
+		ArrayList<Document> documentList = new ArrayList<>();
+		documentList.add(new Document("id_01", null, 0, false, false));
+		documentList.add(new Document("id_02", null, 0, false, true));
+
+		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
+		dossier.setDocumentList(documentList);
+
+		// Checks
+
+		Assert.assertNull(Dossier.findCurrentDocument(null, "id_01"));
+		Assert.assertEquals(Dossier.findCurrentDocument(dossier, null).getId(), "id_01");
+		Assert.assertEquals(Dossier.findCurrentDocument(dossier, "id_01").getId(), "id_01");
+		Assert.assertEquals(Dossier.findCurrentDocument(dossier, "id_02").getId(), "id_02");
+	}
+
+	@Test public void haveActions() throws Exception {
+
+		Dossier dossier01 = new Dossier(null, null, null, CollectionUtils.asSet(EMAIL, JOURNAL, ENREGISTRER), null, null, null, null, false);
+		Dossier dossier02 = new Dossier(null, null, null, CollectionUtils.asSet(VISA, EMAIL, JOURNAL, ENREGISTRER), null, null, null, null, false);
+		Dossier dossier03 = new Dossier(null, null, null, CollectionUtils.asSet(REJET, EMAIL, ENREGISTRER), null, null, null, null, false);
+		Dossier dossier04 = new Dossier(null, null, null, null, null, null, null, null, false);
+
+		// Checks
+
+		Assert.assertFalse(Dossier.haveActions(dossier01));
+		Assert.assertTrue(Dossier.haveActions(dossier02));
+		Assert.assertTrue(Dossier.haveActions(dossier03));
+		Assert.assertFalse(Dossier.haveActions(dossier04));
+	}
+
+	@Test public void getPositiveAction() throws Exception {
+
+		Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
+
+		Dossier dossier = new Dossier(null,
+									  null,
+									  null,
+									  CollectionUtils.asSet(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE),
+									  null,
+									  null,
+									  null,
+									  null,
+									  false
+		);
+
+		Dossier dossierWithActionDemandee = new Dossier(null,
+														null,
+														TDT,
+														CollectionUtils.asSet(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE),
+														null,
+														null,
+														null,
+														null,
+														false
+		);
+
+		// Checks
+
+		Assert.assertNull(Dossier.getPositiveAction(emptyDossier));
+		Assert.assertEquals(Dossier.getPositiveAction(dossierWithActionDemandee), TDT);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), SIGNATURE);
+
+		dossier.getActions().remove(SIGNATURE);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), VISA);
+
+		dossier.getActions().remove(VISA);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), ARCHIVAGE);
+
+		dossier.getActions().remove(ARCHIVAGE);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), MAILSEC);
+
+		dossier.getActions().remove(MAILSEC);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), TDT_ACTES);
+
+		dossier.getActions().remove(TDT_ACTES);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), TDT_HELIOS);
+
+		dossier.getActions().remove(TDT_HELIOS);
+		Assert.assertEquals(Dossier.getPositiveAction(dossier), TDT);
+
+		dossier.getActions().remove(TDT);
+		Assert.assertNull(Dossier.getPositiveAction(dossier));
+	}
+
+	@Test public void getNegativeAction() throws Exception {
+
+		Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
+		Dossier dossier = new Dossier(null, null, SIGNATURE, CollectionUtils.asSet(VISA, SIGNATURE, REJET, TDT), null, null, null, null, false);
+
+		// Checks
+
+		Assert.assertNull(Dossier.getNegativeAction(emptyDossier));
+		Assert.assertEquals(Dossier.getNegativeAction(dossier), REJET);
+
+		dossier.getActions().remove(REJET);
+		Assert.assertNull(Dossier.getNegativeAction(dossier));
+	}
 
 	@Test public void fixActions() throws Exception {
 
 		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
 
-		Set<Action> dossier02ActionsSet = CollectionUtils.asSet(Action.VISA, Action.SIGNATURE);
-		Dossier dossier02 = new Dossier(null, null, Action.SIGNATURE, dossier02ActionsSet, null, null, null, null, false);
+		Set<Action> dossier02ActionsSet = CollectionUtils.asSet(VISA, SIGNATURE);
+		Dossier dossier02 = new Dossier(null, null, SIGNATURE, dossier02ActionsSet, null, null, null, null, false);
 
 		Set<Action> dossier03ActionsSet = CollectionUtils.asSet();
-		Dossier dossier03 = new Dossier(null, null, Action.ARCHIVAGE, dossier03ActionsSet, null, null, null, null, false);
+		Dossier dossier03 = new Dossier(null, null, ARCHIVAGE, dossier03ActionsSet, null, null, null, null, false);
 
 		Dossier.fixActions(dossier01);
 		Dossier.fixActions(dossier02);
@@ -196,16 +305,16 @@ public class DossierTest {
 
 		// Checks
 
-		Assert.assertTrue(dossier01.getActions().contains(Action.VISA));
-		Assert.assertTrue(dossier01.getActions().contains(Action.SIGNATURE));
-		Assert.assertEquals(dossier01.getActionDemandee(), Action.VISA);
+		Assert.assertTrue(dossier01.getActions().contains(VISA));
+		Assert.assertTrue(dossier01.getActions().contains(SIGNATURE));
+		Assert.assertEquals(dossier01.getActionDemandee(), VISA);
 		Assert.assertEquals(dossier01.getActions().size(), 2);
 
-		Assert.assertTrue(dossier02.getActions().contains(Action.SIGNATURE));
-		Assert.assertEquals(dossier02.getActionDemandee(), Action.SIGNATURE);
+		Assert.assertTrue(dossier02.getActions().contains(SIGNATURE));
+		Assert.assertEquals(dossier02.getActionDemandee(), SIGNATURE);
 		Assert.assertEquals(dossier02.getActions().size(), 1);
 
-		Assert.assertTrue(dossier03.getActions().contains(Action.ARCHIVAGE));
+		Assert.assertTrue(dossier03.getActions().contains(ARCHIVAGE));
 		Assert.assertEquals(dossier03.getActions().size(), 1);
 	}
 
@@ -241,4 +350,33 @@ public class DossierTest {
 	}
 
 	// </editor-fold desc="Static utils">
+
+	@SuppressWarnings({"EqualsBetweenInconvertibleTypes", "ObjectEqualsNull"}) @Test public void dossierEquals() {
+
+		Dossier dossier01 = new Dossier("id_01", null, null, null, null, null, null, null, false);
+		Dossier dossier01bis = new Dossier("id_01", null, null, null, null, null, null, null, false);
+		Dossier dossier02 = new Dossier(null, "id_02", null, null, null, null, null, null, false);
+
+		// Checks
+
+		Assert.assertTrue(dossier01.equals(dossier01bis));
+		Assert.assertTrue(dossier01.equals("id_01"));
+
+		Assert.assertFalse(dossier01.equals(dossier02));
+		Assert.assertFalse(dossier01.equals(null));
+		Assert.assertFalse(dossier01.equals("id_02"));
+		Assert.assertFalse(dossier01.equals(1));
+	}
+
+	@Test public void dossierHashCode() {
+
+		Dossier dossier01 = new Dossier("id_01", null, null, null, null, null, null, null, false);
+		Dossier dossier02 = new Dossier(null, null, null, null, null, null, null, null, false);
+
+		// Checks
+
+		Assert.assertEquals(dossier01.hashCode(), "id_01".hashCode());
+		Assert.assertEquals(dossier02.hashCode(), -1);
+	}
+
 }
