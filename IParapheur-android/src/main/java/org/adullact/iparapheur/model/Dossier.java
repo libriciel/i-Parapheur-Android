@@ -82,7 +82,7 @@ public class Dossier {
 			// There is no easy way (@annotation) to do it with Gson,
 			// So we're doing it here instead of overriding everything.
 			for (Dossier dossier : dossiersParsed)
-				Dossier.fixActionsDemandees(dossier);
+				Dossier.fixActions(dossier);
 
 			return dossiersParsed;
 		}
@@ -105,7 +105,7 @@ public class Dossier {
 		return mActions;
 	}
 
-	public void setActions(@NonNull Set<Action> actions) {
+	private void setActions(@NonNull Set<Action> actions) {
 		mActions = actions;
 	}
 
@@ -129,7 +129,7 @@ public class Dossier {
 		return mActionDemandee;
 	}
 
-	public void setActionDemandee(@NonNull Action action) {
+	private void setActionDemandee(@NonNull Action action) {
 		mActionDemandee = action;
 	}
 
@@ -149,16 +149,11 @@ public class Dossier {
 		return mDateLimite;
 	}
 
+	public void setDocumentList(@NonNull List<Document> documentList) {
+		mDocumentList.addAll(documentList);
+	}
+
 	// </editor-fold desc="Setters / Getters">
-
-	public void saveDetails(Dossier dossier) {
-		mDocumentList.addAll(dossier.getDocumentList());
-	}
-
-	public void clearDetails() {
-		mDocumentList.clear();
-		mCircuit = null;
-	}
 
 	public boolean isDetailsAvailable() {
 		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mDocumentList.isEmpty());
@@ -239,7 +234,7 @@ public class Dossier {
 	 *
 	 * @param dossier , the dossier to fix
 	 */
-	public static void fixActionsDemandees(@NonNull Dossier dossier) {
+	public static void fixActions(@NonNull Dossier dossier) {
 
 		// Default init
 		// (Useful after Gson parsing)

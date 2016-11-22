@@ -17,21 +17,48 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 
 import junit.framework.Assert;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static org.adullact.iparapheur.model.Action.VISA;
+import static org.mockito.Matchers.any;
 
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(TextUtils.class)
 public class DossierTest {
 
 	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+
+	@Before public void setUp() throws Exception {
+		PowerMockito.mockStatic(TextUtils.class);
+
+		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				CharSequence b = (CharSequence) invocation.getArguments()[1];
+				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
+			}
+		});
+	}
 
 	@Test public void fromJsonArray() throws Exception {
 
@@ -99,16 +126,7 @@ public class DossierTest {
 										true
 		);
 
-		Dossier dossier02 = new Dossier("id_02",
-										"Title 02",
-										Action.VISA,
-										CollectionUtils.asSet(Action.VISA, Action.SIGNATURE),
-										"Type 02",
-										"Subtype 02",
-										null,
-										null,
-										false
-		);
+		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, CollectionUtils.asSet(VISA, Action.SIGNATURE), "Type 02", "Subtype 02", null, null, false);
 
 		// Checks
 
@@ -139,4 +157,88 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getDateLimite(), dossier02.getDateLimite());
 		Assert.assertEquals(correctArrayParsed.get(1).getDateCreation(), dossier02.getDateCreation());
 	}
+
+//	@Test public void isDetailsAvailable() throws Exception {
+//
+//	}
+//
+//	@Test public void hasActions() throws Exception {
+//
+//	}
+
+	// <editor-fold desc="Static utils">
+
+//	@Test public void findCurrentDocument() throws Exception {
+//
+//	}
+//
+//	@Test public void getPositiveAction() throws Exception {
+//
+//	}
+//
+//	@Test public void getNegativeAction() throws Exception {
+//
+//	}
+
+	@Test public void fixActions() throws Exception {
+
+		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
+
+		Set<Action> dossier02ActionsSet = CollectionUtils.asSet(Action.VISA, Action.SIGNATURE);
+		Dossier dossier02 = new Dossier(null, null, Action.SIGNATURE, dossier02ActionsSet, null, null, null, null, false);
+
+		Set<Action> dossier03ActionsSet = CollectionUtils.asSet();
+		Dossier dossier03 = new Dossier(null, null, Action.ARCHIVAGE, dossier03ActionsSet, null, null, null, null, false);
+
+		Dossier.fixActions(dossier01);
+		Dossier.fixActions(dossier02);
+		Dossier.fixActions(dossier03);
+
+		// Checks
+
+		Assert.assertTrue(dossier01.getActions().contains(Action.VISA));
+		Assert.assertTrue(dossier01.getActions().contains(Action.SIGNATURE));
+		Assert.assertEquals(dossier01.getActionDemandee(), Action.VISA);
+		Assert.assertEquals(dossier01.getActions().size(), 2);
+
+		Assert.assertTrue(dossier02.getActions().contains(Action.SIGNATURE));
+		Assert.assertEquals(dossier02.getActionDemandee(), Action.SIGNATURE);
+		Assert.assertEquals(dossier02.getActions().size(), 1);
+
+		Assert.assertTrue(dossier03.getActions().contains(Action.ARCHIVAGE));
+		Assert.assertEquals(dossier03.getActions().size(), 1);
+	}
+
+	@Test public void getMainDocumentsAndAnnexes() throws Exception {
+
+		Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
+		emptyDossier.setDocumentList(new ArrayList<Document>());
+
+		ArrayList<Document> documentList = new ArrayList<>();
+		documentList.add(new Document("id_01", null, 0, false, true));
+		documentList.add(new Document("id_02", null, 0, false, false));
+		documentList.add(new Document("id_03", null, 0, false, false));
+		documentList.add(new Document("id_04", null, 0, false, true));
+
+		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
+		dossier.setDocumentList(documentList);
+
+		List<Document> mainDocumentList = Dossier.getMainDocuments(dossier);
+		List<Document> annexesList = Dossier.getAnnexes(dossier);
+
+		// Checks
+
+		Assert.assertEquals(Dossier.getMainDocuments(emptyDossier), new ArrayList<Document>());
+		Assert.assertEquals(Dossier.getAnnexes(emptyDossier), new ArrayList<Document>());
+
+		Assert.assertEquals(mainDocumentList.size(), 2);
+		Assert.assertEquals(mainDocumentList.get(0).getId(), "id_01");
+		Assert.assertEquals(mainDocumentList.get(1).getId(), "id_04");
+
+		Assert.assertEquals(annexesList.size(), 2);
+		Assert.assertEquals(annexesList.get(0).getId(), "id_02");
+		Assert.assertEquals(annexesList.get(1).getId(), "id_03");
+	}
+
+	// </editor-fold desc="Static utils">
 }

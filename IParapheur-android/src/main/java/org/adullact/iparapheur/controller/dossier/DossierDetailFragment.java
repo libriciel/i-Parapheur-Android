@@ -488,8 +488,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// To force reload dossier details, just delete its main document path (on local storage).
 
-		if (forceReload)
-			mDossier.clearDetails();
+		if (forceReload) {
+			mDossier.getDocumentList().clear();
+			mDossier.setCircuit(null);
+		}
 
 		// Download information only if details aren't already available
 
@@ -700,7 +702,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				showSpinnerOnUiThread();
 
 				try {
-					mDossier.saveDetails(RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId()));
+					Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
+					mDossier.setDocumentList(retrievedDossier.getDocumentList());
 					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
 				}
 				catch (IParapheurException e) { e.printStackTrace(); }

@@ -94,7 +94,7 @@ public class RestClientApi1 extends RestClientApi {
 		String response = RESTUtils.get(url).getResponse().toString();
 		Dossier dossierParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
 
-		Dossier.fixActionsDemandees(dossierParsed);
+		Dossier.fixActions(dossierParsed);
 		return dossierParsed;
 	}
 
@@ -126,7 +126,7 @@ public class RestClientApi1 extends RestClientApi {
 		);
 
 		for (Dossier dossier : dossiersParsed)
-			Dossier.fixActionsDemandees(dossier);
+			Dossier.fixActions(dossier);
 
 		return dossiersParsed;
 	}
