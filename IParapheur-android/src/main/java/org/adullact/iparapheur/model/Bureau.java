@@ -25,18 +25,36 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
+@DatabaseTable(tableName = "Desk")
 public class Bureau {
 
-	@SerializedName(value = "id", alternate = {"nodeRef"}) private String mId;
-	@SerializedName("name") private String mTitle;
-	@SerializedName("a-traiter") private int mTodoCount;
-	@SerializedName("en-retard") private int mLateCount;
+	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	@SerializedName(value = "id", alternate = {"nodeRef"})  //
+	private String mId;
+
+	@DatabaseField(columnName = "Title", canBeNull = false, defaultValue = "")  //
+	@SerializedName("name")  //
+	private String mTitle;
+
+	@DatabaseField(columnName = "Todo", defaultValue = "0")  //
+	@SerializedName("a-traiter") //
+	private int mTodoCount;
+
+	@DatabaseField(columnName = "Late", defaultValue = "0")  //
+	@SerializedName("en-retard")  //
+	private int mLateCount;
+
+	@DatabaseField(columnName = "Sync")  //
+	private Date mSyncDate;
 
 	/**
 	 * Static parser, useful for Unit tests
@@ -66,7 +84,10 @@ public class Bureau {
 		mTitle = title;
 		mTodoCount = todo;
 		mLateCount = late;
+		mSyncDate = null;
 	}
+
+	public Bureau() {}
 
 	// <editor-fold desc="Setters / Getters">
 
@@ -86,10 +107,18 @@ public class Bureau {
 		return mLateCount;
 	}
 
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date date) {
+		mSyncDate = date;
+	}
+
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return "{Bureau id=" + mId + " title=" + mTitle + " todo=" + mTodoCount + " late=" + mLateCount + "}";
+		return "{Bureau id=" + mId + " title=" + mTitle + " todo=" + mTodoCount + " late=" + mLateCount + " sync=" + mSyncDate + "}";
 	}
 
 	@Override public boolean equals(Object o) {

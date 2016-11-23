@@ -122,6 +122,9 @@ public class BureauTest {
 		Bureau bureau01 = new Bureau("id_01", "Name 01 \"/%@&éè", 10, 5);
 		Bureau bureau02 = new Bureau("workspace://SpacesStore/id_02", "Name 02 \"/%@&éè", 0, 0);
 
+		bureau01.setSyncDate(null);
+		bureau02.setSyncDate(null);
+
 		// Checks
 
 		Assert.assertNull(incorrectArrayParsed);
@@ -132,12 +135,14 @@ public class BureauTest {
 		Assert.assertEquals(correctArrayParsed.get(0).getTitle(), bureau01.getTitle());
 		Assert.assertEquals(correctArrayParsed.get(0).getLateCount(), bureau01.getLateCount());
 		Assert.assertEquals(correctArrayParsed.get(0).getTodoCount(), bureau01.getTodoCount());
+		Assert.assertEquals(correctArrayParsed.get(0).getSyncDate(), bureau01.getSyncDate());
 
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), bureau02.toString());
 		Assert.assertEquals(correctArrayParsed.get(1).getId(), bureau02.getId());
 		Assert.assertEquals(correctArrayParsed.get(1).getTitle(), bureau02.getTitle());
 		Assert.assertEquals(correctArrayParsed.get(1).getLateCount(), bureau02.getLateCount());
 		Assert.assertEquals(correctArrayParsed.get(1).getTodoCount(), bureau02.getTodoCount());
+		Assert.assertEquals(correctArrayParsed.get(1).getSyncDate(), bureau02.getSyncDate());
 
 		Assert.assertTrue(bureau01.equals(correctArrayParsed.get(0)));
 		Assert.assertTrue(bureau02.equals(correctArrayParsed.get(1)));

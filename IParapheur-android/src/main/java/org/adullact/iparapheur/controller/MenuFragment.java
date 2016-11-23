@@ -52,6 +52,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.support.DatabaseConnection;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
@@ -60,6 +63,7 @@ import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.FilterDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
@@ -70,6 +74,8 @@ import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.ViewUtils;
 
+import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -504,7 +510,8 @@ public class MenuFragment extends Fragment {
 		// Callback
 
 		Dossier selectedDossier = ((DossierListAdapter) mDossierListView.getAdapter()).getItem(position);
-		((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
+		if (selectedDossier != null)
+			((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
 	}
 
 	private void executeAsyncTask(@NonNull AsyncTask<Void, ?, ?> task) {
@@ -532,6 +539,9 @@ public class MenuFragment extends Fragment {
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mBureauSwipeRefreshLayout.setRefreshing(true);
+
+			// Adrien test
+			new DownloadBureauLoadingTask().execute();
 		}
 
 		@Override protected IParapheurException doInBackground(Void... params) {
@@ -639,13 +649,73 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
+	private class DownloadBureauLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
+
+		@Override protected IParapheurException doInBackground(Void... params) {
+
+			// Bureaux
+
+			List<Bureau> bureauList = new ArrayList<>();
+			try { bureauList.addAll(RESTClient.INSTANCE.getBureaux()); }
+			catch (IParapheurException exception) { return exception; }
+
+			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			try {
+				Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+
+				// Allow us to insert/update in loops
+				// and calling db only once...
+
+				DatabaseConnection dbConnextion = bureauDao.startThreadConnection();
+				Savepoint savePoint = null;
+
+				dbConnextion.setAutoCommit(false);
+				for (Bureau bureau : bureauList) {
+					savePoint = dbConnextion.setSavePoint(null);
+					bureau.setSyncDate(new Date());
+					bureauDao.createOrUpdate(bureau);
+				}
+				dbConnextion.commit(savePoint);
+				dbConnextion.setAutoCommit(true);
+				dbConnextion.closeQuietly();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			// Dossiers
+
+			try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
+			catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
+
+			return null;
+		}
+
+		@Override protected void onPostExecute(IParapheurException exception) {
+			super.onPostExecute(exception);
+
+			mPendingAsyncTask = null;
+			if (isCancelled())
+				return;
+
+			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
+
+			// Error management
+
+			if (exception != null) {
+				String message = getString(exception.getResId());
+				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
 	private class BureauListAdapter extends ArrayAdapter<Bureau> {
 
-		public BureauListAdapter(Context context) {
+		private BureauListAdapter(Context context) {
 			super(context, R.layout.bureaux_list_cell, R.id.bureau_list_cell_title);
 		}
 
-		@Override public View getView(int position, View convertView, ViewGroup parent) {
+		@Override public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
 			View cell = super.getView(position, convertView, parent);
 
@@ -697,11 +767,11 @@ public class MenuFragment extends Fragment {
 
 	private class DossierListAdapter extends ArrayAdapter<Dossier> {
 
-		public DossierListAdapter(Context context) {
+		private DossierListAdapter(Context context) {
 			super(context, R.layout.dossiers_list_cell, R.id.dossiers_list_item_title);
 		}
 
-		@Override public View getView(int position, View convertView, ViewGroup parent) {
+		@Override public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
 			final View cellView = super.getView(position, convertView, parent);
 			Dossier dossier = mDossierList.get(position);
@@ -785,7 +855,7 @@ public class MenuFragment extends Fragment {
 			return mDossierList.isEmpty();
 		}
 
-		public void toggleSelection(View view) {
+		private void toggleSelection(View view) {
 
 			if (mDossierSwipeRefreshLayout.isRefreshing())
 				return;
