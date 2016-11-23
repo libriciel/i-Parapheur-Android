@@ -23,15 +23,25 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
 
 
 public class Document {
 
-	@SerializedName("id") private String mId;
-	@SerializedName("name") private String mName;
-	@SerializedName("size") private int mSize;                          // TODO : download image instead of too heavy files
-	@SerializedName("visuelPdf") private boolean mIsPdfVisual;
-	@SerializedName("isMainDocument") private boolean mIsMainDocument;
+	@SerializedName("id")  //
+	private String mId;
+
+	@SerializedName("name")  //
+	private String mName;
+
+	@SerializedName("size")  //
+	private int mSize;                          // TODO : download image instead of too heavy files
+
+	@SerializedName("visuelPdf")  //
+	private boolean mIsPdfVisual;
+
+	@SerializedName("isMainDocument")  //
+	private boolean mIsMainDocument;
 
 	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
 	private SparseArray<PageAnnotations> mPagesAnnotations;
@@ -78,8 +88,6 @@ public class Document {
 
 	// </editor-fold desc="Static utils">
 
-	public Document() {}
-
 	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;
 		mName = name;
@@ -88,6 +96,8 @@ public class Document {
 		mIsMainDocument = isMainDocument;
 		mIsPdfVisual = isPdfVisual;
 	}
+
+	public Document() {}
 
 	// <editor-fold desc="Setters / Getters">
 

@@ -25,6 +25,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -35,18 +37,49 @@ import java.util.List;
 import java.util.Set;
 
 
+@DatabaseTable(tableName = "Folder")
 public class Dossier {
 
-	@SerializedName("id") private String mId;
-	@SerializedName("title") private String mName;
-	@SerializedName("actionDemandee") private Action mActionDemandee;
-	@SerializedName("type") private String mType;
-	@SerializedName("sousType") private String mSousType;
-	@SerializedName("dateEmission") private Date mDateCreation;
-	@SerializedName("dateLimite") private Date mDateLimite;
-	@SerializedName("actions") private Set<Action> mActions;
-	@SerializedName("isSignPapier") private boolean mIsSignPapier;
-	@SerializedName("documents") private List<Document> mDocumentList = new ArrayList<>();
+	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	@SerializedName("id")  //
+	private String mId;
+
+	@DatabaseField(columnName = "Name", canBeNull = false, defaultValue = "")  //
+	@SerializedName("title")  //
+	private String mName;
+
+	@SerializedName("actionDemandee")  //
+	private Action mActionDemandee;
+
+	@DatabaseField(columnName = "Type")  //
+	@SerializedName("type")  //
+	private String mType;
+
+	@DatabaseField(columnName = "SubType")  //
+	@SerializedName("sousType")  //
+	private String mSousType;
+
+	@DatabaseField(columnName = "CreationDate")  //
+	@SerializedName("dateEmission")  //
+	private Date mDateCreation;
+
+	@DatabaseField(columnName = "LateDate")  //
+	@SerializedName("dateLimite")  //
+	private Date mDateLimite;
+
+	@SerializedName("actions")  //
+	private Set<Action> mActions;
+
+	@DatabaseField(columnName = "IsPaperSign")  //
+	@SerializedName("isSignPapier")  //
+	private boolean mIsSignPapier;
+
+	@SerializedName("documents")  //
+	private List<Document> mDocumentList = new ArrayList<>();
+
+	@DatabaseField(columnName = "Sync")  //
+	private Date mSyncDate;
+
 	private Circuit mCircuit;
 
 	public Dossier() {}
@@ -176,6 +209,14 @@ public class Dossier {
 
 	public void setDocumentList(@NonNull List<Document> documentList) {
 		mDocumentList.addAll(documentList);
+	}
+
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date date) {
+		mSyncDate = date;
 	}
 
 	// </editor-fold desc="Setters / Getters">

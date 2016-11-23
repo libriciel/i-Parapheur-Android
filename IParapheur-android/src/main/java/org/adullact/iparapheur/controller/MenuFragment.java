@@ -35,6 +35,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -539,17 +540,43 @@ public class MenuFragment extends Fragment {
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mBureauSwipeRefreshLayout.setRefreshing(true);
-
-			// Adrien test
-			new DownloadBureauLoadingTask().execute();
 		}
 
 		@Override protected IParapheurException doInBackground(Void... params) {
+
 			mBureauList.clear();
 
 			if (!DeviceUtils.isDebugOffline()) {
+
+				// Download data
+
 				try { mBureauList.addAll(RESTClient.INSTANCE.getBureaux()); }
 				catch (final IParapheurException exception) { return exception; }
+
+				// Save in Database
+
+				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+				try {
+					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+
+					// Allow us to insert/update in loops
+					// and calling db only once...
+					DatabaseConnection dbConnextion = bureauDao.startThreadConnection();
+					Savepoint savePoint = null;
+
+					dbConnextion.setAutoCommit(false);
+					for (Bureau bureau : mBureauList) {
+						savePoint = dbConnextion.setSavePoint(null);
+						bureau.setSyncDate(new Date());
+						bureauDao.createOrUpdate(bureau);
+					}
+					dbConnextion.commit(savePoint);
+					dbConnextion.setAutoCommit(true);
+					dbConnextion.closeQuietly();
+				}
+				catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 			else {
 				mBureauList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut", 0, 0));
@@ -560,6 +587,17 @@ public class MenuFragment extends Fragment {
 
 		@Override protected void onPostExecute(IParapheurException exception) {
 			super.onPostExecute(exception);
+
+			// Adrien start test
+
+			List<String> bureauIds = new ArrayList<>();
+			for (Bureau bureau : mBureauList) {
+				bureauIds.add(bureau.getId());
+			}
+
+			new DossiersDownloadTask().execute(bureauIds.toArray(new String[bureauIds.size()]));
+
+			// Adrien end test
 
 			mPendingAsyncTask = null;
 
@@ -649,63 +687,68 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	private class DownloadBureauLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
+	private class DossiersDownloadTask extends AsyncTask<String, Void, IParapheurException> {
 
-		@Override protected IParapheurException doInBackground(Void... params) {
+		@Override protected IParapheurException doInBackground(String... bureauIds) {
 
-			// Bureaux
-
-			List<Bureau> bureauList = new ArrayList<>();
-			try { bureauList.addAll(RESTClient.INSTANCE.getBureaux()); }
-			catch (IParapheurException exception) { return exception; }
-
+			// Allow us to insert/update in loops
+			// and calling db only once...
 			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			Dao<Dossier, Integer> dossierDao;
+			DatabaseConnection dbConnextion = null;
+
 			try {
-				Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+				ArrayList<Dossier> dossierList = new ArrayList<>();
+				for (String bureauId : bureauIds) {
 
-				// Allow us to insert/update in loops
-				// and calling db only once...
+					List<Dossier> incompleteDossierList = RESTClient.INSTANCE.getDossiers(bureauId);
+					for (Dossier incompleteDossier : incompleteDossierList) {
 
-				DatabaseConnection dbConnextion = bureauDao.startThreadConnection();
+						Dossier fullDossier = RESTClient.INSTANCE.getDossier(bureauId, incompleteDossier.getId());
+						fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
+						dossierList.add(fullDossier);
+					}
+				}
+
+				// Save in Database
+
+				dossierDao = dbHelper.getDossierDao();
+				dbConnextion = dossierDao.startThreadConnection();
 				Savepoint savePoint = null;
 
 				dbConnextion.setAutoCommit(false);
-				for (Bureau bureau : bureauList) {
+				Log.w("Adrien", "dossiersToSave : " + dossierList);
+				for (Dossier dossier : dossierList) {
 					savePoint = dbConnextion.setSavePoint(null);
-					bureau.setSyncDate(new Date());
-					bureauDao.createOrUpdate(bureau);
+					dossier.setSyncDate(new Date());
+					dossierDao.createOrUpdate(dossier);
 				}
 				dbConnextion.commit(savePoint);
 				dbConnextion.setAutoCommit(true);
 				dbConnextion.closeQuietly();
 			}
 			catch (SQLException e) {
-				e.printStackTrace();
+				return new IParapheurException(-1, "DB error");
 			}
-
-			// Dossiers
-
-			try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
-			catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
+			catch (IParapheurException e) {
+				return e;
+			}
+			finally {
+				try {
+					if (dbConnextion != null)
+						if (!dbConnextion.isClosed())
+							dbConnextion.closeQuietly();
+				}
+				catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 
 			return null;
 		}
 
-		@Override protected void onPostExecute(IParapheurException exception) {
-			super.onPostExecute(exception);
-
-			mPendingAsyncTask = null;
-			if (isCancelled())
-				return;
-
-			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
-
-			// Error management
-
-			if (exception != null) {
-				String message = getString(exception.getResId());
-				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-			}
+		@Override protected void onPostExecute(IParapheurException e) {
+			super.onPostExecute(e);
 		}
 	}
 
