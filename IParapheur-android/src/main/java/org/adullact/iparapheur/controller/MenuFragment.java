@@ -362,7 +362,7 @@ public class MenuFragment extends Fragment {
 
 		// No filter button (if any filter is available)
 
-		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+		List<Filter> filterList = MyFilters.INSTANCE.getFilters(getActivity());
 		menu.clear();
 
 		if (!filterList.isEmpty()) {

@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -34,21 +33,17 @@ import io.fabric.sdk.android.Fabric;
 
 public class IParapheurApplication extends Application {
 
-	private static Context context;
-
-	public static Context getContext() {
-		return context;
-	}
-
 	@Override public void onCreate() {
 		super.onCreate();
+
+		// Crashlytics init
 
 		CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
 		Fabric.with(this, new Crashlytics.Builder().core(core).build());
 
-		context = this;
+		// Accounts init
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		String basePrefsAccount = MyAccounts.PREFS_ACCOUNT_PREFIX + getString(R.string.demo_account_id);
 
 		if (!sharedPreferences.contains(basePrefsAccount + MyAccounts.PREFS_TITLE_SUFFIX)) {

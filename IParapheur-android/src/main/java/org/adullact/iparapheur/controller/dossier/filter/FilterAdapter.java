@@ -32,13 +32,13 @@ public class FilterAdapter extends ArrayAdapter<Filter> {
 	}
 
 	@Override public int getCount() {
-		return MyFilters.INSTANCE.getFilters().size() + 1;
+		return MyFilters.INSTANCE.getFilters(getContext()).size() + 1;
 	}
 
 	@Override public Filter getItem(int position) {
 		Filter filter;
-		if (position < MyFilters.INSTANCE.getFilters().size()) {
-			filter = MyFilters.INSTANCE.getFilters().get(position);
+		if (position < MyFilters.INSTANCE.getFilters(getContext()).size()) {
+			filter = MyFilters.INSTANCE.getFilters(getContext()).get(position);
 		}
 		else {
 			filter = new Filter(Filter.EDIT_FILTER_ID);
@@ -48,8 +48,8 @@ public class FilterAdapter extends ArrayAdapter<Filter> {
 	}
 
 	@Override public int getPosition(Filter item) {
-		int position = MyFilters.INSTANCE.getFilters().indexOf(item);
-		return (position == -1) ? MyFilters.INSTANCE.getFilters().size() + 1 : position;
+		int position = MyFilters.INSTANCE.getFilters(getContext()).indexOf(item);
+		return (position == -1) ? MyFilters.INSTANCE.getFilters(getContext()).size() + 1 : position;
 	}
 
 }

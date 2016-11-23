@@ -100,7 +100,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
 		if (selectedAccount == null)
-			selectedAccount = MyAccounts.INSTANCE.getAccounts().get(0);
+			selectedAccount = MyAccounts.INSTANCE.getAccounts(getActivity()).get(0);
 
 		for (int i = 0; i < mAccounts.size(); i++)
 			if (selectedAccount.getId().contentEquals(mAccounts.get(i).getId()))
@@ -112,7 +112,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private void updateAccounts() {
 		mAccounts.clear();
 
-		for (Account account : MyAccounts.INSTANCE.getAccounts())
+		for (Account account : MyAccounts.INSTANCE.getAccounts(getActivity()))
 			if (account.isValid())
 				if (account.isActivated())
 					mAccounts.add(account);
@@ -150,7 +150,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	private class AccountListAdapter extends ArrayAdapter<Account> {
 
-		public AccountListAdapter(Context context) {
+		private AccountListAdapter(Context context) {
 			super(context, R.layout.account_list_fragment_cell, android.R.id.text1);
 		}
 

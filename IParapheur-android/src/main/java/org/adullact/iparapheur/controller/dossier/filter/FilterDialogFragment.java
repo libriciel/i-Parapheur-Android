@@ -287,7 +287,7 @@ public class FilterDialogFragment extends DialogFragment {
 	private void saveFilterAndDimsiss(@NonNull String name) {
 
 		refreshCurrentFilter(name);
-		MyFilters.INSTANCE.save(mFilter);
+		MyFilters.INSTANCE.save(getActivity(), mFilter);
 		MyFilters.INSTANCE.selectFilter(mFilter);
 
 		getTargetFragment().onActivityResult(REQUEST_CODE_FILTER, Activity.RESULT_OK, null);

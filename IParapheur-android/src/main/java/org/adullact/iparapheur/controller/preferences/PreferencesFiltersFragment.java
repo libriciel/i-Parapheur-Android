@@ -122,7 +122,7 @@ public class PreferencesFiltersFragment extends Fragment {
 
 		String currentFilterId = mFiltersData.get(position).get(LIST_FIELD_ID).toString();
 		Filter currentFilter = MyFilters.INSTANCE.getFilter(currentFilterId);
-		MyFilters.INSTANCE.delete(currentFilter);
+		MyFilters.INSTANCE.delete(getActivity(), currentFilter);
 		Log.i(LOG_TAG, "Delete filer " + currentFilter);
 
 		// Refresh UI
@@ -136,7 +136,7 @@ public class PreferencesFiltersFragment extends Fragment {
 
 		mFiltersData.clear();
 
-		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+		List<Filter> filterList = MyFilters.INSTANCE.getFilters(getActivity());
 		for (Filter filter : filterList) {
 
 			// Mapping results

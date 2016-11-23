@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
 		if (selectedAccount == null)
-			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts().get(0).getId());
+			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts(this).get(0).getId());
 	}
 
 	@Override public void onResume() {
@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Save accounts state for later use. In our case, the latest selected account
 		// will be automatically selected if the application is killed and relaunched.
-		MyAccounts.INSTANCE.saveState();
+		MyAccounts.INSTANCE.saveState(this);
 	}
 
 	@Override protected void onSaveInstanceState(Bundle outState) {
@@ -586,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private void importCertificate(@NonNull final String url, @Nullable final String password) {
 
 		String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
-		final String certificateLocalPath = new File(IParapheurApplication.getContext().getExternalCacheDir(), certificateFileName).getAbsolutePath();
+		final String certificateLocalPath = new File(getExternalCacheDir(), certificateFileName).getAbsolutePath();
 
 		// Download and import
 

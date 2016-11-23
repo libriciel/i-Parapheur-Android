@@ -45,8 +45,6 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.adullact.iparapheur.controller.IParapheurApplication.getContext;
-
 
 public class FileUtils {
 
@@ -76,8 +74,8 @@ public class FileUtils {
 		}
 	}
 
-	private static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
-		File directory = new File(getContext().getExternalCacheDir(), dossier.getId());
+	private static @Nullable File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
+		File directory = new File(context.getExternalCacheDir(), dossier.getId());
 
 		if (!directory.mkdirs())
 			if (!directory.exists())
@@ -93,7 +91,7 @@ public class FileUtils {
 		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
 
 		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(dossier), documentName);
+			return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
 		else
 			//noinspection ConstantConditions
 			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);

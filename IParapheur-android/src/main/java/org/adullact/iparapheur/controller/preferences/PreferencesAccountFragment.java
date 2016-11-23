@@ -159,7 +159,7 @@ public class PreferencesAccountFragment extends Fragment {
 		Account currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
 
 		if (currentAccount == null) {
-			currentAccount = MyAccounts.INSTANCE.addAccount();
+			currentAccount = MyAccounts.INSTANCE.addAccount(getActivity());
 			mAccountData.get(position).put(LIST_FIELD_ID, currentAccount.getId());
 		}
 
@@ -173,7 +173,7 @@ public class PreferencesAccountFragment extends Fragment {
 		// Save
 
 		Log.i(LOG_TAG, "Save account " + currentAccount);
-		MyAccounts.INSTANCE.save(currentAccount);
+		MyAccounts.INSTANCE.save(getActivity(), currentAccount);
 
 		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
 	}
@@ -188,13 +188,13 @@ public class PreferencesAccountFragment extends Fragment {
 		currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
 
 		if (currentAccount == null)
-			currentAccount = MyAccounts.INSTANCE.addAccount();
+			currentAccount = MyAccounts.INSTANCE.addAccount(getActivity());
 
 		// Delete
 
 		mAccountData.remove(position);
 		Log.i(LOG_TAG, "Delete account " + currentAccount);
-		MyAccounts.INSTANCE.delete(currentAccount);
+		MyAccounts.INSTANCE.delete(getActivity(), currentAccount);
 
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 		Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();
@@ -235,7 +235,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 		// Retrieve and sort Account list (by titles, alphabetically)
 
-		List<Account> accountList = MyAccounts.INSTANCE.getAccounts();
+		List<Account> accountList = MyAccounts.INSTANCE.getAccounts(getActivity());
 		Collections.sort(accountList, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
 
 		// Build map
@@ -361,7 +361,7 @@ public class PreferencesAccountFragment extends Fragment {
 						Account currentAccount = MyAccounts.INSTANCE.getAccount(currentAccountId);
 						if (currentAccount != null) {
 							currentAccount.setActivated(isChecked);
-							MyAccounts.INSTANCE.save(currentAccount);
+							MyAccounts.INSTANCE.save(getActivity(), currentAccount);
 						}
 					}
 				}
