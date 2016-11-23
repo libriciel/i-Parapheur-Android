@@ -696,7 +696,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Download the dossier Metadata (if missing, and according to the debug mode)
 
 			if (DeviceUtils.isDebugOffline()) {
-				mDossier.getDocumentList().add(new Document(UUID.randomUUID().toString(), "document par défaut", -1, false, true));
+				mDossier.getDocumentList().add(new Document(UUID.randomUUID().toString(), "document par défaut", -1, true, false));
 			}
 			else if (!Dossier.areDetailsAvailable(mDossier)) {
 				showSpinnerOnUiThread();
@@ -720,8 +720,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			currentDocument.setPath(file.getAbsolutePath());
 
 			if (!file.exists()) {
-				try { RESTClient.INSTANCE.downloadFile(Document.generateContentUrl(currentDocument), file.getAbsolutePath()); }
-				catch (IParapheurException e) { e.printStackTrace(); }
+				String downloadUrl = Document.generateContentUrl(currentDocument);
+				if (downloadUrl != null) {
+					try { RESTClient.INSTANCE.downloadFile(downloadUrl, file.getAbsolutePath()); }
+					catch (IParapheurException e) { e.printStackTrace(); }
+				}
 			}
 
 			// Loading user data and annotations

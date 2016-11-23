@@ -159,6 +159,90 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getDateCreation(), dossier02.getDateCreation());
 	}
 
+	@Test public void fromJsonObject() throws Exception {
+
+		// Parsed data
+
+		String incorrectJsonString = "[[{]   \"id\": \"Value 01\" , \"collectivite\": [\"Value 01-01\"  ]]";
+		String correctJsonString = "{" +
+				"    \"title\": \"Dossier 01\"," +
+				"    \"nomTdT\": \"pas de TdT\"," +
+				"    \"includeAnnexes\": true," +
+				"    \"locked\": null," +
+				"    \"readingMandatory\": true," +
+				"    \"acteursVariables\": []," +
+				"    \"dateEmission\": 1455553363700," +
+				"    \"visibility\": \"public\"," +
+				"    \"isRead\": true," +
+				"    \"actionDemandee\": \"VISA\"," +
+				"    \"status\": null," +
+				"    \"documents\": [{" +
+				"        \"size\": 224260," +
+				"        \"visuelPdf\": false," +
+				"        \"isMainDocument\": true," +
+				"        \"pageCount\": 1," +
+				"        \"attestState\": 0," +
+				"        \"id\": \"0ad04448-4424-416a-8e10-36a160b0cb9d\"," +
+				"        \"name\": \"aaef91b4-d135-40ce-80dd-cb4ef1e0ffbc.pdf\"," +
+				"        \"canDelete\": false," +
+				"        \"isLocked\": false" +
+				"    }, {" +
+				"        \"id\": \"5321b0e1-e055-4cff-a69c-5cd358da12e1\"," +
+				"        \"isLocked\": false," +
+				"        \"attestState\": 0," +
+				"        \"visuelPdf\": false," +
+				"        \"size\": 16153," +
+				"        \"canDelete\": false," +
+				"        \"name\": \"20160205_1540_texte_reponse.odt\"," +
+				"        \"isMainDocument\": false" +
+				"    }]," +
+				"    \"id\": \"id_01\"," +
+				"    \"isSignPapier\": true," +
+				"    \"dateLimite\": 1455553363700," +
+				"    \"hasRead\": true," +
+				"    \"isXemEnabled\": true," +
+				"    \"actions\": [\"ENREGISTRER\", \"EMAIL\", \"JOURNAL\", \"REJET\", \"VISA\", \"TRANSFERT_ACTION\", \"AVIS_COMPLEMENTAIRE\", \"GET_ATTEST\"]," +
+				"    \"banetteName\": \"Dossiers à traiter\"," +
+				"    \"type\": \"Type 01\"," +
+				"    \"canAdd\": true," +
+				"    \"protocole\": \"aucun\"," +
+				"    \"metadatas\": {" +
+				"        \"cu:Canton\": {" +
+				"            \"values\": [\"Castries\", \"Grabels\", \"Jacou\", \"Juvignac\", \"Mauguio\"]," +
+				"            \"default\": \"Castries\"," +
+				"            \"mandatory\": \"false\"," +
+				"            \"value\": \"\"," +
+				"            \"realName\": \"Canton concerné\"," +
+				"            \"type\": \"STRING\"," +
+				"            \"editable\": \"false\"" +
+				"        }" +
+				"    }," +
+				"    \"xPathSignature\": null," +
+				"    \"sousType\": \"SubType 01\"," +
+				"    \"bureauName\": \"Bureau 01\"," +
+				"    \"isSent\": true" +
+				"}";
+
+		Dossier incorrectObjectParsed = Dossier.fromJsonObject(incorrectJsonString, sGson);
+		Dossier correctObjectParsed = Dossier.fromJsonObject(correctJsonString, sGson);
+
+		// Checks
+
+		Assert.assertNull(incorrectObjectParsed);
+		Assert.assertNotNull(correctObjectParsed);
+
+		Assert.assertEquals(correctObjectParsed.getId(), "id_01");
+		Assert.assertEquals(correctObjectParsed.getName(), "Dossier 01");
+		Assert.assertEquals(correctObjectParsed.getActionDemandee(), Action.VISA);
+		Assert.assertEquals(correctObjectParsed.getType(), "Type 01");
+		Assert.assertEquals(correctObjectParsed.getSousType(), "SubType 01");
+		Assert.assertEquals(correctObjectParsed.getDateCreation(), new Date(1455553363700L));
+		Assert.assertEquals(correctObjectParsed.getDateLimite(), new Date(1455553363700L));
+		Assert.assertEquals(correctObjectParsed.getActions().size(), 9);
+		Assert.assertEquals(correctObjectParsed.isSignPapier(), true);
+		Assert.assertEquals(correctObjectParsed.getDocumentList().size(), 2);
+	}
+
 	// <editor-fold desc="Static utils">
 
 	@Test public void areDetailsAvailable() throws Exception {
@@ -170,7 +254,7 @@ public class DossierTest {
 
 		ArrayList<Document> documentList = new ArrayList<>();
 		documentList.add(new Document("id_01", null, 0, false, false));
-		documentList.add(new Document("id_02", null, 0, false, true));
+		documentList.add(new Document("id_02", null, 0, true, false));
 
 		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
 		dossier01.setCircuit(circuit);
@@ -193,7 +277,7 @@ public class DossierTest {
 
 		ArrayList<Document> documentList = new ArrayList<>();
 		documentList.add(new Document("id_01", null, 0, false, false));
-		documentList.add(new Document("id_02", null, 0, false, true));
+		documentList.add(new Document("id_02", null, 0, true, false));
 
 		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
 		dossier.setDocumentList(documentList);
@@ -324,10 +408,10 @@ public class DossierTest {
 		emptyDossier.setDocumentList(new ArrayList<Document>());
 
 		ArrayList<Document> documentList = new ArrayList<>();
-		documentList.add(new Document("id_01", null, 0, false, true));
+		documentList.add(new Document("id_01", null, 0, true, false));
 		documentList.add(new Document("id_02", null, 0, false, false));
 		documentList.add(new Document("id_03", null, 0, false, false));
-		documentList.add(new Document("id_04", null, 0, false, true));
+		documentList.add(new Document("id_04", null, 0, true, false));
 
 		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
 		dossier.setDocumentList(documentList);

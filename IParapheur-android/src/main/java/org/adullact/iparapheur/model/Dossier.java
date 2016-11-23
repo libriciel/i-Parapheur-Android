@@ -91,6 +91,31 @@ public class Dossier {
 		}
 	}
 
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonObjectString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson             passed statically to prevent re-creating it.
+	 * @coveredInLocalUnitTest
+	 */
+	public static @Nullable Dossier fromJsonObject(@NonNull String jsonObjectString, @NonNull Gson gson) {
+
+		try {
+			Dossier dossierParsed = gson.fromJson(jsonObjectString, Dossier.class);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			if (dossierParsed != null)
+				Dossier.fixActions(dossierParsed);
+
+			return dossierParsed;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
+	}
+
 	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {

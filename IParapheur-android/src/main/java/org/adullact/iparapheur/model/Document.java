@@ -18,6 +18,7 @@
 package org.adullact.iparapheur.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
@@ -29,9 +30,7 @@ public class Document {
 	@SerializedName("id") private String mId;
 	@SerializedName("name") private String mName;
 	@SerializedName("size") private int mSize;                          // TODO : download image instead of too heavy files
-	@SerializedName("isLocked") private boolean mIsLocked;
 	@SerializedName("visuelPdf") private boolean mIsPdfVisual;
-	@SerializedName("canDelete") private boolean mCanDelete;
 	@SerializedName("isMainDocument") private boolean mIsMainDocument;
 
 	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
@@ -39,7 +38,10 @@ public class Document {
 
 	// <editor-fold desc="Static utils">
 
-	public static @NonNull String generateContentUrl(@NonNull Document document) {
+	public static @Nullable String generateContentUrl(@NonNull Document document) {
+
+		if (document.getId() == null)
+			return null;
 
 		String downloadUrl = "/api/node/workspace/SpacesStore/" + document.getId() + "/content";
 		if (document.isPdfVisual())
@@ -50,22 +52,41 @@ public class Document {
 
 	public static boolean isMainDocument(@NonNull Dossier dossier, @NonNull Document document) {
 
-		return document.isMainDocument()                                                            // Api4 case
-				|| (dossier.getDocumentList().size() == 1)                                          // Api3 default case
-				|| TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId());    // Api3 other case
+		// Default case
+
+		if ((dossier.getDocumentList() == null) || !dossier.getDocumentList().contains(document))
+			return false;
+
+		// Api4 case :
+		// If the mainDoc wasn't the first one in the list,
+		// But there is at least one declared main document,
+		// Then the first doc isn't the main one...
+
+		if (document.isMainDocument())
+			return true;
+
+		for (Document doc : dossier.getDocumentList())
+			if (doc.isMainDocument())
+				return false;
+
+		// Api3 case :
+		// We already know here the list isn't empty,
+		// and the first document is the only main one.
+
+		return (TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId()));
 	}
 
 	// </editor-fold desc="Static utils">
 
 	public Document() {}
 
-	public Document(String id, String name, int size, boolean isLocked, boolean isMainDocument) {
+	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;
 		mName = name;
 		mSize = size;
 		mPagesAnnotations = new SparseArray<>();
-		mIsLocked = isLocked;
 		mIsMainDocument = isMainDocument;
+		mIsPdfVisual = isPdfVisual;
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -88,10 +109,6 @@ public class Document {
 
 	public void setPath(String path) {
 		mPath = path;
-	}
-
-	public boolean isLocked() {
-		return mIsLocked;
 	}
 
 	public boolean isMainDocument() {

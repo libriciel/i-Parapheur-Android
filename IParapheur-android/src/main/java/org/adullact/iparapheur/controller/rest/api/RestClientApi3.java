@@ -18,6 +18,7 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.gson.Gson;
@@ -100,6 +101,8 @@ public class RestClientApi3 extends RestClientApi {
 		String response = RESTUtils.get(url).getResponse().toString();
 		Dossier dossierParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
 
+		Log.w("Adrien", "response : " + response);
+
 		Dossier.fixActions(dossierParsed);
 		return dossierParsed;
 	}
@@ -124,6 +127,7 @@ public class RestClientApi3 extends RestClientApi {
 		String url = buildUrl(RESOURCE_DOSSIERS, params);
 		String response = RESTUtils.get(url).getResponseArray().toString();
 
+		Log.d("Adrien", "jsonArray : " + response);
 		return Dossier.fromJsonArray(response, mGson);
 	}
 
