@@ -126,8 +126,12 @@ public class DossierTest {
 		);
 
 		Dossier dossier01 = new Dossier("id_01", "Title 01", SIGNATURE, dossier01ActionsSet, "Type 01", "Subtype 01", new Date(1392829477205L), null, true);
-
 		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, CollectionUtils.asSet(VISA, SIGNATURE), "Type 02", "Subtype 02", null, null, false);
+
+		dossier01.setSyncDate(null);
+		dossier02.setSyncDate(null);
+		dossier01.setParent(null);
+		dossier02.setParent(null);
 
 		// Checks
 
@@ -145,6 +149,8 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(0).getDocumentList(), dossier01.getDocumentList());
 		Assert.assertEquals(correctArrayParsed.get(0).getDateLimite(), dossier01.getDateLimite());
 		Assert.assertEquals(correctArrayParsed.get(0).getDateCreation(), dossier01.getDateCreation());
+		Assert.assertEquals(correctArrayParsed.get(0).getSyncDate(), dossier01.getSyncDate());
+		Assert.assertEquals(correctArrayParsed.get(0).getParent(), dossier01.getParent());
 
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), dossier02.toString());
 		Assert.assertEquals(correctArrayParsed.get(1).getId(), dossier02.getId());
@@ -157,6 +163,8 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getDocumentList(), dossier02.getDocumentList());
 		Assert.assertEquals(correctArrayParsed.get(1).getDateLimite(), dossier02.getDateLimite());
 		Assert.assertEquals(correctArrayParsed.get(1).getDateCreation(), dossier02.getDateCreation());
+		Assert.assertEquals(correctArrayParsed.get(1).getSyncDate(), dossier02.getSyncDate());
+		Assert.assertEquals(correctArrayParsed.get(1).getParent(), dossier02.getParent());
 	}
 
 	@Test public void fromJsonObject() throws Exception {

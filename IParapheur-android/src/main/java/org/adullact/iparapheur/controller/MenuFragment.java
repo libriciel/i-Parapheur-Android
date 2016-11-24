@@ -54,7 +54,6 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.support.DatabaseConnection;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
@@ -76,13 +75,13 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -288,6 +287,17 @@ public class MenuFragment extends Fragment {
 	@Override public void onResume() {
 		getActivity().invalidateOptionsMenu();
 		super.onResume();
+
+		DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+		try {
+			final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+			Log.i("Adrien", ">>> " + dossierDao.queryForAll());
+			final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+			Log.w("Adrien", ">>> " + bureauDao.queryForAll());
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -557,24 +567,23 @@ public class MenuFragment extends Fragment {
 
 				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 				try {
-					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+					final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
 
-					// Allow us to insert/update in loops
+					// This callable allow us to insert/update in loops
 					// and calling db only once...
-					DatabaseConnection dbConnextion = bureauDao.startThreadConnection();
-					Savepoint savePoint = null;
+					bureauDao.callBatchTasks(new Callable<Void>() {
+						@Override public Void call() throws Exception {
 
-					dbConnextion.setAutoCommit(false);
-					for (Bureau bureau : mBureauList) {
-						savePoint = dbConnextion.setSavePoint(null);
-						bureau.setSyncDate(new Date());
-						bureauDao.createOrUpdate(bureau);
-					}
-					dbConnextion.commit(savePoint);
-					dbConnextion.setAutoCommit(true);
-					dbConnextion.closeQuietly();
+							for (Bureau bureau : mBureauList) {
+								bureau.setSyncDate(new Date());
+								bureauDao.createOrUpdate(bureau);
+							}
+
+							return null;
+						}
+					});
 				}
-				catch (SQLException e) {
+				catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -693,12 +702,9 @@ public class MenuFragment extends Fragment {
 
 			// Allow us to insert/update in loops
 			// and calling db only once...
-			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-			Dao<Dossier, Integer> dossierDao;
-			DatabaseConnection dbConnextion = null;
 
 			try {
-				ArrayList<Dossier> dossierList = new ArrayList<>();
+				final ArrayList<Dossier> dossierList = new ArrayList<>();
 				for (String bureauId : bureauIds) {
 
 					List<Dossier> incompleteDossierList = RESTClient.INSTANCE.getDossiers(bureauId);
@@ -706,42 +712,35 @@ public class MenuFragment extends Fragment {
 
 						Dossier fullDossier = RESTClient.INSTANCE.getDossier(bureauId, incompleteDossier.getId());
 						fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
+						fullDossier.setParent(CollectionUtils.findBureau(mBureauList, bureauId));
 						dossierList.add(fullDossier);
 					}
 				}
 
 				// Save in Database
 
-				dossierDao = dbHelper.getDossierDao();
-				dbConnextion = dossierDao.startThreadConnection();
-				Savepoint savePoint = null;
+				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
 
-				dbConnextion.setAutoCommit(false);
-				Log.w("Adrien", "dossiersToSave : " + dossierList);
-				for (Dossier dossier : dossierList) {
-					savePoint = dbConnextion.setSavePoint(null);
-					dossier.setSyncDate(new Date());
-					dossierDao.createOrUpdate(dossier);
-				}
-				dbConnextion.commit(savePoint);
-				dbConnextion.setAutoCommit(true);
-				dbConnextion.closeQuietly();
-			}
-			catch (SQLException e) {
-				return new IParapheurException(-1, "DB error");
+				// This callable allow us to insert/update in loops
+				// and calling db only once...
+				dossierDao.callBatchTasks(new Callable<Void>() {
+					@Override public Void call() throws Exception {
+
+						for (Dossier dossier : dossierList) {
+							dossier.setSyncDate(new Date());
+							dossierDao.createOrUpdate(dossier);
+						}
+
+						return null;
+					}
+				});
 			}
 			catch (IParapheurException e) {
 				return e;
 			}
-			finally {
-				try {
-					if (dbConnextion != null)
-						if (!dbConnextion.isClosed())
-							dbConnextion.closeQuietly();
-				}
-				catch (SQLException e) {
-					e.printStackTrace();
-				}
+			catch (Exception e) {
+				return new IParapheurException(-1, "DB error");
 			}
 
 			return null;

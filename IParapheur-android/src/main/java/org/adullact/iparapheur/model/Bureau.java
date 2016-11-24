@@ -25,7 +25,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.lang.reflect.Type;
@@ -55,6 +57,9 @@ public class Bureau {
 
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
+
+	@ForeignCollectionField  //
+	private ForeignCollection<Dossier> mChildrenDossiers;
 
 	/**
 	 * Static parser, useful for Unit tests
@@ -115,6 +120,14 @@ public class Bureau {
 		mSyncDate = date;
 	}
 
+	public ForeignCollection<Dossier> getChildrenDossiers() {
+		return mChildrenDossiers;
+	}
+
+	public void setChildrenDossiers(ForeignCollection<Dossier> childrenDossiers) {
+		mChildrenDossiers = childrenDossiers;
+	}
+
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
@@ -124,4 +137,5 @@ public class Bureau {
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
 	}
+
 }

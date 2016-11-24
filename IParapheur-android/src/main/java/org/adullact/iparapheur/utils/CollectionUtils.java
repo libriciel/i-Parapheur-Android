@@ -18,6 +18,8 @@
 package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,10 +31,16 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.adullact.iparapheur.model.Bureau;
+
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +60,57 @@ public class CollectionUtils {
 	@SafeVarargs public static <T> Set<T> asSet(T... objects) {
 		HashSet<T> result = new HashSet<>();
 		Collections.addAll(result, objects);
+		return result;
+	}
+
+	public static @Nullable Bureau findBureau(@Nullable List<Bureau> bureauList, @Nullable String bureauId) {
+
+		// Default case
+
+		if ((bureauList == null) || (bureauId == null))
+			return null;
+
+		//
+
+		for (Bureau bureau : bureauList)
+			if (TextUtils.equals(bureau.getId(), bureauId))
+				return bureau;
+
+		return null;
+	}
+
+	public static @NonNull String printListReflexionCall(@Nullable Collection<?> collection, @NonNull String methodName) {
+
+		// Default cases
+
+		if (collection == null)
+			return "null";
+
+		if (collection.isEmpty())
+			return "[]";
+
+		// Building String
+
+		List<Object> list = new ArrayList<>(collection);
+		String result;
+
+		try {
+			Method getter = list.get(0).getClass().getMethod(methodName);
+
+			result = "[";
+			for (int i = 0; i < list.size(); i++) {
+
+				result += getter.invoke(list.get(i));
+
+				if (i < list.size() - 1)
+					result += ", ";
+			}
+			result += "]";
+		}
+		catch (Exception e) {
+			return "[-class incompatible with " + methodName + "-]";
+		}
+
 		return result;
 	}
 

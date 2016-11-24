@@ -80,6 +80,9 @@ public class Dossier {
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
+	@DatabaseField(foreign = true, foreignAutoRefresh = true)  //
+	private Bureau mParent;
+
 	private Circuit mCircuit;
 
 	public Dossier() {}
@@ -217,6 +220,14 @@ public class Dossier {
 
 	public void setSyncDate(Date date) {
 		mSyncDate = date;
+	}
+
+	public Bureau getParent() {
+		return mParent;
+	}
+
+	public void setParent(Bureau parent) {
+		mParent = parent;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -416,4 +427,5 @@ public class Dossier {
 	@Override public int hashCode() {
 		return (mId != null) ? mId.hashCode() : -1;
 	}
+
 }

@@ -17,15 +17,32 @@
  */
 package org.adullact.iparapheur.utils;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static org.mockito.Matchers.any;
 
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(TextUtils.class)
 public class CollectionUtilsTest {
 
 	// <editor-fold desc="Utils">
@@ -47,6 +64,60 @@ public class CollectionUtilsTest {
 	}
 
 	// </editor-fold desc="Utils">
+
+	@Before public void setUp() throws Exception {
+		PowerMockito.mockStatic(TextUtils.class);
+
+		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
+			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
+				CharSequence a = (CharSequence) invocation.getArguments()[0];
+				CharSequence b = (CharSequence) invocation.getArguments()[1];
+				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
+			}
+		});
+	}
+
+	@Test public void findBureau() throws Exception {
+
+		List<Bureau> bureauList = new ArrayList<>();
+		bureauList.add(new Bureau("id_01", "Name 01", 10, 5));
+		bureauList.add(new Bureau("id_02", "Name 02", 10, 5));
+		bureauList.add(new Bureau("id_03", "Name 03", 10, 5));
+
+		List<Bureau> emptyList = new ArrayList<>();
+
+		// Checks
+
+		Assert.assertNull(CollectionUtils.findBureau(null, null));
+		Assert.assertNull(CollectionUtils.findBureau(bureauList, null));
+		Assert.assertNull(CollectionUtils.findBureau(bureauList, "id_missing"));
+		Assert.assertNull(CollectionUtils.findBureau(emptyList, "id_01"));
+		//noinspection ConstantConditions
+		Assert.assertEquals(CollectionUtils.findBureau(bureauList, "id_02").getTitle(), "Name 02");
+	}
+
+	@Test public void printListReflexionCall() throws Exception {
+
+		List<Bureau> bureauList = new ArrayList<>();
+		bureauList.add(new Bureau("b_01", "Name 01", 10, 5));
+		bureauList.add(new Bureau("b_02", "Name 02", 10, 5));
+
+		List<Document> documentList = new ArrayList<>();
+		documentList.add(new Document("d_01", null, 0, false, false));
+
+		List<String> incompatibleList = new ArrayList<>();
+		incompatibleList.add("s_01");
+
+		List<Document> emptyList = new ArrayList<>();
+
+		// Checks
+
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(null, "getId"), "null");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(bureauList, "getId"), "[b_01, b_02]");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(documentList, "getId"), "[d_01]");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(incompatibleList, "getId"), "[-class incompatible with getId-]");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(emptyList, "getId"), "[]");
+	}
 
 	@Test public void buildGsonWithLongToDate() throws Exception {
 
