@@ -44,7 +44,6 @@ public class Circuit {
 	 *
 	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson            passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable Circuit fromJsonObject(@NonNull String jsonArrayString, @NonNull Gson gson) {
 

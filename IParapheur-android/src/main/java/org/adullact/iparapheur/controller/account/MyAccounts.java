@@ -15,6 +15,10 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
+	/**
+	 * @return
+	 * @coveredInInstrumentedUnitTest
+	 */
 package org.adullact.iparapheur.controller.account;
 
 import android.content.Context;
@@ -92,9 +96,6 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		return account;
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
 	public void save(@NonNull Context context, @NonNull Account account) {
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -108,9 +109,6 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		editor.apply();
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
 	public void delete(@NonNull Context context, @NonNull Account account) {
 
 		String id = account.getId();
@@ -133,9 +131,6 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			mSelectedAccount = null;
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
 	public @Nullable Account getAccount(@NonNull String id) {
 		int index = mAccounts.indexOf(new Account(id));
 		return (index != -1) ? mAccounts.get(index) : null;

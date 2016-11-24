@@ -105,7 +105,6 @@ public class Dossier {
 	 *
 	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson            passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable List<Dossier> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
@@ -132,7 +131,6 @@ public class Dossier {
 	 *
 	 * @param jsonObjectString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson             passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable Dossier fromJsonObject(@NonNull String jsonObjectString, @NonNull Gson gson) {
 

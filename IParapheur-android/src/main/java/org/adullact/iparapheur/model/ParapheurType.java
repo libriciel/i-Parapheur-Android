@@ -40,7 +40,6 @@ public class ParapheurType {
 	 *
 	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
 	 * @param gson            passed statically to prevent re-creating it.
-	 * @coveredInLocalUnitTest
 	 */
 	public static @Nullable List<ParapheurType> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 

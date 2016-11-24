@@ -101,6 +101,7 @@ public class CollectionUtilsTest {
 		List<Bureau> bureauList = new ArrayList<>();
 		bureauList.add(new Bureau("b_01", "Name 01", 10, 5));
 		bureauList.add(new Bureau("b_02", "Name 02", 10, 5));
+		bureauList.add(null);
 
 		List<Document> documentList = new ArrayList<>();
 		documentList.add(new Document("d_01", null, 0, false, false));
@@ -113,9 +114,9 @@ public class CollectionUtilsTest {
 		// Checks
 
 		Assert.assertEquals(CollectionUtils.printListReflexionCall(null, "getId"), "null");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(bureauList, "getId"), "[b_01, b_02]");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(bureauList, "getId"), "[b_01, b_02, null]");
 		Assert.assertEquals(CollectionUtils.printListReflexionCall(documentList, "getId"), "[d_01]");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(incompatibleList, "getId"), "[-class incompatible with getId-]");
+		Assert.assertEquals(CollectionUtils.printListReflexionCall(incompatibleList, "getId"), "[-class incompatible with getId()-]");
 		Assert.assertEquals(CollectionUtils.printListReflexionCall(emptyList, "getId"), "[]");
 	}
 

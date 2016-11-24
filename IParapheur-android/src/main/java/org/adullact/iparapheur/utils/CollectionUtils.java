@@ -79,6 +79,17 @@ public class CollectionUtils {
 		return null;
 	}
 
+	/**
+	 * Pretty print of every element's method call.
+	 * Only no-parameters methods can be called, otherwise it'll pretty-print an exception.
+	 *
+	 * This method obviously uses reflexion, with an un-elegant amount of {@link Exception} catches.
+	 * It should only be used for testing purposes.
+	 *
+	 * @param collection the collection to pretty-print
+	 * @param methodName usually some "getId"
+	 * @return a String like "[id_01, id_02]", "null", or a printed exception like "[-incompatible...-]"
+	 */
 	public static @NonNull String printListReflexionCall(@Nullable Collection<?> collection, @NonNull String methodName) {
 
 		// Default cases
@@ -100,7 +111,10 @@ public class CollectionUtils {
 			result = "[";
 			for (int i = 0; i < list.size(); i++) {
 
-				result += getter.invoke(list.get(i));
+				if (list.get(i) != null)
+					result += getter.invoke(list.get(i));
+				else
+					result += "null";
 
 				if (i < list.size() - 1)
 					result += ", ";
@@ -108,7 +122,7 @@ public class CollectionUtils {
 			result += "]";
 		}
 		catch (Exception e) {
-			return "[-class incompatible with " + methodName + "-]";
+			return "[-class incompatible with " + methodName + "()-]";
 		}
 
 		return result;
@@ -119,7 +133,6 @@ public class CollectionUtils {
 	 * Since the parsing is waiting for long numbers, we customize the serialization too.
 	 *
 	 * @return {@link Gson} object
-	 * @coveredInLocalUnitTest
 	 */
 	public static @NonNull Gson buildGsonWithLongToDate() {
 
