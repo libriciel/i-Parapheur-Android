@@ -30,7 +30,7 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,19 +57,19 @@ import static org.adullact.iparapheur.model.Action.VISA;
 @LargeTest
 public class DatabaseHelperTest {
 
-	private DatabaseHelper mDbHelper;
+	private static DatabaseHelper sDbHelper;
 
-	@Before public void setup() {
+	@BeforeClass public static void setup() {
 		Context context = InstrumentationRegistry.getTargetContext();
 		context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
-		mDbHelper = new DatabaseHelper(context);
+		sDbHelper = new DatabaseHelper(context);
 	}
 
 	@Test public void order01_onCreate() throws Exception {
 
-		Dao<Bureau, Integer> bureauDao = mDbHelper.getBureauDao();
-		Dao<Dossier, Integer> dossierDao = mDbHelper.getDossierDao();
-		Dao<Document, Integer> documentDao = mDbHelper.getDocumentDao();
+		Dao<Bureau, Integer> bureauDao = sDbHelper.getBureauDao();
+		Dao<Dossier, Integer> dossierDao = sDbHelper.getDossierDao();
+		Dao<Document, Integer> documentDao = sDbHelper.getDocumentDao();
 
 		// Test creation
 
@@ -84,15 +84,15 @@ public class DatabaseHelperTest {
 		Bureau bureau02 = new Bureau("id_02", "Bureau 02 \"/%@&éè", 22, 12);
 		Bureau bureau03 = new Bureau("id_03", null, 23, 13);
 
-		mDbHelper.getBureauDao().create(Arrays.asList(bureau01, bureau02, bureau03));
+		sDbHelper.getBureauDao().create(Arrays.asList(bureau01, bureau02, bureau03));
 
-		Bureau bureau01db = mDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Bureau bureau02db = mDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Bureau bureau03db = mDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Bureau bureau01db = sDbHelper.getBureauDao().queryForSameId(bureau01);
+		Bureau bureau02db = sDbHelper.getBureauDao().queryForSameId(bureau02);
+		Bureau bureau03db = sDbHelper.getBureauDao().queryForSameId(bureau03);
 
 		// Tests
 
-		Assert.assertEquals(mDbHelper.getBureauDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
 
 		Assert.assertEquals(bureau01db.getTitle(), bureau01.getTitle());
 		Assert.assertEquals(bureau02db.getTitle(), bureau02.getTitle());
@@ -100,6 +100,14 @@ public class DatabaseHelperTest {
 	}
 
 	@Test public void order03_getDossierDao() throws Exception {
+
+		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+
+		Assert.assertNotNull(bureau01);
+		Assert.assertNotNull(bureau02);
+		Assert.assertNotNull(bureau03);
 
 		HashSet<Action> actionsSet = new HashSet<>(Arrays.asList(ENREGISTRER,
 																 EMAIL,
@@ -114,18 +122,22 @@ public class DatabaseHelperTest {
 		));
 
 		Dossier dossier01 = new Dossier("id_01", "Title 01", VISA, actionsSet, "t01", "st01", new Date(1392829477205L), new Date(1392829477205L), true);
+		dossier01.setParent(bureau01);
 		Dossier dossier02 = new Dossier("id_02", "Title 02 \"/%@&éè\"", TDT, actionsSet, "t01", "st02", new Date(1392829477205L), null, true);
+		dossier02.setParent(bureau01);
 		Dossier dossier03 = new Dossier("id_03", null, null, null, null, null, null, null, false);
+		dossier03.setParent(bureau02);
 
-		mDbHelper.getDossierDao().create(Arrays.asList(dossier01, dossier02, dossier03));
+		sDbHelper.getDossierDao().create(Arrays.asList(dossier01, dossier02, dossier03));
 
-		Dossier dossier01db = mDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Dossier dossier02db = mDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Dossier dossier03db = mDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Dossier dossier01db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Dossier dossier02db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Dossier dossier03db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
 
 		// Tests
 
-		Assert.assertEquals(mDbHelper.getDossierDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
 
 		Assert.assertEquals(dossier01db.getName(), dossier01.getName());
 		Assert.assertEquals(dossier02db.getName(), dossier02.getName());
@@ -139,6 +151,14 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(dossier01db.getDateCreation(), dossier01.getDateCreation());
 		Assert.assertEquals(dossier02db.getDateCreation(), dossier02.getDateCreation());
 		Assert.assertEquals(dossier03db.getDateCreation(), dossier03.getDateCreation());
+
+		sDbHelper.getBureauDao().update(bureau01);
+		sDbHelper.getBureauDao().update(bureau02);
+		sDbHelper.getBureauDao().update(bureau03);
+
+		Assert.assertEquals(bureau01.getChildrenDossiers().size(), 2);
+		Assert.assertEquals(bureau02.getChildrenDossiers().size(), 1);
+		Assert.assertEquals(bureau03.getChildrenDossiers().size(), 0);
 	}
 
 	@Test public void order04_getDocumentDao() throws Exception {

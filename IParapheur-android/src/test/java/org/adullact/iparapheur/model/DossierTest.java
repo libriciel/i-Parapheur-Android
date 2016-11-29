@@ -34,9 +34,10 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
 import static org.adullact.iparapheur.model.Action.AVIS_COMPLEMENTAIRE;
@@ -118,18 +119,19 @@ public class DossierTest {
 
 		// Valid types
 
-		Set<Action> dossier01ActionsSet = CollectionUtils.asSet(ENREGISTRER,
-																EMAIL,
-																JOURNAL,
-																SECRETARIAT,
-																REJET,
-																SIGNATURE,
-																TRANSFERT_SIGNATURE,
-																AVIS_COMPLEMENTAIRE
-		);
+		HashSet<Action> dossier01ActionsSet = new HashSet<>(Arrays.asList(ENREGISTRER,
+																		  EMAIL,
+																		  JOURNAL,
+																		  SECRETARIAT,
+																		  REJET,
+																		  SIGNATURE,
+																		  TRANSFERT_SIGNATURE,
+																		  AVIS_COMPLEMENTAIRE
+		));
+		HashSet<Action> dossier02ActionsSet = new HashSet<>(Arrays.asList(VISA, SIGNATURE));
 
 		Dossier dossier01 = new Dossier("id_01", "Title 01", SIGNATURE, dossier01ActionsSet, "Type 01", "Subtype 01", new Date(1392829477205L), null, true);
-		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, CollectionUtils.asSet(VISA, SIGNATURE), "Type 02", "Subtype 02", null, null, false);
+		Dossier dossier02 = new Dossier("id_02", "Title 02", VISA, dossier02ActionsSet, "Type 02", "Subtype 02", null, null, false);
 
 		dossier01.setSyncDate(null);
 		dossier02.setSyncDate(null);
@@ -307,9 +309,9 @@ public class DossierTest {
 
 	@Test public void haveActions() throws Exception {
 
-		Dossier dossier01 = new Dossier(null, null, null, CollectionUtils.asSet(EMAIL, JOURNAL, ENREGISTRER), null, null, null, null, false);
-		Dossier dossier02 = new Dossier(null, null, null, CollectionUtils.asSet(VISA, EMAIL, JOURNAL, ENREGISTRER), null, null, null, null, false);
-		Dossier dossier03 = new Dossier(null, null, null, CollectionUtils.asSet(REJET, EMAIL, ENREGISTRER), null, null, null, null, false);
+		Dossier dossier01 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
+		Dossier dossier02 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(VISA, EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
+		Dossier dossier03 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(REJET, EMAIL, ENREGISTRER)), null, null, null, null, false);
 		Dossier dossier04 = new Dossier(null, null, null, null, null, null, null, null, false);
 
 		// Checks
@@ -327,7 +329,7 @@ public class DossierTest {
 		Dossier dossier = new Dossier(null,
 									  null,
 									  null,
-									  CollectionUtils.asSet(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE),
+									  new HashSet<>(Arrays.asList(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE)),
 									  null,
 									  null,
 									  null,
@@ -338,7 +340,7 @@ public class DossierTest {
 		Dossier dossierWithActionDemandee = new Dossier(null,
 														null,
 														TDT,
-														CollectionUtils.asSet(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE),
+														new HashSet<>(Arrays.asList(VISA, MAILSEC, TDT, TDT_HELIOS, SIGNATURE, REJET, TDT_ACTES, ARCHIVAGE)),
 														null,
 														null,
 														null,
@@ -377,7 +379,7 @@ public class DossierTest {
 	@Test public void getNegativeAction() throws Exception {
 
 		Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
-		Dossier dossier = new Dossier(null, null, SIGNATURE, CollectionUtils.asSet(VISA, SIGNATURE, REJET, TDT), null, null, null, null, false);
+		Dossier dossier = new Dossier(null, null, SIGNATURE, new HashSet<>(Arrays.asList(VISA, SIGNATURE, REJET, TDT)), null, null, null, null, false);
 
 		// Checks
 
@@ -392,10 +394,10 @@ public class DossierTest {
 
 		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
 
-		Set<Action> dossier02ActionsSet = CollectionUtils.asSet(VISA, SIGNATURE);
+		HashSet<Action> dossier02ActionsSet = new HashSet<>(Arrays.asList(VISA, SIGNATURE));
 		Dossier dossier02 = new Dossier(null, null, SIGNATURE, dossier02ActionsSet, null, null, null, null, false);
 
-		Set<Action> dossier03ActionsSet = CollectionUtils.asSet();
+		HashSet<Action> dossier03ActionsSet = new HashSet<>();
 		Dossier dossier03 = new Dossier(null, null, ARCHIVAGE, dossier03ActionsSet, null, null, null, null, false);
 
 		Dossier.fixActions(dossier01);

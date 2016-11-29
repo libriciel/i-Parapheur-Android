@@ -90,7 +90,7 @@ public class Dossier {
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
-	@DatabaseField(foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = "DeskId", foreign = true, foreignAutoRefresh = true)  //
 	private Bureau mParent;
 
 	private Circuit mCircuit;
