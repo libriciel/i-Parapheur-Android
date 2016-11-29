@@ -17,13 +17,16 @@
  */
 package org.adullact.iparapheur.controller.account;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.MediumTest;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
 import org.adullact.iparapheur.model.Account;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,11 +38,17 @@ import java.util.List;
 @MediumTest
 public class MyAccountsTest {
 
+	private Context mContext;
+
+	@Before public void setup() {
+		mContext = InstrumentationRegistry.getContext();
+	}
+
 	// <editor-fold desc="Static utils">
 
-	private static @NonNull Account createAccount(@NonNull String number) {
+	private static @NonNull Account createAccount(@NonNull Context context, @NonNull String number) {
 
-		Account account = MyAccounts.INSTANCE.addAccount();
+		Account account = MyAccounts.INSTANCE.addAccount(context);
 		account.setServerBaseUrl("baseurl" + number + ".org");
 		account.setTitle("title_" + number);
 		account.setLogin("login_" + number);
@@ -48,64 +57,64 @@ public class MyAccountsTest {
 		return account;
 	}
 
-	private static void cleanupData() {
+	private static void cleanupData(@NonNull Context context) {
 
-		List<Account> accountList = new ArrayList<>(MyAccounts.INSTANCE.getAccounts());
+		List<Account> accountList = new ArrayList<>(MyAccounts.INSTANCE.getAccounts(context));
 		for (Account account : accountList)
-			MyAccounts.INSTANCE.delete(account);
+			MyAccounts.INSTANCE.delete(context, account);
 	}
 
 	// </editor-fold desc="Static utils">
 
 	@Test public void testSave() {
 
-		cleanupData();
+		cleanupData(mContext);
 
-		createAccount("01");
-		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts().size(), 1);
+		createAccount(mContext, "01");
+		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts(mContext).size(), 1);
 
-		createAccount("02");
-		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts().size(), 2);
+		createAccount(mContext, "02");
+		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts(mContext).size(), 2);
 
-		createAccount("03");
-		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts().size(), 3);
+		createAccount(mContext, "03");
+		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts(mContext).size(), 3);
 
-		cleanupData();
+		cleanupData(mContext);
 	}
 
 	@Test public void testDelete() {
 
 		// Create
 
-		cleanupData();
+		cleanupData(mContext);
 
-		createAccount("01");
-		createAccount("02");
-		createAccount("03");
+		createAccount(mContext, "01");
+		createAccount(mContext, "02");
+		createAccount(mContext, "03");
 
 		// Delete and test
 
-		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts().size(), 3);
+		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts(mContext).size(), 3);
 
-		List<Account> accountList = new ArrayList<>(MyAccounts.INSTANCE.getAccounts());
+		List<Account> accountList = new ArrayList<>(MyAccounts.INSTANCE.getAccounts(mContext));
 		for (Account account : accountList)
-			MyAccounts.INSTANCE.delete(account);
+			MyAccounts.INSTANCE.delete(mContext, account);
 
-		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts().size(), 0);
+		Assert.assertEquals(MyAccounts.INSTANCE.getAccounts(mContext).size(), 0);
 	}
 
 	@Test public void testGetAccount() {
 
 		// Create
 
-		cleanupData();
+		cleanupData(mContext);
 
-		Account inputAccount01 = createAccount("01");
-		Account inputAccount02 = createAccount("02");
+		Account inputAccount01 = createAccount(mContext, "01");
+		Account inputAccount02 = createAccount(mContext, "02");
 
 		// Fetch and test
 
-		MyAccounts.INSTANCE.getAccounts();
+		MyAccounts.INSTANCE.getAccounts(mContext);
 
 		Account savedAccount01 = MyAccounts.INSTANCE.getAccount(inputAccount01.getId());
 		Assert.assertNotNull(savedAccount01);
@@ -123,7 +132,6 @@ public class MyAccountsTest {
 		Assert.assertEquals(savedAccount02.getLogin(), inputAccount02.getLogin());
 		Assert.assertEquals(savedAccount02.getPassword(), inputAccount02.getPassword());
 
-		cleanupData();
+		cleanupData(mContext);
 	}
 }
-

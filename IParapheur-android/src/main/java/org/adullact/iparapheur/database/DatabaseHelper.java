@@ -22,8 +22,8 @@ import java.sql.SQLException;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	private static final String DATABASE_NAME = "iParpaheur.db";
-	private static final int DATABASE_VERSION = 3;
+	public static final String DATABASE_NAME = "iParapheur.db";
+	private static final int DATABASE_VERSION = 1;
 
 	private Dao<Bureau, Integer> bureauDao;
 	private Dao<Dossier, Integer> dossierDao;

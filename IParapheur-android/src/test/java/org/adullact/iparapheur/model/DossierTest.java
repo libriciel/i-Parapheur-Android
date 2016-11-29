@@ -39,15 +39,18 @@ import java.util.List;
 import java.util.Set;
 
 import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
+import static org.adullact.iparapheur.model.Action.AVIS_COMPLEMENTAIRE;
 import static org.adullact.iparapheur.model.Action.EMAIL;
 import static org.adullact.iparapheur.model.Action.ENREGISTRER;
 import static org.adullact.iparapheur.model.Action.JOURNAL;
 import static org.adullact.iparapheur.model.Action.MAILSEC;
 import static org.adullact.iparapheur.model.Action.REJET;
+import static org.adullact.iparapheur.model.Action.SECRETARIAT;
 import static org.adullact.iparapheur.model.Action.SIGNATURE;
 import static org.adullact.iparapheur.model.Action.TDT;
 import static org.adullact.iparapheur.model.Action.TDT_ACTES;
 import static org.adullact.iparapheur.model.Action.TDT_HELIOS;
+import static org.adullact.iparapheur.model.Action.TRANSFERT_SIGNATURE;
 import static org.adullact.iparapheur.model.Action.VISA;
 import static org.mockito.Matchers.any;
 
@@ -115,14 +118,14 @@ public class DossierTest {
 
 		// Valid types
 
-		Set<Action> dossier01ActionsSet = CollectionUtils.asSet(Action.ENREGISTRER,
+		Set<Action> dossier01ActionsSet = CollectionUtils.asSet(ENREGISTRER,
 																EMAIL,
 																JOURNAL,
-																Action.SECRETARIAT,
+																SECRETARIAT,
 																REJET,
 																SIGNATURE,
-																Action.TRANSFERT_SIGNATURE,
-																Action.AVIS_COMPLEMENTAIRE
+																TRANSFERT_SIGNATURE,
+																AVIS_COMPLEMENTAIRE
 		);
 
 		Dossier dossier01 = new Dossier("id_01", "Title 01", SIGNATURE, dossier01ActionsSet, "Type 01", "Subtype 01", new Date(1392829477205L), null, true);

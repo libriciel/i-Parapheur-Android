@@ -70,13 +70,13 @@ import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
-import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -295,6 +295,13 @@ public class MenuFragment extends Fragment {
 			Log.i("Adrien", ">>> " + dossierDao.queryForAll());
 			final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
 			Log.w("Adrien", ">>> " + bureauDao.queryForAll());
+			final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
+			Log.e("Adrien", ">>> " + documentDao.queryForAll());
+
+			System.out.println("Bureau raw mapper : " + bureauDao.getTableName());
+			System.out.println("Dossier raw mapper : " + dossierDao.getTableName());
+			System.out.println("Document raw mapper : " + documentDao.getTableName());
+
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -658,8 +665,9 @@ public class MenuFragment extends Fragment {
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
 			else {
-				Dossier dossier1 = new Dossier("1", "Test 01", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
-				Dossier dossier2 = new Dossier("2", "Test 02", Action.VISA, CollectionUtils.asSet(Action.VISA), "Type", "Sous-Type", new Date(), null, false);
+				HashSet<Action> visaHashSet = new HashSet<>(Collections.singletonList(Action.VISA));
+				Dossier dossier1 = new Dossier("1", "Test 01", Action.VISA, visaHashSet, "Type", "Sous-Type", new Date(), null, false);
+				Dossier dossier2 = new Dossier("2", "Test 02", Action.VISA, visaHashSet, "Type", "Sous-Type", new Date(), null, false);
 				mDossierList.add(dossier1);
 				mDossierList.add(dossier2);
 			}

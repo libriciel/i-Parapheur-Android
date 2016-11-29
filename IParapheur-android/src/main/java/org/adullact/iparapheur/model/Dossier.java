@@ -26,6 +26,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -37,6 +38,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.adullact.iparapheur.model.Action.VISA;
 
 
 @DatabaseTable(tableName = "Folder")
@@ -50,6 +53,7 @@ public class Dossier {
 	@SerializedName("title")  //
 	private String mName;
 
+	@DatabaseField(columnName = "ActionAsked", dataType = DataType.ENUM_STRING, canBeNull = false, defaultValue = "VISA")  //
 	@SerializedName("actionDemandee")  //
 	private Action mActionDemandee;
 
@@ -69,8 +73,9 @@ public class Dossier {
 	@SerializedName("dateLimite")  //
 	private Date mDateLimite;
 
+	@DatabaseField(columnName = "Actions", dataType = DataType.SERIALIZABLE)  //
 	@SerializedName("actions")  //
-	private Set<Action> mActions;
+	private HashSet<Action> mActions;
 
 	@DatabaseField(columnName = "IsPaperSign")  //
 	@SerializedName("isSignPapier")  //
@@ -92,7 +97,7 @@ public class Dossier {
 
 	public Dossier() {}
 
-	public Dossier(String id, String name, Action actionDemandee, Set<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
+	public Dossier(String id, String name, Action actionDemandee, HashSet<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
 				   boolean isSignPapier) {
 		mId = id;
 		mName = name;
@@ -169,7 +174,7 @@ public class Dossier {
 		return mActions;
 	}
 
-	private void setActions(@NonNull Set<Action> actions) {
+	private void setActions(@NonNull HashSet<Action> actions) {
 		mActions = actions;
 	}
 
@@ -306,8 +311,8 @@ public class Dossier {
 
 		if (actions.contains(Action.SIGNATURE))
 			return Action.SIGNATURE;
-		else if (actions.contains(Action.VISA))
-			return Action.VISA;
+		else if (actions.contains(VISA))
+			return VISA;
 		else if (actions.contains(Action.ARCHIVAGE))
 			return Action.ARCHIVAGE;
 		else if (actions.contains(Action.MAILSEC))
@@ -361,7 +366,7 @@ public class Dossier {
 			dossier.setActions(new HashSet<Action>());
 
 		if (dossier.getActionDemandee() == null)
-			dossier.setActionDemandee(Action.VISA);
+			dossier.setActionDemandee(VISA);
 
 		// Yep, sometimes it happens
 
@@ -371,11 +376,11 @@ public class Dossier {
 		// Fixing signature logic
 
 		if (dossier.getActionDemandee() == Action.SIGNATURE) {
-			dossier.getActions().remove(Action.VISA);
+			dossier.getActions().remove(VISA);
 			dossier.getActions().add(Action.SIGNATURE);
 		}
 
-		if (dossier.getActionDemandee() == Action.VISA)
+		if (dossier.getActionDemandee() == VISA)
 			dossier.getActions().add(Action.SIGNATURE);
 	}
 
