@@ -11,6 +11,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.sql.SQLException;
@@ -22,10 +23,11 @@ import java.sql.SQLException;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	private static final String DATABASE_NAME = "iParpaheur.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 3;
 
 	private Dao<Bureau, Integer> bureauDao;
 	private Dao<Dossier, Integer> dossierDao;
+	private Dao<Document, Integer> documentDao;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,6 +40,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		try {
 			TableUtils.createTable(connectionSource, Bureau.class);
 			TableUtils.createTable(connectionSource, Dossier.class);
+			TableUtils.createTable(connectionSource, Document.class);
 		}
 		catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Unable to create databases", e);
@@ -53,6 +56,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 			TableUtils.dropTable(connectionSource, Bureau.class, true);
 			TableUtils.dropTable(connectionSource, Dossier.class, true);
+			TableUtils.dropTable(connectionSource, Document.class, true);
+
 			onCreate(sqliteDatabase, connectionSource);
 		}
 		catch (SQLException e) {
@@ -79,6 +84,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			dossierDao = getDao(Dossier.class);
 
 		return dossierDao;
+	}
+
+	public @NonNull Dao<Document, Integer> getDocumentDao() throws SQLException {
+
+		if (documentDao == null)
+			documentDao = getDao(Document.class);
+
+		return documentDao;
 	}
 
 }

@@ -24,26 +24,43 @@ import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.Date;
 
 
+@DatabaseTable(tableName = "Document")
 public class Document {
 
+	@DatabaseField(columnName = "Id", id = true, index = true)  //
 	@SerializedName("id")  //
 	private String mId;
 
+	@DatabaseField(columnName = "Name", canBeNull = false, defaultValue = "")  //
 	@SerializedName("name")  //
 	private String mName;
 
+	@DatabaseField(columnName = "Size", defaultValue = "-1")  //
 	@SerializedName("size")  //
 	private int mSize;                          // TODO : download image instead of too heavy files
 
+	@DatabaseField(columnName = "IsPdfVisual", defaultValue = "false")  //
 	@SerializedName("visuelPdf")  //
 	private boolean mIsPdfVisual;
 
+	@DatabaseField(columnName = "IsMainDocument")  //
 	@SerializedName("isMainDocument")  //
 	private boolean mIsMainDocument;
 
+	@DatabaseField(columnName = "Path")  //
 	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
+
+	@DatabaseField(columnName = "Sync")  //
+	private Date mSyncDate;
+
+	@DatabaseField(foreign = true, foreignAutoRefresh = true)  //
+	private Dossier mParent;
+
 	private SparseArray<PageAnnotations> mPagesAnnotations;
 
 	// <editor-fold desc="Static utils">
@@ -137,6 +154,22 @@ public class Document {
 		mPagesAnnotations = pagesAnnotations;
 	}
 
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date syncDate) {
+		mSyncDate = syncDate;
+	}
+
+	public Dossier getParent() {
+		return mParent;
+	}
+
+	public void setParent(Dossier parent) {
+		mParent = parent;
+	}
+
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
@@ -146,4 +179,5 @@ public class Document {
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Document) && (mId.contentEquals(((Document) o).getId()));
 	}
+
 }

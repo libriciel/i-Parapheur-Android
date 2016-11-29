@@ -25,7 +25,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.lang.reflect.Type;
@@ -76,6 +78,9 @@ public class Dossier {
 
 	@SerializedName("documents")  //
 	private List<Document> mDocumentList = new ArrayList<>();
+
+	@ForeignCollectionField  //
+	private ForeignCollection<Document> mChildrenDocuments;
 
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
@@ -226,6 +231,14 @@ public class Dossier {
 
 	public void setParent(Bureau parent) {
 		mParent = parent;
+	}
+
+	public ForeignCollection<Document> getChildrenDocuments() {
+		return mChildrenDocuments;
+	}
+
+	public void setChildrenDocuments(ForeignCollection<Document> childrenDocuments) {
+		mChildrenDocuments = childrenDocuments;
 	}
 
 	// </editor-fold desc="Setters / Getters">

@@ -132,6 +132,8 @@ public class DossierTest {
 		dossier02.setSyncDate(null);
 		dossier01.setParent(null);
 		dossier02.setParent(null);
+		dossier01.setChildrenDocuments(null);
+		dossier02.setChildrenDocuments(null);
 
 		// Checks
 
@@ -151,6 +153,7 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(0).getDateCreation(), dossier01.getDateCreation());
 		Assert.assertEquals(correctArrayParsed.get(0).getSyncDate(), dossier01.getSyncDate());
 		Assert.assertEquals(correctArrayParsed.get(0).getParent(), dossier01.getParent());
+		Assert.assertEquals(correctArrayParsed.get(0).getChildrenDocuments(), dossier01.getChildrenDocuments());
 
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), dossier02.toString());
 		Assert.assertEquals(correctArrayParsed.get(1).getId(), dossier02.getId());
@@ -165,6 +168,7 @@ public class DossierTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getDateCreation(), dossier02.getDateCreation());
 		Assert.assertEquals(correctArrayParsed.get(1).getSyncDate(), dossier02.getSyncDate());
 		Assert.assertEquals(correctArrayParsed.get(1).getParent(), dossier02.getParent());
+		Assert.assertEquals(correctArrayParsed.get(1).getChildrenDocuments(), dossier02.getChildrenDocuments());
 	}
 
 	@Test public void fromJsonObject() throws Exception {

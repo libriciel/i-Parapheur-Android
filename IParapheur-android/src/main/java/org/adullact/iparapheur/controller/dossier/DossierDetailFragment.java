@@ -38,11 +38,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.j256.ormlite.dao.Dao;
+
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.MainActivity;
 import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
@@ -58,8 +61,10 @@ import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import coop.adullactprojet.mupdffragment.MuPDFFragment;
 import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
@@ -705,8 +710,29 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 					Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
 					mDossier.setDocumentList(retrievedDossier.getDocumentList());
 					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+
+					// Save in Database
+
+					DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+					final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+
+					// This callable allow us to insert/update in loops
+					// and calling db only once...
+					dossierDao.callBatchTasks(new Callable<Void>() {
+						@Override public Void call() throws Exception {
+							mDossier.setSyncDate(new Date());
+							dossierDao.createOrUpdate(mDossier);
+
+							return null;
+						}
+					});
 				}
-				catch (IParapheurException e) { e.printStackTrace(); }
+				catch (IParapheurException e) {
+					e.printStackTrace();
+				}
+				catch (Exception e) {
+					new IParapheurException(-1, "DB error").printStackTrace();
+				}
 			}
 
 			// Getting metadata

@@ -66,6 +66,7 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
@@ -700,10 +701,10 @@ public class MenuFragment extends Fragment {
 
 		@Override protected IParapheurException doInBackground(String... bureauIds) {
 
-			// Allow us to insert/update in loops
-			// and calling db only once...
-
 			try {
+
+				// Downloading
+
 				final ArrayList<Dossier> dossierList = new ArrayList<>();
 				for (String bureauId : bureauIds) {
 
@@ -712,15 +713,19 @@ public class MenuFragment extends Fragment {
 
 						Dossier fullDossier = RESTClient.INSTANCE.getDossier(bureauId, incompleteDossier.getId());
 						fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
-						fullDossier.setParent(CollectionUtils.findBureau(mBureauList, bureauId));
+						fullDossier.setParent(Bureau.findInList(mBureauList, bureauId));
 						dossierList.add(fullDossier);
+
+						for (Document document : fullDossier.getDocumentList())
+							document.setParent(fullDossier);
 					}
 				}
 
-				// Save in Database
+				// Saving in database
 
 				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
 
 				// This callable allow us to insert/update in loops
 				// and calling db only once...
@@ -730,6 +735,11 @@ public class MenuFragment extends Fragment {
 						for (Dossier dossier : dossierList) {
 							dossier.setSyncDate(new Date());
 							dossierDao.createOrUpdate(dossier);
+
+							for (Document document : dossier.getDocumentList()) {
+								document.setSyncDate(new Date());
+								documentDao.createOrUpdate(document);
+							}
 						}
 
 						return null;

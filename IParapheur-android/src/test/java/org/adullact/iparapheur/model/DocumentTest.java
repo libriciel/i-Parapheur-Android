@@ -79,6 +79,8 @@ public class DocumentTest {
 		Document document = new Document("id_01", "name 01.pdf", 50000, true, true);
 		document.setPath(null);
 		document.setPagesAnnotations(null);
+		document.setSyncDate(null);
+		document.setParent(null);
 
 		// Checks
 
@@ -94,6 +96,8 @@ public class DocumentTest {
 		Assert.assertEquals(correctObjectParsed.isPdfVisual(), document.isPdfVisual());
 		Assert.assertEquals(correctObjectParsed.getPagesAnnotations(), document.getPagesAnnotations());
 		Assert.assertEquals(correctObjectParsed.getPath(), document.getPath());
+		Assert.assertEquals(correctObjectParsed.getSyncDate(), document.getSyncDate());
+		Assert.assertEquals(correctObjectParsed.getParent(), document.getParent());
 	}
 
 	// <editor-fold desc="Static utils">

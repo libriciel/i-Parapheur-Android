@@ -19,7 +19,6 @@ package org.adullact.iparapheur.utils;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,8 +29,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import org.adullact.iparapheur.model.Bureau;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -61,22 +58,6 @@ public class CollectionUtils {
 		HashSet<T> result = new HashSet<>();
 		Collections.addAll(result, objects);
 		return result;
-	}
-
-	public static @Nullable Bureau findBureau(@Nullable List<Bureau> bureauList, @Nullable String bureauId) {
-
-		// Default case
-
-		if ((bureauList == null) || (bureauId == null))
-			return null;
-
-		//
-
-		for (Bureau bureau : bureauList)
-			if (TextUtils.equals(bureau.getId(), bureauId))
-				return bureau;
-
-		return null;
 	}
 
 	/**

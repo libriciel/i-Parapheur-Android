@@ -33,6 +33,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
@@ -62,6 +63,30 @@ public class BureauTest {
 			}
 		});
 	}
+
+	// <editor-fold desc="Static utils">
+
+	@Test public void findInList() throws Exception {
+
+		List<Bureau> bureauList = new ArrayList<>();
+		bureauList.add(new Bureau("id_01", "Name 01", 10, 5));
+		bureauList.add(new Bureau("id_02", "Name 02", 10, 5));
+		bureauList.add(null);
+		bureauList.add(new Bureau("id_03", "Name 03", 10, 5));
+
+		List<Bureau> emptyList = new ArrayList<>();
+
+		// Checks
+
+		org.junit.Assert.assertNull(Bureau.findInList(null, null));
+		org.junit.Assert.assertNull(Bureau.findInList(bureauList, null));
+		org.junit.Assert.assertNull(Bureau.findInList(bureauList, "id_missing"));
+		org.junit.Assert.assertNull(Bureau.findInList(emptyList, "id_01"));
+		//noinspection ConstantConditions
+		org.junit.Assert.assertEquals(Bureau.findInList(bureauList, "id_02").getTitle(), "Name 02");
+	}
+
+	// </editor-fold desc="Static utils">
 
 	@Test public void fromJsonArray() throws Exception {
 

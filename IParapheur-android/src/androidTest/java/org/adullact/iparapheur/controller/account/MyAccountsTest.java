@@ -31,9 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * @see org.adullact.iparapheur.controller.account.MyAccounts
- */
 @RunWith(AndroidJUnit4.class)
 @MediumTest
 public class MyAccountsTest {

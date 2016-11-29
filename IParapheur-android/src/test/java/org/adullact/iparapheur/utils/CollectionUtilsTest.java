@@ -77,25 +77,6 @@ public class CollectionUtilsTest {
 		});
 	}
 
-	@Test public void findBureau() throws Exception {
-
-		List<Bureau> bureauList = new ArrayList<>();
-		bureauList.add(new Bureau("id_01", "Name 01", 10, 5));
-		bureauList.add(new Bureau("id_02", "Name 02", 10, 5));
-		bureauList.add(new Bureau("id_03", "Name 03", 10, 5));
-
-		List<Bureau> emptyList = new ArrayList<>();
-
-		// Checks
-
-		Assert.assertNull(CollectionUtils.findBureau(null, null));
-		Assert.assertNull(CollectionUtils.findBureau(bureauList, null));
-		Assert.assertNull(CollectionUtils.findBureau(bureauList, "id_missing"));
-		Assert.assertNull(CollectionUtils.findBureau(emptyList, "id_01"));
-		//noinspection ConstantConditions
-		Assert.assertEquals(CollectionUtils.findBureau(bureauList, "id_02").getTitle(), "Name 02");
-	}
-
 	@Test public void printListReflexionCall() throws Exception {
 
 		List<Bureau> bureauList = new ArrayList<>();
