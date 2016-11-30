@@ -30,6 +30,8 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -71,7 +73,7 @@ public class DatabaseHelperTest {
 		Dao<Dossier, Integer> dossierDao = sDbHelper.getDossierDao();
 		Dao<Document, Integer> documentDao = sDbHelper.getDocumentDao();
 
-		// Test creation
+		// Checks
 
 		Assert.assertEquals(bureauDao.getTableName(), "Desk");
 		Assert.assertEquals(dossierDao.getTableName(), "Folder");
@@ -90,7 +92,7 @@ public class DatabaseHelperTest {
 		Bureau bureau02db = sDbHelper.getBureauDao().queryForSameId(bureau02);
 		Bureau bureau03db = sDbHelper.getBureauDao().queryForSameId(bureau03);
 
-		// Tests
+		// Checks
 
 		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
 
@@ -134,10 +136,9 @@ public class DatabaseHelperTest {
 		Dossier dossier02db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
 		Dossier dossier03db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
 
-		// Tests
+		// Checks
 
 		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
-		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
 
 		Assert.assertEquals(dossier01db.getName(), dossier01.getName());
 		Assert.assertEquals(dossier02db.getName(), dossier02.getName());
@@ -163,6 +164,53 @@ public class DatabaseHelperTest {
 
 	@Test public void order04_getDocumentDao() throws Exception {
 
+		Dossier dossier01 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Dossier dossier03 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+
+		Assert.assertNotNull(dossier01);
+		Assert.assertNotNull(dossier02);
+		Assert.assertNotNull(dossier03);
+
+		Document document01 = new Document("id_01", "name 01.pdf", 50000, true, true);
+		document01.setPath("/test/path/1/");
+		document01.setPagesAnnotations(new SerializableSparseArray<PageAnnotations>());
+		document01.setParent(dossier01);
+
+		Document document02 = new Document("id_02", "name 02.pdf", 0, true, true);
+		document02.setPath("/test/path/2/");
+		document02.setPagesAnnotations(new SerializableSparseArray<PageAnnotations>());
+		document02.setParent(dossier01);
+
+		Document document03 = new Document("id_03", null, 50000, false, false);
+		document03.setPath("/test/path/3/");
+		document03.setPagesAnnotations(null);
+		document03.setParent(dossier02);
+
+		sDbHelper.getDocumentDao().create(Arrays.asList(document01, document02, document03));
+
+		Document document01db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Document document02db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Document document03db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+
+		// Checks
+
+		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
+
+		Assert.assertEquals(document01db.getName(), document01.getName());
+		Assert.assertEquals(document02db.getName(), document02.getName());
+		Assert.assertEquals(document03db.getName(), "");
+		Assert.assertEquals(String.valueOf(document01db.getPagesAnnotations()), String.valueOf(document01.getPagesAnnotations()));
+		Assert.assertEquals(String.valueOf(document02db.getPagesAnnotations()), String.valueOf(document02.getPagesAnnotations()));
+		Assert.assertEquals(String.valueOf(document03db.getPagesAnnotations()), String.valueOf(document03.getPagesAnnotations()));
+
+		sDbHelper.getDossierDao().update(dossier01);
+		sDbHelper.getDossierDao().update(dossier02);
+		sDbHelper.getDossierDao().update(dossier03);
+
+		Assert.assertEquals(dossier01.getChildrenDocuments().size(), 2);
+		Assert.assertEquals(dossier02.getChildrenDocuments().size(), 1);
+		Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
 	}
 
 }

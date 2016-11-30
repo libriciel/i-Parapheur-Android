@@ -28,6 +28,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
 import java.util.Map;
 
@@ -58,8 +59,8 @@ public class ModelMapper {
 		return result;
 	}
 
-	public SparseArray<PageAnnotations> getAnnotations(RequestResponse response) {
-		SparseArray<PageAnnotations> annotations = new SparseArray<>();
+	public SerializableSparseArray<PageAnnotations> getAnnotations(RequestResponse response) {
+		SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
 
 		// Default case
 

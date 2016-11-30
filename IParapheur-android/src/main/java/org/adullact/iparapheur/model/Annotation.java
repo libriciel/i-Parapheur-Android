@@ -26,8 +26,10 @@ import com.google.gson.JsonObject;
 
 import org.adullact.iparapheur.utils.JsonExplorer;
 
+import java.io.Serializable;
 
-public class Annotation implements Parcelable {
+
+public class Annotation implements Parcelable, Serializable {
 
 	private static final String ID = "id";
 	private static final String IS_SECRETAIRE = "secretaire";

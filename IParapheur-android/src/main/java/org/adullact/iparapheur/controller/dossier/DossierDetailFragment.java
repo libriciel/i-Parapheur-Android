@@ -57,6 +57,7 @@ import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
@@ -755,7 +756,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 			// Loading user data and annotations
 
-			SparseArray<PageAnnotations> annotations = new SparseArray<>();
+			SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
 			Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
 			if (TextUtils.isEmpty(currentAccount.getUserName())) {
 				try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }

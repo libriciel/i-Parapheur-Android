@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
 
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
@@ -29,6 +28,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public interface IParapheurAPI {
 	 * @return les annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
-	SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
+	SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
 
 	/**
 	 * @return l'id de l'annotation crééeles annotations graphiques déposées sur le document principal du dossier

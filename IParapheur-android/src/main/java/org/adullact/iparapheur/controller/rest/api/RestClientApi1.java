@@ -40,6 +40,7 @@ import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -141,7 +142,7 @@ public class RestClientApi1 extends RestClientApi {
 		return null;
 	}
 
-	@Override public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+	@Override public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
 		String url = buildUrl(ACTION_GET_ANNOTATIONS);
 		String body = "{\"dossier\": \"workspace://SpacesStore/" + dossierId + "\"}";
 		return modelMapper.getAnnotations(RESTUtils.post(url, body));

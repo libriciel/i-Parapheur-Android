@@ -17,13 +17,14 @@
  */
 package org.adullact.iparapheur.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 
-public class PageAnnotations {
+public class PageAnnotations implements Serializable {
 
 	// <editor-fold desc="Static methods">
 

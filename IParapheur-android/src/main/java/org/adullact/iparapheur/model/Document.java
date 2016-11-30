@@ -23,8 +23,11 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
 import java.util.Date;
 
@@ -55,13 +58,14 @@ public class Document {
 	@DatabaseField(columnName = "Path")  //
 	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
 
+	@DatabaseField(columnName = "Annotations", dataType = DataType.SERIALIZABLE)  //
+	private SerializableSparseArray<PageAnnotations> mPagesAnnotations;
+
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
-	@DatabaseField(foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = "DossierId", foreign = true, foreignAutoRefresh = true)  //
 	private Dossier mParent;
-
-	private SparseArray<PageAnnotations> mPagesAnnotations;
 
 	// <editor-fold desc="Static utils">
 
@@ -109,7 +113,7 @@ public class Document {
 		mId = id;
 		mName = name;
 		mSize = size;
-		mPagesAnnotations = new SparseArray<>();
+		mPagesAnnotations = new SerializableSparseArray<>();
 		mIsMainDocument = isMainDocument;
 		mIsPdfVisual = isPdfVisual;
 	}
@@ -150,7 +154,7 @@ public class Document {
 		return mPagesAnnotations;
 	}
 
-	public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
+	public void setPagesAnnotations(SerializableSparseArray<PageAnnotations> pagesAnnotations) {
 		mPagesAnnotations = pagesAnnotations;
 	}
 

@@ -34,6 +34,7 @@ import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
 import java.util.List;
 
@@ -191,7 +192,7 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getCircuit(dossierId);
 	}
 
-	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+	public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 

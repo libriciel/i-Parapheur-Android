@@ -41,6 +41,7 @@ import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -186,7 +187,7 @@ public class RestClientApi3 extends RestClientApi {
 		return String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId);
 	}
 
-	@Override public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
+	@Override public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
 		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
