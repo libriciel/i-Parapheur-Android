@@ -69,9 +69,11 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
+import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
@@ -612,7 +614,7 @@ public class MenuFragment extends Fragment {
 				bureauIds.add(bureau.getId());
 			}
 
-			new DossiersDownloadTask().execute(bureauIds.toArray(new String[bureauIds.size()]));
+			new DownloadTask().execute(bureauIds.toArray(new String[bureauIds.size()]));
 
 			// Adrien end test
 
@@ -705,7 +707,7 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	private class DossiersDownloadTask extends AsyncTask<String, Void, IParapheurException> {
+	private class DownloadTask extends AsyncTask<String, Void, IParapheurException> {
 
 		@Override protected IParapheurException doInBackground(String... bureauIds) {
 
@@ -724,8 +726,18 @@ public class MenuFragment extends Fragment {
 						fullDossier.setParent(Bureau.findInList(mBureauList, bureauId));
 						dossierList.add(fullDossier);
 
-						for (Document document : fullDossier.getDocumentList())
+						for (Document document : fullDossier.getDocumentList()) {
 							document.setParent(fullDossier);
+
+							if (Document.isMainDocument(fullDossier, document)) {
+								try {
+									SerializableSparseArray<PageAnnotations> annotations;
+									annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
+									document.setPagesAnnotations(annotations);
+								}
+								catch (IParapheurException e) { e.printStackTrace(); }
+							}
+						}
 					}
 				}
 

@@ -18,6 +18,7 @@
 package org.adullact.iparapheur.database;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -27,6 +28,7 @@ import com.j256.ormlite.dao.Dao;
 import junit.framework.Assert;
 
 import org.adullact.iparapheur.model.Action;
+import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -177,9 +179,14 @@ public class DatabaseHelperTest {
 		document01.setPagesAnnotations(new SerializableSparseArray<PageAnnotations>());
 		document01.setParent(dossier01);
 
+		Annotation annotation = new Annotation("Author 01", 2, false, null, new RectF(0, 0, 10, 10), "Text 01", 0);
+		PageAnnotations pageAnnotations = new PageAnnotations();
+		pageAnnotations.add(annotation);
+		SerializableSparseArray<PageAnnotations> serializableSparseArray = new SerializableSparseArray<>();
+		serializableSparseArray.put(2, pageAnnotations);
 		Document document02 = new Document("id_02", "name 02.pdf", 0, true, true);
 		document02.setPath("/test/path/2/");
-		document02.setPagesAnnotations(new SerializableSparseArray<PageAnnotations>());
+		document02.setPagesAnnotations(serializableSparseArray);
 		document02.setParent(dossier01);
 
 		Document document03 = new Document("id_03", null, 50000, false, false);

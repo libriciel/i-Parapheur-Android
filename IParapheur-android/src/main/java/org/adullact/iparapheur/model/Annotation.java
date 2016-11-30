@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 
 import org.adullact.iparapheur.utils.JsonExplorer;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 
@@ -217,6 +218,47 @@ public class Annotation implements Parcelable, Serializable {
 	}
 
 	// </editor-fold desc="Parcelable">
+
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+		out.writeObject(uuid);
+		out.writeInt(mPage);
+		out.writeObject(author);
+		out.writeBoolean(secretaire);
+		out.writeObject(mDate);
+		out.writeFloat(rect.left);
+		out.writeFloat(rect.top);
+		out.writeFloat(rect.bottom);
+		out.writeFloat(rect.right);
+		out.writeObject(text);
+		out.writeObject(type);
+		out.writeObject(mPenColor);
+		out.writeObject(mFillColor);
+		out.writeInt(mStep);
+		out.writeBoolean(updated);
+		out.writeBoolean(deleted);
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		uuid = (String) in.readObject();
+		mPage = in.readInt();
+		author = (String) in.readObject();
+		secretaire = in.readBoolean();
+		mDate = (String) in.readObject();
+
+		float left = in.readFloat();
+		float top = in.readFloat();
+		float right = in.readFloat();
+		float bottom = in.readFloat();
+		rect = new RectF(left, top, right, bottom);
+
+		text = (String) in.readObject();
+		type = (String) in.readObject();
+		mPenColor = (String) in.readObject();
+		mFillColor = (String) in.readObject();
+		mStep = in.readInt();
+		updated = in.readBoolean();
+		deleted = in.readBoolean();
+	}
 
 	@Override public String toString() {
 		return "{Annotation uuid:" + uuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + " text=" + text + "}";
