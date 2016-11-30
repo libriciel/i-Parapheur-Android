@@ -213,4 +213,36 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
 	}
 
+	@Test public void order05_onDeleteCascade() throws Exception {
+
+		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+
+		// Checks
+
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
+
+		sDbHelper.deleteCascade(dossier02);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
+		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 2);
+		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 2);
+
+		sDbHelper.deleteCascade(bureau02);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 2);
+		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 1);
+		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 2);
+
+		sDbHelper.deleteCascade(bureau01);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 1);
+		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 0);
+		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 0);
+
+		sDbHelper.deleteCascade(bureau03);
+		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 0);
+	}
+
 }

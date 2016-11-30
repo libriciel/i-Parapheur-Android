@@ -64,7 +64,7 @@ public class Document {
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
-	@DatabaseField(columnName = "DossierId", foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = "Dossier", foreign = true, foreignAutoRefresh = true)  //
 	private Dossier mParent;
 
 	// <editor-fold desc="Static utils">

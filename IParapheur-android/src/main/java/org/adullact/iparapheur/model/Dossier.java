@@ -84,13 +84,13 @@ public class Dossier {
 	@SerializedName("documents")  //
 	private List<Document> mDocumentList = new ArrayList<>();
 
-	@ForeignCollectionField  //
+	@ForeignCollectionField(columnName = "Documents")  //
 	private ForeignCollection<Document> mChildrenDocuments;
 
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
-	@DatabaseField(columnName = "DeskId", foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = "Desk", foreign = true, foreignAutoRefresh = true)  //
 	private Bureau mParent;
 
 	private Circuit mCircuit;

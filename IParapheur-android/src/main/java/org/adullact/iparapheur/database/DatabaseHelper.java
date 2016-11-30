@@ -15,6 +15,7 @@ import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.sql.SQLException;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -92,6 +93,36 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			documentDao = getDao(Document.class);
 
 		return documentDao;
+	}
+
+	/**
+	 * This will probably call multiples operations at once,
+	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
+	 * and keep respectable performances:
+	 *
+	 * @param instanceToDelete the target
+	 * @throws SQLException
+	 */
+	public void deleteCascade(@NonNull Dossier instanceToDelete) throws SQLException {
+		getDocumentDao().delete(instanceToDelete.getChildrenDocuments());
+		getDossierDao().delete(instanceToDelete);
+	}
+
+	/**
+	 * This will probably call multiples operations at once,
+	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
+	 * and keep respectable performances:
+	 *
+	 * @param instanceToDelete the target
+	 * @throws SQLException
+	 */
+	public void deleteCascade(@NonNull Bureau instanceToDelete) throws SQLException {
+
+		for (Dossier dossier : instanceToDelete.getChildrenDossiers())
+			getDocumentDao().delete(dossier.getChildrenDocuments());
+
+		getDossierDao().delete(instanceToDelete.getChildrenDossiers());
+		getBureauDao().delete(instanceToDelete);
 	}
 
 }
