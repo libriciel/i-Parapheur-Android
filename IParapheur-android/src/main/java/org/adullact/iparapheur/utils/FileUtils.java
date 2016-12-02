@@ -54,6 +54,8 @@ public class FileUtils {
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
 	private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
 
+	private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
+
 	private static void copy(@NonNull File src, @NonNull File dst) {
 
 		try {
@@ -75,7 +77,13 @@ public class FileUtils {
 	}
 
 	private static @Nullable File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
-		File directory = new File(context.getExternalCacheDir(), dossier.getId());
+
+		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+		if (!folder.exists())
+			//noinspection ResultOfMethodCallIgnored
+			folder.mkdirs();
+
+		File directory = new File(folder.getAbsolutePath(), dossier.getId());
 
 		if (!directory.mkdirs())
 			if (!directory.exists())

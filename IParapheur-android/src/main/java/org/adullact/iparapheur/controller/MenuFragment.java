@@ -72,6 +72,7 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.DeviceUtils;
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.ViewUtils;
@@ -739,6 +740,20 @@ public class MenuFragment extends Fragment {
 							}
 						}
 					}
+				}
+
+				// Downloading files
+
+				List<Document> documentsToDld = new ArrayList<>();
+				for (Dossier dossier : dossierList) {
+					documentsToDld.addAll(dossier.getDocumentList());
+				}
+
+				int totalSize = 0;
+				for (Document document : documentsToDld) {
+					totalSize += document.getSize();
+
+					FileUtils.getFileForDocument(getActivity(), document.getParent(), document);
 				}
 
 				// Saving in database
