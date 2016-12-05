@@ -71,6 +71,7 @@ public class StringUtilsTest {
 	@Test public void endsWithIgnoreCase() throws Exception {
 
 		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "test 123"));
+		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "T 123"));
 		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "123"));
 		Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", ""));
 

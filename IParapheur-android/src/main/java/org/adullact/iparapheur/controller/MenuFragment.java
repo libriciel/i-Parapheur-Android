@@ -77,7 +77,6 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.ViewUtils;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -86,6 +85,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
+import static org.adullact.iparapheur.model.Bureau.findInList;
 
 
 /**
@@ -291,24 +292,6 @@ public class MenuFragment extends Fragment {
 	@Override public void onResume() {
 		getActivity().invalidateOptionsMenu();
 		super.onResume();
-
-		DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-		try {
-			final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-			Log.i("Adrien", ">>> " + dossierDao.queryForAll());
-			final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-			Log.w("Adrien", ">>> " + bureauDao.queryForAll());
-			final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
-			Log.e("Adrien", ">>> " + documentDao.queryForAll());
-
-			System.out.println("Bureau raw mapper : " + bureauDao.getTableName());
-			System.out.println("Dossier raw mapper : " + dossierDao.getTableName());
-			System.out.println("Document raw mapper : " + documentDao.getTableName());
-
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -708,56 +691,63 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	private class DownloadTask extends AsyncTask<String, Void, IParapheurException> {
+	private class DownloadTask extends AsyncTask<String, Long, IParapheurException> {
+
+		private final Long STEP_DOWNLOAD_METADATA = 0L;
+		private final Long STEP_DOWNLOAD_FILES = 1L;
 
 		@Override protected IParapheurException doInBackground(String... bureauIds) {
 
-			try {
+			// Updating models
 
-				// Downloading
+			final ArrayList<Dossier> dossierList = new ArrayList<>();
+			List<Dossier> incompleteDossierList = new ArrayList<>();
 
-				final ArrayList<Dossier> dossierList = new ArrayList<>();
-				for (String bureauId : bureauIds) {
+			for (String bureauId : bureauIds) {
+				Bureau parent = Bureau.findInList(mBureauList, bureauId);
 
-					List<Dossier> incompleteDossierList = RESTClient.INSTANCE.getDossiers(bureauId);
-					for (Dossier incompleteDossier : incompleteDossierList) {
+				try {
+					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureauId);
+					for (Dossier dossier : incompleteDossierTempList)
+						dossier.setParent(parent);
 
-						Dossier fullDossier = RESTClient.INSTANCE.getDossier(bureauId, incompleteDossier.getId());
-						fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
-						fullDossier.setParent(Bureau.findInList(mBureauList, bureauId));
-						dossierList.add(fullDossier);
+					incompleteDossierList.addAll(incompleteDossierTempList);
+				}
+				catch (IParapheurException e) { e.printStackTrace(); }
+			}
 
-						for (Document document : fullDossier.getDocumentList()) {
-							document.setParent(fullDossier);
+			Long totalMetadataSize = (long) incompleteDossierList.size();
+			Long progressMetadataSize = 0L;
+			publishProgress(STEP_DOWNLOAD_METADATA, 0L, totalMetadataSize);
 
-							if (Document.isMainDocument(fullDossier, document)) {
-								try {
-									SerializableSparseArray<PageAnnotations> annotations;
-									annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
-									document.setPagesAnnotations(annotations);
-								}
-								catch (IParapheurException e) { e.printStackTrace(); }
-							}
+			for (Dossier incompleteDossier : incompleteDossierList) {
+
+				try {
+					Dossier fullDossier = RESTClient.INSTANCE.getDossier(incompleteDossier.getParent().getId(), incompleteDossier.getId());
+					fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
+					fullDossier.setParent(findInList(mBureauList, incompleteDossier.getParent().getId()));
+					dossierList.add(fullDossier);
+
+					for (Document document : fullDossier.getDocumentList()) {
+						document.setParent(fullDossier);
+						document.setPath(FileUtils.getFileForDocument(getActivity(), fullDossier, document).getAbsolutePath());
+
+						if (Document.isMainDocument(fullDossier, document)) {
+							SerializableSparseArray<PageAnnotations> annotations;
+							annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
+							document.setPagesAnnotations(annotations);
 						}
 					}
 				}
+				catch (IParapheurException e) { e.printStackTrace(); }
 
-				// Downloading files
+				progressMetadataSize++;
+				publishProgress(STEP_DOWNLOAD_METADATA, progressMetadataSize, totalMetadataSize);
+			}
 
-				List<Document> documentsToDld = new ArrayList<>();
-				for (Dossier dossier : dossierList) {
-					documentsToDld.addAll(dossier.getDocumentList());
-				}
+			// Saving in database
 
-				int totalSize = 0;
-				for (Document document : documentsToDld) {
-					totalSize += document.getSize();
-
-					FileUtils.getFileForDocument(getActivity(), document.getParent(), document);
-				}
-
-				// Saving in database
-
+			try {
 				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
 				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
@@ -781,18 +771,63 @@ public class MenuFragment extends Fragment {
 					}
 				});
 			}
-			catch (IParapheurException e) {
-				return e;
+			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
+
+			// Downloading files
+
+			List<Document> documentsToDld = new ArrayList<>();
+			for (Dossier dossier : dossierList) {
+				documentsToDld.addAll(dossier.getDocumentList());
 			}
-			catch (Exception e) {
-				return new IParapheurException(-1, "DB error");
+
+			Long totalFileSize = 0L;
+			Long progressFileSize = 0L;
+			for (Document document : documentsToDld)
+				if (document.getSize() > 0)
+					totalFileSize += document.getSize();
+
+			if (totalFileSize > FileUtils.getFreeSpace(getActivity()))
+				return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
+
+			publishProgress(STEP_DOWNLOAD_FILES, 0L, totalFileSize);
+
+			for (Document document : documentsToDld) {
+				String downloadUrl = Document.generateContentUrl(document);
+
+				if (!TextUtils.isEmpty(downloadUrl)) {
+
+					try { RESTClient.INSTANCE.downloadFile(downloadUrl, document.getPath()); }
+					catch (IParapheurException e) { e.printStackTrace(); }
+
+					if (document.getSize() > 0)
+						progressFileSize += document.getSize();
+
+					publishProgress(STEP_DOWNLOAD_FILES, progressFileSize, totalFileSize);
+
+					if (isCancelled())
+						break;
+				}
 			}
 
 			return null;
 		}
 
+		@Override protected void onProgressUpdate(Long... values) {
+			super.onProgressUpdate(values);
+
+			if ((values.length == 3) && (values[2] != 0)) {
+				if (values[0].equals(STEP_DOWNLOAD_METADATA))
+					Log.d("Adrien", "download metadatas : " + (values[1] * 50 / values[2]) + "%");
+				else if (values[0].equals(STEP_DOWNLOAD_FILES))
+					Log.w("Adrien", "download files     : " + (50 + (values[1] * 50 / values[2])) + "%");
+			}
+		}
+
 		@Override protected void onPostExecute(IParapheurException e) {
 			super.onPostExecute(e);
+
+			if (e != null)
+				Log.e("Adrien", "" + e.getComplement());
 		}
 	}
 
@@ -962,8 +997,9 @@ public class MenuFragment extends Fragment {
 
 					@Override public void onAnimationStart(Animator animator) { }
 
-					@Override public void onAnimationEnd(
-							Animator animator) { ((MenuFragmentListener) getActivity()).onDossierCheckedChanged(mCheckedDossiers.isEmpty()); }
+					@Override public void onAnimationEnd(Animator animator) {
+						((MenuFragmentListener) getActivity()).onDossierCheckedChanged(mCheckedDossiers.isEmpty());
+					}
 
 					@Override public void onAnimationCancel(Animator animator) { }
 

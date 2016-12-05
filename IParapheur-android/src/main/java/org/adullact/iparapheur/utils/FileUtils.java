@@ -23,7 +23,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -88,8 +90,6 @@ public class FileUtils {
 		if (!directory.mkdirs())
 			if (!directory.exists())
 				Log.e(LOG, "getDirectoryForDossier failed");
-
-		Log.e(LOG, "directory : " + directory.getAbsolutePath() + " " + directory.exists());
 
 		return directory;
 	}
@@ -213,6 +213,18 @@ public class FileUtils {
 			Toast.makeText(activity, R.string.import_error_message_cant_copy_certificate, Toast.LENGTH_SHORT).show();
 			return false;
 		}
+	}
+
+	public static long getFreeSpace(@NonNull Context context) {
+
+		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+		StatFs statFs = new StatFs(folder.getAbsolutePath());
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+			//noinspection deprecation
+			return (statFs.getAvailableBlocks() * statFs.getBlockSize());
+		else
+			return (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
 	}
 
 	/**
