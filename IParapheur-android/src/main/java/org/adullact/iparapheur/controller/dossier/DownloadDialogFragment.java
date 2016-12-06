@@ -147,12 +147,10 @@ public class DownloadDialogFragment extends DialogFragment {
 	private void onCancelButtonClicked() {
 
 		if (mPendingTask != null)
-			mPendingTask.cancel(true);
+			mPendingTask.cancel(false);
 
 		dismiss();
 	}
-
-	// <editor-fold desc="Task">
 
 	private class DownloadTask extends AsyncTask<String, Long, IParapheurException> {
 
@@ -162,9 +160,22 @@ public class DownloadDialogFragment extends DialogFragment {
 
 		@Override protected IParapheurException doInBackground(String... bureauIds) {
 
-			// Updating Bureaux
+			// This method does a little bit of Thread pausing.
+			// It may feel weird, but it bring a way better feeling on download.
+			// This AsyncTask is not on the UI thread anyway.
+			//
+			// If we're dealing with a fast connection, and an almost empty Parapheur,
+			// The popup will flash for a fraction of second.
+			// Those delays are indeed loosing 1.5 second per thread,
+			// but make the UI way more smooth.
+			//
+			// Trust me, I'm an engineer, keep those.
 
+			// UI tuning
 			publishProgress(STEP_BUREAUX_METADATA, 0L, 100L);
+			try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+
+			// Updating Bureaux
 
 			final ArrayList<Dossier> dossierList = new ArrayList<>();
 			List<Dossier> incompleteDossierList = new ArrayList<>();
@@ -191,11 +202,12 @@ public class DownloadDialogFragment extends DialogFragment {
 					return new IParapheurException(-1, "Annulation");
 			}
 
+			// UI tuning
 			publishProgress(STEP_BUREAUX_METADATA, 100L, 100L);
+			publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
+			try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
 			// Updating Dossiers
-
-			publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
 
 			Long totalDossiersMetadataSize = (long) incompleteDossierList.size();
 			Long progressDossiersMetadataSize = 0L;
@@ -259,11 +271,12 @@ public class DownloadDialogFragment extends DialogFragment {
 			}
 			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
 
+			// UI tuning
 			publishProgress(STEP_DOSSIERS_METADATA, 100L, 100L);
+			publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
+			try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
 			// Downloading files
-
-			publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
 
 			List<Document> documentsToDld = new ArrayList<>();
 			for (Dossier dossier : dossierList) {
@@ -297,7 +310,9 @@ public class DownloadDialogFragment extends DialogFragment {
 				}
 			}
 
+			// UI tuning
 			publishProgress(STEP_DOCUMENT_FILES, 100L, 100L);
+			try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
 
 			return null;
 		}
@@ -328,12 +343,10 @@ public class DownloadDialogFragment extends DialogFragment {
 			super.onPostExecute(e);
 
 			if (e != null)
-				Log.e("Adrien", "" + e.getComplement());
+				Log.e("", "" + e.getComplement());
 			else
 				dismiss();
 		}
 	}
-
-	// </editor-fold desc="Task">
 
 }

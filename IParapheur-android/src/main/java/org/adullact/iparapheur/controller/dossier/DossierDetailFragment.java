@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,6 +79,7 @@ import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
 	public static final String FRAGMENT_TAG = "dossier_details_fragment";
+	public static final String LOG_TAG = "DossierDetailFragment";
 
 	private static final int FAB_ANIM_DELAY_IN_MS = 75;
 	private static final String ANNOTATION_PAYLOAD_STEP = "step";
@@ -745,6 +747,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			showSpinnerOnUiThread();
 			File file = FileUtils.getFileForDocument(getActivity(), mDossier, currentDocument);
 			currentDocument.setPath(file.getAbsolutePath());
+			Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
 
 			if (!file.exists()) {
 				String downloadUrl = Document.generateContentUrl(currentDocument);

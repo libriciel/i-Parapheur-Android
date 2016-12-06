@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="96dp"
+    android:layout_height="88dp"
     android:background="@drawable/list_background_secondary50"
     android:gravity="center"
     android:orientation="horizontal"
@@ -32,7 +32,6 @@
             android:textColor="@color/text_black"
             android:textSize="16sp"
             tools:ignore="NestedWeights" />
-
 
         <TextView
             android:id="@+id/bureau_list_cell_todo_count"

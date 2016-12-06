@@ -27,7 +27,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
-                    android:divider="@android:color/background_light" />
+                    android:divider="@color/text_black_divider"
+                    android:dividerHeight="1dp" />
 
                 <LinearLayout
                     android:id="@+id/menu_fragment_bureaux_empty"
@@ -76,7 +77,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
-                    android:divider="@android:color/background_light" />
+                    android:divider="@color/text_black_divider"
+                    android:dividerHeight="1dp" />
 
                 <LinearLayout
                     android:id="@+id/menu_fragment_dossier_empty"
