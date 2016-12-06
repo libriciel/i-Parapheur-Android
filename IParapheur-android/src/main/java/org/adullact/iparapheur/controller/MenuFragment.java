@@ -19,6 +19,7 @@ package org.adullact.iparapheur.controller;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +36,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,6 +57,7 @@ import com.j256.ormlite.dao.Dao;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.MyAccounts;
+import org.adullact.iparapheur.controller.dossier.DownloadDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
@@ -66,15 +67,11 @@ import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
-import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.DeviceUtils;
-import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -85,8 +82,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-
-import static org.adullact.iparapheur.model.Bureau.findInList;
 
 
 /**
@@ -217,15 +212,15 @@ public class MenuFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		setHasOptionsMenu(true);
 
-		// This button is not in this Fragment directly,
-		// it's in the navigation drawer. But we need to inflate it anyway.
+		// These buttons aren't directly in this Fragment,
+		// they are's in the navigation drawer. But we need to inflate them anyway.
 
-		final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-		if (filterListPortraitButton != null) {
-			filterListPortraitButton.setOnClickListener(new View.OnClickListener() {
+		final ImageButton filterListButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+		if (filterListButton != null) {
+			filterListButton.setOnClickListener(new View.OnClickListener() {
 				@Override public void onClick(View v) {
 
-					PopupMenu popup = new PopupMenu(getActivity(), filterListPortraitButton);
+					PopupMenu popup = new PopupMenu(getActivity(), filterListButton);
 					inflateFilterSubMenu(popup.getMenu());
 					ViewUtils.setForceShowIcon(popup);
 
@@ -235,6 +230,15 @@ public class MenuFragment extends Fragment {
 						}
 					});
 					popup.show();
+				}
+			});
+		}
+
+		final ImageButton downloadButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+		if (downloadButton != null) {
+			downloadButton.setOnClickListener(new View.OnClickListener() {
+				@Override public void onClick(View v) {
+					onDownloadItemSelected();
 				}
 			});
 		}
@@ -364,7 +368,14 @@ public class MenuFragment extends Fragment {
 	}
 
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
-		return onFilterItemSelected(item) || getActivity().onOptionsItemSelected(item);
+
+		if (item.getItemId() == R.id.menu_fragment_filter_selection_item)
+			return onFilterItemSelected(item);
+
+		if (item.getItemId() == R.id.menu_fragment_download_item)
+			return onDownloadItemSelected();
+
+		return getActivity().onOptionsItemSelected(item);
 	}
 
 	// </editor-fold desc="ActionBar">
@@ -439,6 +450,14 @@ public class MenuFragment extends Fragment {
 		}
 
 		return false;
+	}
+
+	private boolean onDownloadItemSelected() {
+
+		DialogFragment actionDialog = DownloadDialogFragment.newInstance(mBureauList);
+		actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
+
+		return true;
 	}
 
 	public Bureau getSelectedBureau() {
@@ -591,17 +610,6 @@ public class MenuFragment extends Fragment {
 		@Override protected void onPostExecute(IParapheurException exception) {
 			super.onPostExecute(exception);
 
-			// Adrien start test
-
-			List<String> bureauIds = new ArrayList<>();
-			for (Bureau bureau : mBureauList) {
-				bureauIds.add(bureau.getId());
-			}
-
-			new DownloadTask().execute(bureauIds.toArray(new String[bureauIds.size()]));
-
-			// Adrien end test
-
 			mPendingAsyncTask = null;
 
 			if (isCancelled())
@@ -688,146 +696,6 @@ public class MenuFragment extends Fragment {
 				String message = getString(exception.getResId());
 				Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
 			}
-		}
-	}
-
-	private class DownloadTask extends AsyncTask<String, Long, IParapheurException> {
-
-		private final Long STEP_DOWNLOAD_METADATA = 0L;
-		private final Long STEP_DOWNLOAD_FILES = 1L;
-
-		@Override protected IParapheurException doInBackground(String... bureauIds) {
-
-			// Updating models
-
-			final ArrayList<Dossier> dossierList = new ArrayList<>();
-			List<Dossier> incompleteDossierList = new ArrayList<>();
-
-			for (String bureauId : bureauIds) {
-				Bureau parent = Bureau.findInList(mBureauList, bureauId);
-
-				try {
-					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureauId);
-					for (Dossier dossier : incompleteDossierTempList)
-						dossier.setParent(parent);
-
-					incompleteDossierList.addAll(incompleteDossierTempList);
-				}
-				catch (IParapheurException e) { e.printStackTrace(); }
-			}
-
-			Long totalMetadataSize = (long) incompleteDossierList.size();
-			Long progressMetadataSize = 0L;
-			publishProgress(STEP_DOWNLOAD_METADATA, 0L, totalMetadataSize);
-
-			for (Dossier incompleteDossier : incompleteDossierList) {
-
-				try {
-					Dossier fullDossier = RESTClient.INSTANCE.getDossier(incompleteDossier.getParent().getId(), incompleteDossier.getId());
-					fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId()));
-					fullDossier.setParent(findInList(mBureauList, incompleteDossier.getParent().getId()));
-					dossierList.add(fullDossier);
-
-					for (Document document : fullDossier.getDocumentList()) {
-						document.setParent(fullDossier);
-						document.setPath(FileUtils.getFileForDocument(getActivity(), fullDossier, document).getAbsolutePath());
-
-						if (Document.isMainDocument(fullDossier, document)) {
-							SerializableSparseArray<PageAnnotations> annotations;
-							annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
-							document.setPagesAnnotations(annotations);
-						}
-					}
-				}
-				catch (IParapheurException e) { e.printStackTrace(); }
-
-				progressMetadataSize++;
-				publishProgress(STEP_DOWNLOAD_METADATA, progressMetadataSize, totalMetadataSize);
-			}
-
-			// Saving in database
-
-			try {
-				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
-
-				// This callable allow us to insert/update in loops
-				// and calling db only once...
-				dossierDao.callBatchTasks(new Callable<Void>() {
-					@Override public Void call() throws Exception {
-
-						for (Dossier dossier : dossierList) {
-							dossier.setSyncDate(new Date());
-							dossierDao.createOrUpdate(dossier);
-
-							for (Document document : dossier.getDocumentList()) {
-								document.setSyncDate(new Date());
-								documentDao.createOrUpdate(document);
-							}
-						}
-
-						return null;
-					}
-				});
-			}
-			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
-
-			// Downloading files
-
-			List<Document> documentsToDld = new ArrayList<>();
-			for (Dossier dossier : dossierList) {
-				documentsToDld.addAll(dossier.getDocumentList());
-			}
-
-			Long totalFileSize = 0L;
-			Long progressFileSize = 0L;
-			for (Document document : documentsToDld)
-				if (document.getSize() > 0)
-					totalFileSize += document.getSize();
-
-			if (totalFileSize > FileUtils.getFreeSpace(getActivity()))
-				return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
-
-			publishProgress(STEP_DOWNLOAD_FILES, 0L, totalFileSize);
-
-			for (Document document : documentsToDld) {
-				String downloadUrl = Document.generateContentUrl(document);
-
-				if (!TextUtils.isEmpty(downloadUrl)) {
-
-					try { RESTClient.INSTANCE.downloadFile(downloadUrl, document.getPath()); }
-					catch (IParapheurException e) { e.printStackTrace(); }
-
-					if (document.getSize() > 0)
-						progressFileSize += document.getSize();
-
-					publishProgress(STEP_DOWNLOAD_FILES, progressFileSize, totalFileSize);
-
-					if (isCancelled())
-						break;
-				}
-			}
-
-			return null;
-		}
-
-		@Override protected void onProgressUpdate(Long... values) {
-			super.onProgressUpdate(values);
-
-			if ((values.length == 3) && (values[2] != 0)) {
-				if (values[0].equals(STEP_DOWNLOAD_METADATA))
-					Log.d("Adrien", "download metadatas : " + (values[1] * 50 / values[2]) + "%");
-				else if (values[0].equals(STEP_DOWNLOAD_FILES))
-					Log.w("Adrien", "download files     : " + (50 + (values[1] * 50 / values[2])) + "%");
-			}
-		}
-
-		@Override protected void onPostExecute(IParapheurException e) {
-			super.onPostExecute(e);
-
-			if (e != null)
-				Log.e("Adrien", "" + e.getComplement());
 		}
 	}
 

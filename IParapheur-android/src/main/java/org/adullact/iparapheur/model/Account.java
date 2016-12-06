@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 public class Account implements Serializable {
@@ -145,6 +146,18 @@ public class Account implements Serializable {
 
 	public static boolean validateAccount(String title, String url, String login, String password) {
 		return StringUtils.areNotEmpty(title, login, password) && StringUtils.isUrlValid(url);
+	}
+
+	public static @Nullable Account findInList(@Nullable List<Account> accountList, @NonNull String accountId) {
+
+		if (accountList == null)
+			return null;
+
+		for (Account account : accountList)
+			if (TextUtils.equals(account.getId(), accountId))
+				return account;
+
+		return null;
 	}
 
 	@Override public boolean equals(Object o) {

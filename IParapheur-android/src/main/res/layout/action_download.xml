@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/download_bureau"
+        android:textColor="@color/edittext_label_activable"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/action_download_bureau_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:indeterminate="false"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/action_download_bureau_progress_textview"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|end"
+            android:text="@string/mockup_percent"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/download_dossier"
+        android:textColor="@color/edittext_label_activable"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/action_download_dossier_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:indeterminate="false"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/action_download_dossier_progress_textview"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|end"
+            android:text="@string/mockup_percent"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/download_document"
+        android:textColor="@color/edittext_label_activable"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/action_download_document_progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:indeterminate="false"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/action_download_document_progress_textview"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|end"
+            android:text="@string/mockup_percent"
+            android:textColor="@color/edittext_label_activable"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>
