@@ -97,7 +97,7 @@ import java.util.Set;
  * {@link MenuFragment.MenuFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountFragmentListener,
+public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountListFragmentListener,
 		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private ActionBarDrawerToggle mLeftDrawerToggle;
 	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
 	private View mNavigationDrawerFilterContainer;
+	private View mDownloadDrawerFilterContainer;
 
 	private boolean mSouldShowAccountAfterRotation = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
@@ -151,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
 		mNavigationDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_filters_container);
+		mDownloadDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_download_container);
+
 		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
 		if (drawerAccountImageButton != null) {
 			drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
@@ -167,6 +170,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 					if (mNavigationDrawerFilterContainer != null)
 						mNavigationDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
+
+					if (mDownloadDrawerFilterContainer != null)
+						mDownloadDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
 				}
 			});
 		}

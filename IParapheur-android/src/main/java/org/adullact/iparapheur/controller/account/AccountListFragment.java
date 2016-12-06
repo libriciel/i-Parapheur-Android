@@ -75,7 +75,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
 		footerView.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				((AccountFragmentListener) getActivity()).onCreateAccountInvoked();
+				((AccountListFragmentListener) getActivity()).onCreateAccountInvoked();
 			}
 		});
 		mListView.addFooterView(footerView, null, false);
@@ -131,14 +131,14 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (isAdded())
-			((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
+			((AccountListFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">
 
 	// <editor-fold desc="AccountSelectedListener">
 
-	public interface AccountFragmentListener {
+	public interface AccountListFragmentListener {
 
 		void onAccountSelected(@NonNull Account account);
 

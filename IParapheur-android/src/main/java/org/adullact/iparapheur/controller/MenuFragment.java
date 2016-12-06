@@ -340,11 +340,24 @@ public class MenuFragment extends Fragment {
 
 	@Override public void onPrepareOptionsMenu(Menu menu) {
 
-		// Compute main filters icon visibility
+		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+
+		// Compute main  icon visibility
 
 		boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
+		boolean isBureauList = (mViewSwitcher.getDisplayedChild() == 0);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 		boolean isListFiltered = (MyFilters.INSTANCE.getSelectedFilter() != null);
+
+		// Download visibility (visible in Landscape)
+
+		MenuItem downloadItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_download_item);
+		downloadItem.setVisible(isBureauList && isInLandscape);
+
+		// Download visibility (visible in Portrait)
+
+		final ImageButton downloadPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+		downloadPortraitButton.setVisibility((isBureauList && !isInLandscape) ? View.VISIBLE : View.GONE);
 
 		// Refreshing navigation drawer filter button (visible in portrait)
 
@@ -354,7 +367,6 @@ public class MenuFragment extends Fragment {
 
 		// Refreshing toolbar filter button (visible in landscape)
 
-		Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
 		MenuItem filterItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
 		filterItem.setIcon(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
 		filterItem.setVisible(isDossierList && isInLandscape);
