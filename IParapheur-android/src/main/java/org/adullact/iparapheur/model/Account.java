@@ -21,25 +21,57 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import org.adullact.iparapheur.utils.StringUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 
+@DatabaseTable(tableName = "Account")
 public class Account implements Serializable {
 
-	private final String mId;
+	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	private String mId;
+
+	@DatabaseField(columnName = "Title", canBeNull = false, defaultValue = "")  //
 	private String mTitle;
-	private String mName;
+
+	@DatabaseField(columnName = "BaseUrl", canBeNull = false, defaultValue = "")  //
 	private String mServerBaseUrl;
+
+	@DatabaseField(columnName = "Login", canBeNull = false, defaultValue = "")  //
 	private String mLogin;
-	private String mTenant;
+
+	@DatabaseField(columnName = "Password", canBeNull = false, defaultValue = "")  //
 	private String mPassword;
-	private String mTicket;
+
+	@DatabaseField(columnName = "UserFullName")  //
+	private String mUserFullName;
+
+	@DatabaseField(columnName = "Tenant")  //
+	private String mTenant;
+
+	@DatabaseField(columnName = "ApiVersion")  //
 	private Integer mApiVersion;
-	private Long mLastRequest;
+
+	@DatabaseField(columnName = "Activated")  //
 	private boolean mActivated;
+
+	@DatabaseField(columnName = "LastRequest")  //
+	private Date mLastRequest;
+
+	@ForeignCollectionField(columnName = "Desks")  //
+	private ForeignCollection<Bureau> mChildrenBureaux;
+
+	private String mTicket;
+
+	public Account() {}
 
 	public Account(String id) {
 		mId = id;
@@ -48,7 +80,18 @@ public class Account implements Serializable {
 		mLogin = "";
 		mPassword = "";
 		mTenant = null;
-		mLastRequest = 0L;
+		mActivated = true;
+	}
+
+	public Account(@NonNull String id, @NonNull String title, @NonNull String serverBaseUrl, @NonNull String login, @NonNull String password,
+				   @Nullable String tenant, @Nullable Integer apiVersion) {
+		mId = id;
+		mTitle = title;
+		mServerBaseUrl = serverBaseUrl;
+		mLogin = login;
+		mPassword = password;
+		mTenant = tenant;
+		mApiVersion = apiVersion;
 		mActivated = true;
 	}
 
@@ -98,6 +141,14 @@ public class Account implements Serializable {
 		mPassword = password;
 	}
 
+	public String getUserFullName() {
+		return mUserFullName;
+	}
+
+	public void setUserFullName(String userFullName) {
+		mUserFullName = userFullName;
+	}
+
 	public String getTicket() {
 		return mTicket;
 	}
@@ -114,28 +165,24 @@ public class Account implements Serializable {
 		mApiVersion = apiVersion;
 	}
 
-	public Long getLastRequest() {
-		return mLastRequest;
-	}
-
-	public void setLastRequest(Long lastRequest) {
-		mLastRequest = lastRequest;
-	}
-
-	public String getUserName() {
-		return mName;
-	}
-
-	public void setName(String name) {
-		mName = name;
-	}
-
 	public boolean isActivated() {
 		return mActivated;
 	}
 
 	public void setActivated(boolean activated) {
 		mActivated = activated;
+	}
+
+	public Date getLastRequest() {
+		return mLastRequest;
+	}
+
+	public void setLastRequest(Date lastRequest) {
+		mLastRequest = lastRequest;
+	}
+
+	public ForeignCollection<Bureau> getChildrenBureaux() {
+		return mChildrenBureaux;
 	}
 
 	// </editor-fold desc="Getters / Setters">

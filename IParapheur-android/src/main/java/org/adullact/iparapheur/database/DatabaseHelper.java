@@ -10,6 +10,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -26,6 +27,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	public static final String DATABASE_NAME = "iParapheur.db";
 	private static final int DATABASE_VERSION = 1;
 
+	private Dao<Account, Integer> accountDao;
 	private Dao<Bureau, Integer> bureauDao;
 	private Dao<Dossier, Integer> dossierDao;
 	private Dao<Document, Integer> documentDao;
@@ -39,6 +41,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override public void onCreate(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource) {
 
 		try {
+			TableUtils.createTable(connectionSource, Account.class);
 			TableUtils.createTable(connectionSource, Bureau.class);
 			TableUtils.createTable(connectionSource, Dossier.class);
 			TableUtils.createTable(connectionSource, Document.class);
@@ -55,9 +58,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			// then this method will be invoked automatically. Developer needs to handle the upgrade logic here,
 			// i.e. create a new table or a new column to an existing table, take the backups of the existing database etc.
 
-			TableUtils.dropTable(connectionSource, Bureau.class, true);
-			TableUtils.dropTable(connectionSource, Dossier.class, true);
 			TableUtils.dropTable(connectionSource, Document.class, true);
+			TableUtils.dropTable(connectionSource, Dossier.class, true);
+			TableUtils.dropTable(connectionSource, Bureau.class, true);
+			TableUtils.dropTable(connectionSource, Account.class, true);
 
 			onCreate(sqliteDatabase, connectionSource);
 		}
@@ -70,6 +74,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 	// Create the getDao methods of all database tables to access those from android code.
 	// Insert, delete, read, update everything will be happened through DAOs
+
+	public @NonNull Dao<Account, Integer> getAccountDao() throws SQLException {
+
+		if (accountDao == null)
+			accountDao = getDao(Account.class);
+
+		return accountDao;
+	}
 
 	public @NonNull Dao<Bureau, Integer> getBureauDao() throws SQLException {
 

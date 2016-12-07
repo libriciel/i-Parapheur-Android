@@ -132,7 +132,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 		if (withTicket && TextUtils.isEmpty(ticket))
 			throw new IParapheurException(R.string.error_no_ticket, null);
 
-		account.setLastRequest(new Date().getTime());
+		account.setLastRequest(new Date());
 
 		// Build URL
 

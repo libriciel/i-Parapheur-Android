@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -171,7 +170,7 @@ public class RestClientApi3 extends RestClientApi {
 			String lastName = json.findObject("data").findObject("properties").optString(USER_INFO_LAST_NAME);
 
 			if (StringUtils.areNotEmpty(firstName, lastName))
-				account.setName(firstName + " " + lastName);
+				account.setUserFullName(firstName + " " + lastName);
 		}
 
 		return true;

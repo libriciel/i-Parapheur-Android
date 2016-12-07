@@ -58,6 +58,9 @@ public class Bureau {
 	@DatabaseField(columnName = "Sync")  //
 	private Date mSyncDate;
 
+	@DatabaseField(columnName = "Account", foreign = true, foreignAutoRefresh = true)  //
+	private Account mParent;
+
 	@ForeignCollectionField(columnName = "Folders")  //
 	private ForeignCollection<Dossier> mChildrenDossiers;
 
@@ -130,6 +133,14 @@ public class Bureau {
 
 	public int getLateCount() {
 		return mLateCount;
+	}
+
+	public Account getParent() {
+		return mParent;
+	}
+
+	public void setParent(Account account) {
+		mParent = account;
 	}
 
 	public Date getSyncDate() {

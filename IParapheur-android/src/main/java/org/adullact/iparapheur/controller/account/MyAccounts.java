@@ -15,10 +15,10 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
-	/**
-	 * @return
-	 * @coveredInInstrumentedUnitTest
-	 */
+/**
+ * @return
+ * @coveredInInstrumentedUnitTest
+ */
 package org.adullact.iparapheur.controller.account;
 
 import android.content.Context;

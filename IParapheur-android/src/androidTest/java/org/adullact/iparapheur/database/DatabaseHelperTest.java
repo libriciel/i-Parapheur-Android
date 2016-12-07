@@ -27,6 +27,7 @@ import com.j256.ormlite.dao.Dao;
 
 import junit.framework.Assert;
 
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
@@ -71,22 +72,52 @@ public class DatabaseHelperTest {
 
 	@Test public void order01_onCreate() throws Exception {
 
+		Dao<Account, Integer> accountDao = sDbHelper.getAccountDao();
 		Dao<Bureau, Integer> bureauDao = sDbHelper.getBureauDao();
 		Dao<Dossier, Integer> dossierDao = sDbHelper.getDossierDao();
 		Dao<Document, Integer> documentDao = sDbHelper.getDocumentDao();
 
 		// Checks
 
+		Assert.assertEquals(accountDao.getTableName(), "Account");
 		Assert.assertEquals(bureauDao.getTableName(), "Desk");
 		Assert.assertEquals(dossierDao.getTableName(), "Folder");
 		Assert.assertEquals(documentDao.getTableName(), "Document");
 	}
 
-	@Test public void order02_getBureauDao() throws Exception {
+	@Test public void order02_getAccountDao() throws Exception {
+
+		Account account01 = new Account("id_01", "Title 01", "parapheur.test01.adullact.org", "login01", "password01", "tenant01", 1);
+		Account account02 = new Account("id_02", "Title 02", "parapheur.test02.adullact.org", "login02", "password02", "tenant02", 2);
+		Account account03 = new Account("id_03", "Title 03", "parapheur.test03.adullact.org", "login03", "password03", null, null);
+
+		sDbHelper.getAccountDao().create(Arrays.asList(account01, account02, account03));
+
+		Account account01db = sDbHelper.getAccountDao().queryForSameId(account01);
+		Account account02db = sDbHelper.getAccountDao().queryForSameId(account02);
+		Account account03db = sDbHelper.getAccountDao().queryForSameId(account03);
+
+		// Checks
+
+		Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 3);
+
+		Assert.assertEquals(account01db.getApiVersion(), account01.getApiVersion());
+		Assert.assertEquals(account02db.getApiVersion(), account02.getApiVersion());
+		Assert.assertEquals(account03db.getApiVersion(), null);
+	}
+
+	@Test public void order03_getBureauDao() throws Exception {
+
+		Account account01 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
+		Account account02 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Account account03 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
 
 		Bureau bureau01 = new Bureau("id_01", "Bureau 01", 21, 11);
+		bureau01.setParent(account01);
 		Bureau bureau02 = new Bureau("id_02", "Bureau 02 \"/%@&éè", 22, 12);
+		bureau02.setParent(account01);
 		Bureau bureau03 = new Bureau("id_03", null, 23, 13);
+		bureau03.setParent(account02);
 
 		sDbHelper.getBureauDao().create(Arrays.asList(bureau01, bureau02, bureau03));
 
@@ -101,9 +132,17 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(bureau01db.getTitle(), bureau01.getTitle());
 		Assert.assertEquals(bureau02db.getTitle(), bureau02.getTitle());
 		Assert.assertEquals(bureau03db.getTitle(), "");
+
+		sDbHelper.getAccountDao().update(account01);
+		sDbHelper.getAccountDao().update(account02);
+		sDbHelper.getAccountDao().update(account03);
+
+		Assert.assertEquals(account01.getChildrenBureaux().size(), 2);
+		Assert.assertEquals(account02.getChildrenBureaux().size(), 1);
+		Assert.assertEquals(account03.getChildrenBureaux().size(), 0);
 	}
 
-	@Test public void order03_getDossierDao() throws Exception {
+	@Test public void order04_getDossierDao() throws Exception {
 
 		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
 		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
@@ -164,7 +203,7 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(bureau03.getChildrenDossiers().size(), 0);
 	}
 
-	@Test public void order04_getDocumentDao() throws Exception {
+	@Test public void order05_getDocumentDao() throws Exception {
 
 		Dossier dossier01 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
 		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
@@ -175,7 +214,6 @@ public class DatabaseHelperTest {
 		Assert.assertNotNull(dossier03);
 
 		Document document01 = new Document("id_01", "name 01.pdf", 50000, true, true);
-		document01.setPath("/test/path/1/");
 		document01.setPagesAnnotations(new SerializableSparseArray<PageAnnotations>());
 		document01.setParent(dossier01);
 
@@ -185,12 +223,10 @@ public class DatabaseHelperTest {
 		SerializableSparseArray<PageAnnotations> serializableSparseArray = new SerializableSparseArray<>();
 		serializableSparseArray.put(2, pageAnnotations);
 		Document document02 = new Document("id_02", "name 02.pdf", 0, true, true);
-		document02.setPath("/test/path/2/");
 		document02.setPagesAnnotations(serializableSparseArray);
 		document02.setParent(dossier01);
 
 		Document document03 = new Document("id_03", null, 50000, false, false);
-		document03.setPath("/test/path/3/");
 		document03.setPagesAnnotations(null);
 		document03.setParent(dossier02);
 
@@ -220,7 +256,7 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
 	}
 
-	@Test public void order05_onDeleteCascade() throws Exception {
+	@Test public void order06_onDeleteCascade() throws Exception {
 
 		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
 		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);

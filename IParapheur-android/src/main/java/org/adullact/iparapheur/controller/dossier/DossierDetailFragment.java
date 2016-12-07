@@ -586,7 +586,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				// Building final StickyNote object
 
-				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserName());
+				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserFullName());
 
 				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
 						annotation.getUuid(),
@@ -778,7 +778,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			if (DeviceUtils.isConnected(getActivity())) {
 				SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
 				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
-				if (TextUtils.isEmpty(currentAccount.getUserName())) {
+				if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
 					try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}
