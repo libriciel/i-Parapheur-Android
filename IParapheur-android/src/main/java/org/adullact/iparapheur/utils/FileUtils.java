@@ -32,7 +32,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
@@ -78,7 +77,7 @@ public class FileUtils {
 		}
 	}
 
-	private static @Nullable File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
+	public static @Nullable File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
 
 		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
 		if (!folder.exists())
@@ -92,17 +91,6 @@ public class FileUtils {
 				Log.e(LOG, "getDirectoryForDossier failed");
 
 		return directory;
-	}
-
-	public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier, @NonNull Document document) {
-
-		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
-
-		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
-		else
-			//noinspection ConstantConditions
-			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
 	}
 
 	public static void launchCertificateTutoPdfIntent(@NonNull Context context) {

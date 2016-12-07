@@ -55,7 +55,6 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
-import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -516,7 +515,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (document == null)
 			return;
 
-		File documentFile = FileUtils.getFileForDocument(getActivity(), mDossier, document);
+		File documentFile = Document.getFile(getActivity(), mDossier, document);
 		if (!documentFile.exists())
 			return;
 
@@ -640,7 +639,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (document == null)
 			return;
 
-		File documentFile = new File(document.getPath());
+		File documentFile = Document.getFile(getActivity(), mDossier, document);
 		if (!documentFile.exists())
 			return;
 
@@ -763,8 +762,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return null;
 
 			showSpinnerOnUiThread();
-			File file = FileUtils.getFileForDocument(getActivity(), mDossier, currentDocument);
-			currentDocument.setPath(file.getAbsolutePath());
+			File file = Document.getFile(getActivity(), mDossier, currentDocument);
 			Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
 
 			if (!file.exists() && DeviceUtils.isConnected(getActivity())) {

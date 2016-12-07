@@ -46,6 +46,7 @@ import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -225,7 +226,6 @@ public class DownloadDialogFragment extends DialogFragment {
 
 					for (Document document : fullDossier.getDocumentList()) {
 						document.setParent(fullDossier);
-						document.setPath(FileUtils.getFileForDocument(getActivity(), fullDossier, document).getAbsolutePath());
 
 						if (Document.isMainDocument(fullDossier, document)) {
 							SerializableSparseArray<PageAnnotations> annotations;
@@ -296,8 +296,9 @@ public class DownloadDialogFragment extends DialogFragment {
 				String downloadUrl = Document.generateContentUrl(document);
 
 				if (!TextUtils.isEmpty(downloadUrl)) {
+					File documentFile = Document.getFile(getActivity(), document.getParent(), document);
 
-					try { RESTClient.INSTANCE.downloadFile(downloadUrl, document.getPath()); }
+					try { RESTClient.INSTANCE.downloadFile(downloadUrl, documentFile.getAbsolutePath()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 
 					if (document.getSize() > 0)

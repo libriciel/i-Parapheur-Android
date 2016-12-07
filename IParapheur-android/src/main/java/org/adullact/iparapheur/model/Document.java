@@ -17,6 +17,7 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -27,8 +28,11 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
+import org.adullact.iparapheur.utils.StringUtils;
 
+import java.io.File;
 import java.util.Date;
 
 
@@ -54,9 +58,6 @@ public class Document {
 	@DatabaseField(columnName = "IsMainDocument")  //
 	@SerializedName("isMainDocument")  //
 	private boolean mIsMainDocument;
-
-	@DatabaseField(columnName = "Path")  //
-	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
 
 	@DatabaseField(columnName = "Annotations", dataType = DataType.SERIALIZABLE)  //
 	private SerializableSparseArray<PageAnnotations> mPagesAnnotations;
@@ -107,6 +108,12 @@ public class Document {
 		return (TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId()));
 	}
 
+	public static @NonNull File getFile(@NonNull Context context, @NonNull Dossier dossier, @NonNull Document document) {
+
+		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
+		return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
+	}
+
 	// </editor-fold desc="Static utils">
 
 	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
@@ -132,14 +139,6 @@ public class Document {
 
 	public int getSize() {
 		return mSize;
-	}
-
-	public String getPath() {
-		return mPath;
-	}
-
-	public void setPath(String path) {
-		mPath = path;
 	}
 
 	public boolean isMainDocument() {
