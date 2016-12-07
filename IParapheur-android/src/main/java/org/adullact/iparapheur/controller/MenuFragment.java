@@ -783,8 +783,8 @@ public class MenuFragment extends Fragment {
 			// Text
 
 			TextView nameTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_title);
-			TextView dateTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_typology);
-			TextView typeTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_date);
+			TextView typeTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_typology);
+			TextView dateTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_date);
 
 			String typologyText = String.format("%s / %s", dossier.getType(), dossier.getSousType());
 
