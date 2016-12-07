@@ -114,8 +114,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private FrameLayout mLeftDrawerMenu;
 	private ActionBarDrawerToggle mLeftDrawerToggle;
 	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
-	private View mNavigationDrawerFilterContainer;
-	private View mDownloadDrawerFilterContainer;
+	private View mActionsContainer;
 
 	private boolean mSouldShowAccountAfterRotation = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
@@ -151,8 +150,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
-		mNavigationDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_filters_container);
-		mDownloadDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_download_container);
+		mActionsContainer = findViewById(R.id.navigation_drawer_filters_menu_header_actions_container);
 
 		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
 		if (drawerAccountImageButton != null) {
@@ -168,11 +166,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 					else
 						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-					if (mNavigationDrawerFilterContainer != null)
-						mNavigationDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
-
-					if (mDownloadDrawerFilterContainer != null)
-						mDownloadDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
+					if (mActionsContainer != null)
+						mActionsContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
 				}
 			});
 		}

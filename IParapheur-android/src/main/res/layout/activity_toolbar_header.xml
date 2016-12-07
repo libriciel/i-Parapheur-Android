@@ -68,7 +68,7 @@
 
 
         <FrameLayout
-            android:id="@+id/navigation_drawer_filters_menu_header_filters_container"
+            android:id="@+id/navigation_drawer_filters_menu_header_actions_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -79,12 +79,6 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/Filter_selection"
                 android:src="@drawable/ic_filter_list_white_24dp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/navigation_drawer_filters_menu_header_download_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/navigation_drawer_filters_menu_header_download_imagebutton"
@@ -94,6 +88,7 @@
                 android:contentDescription="@string/Download"
                 android:src="@drawable/ic_file_download_white_24dp" />
         </FrameLayout>
+
     </LinearLayout>
 
 </LinearLayout>
