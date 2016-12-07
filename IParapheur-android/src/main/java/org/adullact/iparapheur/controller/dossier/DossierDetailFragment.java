@@ -64,6 +64,7 @@ import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -705,48 +706,54 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			if (mDossier == null)
 				return null;
 
-			// Offline backup
-
-			if (!DeviceUtils.isConnected(getActivity())) {
-				try {
-					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq("Id", mDossier.getId()).query();
-					if (!dbRequestResult.isEmpty())
-						mDossier = dbRequestResult.get(0);
-				}
-				catch (SQLException e) { e.printStackTrace(); }
-			}
-
 			// Download the dossier Metadata
 
-			if (!Dossier.areDetailsAvailable(mDossier)) {
-				showSpinnerOnUiThread();
+			if (DeviceUtils.isConnected(getActivity())) {
+				if (!Dossier.areDetailsAvailable(mDossier)) {
+					showSpinnerOnUiThread();
+
+					try {
+						Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
+						mDossier.setDocumentList(retrievedDossier.getDocumentList());
+						mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+
+						// Save in Database
+
+						final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+
+						// This callable allow us to insert/update in loops
+						// and calling db only once...
+						dossierDao.callBatchTasks(new Callable<Void>() {
+							@Override public Void call() throws Exception {
+								mDossier.setSyncDate(new Date());
+								dossierDao.createOrUpdate(mDossier);
+
+								return null;
+							}
+						});
+					}
+					catch (IParapheurException e) {
+						e.printStackTrace();
+					}
+					catch (Exception e) {
+						new IParapheurException(-1, "DB error").printStackTrace();
+					}
+				}
+			}
+			else { // Offline backup
 
 				try {
-					Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
-					mDossier.setDocumentList(retrievedDossier.getDocumentList());
-					mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq("Id", mDossier.getId()).query();
 
-					// Save in Database
+					if (dbRequestResult.isEmpty())
+						return null;
 
-					final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-
-					// This callable allow us to insert/update in loops
-					// and calling db only once...
-					dossierDao.callBatchTasks(new Callable<Void>() {
-						@Override public Void call() throws Exception {
-							mDossier.setSyncDate(new Date());
-							dossierDao.createOrUpdate(mDossier);
-
-							return null;
-						}
-					});
+					mDossier = dbRequestResult.get(0);
+					List<Document> documents = new ArrayList<>();
+					documents.addAll(mDossier.getChildrenDocuments());
+					mDossier.setDocumentList(documents);
 				}
-				catch (IParapheurException e) {
-					e.printStackTrace();
-				}
-				catch (Exception e) {
-					new IParapheurException(-1, "DB error").printStackTrace();
-				}
+				catch (SQLException e) { e.printStackTrace(); }
 			}
 
 			// Getting metadata
@@ -760,7 +767,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			currentDocument.setPath(file.getAbsolutePath());
 			Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
 
-			if (!file.exists()) {
+			if (!file.exists() && DeviceUtils.isConnected(getActivity())) {
 				String downloadUrl = Document.generateContentUrl(currentDocument);
 				if (downloadUrl != null) {
 					try { RESTClient.INSTANCE.downloadFile(downloadUrl, file.getAbsolutePath()); }
@@ -770,18 +777,20 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 			// Loading user data and annotations
 
-			SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
-			Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
-			if (TextUtils.isEmpty(currentAccount.getUserName())) {
-				try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
-				catch (IParapheurException e) { e.printStackTrace(); }
-			}
+			if (DeviceUtils.isConnected(getActivity())) {
+				SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
+				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				if (TextUtils.isEmpty(currentAccount.getUserName())) {
+					try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
+					catch (IParapheurException e) { e.printStackTrace(); }
+				}
 
-			if (Document.isMainDocument(mDossier, currentDocument)) {
-				try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
-				catch (IParapheurException e) { e.printStackTrace(); }
+				if (Document.isMainDocument(mDossier, currentDocument)) {
+					try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
+					catch (IParapheurException e) { e.printStackTrace(); }
+				}
+				currentDocument.setPagesAnnotations(annotations);
 			}
-			currentDocument.setPagesAnnotations(annotations);
 
 			return null;
 		}
