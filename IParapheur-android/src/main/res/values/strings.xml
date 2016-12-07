@@ -30,6 +30,10 @@
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
 
+    <string name="Late_since">En retard depuis le %s</string>
+    <string name="Emit_since">Émis le %s</string>
+    <string name="Sync_date">Téléchargé le %1$s à %2$s</string>
+
     <string name="one_dossier">1 dossier</string>
     <string name="nb_dossiers">%d dossiers</string>
     <string name="no_dossier">Aucun dossier</string>

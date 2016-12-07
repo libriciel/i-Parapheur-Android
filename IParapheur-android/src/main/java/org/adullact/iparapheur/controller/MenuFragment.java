@@ -72,6 +72,7 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
+import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -781,9 +782,39 @@ public class MenuFragment extends Fragment {
 
 			// Text
 
-			// FIXME : changement d'api avec toutes les actions.
-			((TextView) cellView.findViewById(R.id.dossiers_list_item_extras)).setText(String.format("%s / %s", dossier.getType(), dossier.getSousType()));
-			((TextView) cellView.findViewById(R.id.dossiers_list_item_title)).setText(dossier.getName());
+			TextView nameTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_title);
+			TextView dateTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_typology);
+			TextView typeTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_date);
+
+			String typologyText = String.format("%s / %s", dossier.getType(), dossier.getSousType());
+
+			typeTextView.setText(typologyText);
+			nameTextView.setText(dossier.getName());
+
+			// Date text
+
+			dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+
+			if ((dossier.getDateLimite() != null) && (new Date().after(dossier.getDateLimite()))) {
+				String lateText = getString(R.string.Late_since, StringUtils.getLocalizedSmallDate(dossier.getDateLimite()));
+				dateTextView.setText(lateText);
+				dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
+			}
+			else if (dossier.getSyncDate() != null) {
+				String syncText = getString(R.string.Sync_date,
+											StringUtils.getVerySmallDate(dossier.getSyncDate()),
+											StringUtils.getSmallTime(dossier.getSyncDate())
+				);
+				dateTextView.setText(syncText);
+			}
+			else if (dossier.getDateCreation() != null) {
+				String emitSinceText = getString(R.string.Emit_since, StringUtils.getLocalizedSmallDate(dossier.getDateCreation()));
+				dateTextView.setText(emitSinceText);
+			}
+			else {
+				typeTextView.setText(dossier.getType());
+				dateTextView.setText(dossier.getSousType());
+			}
 
 			// CheckBox
 

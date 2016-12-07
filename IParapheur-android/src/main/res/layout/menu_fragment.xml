@@ -26,8 +26,7 @@
                     android:id="@+id/menu_fragment_bureaux_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="singleChoice"
-                    android:divider="@color/text_black_divider"
+                    android:choiceMode="singleChoice"                    android:divider="@color/text_black_divider"
                     android:dividerHeight="1dp" />
 
                 <LinearLayout

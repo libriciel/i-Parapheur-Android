@@ -300,6 +300,24 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		return dateFormat.format(date);
 	}
 
+	public static @NonNull String getVerySmallDate(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+		return dateFormat.format(date);
+	}
+
+	public static @NonNull String getSmallTime(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
+		DateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+		return dateFormat.format(date);
+	}
+
 	public static boolean isUrlValid(@Nullable String url) {
 
 		if (TextUtils.isEmpty(url))

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="mockup_dossier_title">Dossier titre</string>
-    <string name="mockup_dossier_date">45 min</string>
+    <string name="mockup_dossier_date">En retard depuis le 12/01</string>
     <string name="mockup_dossier_subtitle">Dossier Details / Dossier description</string>
 
     <string name="mockup_bureau_content">526</string>
