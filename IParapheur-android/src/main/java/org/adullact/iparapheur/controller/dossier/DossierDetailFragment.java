@@ -63,8 +63,10 @@ import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -696,17 +698,27 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// TODO : Error messages
 		@Override protected Void doInBackground(Void... params) {
 
-			// Default cases
+			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+
+			// Default case
 
 			if (mDossier == null)
 				return null;
 
-			// Download the dossier Metadata (if missing, and according to the debug mode)
+			// Offline backup
 
-			if (DeviceUtils.isDebugOffline()) {
-				mDossier.getDocumentList().add(new Document(UUID.randomUUID().toString(), "document par défaut", -1, true, false));
+			if (!DeviceUtils.isConnected(getActivity())) {
+				try {
+					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq("Id", mDossier.getId()).query();
+					if (!dbRequestResult.isEmpty())
+						mDossier = dbRequestResult.get(0);
+				}
+				catch (SQLException e) { e.printStackTrace(); }
 			}
-			else if (!Dossier.areDetailsAvailable(mDossier)) {
+
+			// Download the dossier Metadata
+
+			if (!Dossier.areDetailsAvailable(mDossier)) {
 				showSpinnerOnUiThread();
 
 				try {
@@ -716,7 +728,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 					// Save in Database
 
-					DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 					final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
 
 					// This callable allow us to insert/update in loops

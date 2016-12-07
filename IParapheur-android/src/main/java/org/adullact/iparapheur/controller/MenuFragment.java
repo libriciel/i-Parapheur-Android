@@ -75,13 +75,12 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 
@@ -581,8 +580,9 @@ public class MenuFragment extends Fragment {
 		@Override protected IParapheurException doInBackground(Void... params) {
 
 			mBureauList.clear();
+			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
-			if (!DeviceUtils.isDebugOffline()) {
+			if (DeviceUtils.isConnected(getActivity())) {
 
 				// Download data
 
@@ -591,7 +591,6 @@ public class MenuFragment extends Fragment {
 
 				// Save in Database
 
-				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 				try {
 					final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
 
@@ -609,12 +608,15 @@ public class MenuFragment extends Fragment {
 						}
 					});
 				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
+				catch (Exception e) { e.printStackTrace(); }
 			}
-			else {
-				mBureauList.add(new Bureau(UUID.randomUUID().toString(), "bureau defaut", 0, 0));
+			else { // Offline backup
+
+				try {
+					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+					mBureauList.addAll(bureauDao.queryForAll());
+				}
+				catch (SQLException e) { e.printStackTrace(); }
 			}
 
 			return null;
@@ -662,8 +664,9 @@ public class MenuFragment extends Fragment {
 
 			mDossierList.clear();
 			mTypology.clear();
+			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
-			if (!DeviceUtils.isDebugOffline()) {
+			if (DeviceUtils.isConnected(getActivity())) {
 
 				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
 				catch (IParapheurException exception) { return exception; }
@@ -671,12 +674,14 @@ public class MenuFragment extends Fragment {
 				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
-			else {
-				HashSet<Action> visaHashSet = new HashSet<>(Collections.singletonList(Action.VISA));
-				Dossier dossier1 = new Dossier("1", "Test 01", Action.VISA, visaHashSet, "Type", "Sous-Type", new Date(), null, false);
-				Dossier dossier2 = new Dossier("2", "Test 02", Action.VISA, visaHashSet, "Type", "Sous-Type", new Date(), null, false);
-				mDossierList.add(dossier1);
-				mDossierList.add(dossier2);
+			else { // Offline backup
+
+				try {
+					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+					bureauDao.update(mSelectedBureau);
+					mDossierList.addAll(mSelectedBureau.getChildrenDossiers());
+				}
+				catch (SQLException e) { e.printStackTrace(); }
 			}
 
 			return null;
