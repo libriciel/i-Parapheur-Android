@@ -14,12 +14,4 @@
     <string name="mockup_filter_name">Mon filtre</string>
     <string name="mockup_percent">0%</string>
 
-    <!-- Default Account -->
-
-    <string name="demo_account_id">AccountTest0</string>
-    <string name="demo_account_title">iParapheur demo</string>
-    <string name="demo_account_url">parapheur.demonstrations.adullact.org</string>
-    <string name="demo_account_login">bma</string>
-    <string name="demo_account_password">secret</string>
-
 </resources>

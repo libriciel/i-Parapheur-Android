@@ -36,6 +36,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,7 +57,6 @@ import android.widget.ViewSwitcher;
 import com.j256.ormlite.dao.Dao;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.DownloadDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
@@ -65,11 +65,13 @@ import org.adullact.iparapheur.controller.dossier.filter.FilterDialogFragment;
 import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -490,7 +492,7 @@ public class MenuFragment extends Fragment {
 		if (forceReload)
 			mBureauList.clear();
 
-		if ((mBureauList.isEmpty()) && (MyAccounts.INSTANCE.getSelectedAccount() != null)) {
+		if ((mBureauList.isEmpty()) && (AccountUtils.SELECTED_ACCOUNT != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 			executeAsyncTask(new BureauxLoadingTask());
@@ -581,6 +583,7 @@ public class MenuFragment extends Fragment {
 
 			mBureauList.clear();
 			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			final Account selectedAccount = new Account();
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
@@ -592,6 +595,9 @@ public class MenuFragment extends Fragment {
 				// Save in Database
 
 				try {
+					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
+					accountDao.createOrUpdate(selectedAccount);
+
 					final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
 
 					// This callable allow us to insert/update in loops
@@ -601,6 +607,7 @@ public class MenuFragment extends Fragment {
 
 							for (Bureau bureau : mBureauList) {
 								bureau.setSyncDate(new Date());
+								bureau.setParent(selectedAccount);
 								bureauDao.createOrUpdate(bureau);
 							}
 
@@ -613,8 +620,13 @@ public class MenuFragment extends Fragment {
 			else { // Offline backup
 
 				try {
-					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-					mBureauList.addAll(bureauDao.queryForAll());
+					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
+					accountDao.update(selectedAccount);
+
+					if ((selectedAccount == null) || (selectedAccount.getChildrenBureaux() == null))
+						return null;
+
+					mBureauList.addAll(selectedAccount.getChildrenBureaux());
 				}
 				catch (SQLException e) { e.printStackTrace(); }
 			}

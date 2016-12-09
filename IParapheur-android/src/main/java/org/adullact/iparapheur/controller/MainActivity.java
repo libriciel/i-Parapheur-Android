@@ -56,7 +56,6 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
@@ -68,15 +67,18 @@ import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFr
 import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -223,9 +225,22 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Selecting the first account by default, the demo one
 
-		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
-		if (selectedAccount == null)
-			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts(this).get(0).getId());
+		if (AccountUtils.SELECTED_ACCOUNT == null) {
+			DatabaseHelper dbHelpder = new DatabaseHelper(this);
+
+			try {
+				String selectedAccountId = AccountUtils.loadSelectedAccountId(this);
+
+				if (TextUtils.isEmpty(selectedAccountId))
+					AccountUtils.SELECTED_ACCOUNT = dbHelpder.getAccountDao().queryBuilder().where().eq("Id", selectedAccountId).query().get(0);
+
+				if (AccountUtils.SELECTED_ACCOUNT == null)
+					AccountUtils.SELECTED_ACCOUNT = AccountUtils.getDemoAccount();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override public void onResume() {
@@ -386,14 +401,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		}
 
 		super.onBackPressed();
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-
-		// Save accounts state for later use. In our case, the latest selected account
-		// will be automatically selected if the application is killed and relaunched.
-		MyAccounts.INSTANCE.saveState(this);
 	}
 
 	@Override protected void onSaveInstanceState(Bundle outState) {
@@ -571,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	private void refreshNavigationDrawerHeader() {
 
-		Account account = MyAccounts.INSTANCE.getSelectedAccount();
+		Account account = AccountUtils.SELECTED_ACCOUNT;
 
 		TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
 		TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
@@ -676,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public void onAccountSelected(@NonNull Account account) {
 
-		MyAccounts.INSTANCE.selectAccount(account.getId());
+		AccountUtils.SELECTED_ACCOUNT = account;
 		refreshNavigationDrawerHeader();
 
 		// Close the drawer
@@ -773,7 +780,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		@Override public void onDrawerClosed(View view) {
 
 			if (getSupportActionBar() != null) {
-				Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
 				if (selectedAccount != null)
 					getSupportActionBar().setTitle(selectedAccount.getTitle());
 			}

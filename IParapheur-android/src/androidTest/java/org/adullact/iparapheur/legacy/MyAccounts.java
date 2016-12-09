@@ -19,7 +19,7 @@
  * @return
  * @coveredInInstrumentedUnitTest
  */
-package org.adullact.iparapheur.controller.account;
+package org.adullact.iparapheur.legacy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -134,25 +134,6 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	public @Nullable Account getAccount(@NonNull String id) {
 		int index = mAccounts.indexOf(new Account(id));
 		return (index != -1) ? mAccounts.get(index) : null;
-	}
-
-	public Account getSelectedAccount() {
-		return mSelectedAccount;
-	}
-
-	public void selectAccount(@NonNull String id) {
-		mSelectedAccount = getAccount(id);
-	}
-
-	public void saveState(@NonNull Context context) {
-		if (mSelectedAccount != null) {
-
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-
-			editor.putString(PREFS_SELECTED_ACCOUNT, mSelectedAccount.getId());
-			editor.apply();
-		}
 	}
 
 	// <editor-fold desc="OnSharedPreferenceChangeListener">

@@ -17,7 +17,6 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
 import org.adullact.iparapheur.model.Account;
 
@@ -96,15 +94,15 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	// </editor-fold desc="TextUtils">
 
-	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
+	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator() {
 
 		return new Comparator<Account>() {
 			@Override public int compare(Account lhs, Account rhs) {
 
-				if (TextUtils.equals(lhs.getId(), context.getString(R.string.demo_account_id)))
+				if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
 					return 1;
 
-				if (TextUtils.equals(rhs.getId(), context.getString(R.string.demo_account_id)))
+				if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
 					return -1;
 
 				return lhs.getTitle().compareTo(rhs.getTitle());

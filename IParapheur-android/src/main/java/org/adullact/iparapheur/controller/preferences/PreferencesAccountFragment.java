@@ -42,17 +42,20 @@ import android.widget.ToggleButton;
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -75,6 +78,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 	private ListView mAccountList;
 	private List<Map<String, String>> mAccountData;
+	private DatabaseHelper mDatabaseHelper;
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -98,6 +102,8 @@ public class PreferencesAccountFragment extends Fragment {
 
 		mAccountData = new ArrayList<>();
 		buildAccountDataMap();
+
+		mDatabaseHelper = new DatabaseHelper(getActivity());
 	}
 
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -156,10 +162,13 @@ public class PreferencesAccountFragment extends Fragment {
 		// Retrieve existing account, or create it
 
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
-		Account currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
+		Account currentAccount = null;
+
+		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+		catch (SQLException e) { e.printStackTrace(); }
 
 		if (currentAccount == null) {
-			currentAccount = MyAccounts.INSTANCE.addAccount(getActivity());
+			currentAccount = new Account(UUID.randomUUID().toString());
 			mAccountData.get(position).put(LIST_FIELD_ID, currentAccount.getId());
 		}
 
@@ -173,7 +182,8 @@ public class PreferencesAccountFragment extends Fragment {
 		// Save
 
 		Log.i(LOG_TAG, "Save account " + currentAccount);
-		MyAccounts.INSTANCE.save(getActivity(), currentAccount);
+		try { mDatabaseHelper.getAccountDao().createOrUpdate(currentAccount); }
+		catch (SQLException e) { e.printStackTrace(); }
 
 		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
 	}
@@ -183,18 +193,20 @@ public class PreferencesAccountFragment extends Fragment {
 		// Retrieve existing account
 
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
-		Account currentAccount;
+		Account currentAccount = null;
 
-		currentAccount = MyAccounts.INSTANCE.getAccount(currentId);
+		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+		catch (SQLException e) { e.printStackTrace(); }
 
 		if (currentAccount == null)
-			currentAccount = MyAccounts.INSTANCE.addAccount(getActivity());
+			currentAccount = new Account(UUID.randomUUID().toString());
 
 		// Delete
 
 		mAccountData.remove(position);
 		Log.i(LOG_TAG, "Delete account " + currentAccount);
-		MyAccounts.INSTANCE.delete(getActivity(), currentAccount);
+		try { mDatabaseHelper.getAccountDao().delete(currentAccount); }
+		catch (SQLException e) { e.printStackTrace(); }
 
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 		Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();
@@ -235,8 +247,12 @@ public class PreferencesAccountFragment extends Fragment {
 
 		// Retrieve and sort Account list (by titles, alphabetically)
 
-		List<Account> accountList = MyAccounts.INSTANCE.getAccounts(getActivity());
-		Collections.sort(accountList, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
+		List<Account> accountList = new ArrayList<>();
+
+		try { accountList.addAll(mDatabaseHelper.getAccountDao().queryForAll()); }
+		catch (SQLException e) { e.printStackTrace(); }
+
+		Collections.sort(accountList, StringUtils.buildAccountAlphabeticalComparator());
 
 		// Build map
 
@@ -270,7 +286,7 @@ public class PreferencesAccountFragment extends Fragment {
 		 * @param to       The views that should display column in the "from" parameter. These should all be
 		 *                 TextViews. The first N views in this list are given the values of the first N columns
 		 */
-		public AccountSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+		private AccountSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
 			super(context, data, resource, from, to);
 		}
 
@@ -334,7 +350,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 			// Demo case
 
-			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), getString(R.string.demo_account_id));
+			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
 			boolean isActivated = Boolean.valueOf(mAccountData.get(position).get(LIST_FIELD_ACTIVATED));
 
 			lockEditText(titleEditText, !isDemoAccount);
@@ -349,19 +365,25 @@ public class PreferencesAccountFragment extends Fragment {
 			enableToggleButton.setOnCheckedChangeListener(null);
 			enableToggleButton.setChecked(isActivated);
 			enableToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
 				@Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-					boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), getString(R.string.demo_account_id));
+					boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
 					if (isDemoAccount) {
 
 						int currentPosition = (Integer) v.getTag(LIST_CELL_TAG_POSITION);
 						mAccountData.get(currentPosition).put(LIST_FIELD_ACTIVATED, String.valueOf(isChecked));
 
-						String currentAccountId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
-						Account currentAccount = MyAccounts.INSTANCE.getAccount(currentAccountId);
+						String currentId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
+						Account currentAccount = null;
+
+						try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+						catch (SQLException e) { e.printStackTrace(); }
+
 						if (currentAccount != null) {
 							currentAccount.setActivated(isChecked);
-							MyAccounts.INSTANCE.save(getActivity(), currentAccount);
+							try { mDatabaseHelper.getAccountDao().update(currentAccount); }
+							catch (SQLException e) { e.printStackTrace(); }
 						}
 					}
 				}

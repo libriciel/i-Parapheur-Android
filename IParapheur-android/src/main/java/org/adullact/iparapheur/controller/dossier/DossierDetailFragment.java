@@ -43,7 +43,6 @@ import com.j256.ormlite.dao.Dao;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.MainActivity;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.circuit.CircuitAdapter;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
@@ -53,6 +52,7 @@ import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -352,7 +352,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	@Override protected @NonNull String getStickyNoteAuthorName() {
-		return MyAccounts.INSTANCE.getSelectedAccount().getLogin();
+		return AccountUtils.SELECTED_ACCOUNT.getLogin();
 	}
 
 	@Override protected @NonNull String generateNewStickyNoteId() {
@@ -586,7 +586,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				// Building final StickyNote object
 
-				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), MyAccounts.INSTANCE.getSelectedAccount().getUserFullName());
+				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), AccountUtils.SELECTED_ACCOUNT.getUserFullName());
 
 				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
 						annotation.getUuid(),
@@ -777,7 +777,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 			if (DeviceUtils.isConnected(getActivity())) {
 				SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
-				Account currentAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+
 				if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
 					try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
 					catch (IParapheurException e) { e.printStackTrace(); }

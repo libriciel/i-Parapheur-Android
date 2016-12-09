@@ -134,13 +134,7 @@ public class DownloadDialogFragment extends DialogFragment {
 		super.onResume();
 
 		mPendingTask = new DownloadTask();
-
-		String[] bureauIds = new String[mBureauList.size()];
-		for (int i = 0; i < mBureauList.size(); i++)
-			bureauIds[i] = mBureauList.get(i).getId();
-
-		mPendingTask.execute(bureauIds);
-
+		mPendingTask.execute(mBureauList.toArray(new Bureau[mBureauList.size()]));
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -153,13 +147,13 @@ public class DownloadDialogFragment extends DialogFragment {
 		dismiss();
 	}
 
-	private class DownloadTask extends AsyncTask<String, Long, IParapheurException> {
+	private class DownloadTask extends AsyncTask<Bureau, Long, IParapheurException> {
 
 		private final Long STEP_BUREAUX_METADATA = 0L;
 		private final Long STEP_DOSSIERS_METADATA = 1L;
 		private final Long STEP_DOCUMENT_FILES = 2L;
 
-		@Override protected IParapheurException doInBackground(String... bureauIds) {
+		@Override protected IParapheurException doInBackground(Bureau... bureaux) {
 
 			// This method does a little bit of Thread pausing.
 			// It may feel weird, but it bring a way better feeling on download,
@@ -180,15 +174,16 @@ public class DownloadDialogFragment extends DialogFragment {
 
 			final ArrayList<Dossier> dossierList = new ArrayList<>();
 			List<Dossier> incompleteDossierList = new ArrayList<>();
+			final List<Document> finalDocumentList = new ArrayList<>();
 
-			Long totalBureauxMetadataSize = (long) bureauIds.length;
+			Long totalBureauxMetadataSize = (long) bureaux.length;
 			Long progressBureauxMetadataSize = 0L;
 
-			for (String bureauId : bureauIds) {
-				Bureau parent = Bureau.findInList(mBureauList, bureauId);
+			for (Bureau bureau : bureaux) {
+				Bureau parent = Bureau.findInList(mBureauList, bureau.getId());
 
 				try {
-					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureauId);
+					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureau.getId());
 					for (Dossier dossier : incompleteDossierTempList)
 						dossier.setParent(parent);
 
@@ -233,6 +228,8 @@ public class DownloadDialogFragment extends DialogFragment {
 							document.setPagesAnnotations(annotations);
 						}
 
+						finalDocumentList.add(document);
+
 						if (isCancelled())
 							return new IParapheurException(-1, "Annulation");
 					}
@@ -258,16 +255,23 @@ public class DownloadDialogFragment extends DialogFragment {
 						for (Dossier dossier : dossierList) {
 							dossier.setSyncDate(new Date());
 							dossierDao.createOrUpdate(dossier);
-
-							for (Document document : dossier.getDocumentList()) {
-								document.setSyncDate(new Date());
-								documentDao.createOrUpdate(document);
-							}
 						}
 
 						return null;
 					}
 				});
+
+				documentDao.callBatchTasks(new Callable<Void>() {
+					@Override public Void call() throws Exception {
+						for (Document document : finalDocumentList) {
+							document.setSyncDate(new Date());
+							documentDao.createOrUpdate(document);
+						}
+
+						return null;
+					}
+				});
+
 			}
 			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
 

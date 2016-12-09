@@ -2,7 +2,7 @@
 <resources>
 
     <string name="about_main_title">Aide</string>
-    <string name="about_version_number">I-Parapheur Android - Version -version-</string>
+    <string name="about_version_number">I-Parapheur Android - Version %s</string>
     <string name="about_copyright">Copyright © 2012–2016, ADULLACT–Projet \nInitié et Developpé par ADULLACT-Projet S.A.</string>
     <string name="about_legal_title">Informations légales</string>
     <string name="about_legal_content_part1">IPARAPHEUR-ANDROID est un logiciel libre ; vous pouvez le redistribuer ou le modifier suivant les termes de la GNU Affero General Public License telle que publiée par la Free Software Foundation : soit la version 3 de cette licence, soit (à votre gré) toute version ultérieure.</string>

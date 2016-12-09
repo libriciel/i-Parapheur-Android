@@ -187,26 +187,6 @@ public class Account implements Serializable {
 
 	// </editor-fold desc="Getters / Setters">
 
-	public boolean isValid() {
-		return validateAccount(mTitle, mLogin, mPassword, mServerBaseUrl);
-	}
-
-	public static boolean validateAccount(String title, String url, String login, String password) {
-		return StringUtils.areNotEmpty(title, login, password) && StringUtils.isUrlValid(url);
-	}
-
-	public static @Nullable Account findInList(@Nullable List<Account> accountList, @NonNull String accountId) {
-
-		if (accountList == null)
-			return null;
-
-		for (Account account : accountList)
-			if (TextUtils.equals(account.getId(), accountId))
-				return account;
-
-		return null;
-	}
-
 	@Override public boolean equals(Object o) {
 		if (o instanceof Account) {
 			Account toCompare = (Account) o;

@@ -31,9 +31,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.StringUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -98,9 +101,9 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		// Setting selected view
 
-		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+		Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
 		if (selectedAccount == null)
-			selectedAccount = MyAccounts.INSTANCE.getAccounts(getActivity()).get(0);
+			selectedAccount = AccountUtils.getDemoAccount();
 
 		for (int i = 0; i < mAccounts.size(); i++)
 			if (selectedAccount.getId().contentEquals(mAccounts.get(i).getId()))
@@ -112,12 +115,16 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private void updateAccounts() {
 		mAccounts.clear();
 
-		for (Account account : MyAccounts.INSTANCE.getAccounts(getActivity()))
-			if (account.isValid())
+		ArrayList<Account> accountList = new ArrayList<>();
+		try { accountList.addAll(new DatabaseHelper(getActivity()).getAccountDao().queryForAll()); }
+		catch (SQLException e) { e.printStackTrace(); }
+
+		for (Account account : accountList)
+			if (AccountUtils.isValid(account))
 				if (account.isActivated())
 					mAccounts.add(account);
 
-		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
+		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator());
 
 		if (mAccountListAdapter != null)
 			mAccountListAdapter.notifyDataSetChanged();

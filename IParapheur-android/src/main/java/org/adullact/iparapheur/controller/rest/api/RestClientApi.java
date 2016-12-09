@@ -25,10 +25,10 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.HttpException;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
@@ -110,7 +110,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 	}
 
 	public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
-		return buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), action, params, true);
+		return buildUrl(AccountUtils.SELECTED_ACCOUNT, action, params, true);
 	}
 
 	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {

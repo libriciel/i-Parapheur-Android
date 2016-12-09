@@ -18,10 +18,8 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
@@ -32,6 +30,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -145,7 +144,7 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	private IParapheurAPI getRESTClient() throws IParapheurException {
-		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount());
+		return getRESTClient(AccountUtils.SELECTED_ACCOUNT);
 	}
 
 	private IParapheurAPI getRESTClient(Account account) throws IParapheurException {
@@ -153,7 +152,7 @@ public enum RESTClient implements IParapheurAPI {
 		IParapheurAPI apiClient;
 
 		if (apiVersion > API_VERSION_MAX)
-			throw new IParapheurException(R.string.Error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			throw new IParapheurException(R.string.Error_forward_parapheur_version, AccountUtils.SELECTED_ACCOUNT.getTitle());
 
 		switch (apiVersion) {
 			case 1:
@@ -177,11 +176,11 @@ public enum RESTClient implements IParapheurAPI {
 	}
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossier(bureauId, dossierId);
+		return getRESTClient(AccountUtils.SELECTED_ACCOUNT).getDossier(bureauId, dossierId);
 	}
 
 	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount()).getDossiers(bureauId);
+		return getRESTClient(AccountUtils.SELECTED_ACCOUNT).getDossiers(bureauId);
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
