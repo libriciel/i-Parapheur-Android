@@ -18,7 +18,6 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
 
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -85,7 +84,7 @@ public class RestClientApi1 extends RestClientApi {
 
 	protected ModelMapper modelMapper = new ModelMapper();
 
-	@Override public List<Bureau> getBureaux() throws IParapheurException {
+	@Override public List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException {
 		return null;
 	}
 
@@ -160,11 +159,23 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
+					)
+			);
 
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations", new JSONArray().put(new JSONObject().put("author",
-																																	 annotation.getAuthor()
-			).put("page", page).put("rect", rect).put("text", annotation.getText()).put("type", "rect")));
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations",
+																			 new JSONArray().put(new JSONObject().put("author", annotation.getAuthor()).put(
+																					 "page",
+																					 page
+																			 ).put("rect", rect).put("text", annotation.getText()).put("type", "rect"))
+			);
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de la création de l'annotation", e);
@@ -195,11 +206,23 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
+			).putOpt(
+					"topLeft",
+					new JSONObject().put(
+							"x",
+							centerX - annotwidth / 2
+					).put(
+							"y",
+							centerY + annotHeight / 2
+					)
+			);
 
-			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation", new JSONObject().put("uuid", annotation.getUuid()).put("rect",
-																																				  rect
-			).put("text", annotation.getText()));
+			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation",
+																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put(
+																					 "text",
+																					 annotation.getText()
+																			 )
+			);
 		}
 		catch (JSONException e) {
 			throw new RuntimeException("Une erreur est survenue lors de l'enregistrement de l'annotation", e);

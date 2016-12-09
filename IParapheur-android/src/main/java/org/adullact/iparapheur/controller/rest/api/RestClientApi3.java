@@ -53,7 +53,7 @@ import java.util.Locale;
 
 public class RestClientApi3 extends RestClientApi {
 
-	protected static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
+	private static final String RESOURCE_DOSSIERS = "/parapheur/dossiers";
 
 	/* Ressources principales */
 	private static final String RESOURCE_BUREAUX = "/parapheur/bureaux";
@@ -125,9 +125,9 @@ public class RestClientApi3 extends RestClientApi {
 		return Dossier.fromJsonArray(response, mGson);
 	}
 
-	@Override public List<Bureau> getBureaux() throws IParapheurException {
+	@Override public List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException {
 
-		String url = buildUrl(RESOURCE_BUREAUX);
+		String url = buildUrl(account, RESOURCE_BUREAUX);
 		RequestResponse result = RESTUtils.get(url);
 
 		return Bureau.fromJsonArray(result.getResponseArray().toString(), mGson);

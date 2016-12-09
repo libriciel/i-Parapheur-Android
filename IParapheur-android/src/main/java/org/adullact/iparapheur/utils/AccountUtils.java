@@ -28,10 +28,10 @@ import org.adullact.iparapheur.model.Account;
 public class AccountUtils {
 
 	public static final String DEMO_ID = "AccountTest0";
-	private static final String DEMO_TITLE = "iParapheur demo";
-	private static final String DEMO_BASE_URL = "parapheur.demonstrations.adullact.org";
-	private static final String DEMO_LOGIN = "bma";
-	private static final String DEMO_PASSWORD = "secret";
+	public static final String DEMO_TITLE = "iParapheur demo";
+	public static final String DEMO_BASE_URL = "parapheur.demonstrations.adullact.org";
+	public static final String DEMO_LOGIN = "bma";
+	public static final String DEMO_PASSWORD = "secret";
 
 	private static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
@@ -44,10 +44,6 @@ public class AccountUtils {
 
 	public static boolean isValid(@NonNull Account account) {
 		return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
-	}
-
-	public static @NonNull Account getDemoAccount() {
-		return new Account(DEMO_ID, DEMO_TITLE, DEMO_BASE_URL, DEMO_LOGIN, DEMO_PASSWORD, null, null);
 	}
 
 }

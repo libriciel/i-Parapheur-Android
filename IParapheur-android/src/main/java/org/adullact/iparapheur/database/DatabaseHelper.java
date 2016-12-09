@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -39,6 +40,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import static org.adullact.iparapheur.utils.AccountUtils.DEMO_BASE_URL;
+import static org.adullact.iparapheur.utils.AccountUtils.DEMO_ID;
+import static org.adullact.iparapheur.utils.AccountUtils.DEMO_LOGIN;
+import static org.adullact.iparapheur.utils.AccountUtils.DEMO_PASSWORD;
+import static org.adullact.iparapheur.utils.AccountUtils.DEMO_TITLE;
 
 
 /**
@@ -59,6 +66,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		retrieveLegacyAccounts(context);
 		createDefaultDemoAccount();
+		retrieveSelectedAccount(context);
 	}
 
 	// <editor-fold desc="OrmLiteSqliteOpenHelper">
@@ -218,21 +226,43 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		editor.commit();
 	}
 
-	public void createDefaultDemoAccount() {
+	private void createDefaultDemoAccount() {
 
 		List<Account> demoList = new ArrayList<>();
 
-		try { demoList.addAll(getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, AccountUtils.DEMO_ID).query()); }
+		try { demoList.addAll(getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query()); }
 		catch (SQLException e) { e.printStackTrace(); }
 
 		if (demoList.isEmpty()) {
-			Account demoAccount = AccountUtils.getDemoAccount();
+
+			Account demoAccount = new Account(DEMO_ID, DEMO_TITLE, DEMO_BASE_URL, DEMO_LOGIN, DEMO_PASSWORD, null, null);
 			demoAccount.setActivated(true);
 
 			try { getAccountDao().createOrUpdate(demoAccount); }
 			catch (SQLException e) { e.printStackTrace(); }
+		}
+	}
 
-			AccountUtils.SELECTED_ACCOUNT = demoAccount;
+	private void retrieveSelectedAccount(@NonNull Context context) {
+
+		String selectedAccountId = AccountUtils.loadSelectedAccountId(context);
+
+		// Load from DB
+
+		List<Account> accountList = new ArrayList<>();
+		try { accountList.addAll(getAccountDao().queryForAll()); }
+		catch (SQLException e) { e.printStackTrace(); }
+
+		for (Account account : accountList)
+			if (TextUtils.equals(selectedAccountId, account.getId())) {
+				AccountUtils.SELECTED_ACCOUNT = account;
+			}
+
+		// Default case
+
+		if (AccountUtils.SELECTED_ACCOUNT == null) {
+			try { AccountUtils.SELECTED_ACCOUNT = getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query().get(0); }
+			catch (SQLException e) { e.printStackTrace(); }
 		}
 	}
 

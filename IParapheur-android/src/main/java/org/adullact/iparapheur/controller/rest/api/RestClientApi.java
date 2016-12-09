@@ -48,7 +48,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 
 	public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
 
-	protected static final String ACTION_LOGIN = "/parapheur/api/login";
+	private static final String ACTION_LOGIN = "/parapheur/api/login";
 
 	@Override public int test(Account account) throws IParapheurException {
 
@@ -105,12 +105,16 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return account.getTicket();
 	}
 
-	public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
+	@Deprecated public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
 		return buildUrl(action, null);
 	}
 
-	public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
+	@Deprecated public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
 		return buildUrl(AccountUtils.SELECTED_ACCOUNT, action, params, true);
+	}
+
+	public @NonNull String buildUrl(@NonNull Account account, @NonNull String action) throws IParapheurException {
+		return buildUrl(account, action, null, true);
 	}
 
 	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {

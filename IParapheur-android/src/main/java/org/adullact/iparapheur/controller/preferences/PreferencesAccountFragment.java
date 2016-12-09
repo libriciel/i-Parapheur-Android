@@ -101,9 +101,9 @@ public class PreferencesAccountFragment extends Fragment {
 		setRetainInstance(true);
 
 		mAccountData = new ArrayList<>();
-		buildAccountDataMap();
-
 		mDatabaseHelper = new DatabaseHelper(getActivity());
+		
+		buildAccountDataMap();
 	}
 
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

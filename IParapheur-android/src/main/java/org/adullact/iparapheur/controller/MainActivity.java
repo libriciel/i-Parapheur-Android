@@ -67,7 +67,6 @@ import org.adullact.iparapheur.controller.preferences.ImportCertificatesDialogFr
 import org.adullact.iparapheur.controller.preferences.PreferencesAccountFragment;
 import org.adullact.iparapheur.controller.preferences.PreferencesActivity;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
@@ -78,7 +77,6 @@ import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -221,25 +219,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			File certificateFound = certificatesFoundList.get(0);
 			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
 			actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
-		}
-
-		// Selecting the first account by default, the demo one
-
-		if (AccountUtils.SELECTED_ACCOUNT == null) {
-			DatabaseHelper dbHelpder = new DatabaseHelper(this);
-
-			try {
-				String selectedAccountId = AccountUtils.loadSelectedAccountId(this);
-
-				if (TextUtils.isEmpty(selectedAccountId))
-					AccountUtils.SELECTED_ACCOUNT = dbHelpder.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, selectedAccountId).query().get(0);
-
-				if (AccountUtils.SELECTED_ACCOUNT == null)
-					AccountUtils.SELECTED_ACCOUNT = AccountUtils.getDemoAccount();
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

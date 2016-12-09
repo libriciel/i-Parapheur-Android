@@ -213,7 +213,7 @@ public class Account implements Serializable {
 	}
 
 	@Override public String toString() {
-		return mTitle;
+		return "{Account id:" + mId + " title:" + mTitle + " url:" + mServerBaseUrl + " login:" + mLogin + " pass:" + mPassword + "}";
 	}
 
 }

@@ -18,6 +18,7 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
@@ -45,7 +46,6 @@ public enum RESTClient implements IParapheurAPI {
 	private static final int API_VERSION_MAX = 4;
 
 	private final RestClientApi1 restClientAPI1 = new RestClientApi1();
-	private final RestClientApi2 restClientAPI2 = new RestClientApi2();
 	private final RestClientApi3 restClientAPI3 = new RestClientApi3();
 	private final RestClientApi3 restClientAPI4 = new RestClientApi4();
 
@@ -71,6 +71,8 @@ public enum RESTClient implements IParapheurAPI {
 
 		// Request
 
+		Log.v("Adrien", ">>>>> " + account);
+		Log.v("Adrien", ">>>>> " + account.getServerBaseUrl());
 		String url = restClientAPI4.buildUrl(account, RESOURCE_API_VERSION, null, withAuthentication, withTenant);
 
 		try {
@@ -139,8 +141,8 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient(account).updateAccountInformations(account);
 	}
 
-	@Override public List<Bureau> getBureaux() throws IParapheurException {
-		return getRESTClient().getBureaux();
+	@Override public List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException {
+		return getRESTClient().getBureaux(account);
 	}
 
 	private IParapheurAPI getRESTClient() throws IParapheurException {
@@ -149,7 +151,7 @@ public enum RESTClient implements IParapheurAPI {
 
 	private IParapheurAPI getRESTClient(Account account) throws IParapheurException {
 		Integer apiVersion = getAPIVersion(account);
-		IParapheurAPI apiClient;
+		IParapheurAPI apiClient = null;
 
 		if (apiVersion > API_VERSION_MAX)
 			throw new IParapheurException(R.string.Error_forward_parapheur_version, AccountUtils.SELECTED_ACCOUNT.getTitle());
@@ -158,19 +160,16 @@ public enum RESTClient implements IParapheurAPI {
 			case 1:
 				apiClient = restClientAPI1;
 				break;
-			case 2:
-				apiClient = restClientAPI2;
-				break;
 			case 3:
 				apiClient = restClientAPI3;
 				break;
 			case 4:
 				apiClient = restClientAPI4;
 				break;
-			default:
-				apiClient = restClientAPI2;
-				break;
 		}
+
+		if (apiClient == null)
+			throw new IParapheurException(-1, "Unsupported API");
 
 		return apiClient;
 	}

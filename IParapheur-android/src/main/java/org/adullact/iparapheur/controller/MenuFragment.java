@@ -117,7 +117,7 @@ public class MenuFragment extends Fragment {
 	private Bureau mSelectedBureau = null;                          // Which Bureau is displayed in the submenu
 	private Dossier mDisplayedDossier = null;                       // Which Dossier is displayed in the Pdf viewer fragment
 	private Bureau mDisplayedBureau = null;                         // Which Bureau is displayed in the Pdf viewer fragment
-	private AsyncTask<Void, ?, ?> mPendingAsyncTask = null;
+	private AsyncTask<Account, ?, ?> mPendingAsyncTask = null;
 
 	// <editor-fold desc="LifeCycle">
 
@@ -290,6 +290,8 @@ public class MenuFragment extends Fragment {
 
 	@Override public void onStart() {
 		super.onStart();
+
+		Log.i("Adrien", "account :: " + AccountUtils.SELECTED_ACCOUNT);
 
 		if (mBureauList.isEmpty())
 			updateBureaux(true);
@@ -552,13 +554,13 @@ public class MenuFragment extends Fragment {
 			((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
 	}
 
-	private void executeAsyncTask(@NonNull AsyncTask<Void, ?, ?> task) {
+	private void executeAsyncTask(@NonNull AsyncTask<Account, ?, ?> task) {
 
 		if (mPendingAsyncTask != null)
 			mPendingAsyncTask.cancel(false);
 
 		mPendingAsyncTask = task;
-		mPendingAsyncTask.execute();
+		mPendingAsyncTask.execute(AccountUtils.SELECTED_ACCOUNT);
 	}
 
 	// <editor-fold desc="Interface">
@@ -572,31 +574,34 @@ public class MenuFragment extends Fragment {
 
 	// </editor-fold desc="Interface">
 
-	private class BureauxLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
+	private class BureauxLoadingTask extends AsyncTask<Account, Void, IParapheurException> {
 
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mBureauSwipeRefreshLayout.setRefreshing(true);
 		}
 
-		@Override protected IParapheurException doInBackground(Void... params) {
+		@Override protected IParapheurException doInBackground(Account... params) {
+
+			Account currentAccount = params[0];
+			if (currentAccount == null)
+				return new IParapheurException(-1, "No account selected");
 
 			mBureauList.clear();
 			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-			final Account selectedAccount = new Account();
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
 				// Download data
 
-				try { mBureauList.addAll(RESTClient.INSTANCE.getBureaux()); }
+				try { mBureauList.addAll(RESTClient.INSTANCE.getBureaux(currentAccount)); }
 				catch (final IParapheurException exception) { return exception; }
 
 				// Save in Database
 
 				try {
 					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-					accountDao.createOrUpdate(selectedAccount);
+					accountDao.createOrUpdate(AccountUtils.SELECTED_ACCOUNT);
 
 					final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
 
@@ -607,7 +612,7 @@ public class MenuFragment extends Fragment {
 
 							for (Bureau bureau : mBureauList) {
 								bureau.setSyncDate(new Date());
-								bureau.setParent(selectedAccount);
+								bureau.setParent(AccountUtils.SELECTED_ACCOUNT);
 								bureauDao.createOrUpdate(bureau);
 							}
 
@@ -621,12 +626,12 @@ public class MenuFragment extends Fragment {
 
 				try {
 					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-					accountDao.update(selectedAccount);
+					accountDao.update(AccountUtils.SELECTED_ACCOUNT);
 
-					if ((selectedAccount == null) || (selectedAccount.getChildrenBureaux() == null))
+					if ((AccountUtils.SELECTED_ACCOUNT == null) || (AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux() == null))
 						return null;
 
-					mBureauList.addAll(selectedAccount.getChildrenBureaux());
+					mBureauList.addAll(AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux());
 				}
 				catch (SQLException e) { e.printStackTrace(); }
 			}
@@ -665,14 +670,14 @@ public class MenuFragment extends Fragment {
 		}
 	}
 
-	private class DossiersLoadingTask extends AsyncTask<Void, Void, IParapheurException> {
+	private class DossiersLoadingTask extends AsyncTask<Account, Void, IParapheurException> {
 
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mDossierSwipeRefreshLayout.setRefreshing(true);
 		}
 
-		@Override protected IParapheurException doInBackground(Void... params) {
+		@Override protected IParapheurException doInBackground(Account... params) {
 
 			mDossierList.clear();
 			mTypology.clear();

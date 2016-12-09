@@ -23,12 +23,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.database.DatabaseHelper;
@@ -101,12 +103,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		// Setting selected view
 
-		Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
-		if (selectedAccount == null)
-			selectedAccount = AccountUtils.getDemoAccount();
-
 		for (int i = 0; i < mAccounts.size(); i++)
-			if (selectedAccount.getId().contentEquals(mAccounts.get(i).getId()))
+			if (TextUtils.equals(AccountUtils.SELECTED_ACCOUNT.getId(), mAccounts.get(i).getId()))
 				mListView.setItemChecked(i, true);
 	}
 
@@ -167,6 +165,18 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		@Override public Account getItem(int position) {
 			return mAccounts.get(position);
+		}
+
+		@Override public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent) {
+
+			View cell = super.getView(position, convertView, parent);
+			TextView bureauTitleTextView = (TextView) cell.findViewById(android.R.id.text1);
+			Account account = mAccounts.get(position);
+
+			if (account != null)
+				bureauTitleTextView.setText(account.getTitle());
+
+			return cell;
 		}
 
 		@Override public int getPosition(Account item) {

@@ -54,7 +54,7 @@ public interface IParapheurAPI {
 	 */
 	String getTicket(Account account) throws IParapheurException;
 
-	List<Bureau> getBureaux() throws IParapheurException;
+	List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException;
 
 	Dossier getDossier(String bureauId, String dossierId) throws IParapheurException;
 
