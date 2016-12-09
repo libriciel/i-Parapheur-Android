@@ -45,52 +45,65 @@ import static org.adullact.iparapheur.model.Action.VISA;
 @DatabaseTable(tableName = "Folder")
 public class Dossier {
 
-	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_NAME = "Name";
+	private static final String DB_FIELD_ACTION_ASKED = "ActionAsked";
+	private static final String DB_FIELD_TYPE = "Type";
+	private static final String DB_FIELD_SUBTYPE = "SubType";
+	private static final String DB_FIELD_CREATION_DATE = "CreationDate";
+	private static final String DB_FIELD_LATE_DATE = "LateDate";
+	private static final String DB_FIELD_ACTIONS = "Actions";
+	private static final String DB_FIELD_IS_PAPER_SIGN = "IsPaperSign";
+	private static final String DB_FIELD_DOCUMENTS = "Documents";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_DESK = "Desk";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
 	@SerializedName("id")  //
 	private String mId;
 
-	@DatabaseField(columnName = "Name", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_NAME, canBeNull = false, defaultValue = "")  //
 	@SerializedName("title")  //
 	private String mName;
 
-	@DatabaseField(columnName = "ActionAsked", dataType = DataType.ENUM_STRING, canBeNull = false, defaultValue = "VISA")  //
+	@DatabaseField(columnName = DB_FIELD_ACTION_ASKED, dataType = DataType.ENUM_STRING, canBeNull = false, defaultValue = "VISA")  //
 	@SerializedName("actionDemandee")  //
 	private Action mActionDemandee;
 
-	@DatabaseField(columnName = "Type")  //
+	@DatabaseField(columnName = DB_FIELD_TYPE)  //
 	@SerializedName("type")  //
 	private String mType;
 
-	@DatabaseField(columnName = "SubType")  //
+	@DatabaseField(columnName = DB_FIELD_SUBTYPE)  //
 	@SerializedName("sousType")  //
 	private String mSousType;
 
-	@DatabaseField(columnName = "CreationDate")  //
+	@DatabaseField(columnName = DB_FIELD_CREATION_DATE)  //
 	@SerializedName("dateEmission")  //
 	private Date mDateCreation;
 
-	@DatabaseField(columnName = "LateDate")  //
+	@DatabaseField(columnName = DB_FIELD_LATE_DATE)  //
 	@SerializedName("dateLimite")  //
 	private Date mDateLimite;
 
-	@DatabaseField(columnName = "Actions", dataType = DataType.SERIALIZABLE)  //
+	@DatabaseField(columnName = DB_FIELD_ACTIONS, dataType = DataType.SERIALIZABLE)  //
 	@SerializedName("actions")  //
 	private HashSet<Action> mActions;
 
-	@DatabaseField(columnName = "IsPaperSign")  //
+	@DatabaseField(columnName = DB_FIELD_IS_PAPER_SIGN)  //
 	@SerializedName("isSignPapier")  //
 	private boolean mIsSignPapier;
 
 	@SerializedName("documents")  //
 	private List<Document> mDocumentList = new ArrayList<>();
 
-	@ForeignCollectionField(columnName = "Documents")  //
+	@ForeignCollectionField(columnName = DB_FIELD_DOCUMENTS)  //
 	private ForeignCollection<Document> mChildrenDocuments;
 
-	@DatabaseField(columnName = "Sync")  //
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
 	private Date mSyncDate;
 
-	@DatabaseField(columnName = "Desk", foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = DB_FIELD_DESK, foreign = true, foreignAutoRefresh = true)  //
 	private Bureau mParent;
 
 	private Circuit mCircuit;

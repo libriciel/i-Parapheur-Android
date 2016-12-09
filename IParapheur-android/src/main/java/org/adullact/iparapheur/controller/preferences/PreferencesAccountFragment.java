@@ -164,7 +164,7 @@ public class PreferencesAccountFragment extends Fragment {
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
 		Account currentAccount = null;
 
-		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
 		catch (SQLException e) { e.printStackTrace(); }
 
 		if (currentAccount == null) {
@@ -195,7 +195,7 @@ public class PreferencesAccountFragment extends Fragment {
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
 		Account currentAccount = null;
 
-		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
 		catch (SQLException e) { e.printStackTrace(); }
 
 		if (currentAccount == null)
@@ -377,7 +377,7 @@ public class PreferencesAccountFragment extends Fragment {
 						String currentId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
 						Account currentAccount = null;
 
-						try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq("Id", currentId).query().get(0); }
+						try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
 						catch (SQLException e) { e.printStackTrace(); }
 
 						if (currentAccount != null) {

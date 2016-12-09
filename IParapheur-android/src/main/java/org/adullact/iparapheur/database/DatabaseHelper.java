@@ -222,7 +222,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
 		List<Account> demoList = new ArrayList<>();
 
-		try { demoList.addAll(getAccountDao().queryBuilder().where().eq("Id", AccountUtils.DEMO_ID).query()); }
+		try { demoList.addAll(getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, AccountUtils.DEMO_ID).query()); }
 		catch (SQLException e) { e.printStackTrace(); }
 
 		if (demoList.isEmpty()) {

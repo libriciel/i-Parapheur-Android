@@ -39,33 +39,42 @@ import java.util.Date;
 @DatabaseTable(tableName = "Document")
 public class Document {
 
-	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_NAME = "Name";
+	private static final String DB_FIELD_SIZE = "Size";
+	private static final String DB_FIELD_IS_PDF_VISUAL = "IsPdfVisual";
+	private static final String DB_FIELD_IS_MAIN_DOCUMENT = "IsMainDocument";
+	private static final String DB_FIELD_ANNOTATIONS = "Annotations";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_DOSSIER = "Dossier";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
 	@SerializedName("id")  //
 	private String mId;
 
-	@DatabaseField(columnName = "Name", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_NAME, canBeNull = false, defaultValue = "")  //
 	@SerializedName("name")  //
 	private String mName;
 
-	@DatabaseField(columnName = "Size", defaultValue = "-1")  //
+	@DatabaseField(columnName = DB_FIELD_SIZE, defaultValue = "-1")  //
 	@SerializedName("size")  //
 	private int mSize;                          // TODO : download image instead of too heavy files
 
-	@DatabaseField(columnName = "IsPdfVisual", defaultValue = "false")  //
+	@DatabaseField(columnName = DB_FIELD_IS_PDF_VISUAL, defaultValue = "false")  //
 	@SerializedName("visuelPdf")  //
 	private boolean mIsPdfVisual;
 
-	@DatabaseField(columnName = "IsMainDocument")  //
+	@DatabaseField(columnName = DB_FIELD_IS_MAIN_DOCUMENT)  //
 	@SerializedName("isMainDocument")  //
 	private boolean mIsMainDocument;
 
-	@DatabaseField(columnName = "Annotations", dataType = DataType.SERIALIZABLE)  //
+	@DatabaseField(columnName = DB_FIELD_ANNOTATIONS, dataType = DataType.SERIALIZABLE)  //
 	private SerializableSparseArray<PageAnnotations> mPagesAnnotations;
 
-	@DatabaseField(columnName = "Sync")  //
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
 	private Date mSyncDate;
 
-	@DatabaseField(columnName = "Dossier", foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = DB_FIELD_DOSSIER, foreign = true, foreignAutoRefresh = true)  //
 	private Dossier mParent;
 
 	// <editor-fold desc="Static utils">

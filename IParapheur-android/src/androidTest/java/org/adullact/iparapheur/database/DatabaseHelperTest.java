@@ -82,7 +82,7 @@ public class DatabaseHelperTest {
 	}
 
 	@Test public void order01_createDefaultDemoAccount() throws Exception {
-		Account demoAccount = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", AccountUtils.DEMO_ID).query().get(0);
+		Account demoAccount = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, AccountUtils.DEMO_ID).query().get(0);
 		Assert.assertNotNull(demoAccount);
 		sDbHelper.getAccountDao().delete(demoAccount);
 		Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 0);
@@ -126,9 +126,9 @@ public class DatabaseHelperTest {
 
 	@Test public void order04_getBureauDao() throws Exception {
 
-		Account account01 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Account account02 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Account account03 = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Account account01 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_01").query().get(0);
+		Account account02 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_02").query().get(0);
+		Account account03 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_03").query().get(0);
 
 		Bureau bureau01 = new Bureau("id_01", "Bureau 01", 21, 11);
 		bureau01.setParent(account01);
@@ -162,9 +162,9 @@ public class DatabaseHelperTest {
 
 	@Test public void order05_getDossierDao() throws Exception {
 
-		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_01").query().get(0);
+		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_02").query().get(0);
+		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_03").query().get(0);
 
 		Assert.assertNotNull(bureau01);
 		Assert.assertNotNull(bureau02);
@@ -191,9 +191,9 @@ public class DatabaseHelperTest {
 
 		sDbHelper.getDossierDao().create(Arrays.asList(dossier01, dossier02, dossier03));
 
-		Dossier dossier01db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Dossier dossier02db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Dossier dossier03db = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Dossier dossier01db = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_01").query().get(0);
+		Dossier dossier02db = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_02").query().get(0);
+		Dossier dossier03db = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_03").query().get(0);
 
 		// Checks
 
@@ -223,9 +223,9 @@ public class DatabaseHelperTest {
 
 	@Test public void order06_getDocumentDao() throws Exception {
 
-		Dossier dossier01 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Dossier dossier03 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Dossier dossier01 = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_01").query().get(0);
+		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_02").query().get(0);
+		Dossier dossier03 = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_03").query().get(0);
 
 		Assert.assertNotNull(dossier01);
 		Assert.assertNotNull(dossier02);
@@ -250,9 +250,9 @@ public class DatabaseHelperTest {
 
 		sDbHelper.getDocumentDao().create(Arrays.asList(document01, document02, document03));
 
-		Document document01db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Document document02db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Document document03db = sDbHelper.getDocumentDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
+		Document document01db = sDbHelper.getDocumentDao().queryBuilder().where().eq(Document.DB_FIELD_ID, "id_01").query().get(0);
+		Document document02db = sDbHelper.getDocumentDao().queryBuilder().where().eq(Document.DB_FIELD_ID, "id_02").query().get(0);
+		Document document03db = sDbHelper.getDocumentDao().queryBuilder().where().eq(Document.DB_FIELD_ID, "id_03").query().get(0);
 
 		// Checks
 
@@ -276,10 +276,10 @@ public class DatabaseHelperTest {
 
 	@Test public void order07_onDeleteCascade() throws Exception {
 
-		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_01").query().get(0);
-		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
-		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq("Id", "id_03").query().get(0);
-		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq("Id", "id_02").query().get(0);
+		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_01").query().get(0);
+		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_02").query().get(0);
+		Bureau bureau03 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_03").query().get(0);
+		Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_02").query().get(0);
 
 		// Checks
 
@@ -340,7 +340,7 @@ public class DatabaseHelperTest {
 
 		// Check Account
 
-		Account dbAccount = sDbHelper.getAccountDao().queryBuilder().where().eq("Id", legacyAccount.getId()).query().get(0);
+		Account dbAccount = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, legacyAccount.getId()).query().get(0);
 		Assert.assertEquals(legacyAccount.getServerBaseUrl(), dbAccount.getServerBaseUrl());
 		Assert.assertEquals(legacyAccount.getLogin(), dbAccount.getLogin());
 		Assert.assertEquals(legacyAccount.getPassword(), dbAccount.getPassword());

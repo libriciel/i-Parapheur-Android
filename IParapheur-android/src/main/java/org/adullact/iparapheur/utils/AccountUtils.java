@@ -21,12 +21,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.adullact.iparapheur.model.Account;
-
-import java.util.List;
 
 
 public class AccountUtils {
@@ -48,18 +44,6 @@ public class AccountUtils {
 
 	public static boolean isValid(@NonNull Account account) {
 		return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
-	}
-
-	public static @Nullable Account findInList(@Nullable List<Account> accountList, @NonNull String accountId) {
-
-		if (accountList == null)
-			return null;
-
-		for (Account account : accountList)
-			if (TextUtils.equals(account.getId(), accountId))
-				return account;
-
-		return null;
 	}
 
 	public static @NonNull Account getDemoAccount() {

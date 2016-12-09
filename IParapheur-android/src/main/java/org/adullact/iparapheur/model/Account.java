@@ -26,47 +26,56 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.adullact.iparapheur.utils.StringUtils;
-
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 
 @DatabaseTable(tableName = "Account")
 public class Account implements Serializable {
 
-	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_TITLE = "Title";
+	private static final String DB_FIELD_BASE_URL = "BaseUrl";
+	private static final String DB_FIELD_LOGIN = "Login";
+	private static final String DB_FIELD_PASSWORD = "Password";
+	private static final String DB_FIELD_USER_FULL_NAME = "UserFullName";
+	private static final String DB_FIELD_TENANT = "Tenant";
+	private static final String DB_FIELD_API_VERSION = "ApiVersion";
+	private static final String DB_FIELD_ACTIVATED = "Activated";
+	private static final String DB_FIELD_LAST_REQUEST = "LastRequest";
+	private static final String DB_FIELD_DESKS = "Desks";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
 	private String mId;
 
-	@DatabaseField(columnName = "Title", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
 	private String mTitle;
 
-	@DatabaseField(columnName = "BaseUrl", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_BASE_URL, canBeNull = false, defaultValue = "")  //
 	private String mServerBaseUrl;
 
-	@DatabaseField(columnName = "Login", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_LOGIN, canBeNull = false, defaultValue = "")  //
 	private String mLogin;
 
-	@DatabaseField(columnName = "Password", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_PASSWORD, canBeNull = false, defaultValue = "")  //
 	private String mPassword;
 
-	@DatabaseField(columnName = "UserFullName")  //
+	@DatabaseField(columnName = DB_FIELD_USER_FULL_NAME)  //
 	private String mUserFullName;
 
-	@DatabaseField(columnName = "Tenant")  //
+	@DatabaseField(columnName = DB_FIELD_TENANT)  //
 	private String mTenant;
 
-	@DatabaseField(columnName = "ApiVersion")  //
+	@DatabaseField(columnName = DB_FIELD_API_VERSION)  //
 	private Integer mApiVersion;
 
-	@DatabaseField(columnName = "Activated")  //
+	@DatabaseField(columnName = DB_FIELD_ACTIVATED)  //
 	private boolean mActivated;
 
-	@DatabaseField(columnName = "LastRequest")  //
+	@DatabaseField(columnName = DB_FIELD_LAST_REQUEST)  //
 	private Date mLastRequest;
 
-	@ForeignCollectionField(columnName = "Desks")  //
+	@ForeignCollectionField(columnName = DB_FIELD_DESKS)  //
 	private ForeignCollection<Bureau> mChildrenBureaux;
 
 	private String mTicket;
@@ -181,6 +190,10 @@ public class Account implements Serializable {
 		mLastRequest = lastRequest;
 	}
 
+	public void setChildrenBureaux(ForeignCollection<Bureau> childrenBureaux) {
+		mChildrenBureaux = childrenBureaux;
+	}
+
 	public ForeignCollection<Bureau> getChildrenBureaux() {
 		return mChildrenBureaux;
 	}
@@ -202,4 +215,5 @@ public class Account implements Serializable {
 	@Override public String toString() {
 		return mTitle;
 	}
+
 }

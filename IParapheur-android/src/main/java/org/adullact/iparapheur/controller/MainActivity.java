@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 				String selectedAccountId = AccountUtils.loadSelectedAccountId(this);
 
 				if (TextUtils.isEmpty(selectedAccountId))
-					AccountUtils.SELECTED_ACCOUNT = dbHelpder.getAccountDao().queryBuilder().where().eq("Id", selectedAccountId).query().get(0);
+					AccountUtils.SELECTED_ACCOUNT = dbHelpder.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, selectedAccountId).query().get(0);
 
 				if (AccountUtils.SELECTED_ACCOUNT == null)
 					AccountUtils.SELECTED_ACCOUNT = AccountUtils.getDemoAccount();

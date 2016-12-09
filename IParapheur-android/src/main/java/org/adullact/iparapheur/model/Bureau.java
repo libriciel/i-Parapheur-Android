@@ -39,29 +39,37 @@ import java.util.List;
 @DatabaseTable(tableName = "Desk")
 public class Bureau {
 
-	@DatabaseField(columnName = "Id", id = true, index = true)  //
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_TITLE = "Title";
+	private static final String DB_FIELD_TODO = "Todo";
+	private static final String DB_FIELD_LATE = "Late";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_ACCOUNT = "Account";
+	private static final String DB_FIELD_FOLDERS = "Folders";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
 	@SerializedName(value = "id", alternate = {"nodeRef"})  //
 	private String mId;
 
-	@DatabaseField(columnName = "Title", canBeNull = false, defaultValue = "")  //
+	@DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
 	@SerializedName("name")  //
 	private String mTitle;
 
-	@DatabaseField(columnName = "Todo", defaultValue = "0")  //
+	@DatabaseField(columnName = DB_FIELD_TODO, defaultValue = "0")  //
 	@SerializedName("a-traiter") //
 	private int mTodoCount;
 
-	@DatabaseField(columnName = "Late", defaultValue = "0")  //
+	@DatabaseField(columnName = DB_FIELD_LATE, defaultValue = "0")  //
 	@SerializedName("en-retard")  //
 	private int mLateCount;
 
-	@DatabaseField(columnName = "Sync")  //
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
 	private Date mSyncDate;
 
-	@DatabaseField(columnName = "Account", foreign = true, foreignAutoRefresh = true)  //
+	@DatabaseField(columnName = DB_FIELD_ACCOUNT, foreign = true, foreignAutoRefresh = true)  //
 	private Account mParent;
 
-	@ForeignCollectionField(columnName = "Folders")  //
+	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
 	private ForeignCollection<Dossier> mChildrenDossiers;
 
 	// <editor-fold desc="Static utils">

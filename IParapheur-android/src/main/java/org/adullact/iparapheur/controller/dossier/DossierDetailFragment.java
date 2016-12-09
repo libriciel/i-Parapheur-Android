@@ -742,7 +742,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			else { // Offline backup
 
 				try {
-					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq("Id", mDossier.getId()).query();
+					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, mDossier.getId()).query();
 
 					if (dbRequestResult.isEmpty())
 						return null;
