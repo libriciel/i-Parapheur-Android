@@ -206,6 +206,11 @@ public class FileUtils {
 	public static long getFreeSpace(@NonNull Context context) {
 
 		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+
+		if (!folder.exists())
+			//noinspection ResultOfMethodCallIgnored
+			folder.mkdirs();
+
 		StatFs statFs = new StatFs(folder.getAbsolutePath());
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)

@@ -102,7 +102,7 @@ public class PreferencesAccountFragment extends Fragment {
 
 		mAccountData = new ArrayList<>();
 		mDatabaseHelper = new DatabaseHelper(getActivity());
-		
+
 		buildAccountDataMap();
 	}
 
@@ -164,8 +164,10 @@ public class PreferencesAccountFragment extends Fragment {
 		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
 		Account currentAccount = null;
 
-		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
-		catch (SQLException e) { e.printStackTrace(); }
+		if (!TextUtils.isEmpty(currentId)) {
+			try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
+			catch (SQLException e) { e.printStackTrace(); }
+		}
 
 		if (currentAccount == null) {
 			currentAccount = new Account(UUID.randomUUID().toString());

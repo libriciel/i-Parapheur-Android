@@ -76,7 +76,7 @@ public class Account implements Serializable {
 	private Date mLastRequest;
 
 	@ForeignCollectionField(columnName = DB_FIELD_DESKS)  //
-	private ForeignCollection<Bureau> mChildrenBureaux;
+	private transient ForeignCollection<Bureau> mChildrenBureaux;
 
 	private String mTicket;
 

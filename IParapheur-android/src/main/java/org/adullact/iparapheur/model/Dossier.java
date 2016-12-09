@@ -98,7 +98,7 @@ public class Dossier {
 	private List<Document> mDocumentList = new ArrayList<>();
 
 	@ForeignCollectionField(columnName = DB_FIELD_DOCUMENTS)  //
-	private ForeignCollection<Document> mChildrenDocuments;
+	private transient ForeignCollection<Document> mChildrenDocuments;
 
 	@DatabaseField(columnName = DB_FIELD_SYNC)  //
 	private Date mSyncDate;

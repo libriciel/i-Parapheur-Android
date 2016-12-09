@@ -70,7 +70,7 @@ public class Bureau {
 	private Account mParent;
 
 	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
-	private ForeignCollection<Dossier> mChildrenDossiers;
+	private transient ForeignCollection<Dossier> mChildrenDossiers;
 
 	// <editor-fold desc="Static utils">
 
