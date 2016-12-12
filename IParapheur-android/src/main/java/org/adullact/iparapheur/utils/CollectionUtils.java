@@ -84,29 +84,29 @@ public class CollectionUtils {
 		// Building String
 
 		List<Object> list = new ArrayList<>(collection);
-		String result;
+		StringBuilder result = new StringBuilder();
 
 		try {
 			Method getter = list.get(0).getClass().getMethod(methodName);
 
-			result = "[";
+			result.append("[");
 			for (int i = 0; i < list.size(); i++) {
 
 				if (list.get(i) != null)
-					result += getter.invoke(list.get(i));
+					result.append(getter.invoke(list.get(i)));
 				else
-					result += "null";
+					result.append("null");
 
 				if (i < list.size() - 1)
-					result += ", ";
+					result.append(", ");
 			}
-			result += "]";
+			result.append("]");
 		}
 		catch (Exception e) {
 			return "[-class incompatible with " + methodName + "()-]";
 		}
 
-		return result;
+		return result.toString();
 	}
 
 	/**

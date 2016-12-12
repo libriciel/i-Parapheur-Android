@@ -228,7 +228,7 @@ public class Dossier {
 	}
 
 	public Date getDateCreation() {
-		return mDateLimite;
+		return mDateCreation;
 	}
 
 	public void setDocumentList(@NonNull List<Document> documentList) {
