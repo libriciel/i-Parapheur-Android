@@ -101,14 +101,23 @@ public class Bureau {
 	 */
 	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
+		List<Bureau> bureauList = new ArrayList<>();
 		Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
 
 		try {
-			return gson.fromJson(jsonArrayString, typologyType);
+			bureauList.addAll((List<Bureau>) gson.fromJson(jsonArrayString, typologyType));
 		}
 		catch (JsonSyntaxException e) {
 			return null;
 		}
+
+		// Fixes
+
+		for (Bureau bureau : bureauList)
+			if (bureau.getLateCount() > bureau.getTodoCount())
+				bureau.setLateCount(bureau.getTodoCount());
+
+		return bureauList;
 	}
 
 	public Bureau(String id, String title, int todo, int late) {
@@ -141,6 +150,10 @@ public class Bureau {
 
 	public int getLateCount() {
 		return mLateCount;
+	}
+
+	private void setLateCount(int lateCount) {
+		mLateCount = lateCount;
 	}
 
 	public Account getParent() {

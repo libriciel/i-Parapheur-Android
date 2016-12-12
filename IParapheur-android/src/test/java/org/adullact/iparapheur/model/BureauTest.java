@@ -124,6 +124,7 @@ public class BureauTest {
 				"    \"en-preparation\": 1," +
 				"    \"nodeRef\": \"id_02\"," +
 				"    \"shortName\": \"C2\"," +
+				"    \"en-retard\": 5," +
 				"    \"image\": null," +
 				"    \"show_a_venir\": null," +
 				"    \"habilitation\": {" +
