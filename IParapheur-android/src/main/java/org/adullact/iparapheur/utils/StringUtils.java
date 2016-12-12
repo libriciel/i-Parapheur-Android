@@ -100,10 +100,10 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 			@Override public int compare(Account lhs, Account rhs) {
 
 				if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
-					return 1;
+					return Integer.MIN_VALUE;
 
 				if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
-					return -1;
+					return Integer.MAX_VALUE;
 
 				return lhs.getTitle().compareTo(rhs.getTitle());
 			}

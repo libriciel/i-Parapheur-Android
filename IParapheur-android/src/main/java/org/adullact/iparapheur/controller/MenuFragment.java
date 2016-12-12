@@ -136,25 +136,6 @@ public class MenuFragment extends Fragment {
 		mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
 		mDossierEmptyFiltersAlertView = view.findViewById(R.id.menu_fragment_dossier_empty_filter_alert_textview);
 
-//		// Headers
-//
-//		int pixels8dp = Math.round(DeviceUtils.dipsToPixels(getActivity(), 8));
-//		ListView.LayoutParams lp = new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, pixels8dp);
-//
-//		View headerDossier = new View(getActivity());
-//		headerDossier.setLayoutParams(lp);
-//		View footerDossier = new View(getActivity());
-//		footerDossier.setLayoutParams(lp);
-//		View headerBureaux = new View(getActivity());
-//		headerBureaux.setLayoutParams(lp);
-//		View footerBureaux = new View(getActivity());
-//		footerBureaux.setLayoutParams(lp);
-//
-//		mDossierListView.addHeaderView(headerDossier, null, false);
-//		mDossierListView.addFooterView(footerDossier, null, false);
-//		mBureauListView.addFooterView(headerBureaux, null, false);
-//		mBureauListView.addFooterView(footerBureaux, null, false);
-
 		// Setting up listeners, etc
 
 		mBureauSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
@@ -606,15 +587,19 @@ public class MenuFragment extends Fragment {
 			if (currentAccount == null)
 				return new IParapheurException(-1, "No account selected");
 
-			mBureauList.clear();
 			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
 				// Download data
 
-				try { mBureauList.addAll(RESTClient.INSTANCE.getBureaux(currentAccount)); }
+				List<Bureau> bureauList = new ArrayList<>();
+
+				try { bureauList.addAll(RESTClient.INSTANCE.getBureaux(currentAccount)); }
 				catch (final IParapheurException exception) { return exception; }
+
+				mBureauList.clear();
+				mBureauList.addAll(bureauList);
 
 				// Save in Database
 
@@ -644,12 +629,21 @@ public class MenuFragment extends Fragment {
 			else { // Offline backup
 
 				try {
-					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-					accountDao.update(AccountUtils.SELECTED_ACCOUNT);
 
-					if ((AccountUtils.SELECTED_ACCOUNT == null) || (AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux() == null))
+					// Update Account from DB
+
+					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
+					String selectedId = currentAccount.getId();
+					List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, selectedId).query();
+
+					if (fetchedAccountList.size() > 0)
+						AccountUtils.SELECTED_ACCOUNT = fetchedAccountList.get(0);
+					else
 						return null;
 
+					// Update Bureaux
+
+					mBureauList.clear();
 					mBureauList.addAll(AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux());
 				}
 				catch (SQLException e) { e.printStackTrace(); }
@@ -698,23 +692,39 @@ public class MenuFragment extends Fragment {
 
 		@Override protected IParapheurException doInBackground(Account... params) {
 
-			mDossierList.clear();
 			mTypology.clear();
 			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
-				try { mDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
+				List<Dossier> fetchedDossierList = new ArrayList<>();
+				try { fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
 				catch (IParapheurException exception) { return exception; }
+
+				mDossierList.clear();
+				mDossierList.addAll(fetchedDossierList);
 
 				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 			}
-			else { // Offline backup
+			else {  // Offline backup
 
 				try {
+
+					// Update bureau from DB
+
 					Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-					bureauDao.update(mSelectedBureau);
+					String selectedId = mSelectedBureau.getId();
+					List<Bureau> fetchedBureauList = bureauDao.queryBuilder().where().eq(Bureau.DB_FIELD_ID, selectedId).query();
+
+					if (fetchedBureauList.size() > 0)
+						mSelectedBureau = fetchedBureauList.get(0);
+					else
+						return null;
+
+					//Update List
+
+					mDossierList.clear();
 					mDossierList.addAll(mSelectedBureau.getChildrenDossiers());
 				}
 				catch (SQLException e) { e.printStackTrace(); }
@@ -845,7 +855,7 @@ public class MenuFragment extends Fragment {
 		}
 
 		@Override public Bureau getItem(int position) {
-			return mBureauList.get(position);
+			return mBureauList.get(position); // FIXME : OOB
 		}
 
 		@Override public int getPosition(Bureau item) {
