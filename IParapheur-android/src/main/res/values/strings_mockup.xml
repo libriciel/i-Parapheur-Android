@@ -5,8 +5,10 @@
     <string name="mockup_dossier_date">En retard depuis le 12/01</string>
     <string name="mockup_dossier_subtitle">Dossier Details / Dossier description</string>
 
-    <string name="mockup_bureau_content">526</string>
-    <string name="mockup_bureau_late">6</string>
+    <string name="mockup_bureau_title">Dossier titre</string>
+    <string name="mockup_bureau_todo">25 dossiers, 12 en retard</string>
+
+    <string name="mockup_sync_date">Téléchargé le 25/12 à 22h00</string>
 
     <string name="mockup_certificate_name">Certificat.bks</string>
     <string name="mockup_certificate_expiration_date">exp. 16/02/15</string>

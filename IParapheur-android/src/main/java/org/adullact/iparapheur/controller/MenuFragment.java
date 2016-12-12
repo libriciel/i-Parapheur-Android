@@ -744,30 +744,78 @@ public class MenuFragment extends Fragment {
 
 			View cell = super.getView(position, convertView, parent);
 
-			TextView lateBadgeTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_late);
-			TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo_count);
 			TextView bureauTitleTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_title);
+			TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo);
+			TextView detailsTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_details);
 
 			Bureau currentBureau = getItem(position);
 			if (currentBureau != null) {
 
-				// Determines subtitle content
-
-				String subtitle;
-
-				if (currentBureau.getTodoCount() == 0)
-					subtitle = getString(R.string.no_dossier);
-				else if (currentBureau.getTodoCount() == 1)
-					subtitle = getString(R.string.one_dossier);
-				else
-					subtitle = String.format(getString(R.string.nb_dossiers), currentBureau.getTodoCount());
-
-				// Applies values
-
 				bureauTitleTextView.setText(currentBureau.getTitle());
-				todoCountTextView.setText(subtitle);
-				lateBadgeTextView.setText(String.valueOf(currentBureau.getLateCount()));
-				lateBadgeTextView.setVisibility((currentBureau.getLateCount() != 0 ? View.VISIBLE : View.INVISIBLE));
+
+				// Details text
+
+				if (!DeviceUtils.isConnected(getActivity())) {
+
+					// Color
+
+					if (currentBureau.getLateCount() > 0)
+						todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
+					else
+						todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+
+					// To do text
+
+					if (currentBureau.getTodoCount() == 0)
+						todoCountTextView.setText(R.string.no_dossier);
+					else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() == 0))
+						todoCountTextView.setText(R.string.one_dossier);
+					else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() > 0))
+						todoCountTextView.setText(R.string.one_late_dossier);
+					else if (currentBureau.getLateCount() == currentBureau.getTodoCount())
+						todoCountTextView.setText(getString(R.string.nb_late_dossiers, currentBureau.getTodoCount()));
+					else if (currentBureau.getLateCount() > 0)
+						todoCountTextView.setText(getString(R.string.nb_dossiers_nb_late, currentBureau.getTodoCount(), currentBureau.getLateCount()));
+					else
+						todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
+
+					// Sync date
+
+					detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+					detailsTextView.setText(getString(R.string.Sync_date,
+													  StringUtils.getVerySmallDate(currentBureau.getSyncDate()),
+													  StringUtils.getSmallTime(currentBureau.getSyncDate())
+					));
+				}
+				else {
+
+					// Color
+
+					todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+
+					if (currentBureau.getLateCount() > 0)
+						detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
+					else
+						detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+
+					// To do text
+
+					if (currentBureau.getTodoCount() == 0)
+						todoCountTextView.setText(R.string.no_dossier);
+					else if (currentBureau.getTodoCount() == 1)
+						todoCountTextView.setText(R.string.one_dossier);
+					else
+						todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
+
+					// Late text
+
+					if (currentBureau.getLateCount() == 0)
+						detailsTextView.setText(R.string.no_late_dossier);
+					else if (currentBureau.getLateCount() == 1)
+						detailsTextView.setText(R.string.one_late_dossier);
+					else
+						detailsTextView.setText(getString(R.string.nb_late_dossiers, currentBureau.getLateCount()));
+				}
 			}
 
 			return cell;

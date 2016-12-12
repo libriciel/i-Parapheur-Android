@@ -35,8 +35,12 @@
     <string name="Sync_date">Téléchargé le %1$s à %2$s</string>
 
     <string name="one_dossier">1 dossier</string>
+    <string name="one_late_dossier">1 dossier en retard</string>
     <string name="nb_dossiers">%d dossiers</string>
+    <string name="nb_late_dossiers">%d dossiers en retard</string>
+    <string name="nb_dossiers_nb_late">%1$d dossiers, %2$d en retard</string>
     <string name="no_dossier">Aucun dossier</string>
+    <string name="no_late_dossier">Aucun dossier en retard</string>
 
     <!-- Share -->
     <string name="Share">Partager</string>
