@@ -136,6 +136,25 @@ public class MenuFragment extends Fragment {
 		mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
 		mDossierEmptyFiltersAlertView = view.findViewById(R.id.menu_fragment_dossier_empty_filter_alert_textview);
 
+//		// Headers
+//
+//		int pixels8dp = Math.round(DeviceUtils.dipsToPixels(getActivity(), 8));
+//		ListView.LayoutParams lp = new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, pixels8dp);
+//
+//		View headerDossier = new View(getActivity());
+//		headerDossier.setLayoutParams(lp);
+//		View footerDossier = new View(getActivity());
+//		footerDossier.setLayoutParams(lp);
+//		View headerBureaux = new View(getActivity());
+//		headerBureaux.setLayoutParams(lp);
+//		View footerBureaux = new View(getActivity());
+//		footerBureaux.setLayoutParams(lp);
+//
+//		mDossierListView.addHeaderView(headerDossier, null, false);
+//		mDossierListView.addFooterView(footerDossier, null, false);
+//		mBureauListView.addFooterView(headerBureaux, null, false);
+//		mBureauListView.addFooterView(footerBureaux, null, false);
+
 		// Setting up listeners, etc
 
 		mBureauSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);

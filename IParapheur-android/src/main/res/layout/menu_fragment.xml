@@ -26,8 +26,12 @@
                     android:id="@+id/menu_fragment_bureaux_listview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="singleChoice"                    android:divider="@color/text_black_divider"
-                    android:dividerHeight="1dp" />
+                    android:choiceMode="singleChoice"
+                    android:clipToPadding="false"
+                    android:divider="@color/text_black_divider"
+                    android:dividerHeight="0dp"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp" />
 
                 <LinearLayout
                     android:id="@+id/menu_fragment_bureaux_empty"
@@ -76,8 +80,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
+                    android:clipToPadding="false"
                     android:divider="@color/text_black_divider"
-                    android:dividerHeight="1dp" />
+                    android:dividerHeight="0dp"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp" />
 
                 <LinearLayout
                     android:id="@+id/menu_fragment_dossier_empty"

@@ -101,21 +101,20 @@ public class Bureau {
 	 */
 	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
-		List<Bureau> bureauList = new ArrayList<>();
+		List<Bureau> bureauList;
 		Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
 
-		try {
-			bureauList.addAll((List<Bureau>) gson.fromJson(jsonArrayString, typologyType));
-		}
-		catch (JsonSyntaxException e) {
-			return null;
-		}
+		try { bureauList = gson.fromJson(jsonArrayString, typologyType); }
+		catch (JsonSyntaxException e) { return null; }
 
 		// Fixes
 
-		for (Bureau bureau : bureauList)
-			if (bureau.getLateCount() > bureau.getTodoCount())
-				bureau.setLateCount(bureau.getTodoCount());
+		if (bureauList != null)
+			for (Bureau bureau : bureauList)
+				if (bureau.getLateCount() > bureau.getTodoCount())
+					bureau.setLateCount(bureau.getTodoCount());
+
+		//
 
 		return bureauList;
 	}
