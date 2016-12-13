@@ -28,10 +28,6 @@ import java.io.Serializable;
 @SuppressWarnings("unused")
 public class SerializableSparseArray<E> extends android.util.SparseArray<E> implements Serializable {
 
-	public SerializableSparseArray(int capacity) {
-		super(capacity);
-	}
-
 	public SerializableSparseArray() {
 		super();
 	}
