@@ -43,7 +43,7 @@ import static org.mockito.Matchers.any;
 @PrepareForTest(TextUtils.class)
 public class BureauTest {
 
-	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+	private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
 
 	@Before public void setUp() throws Exception {
 		PowerMockito.mockStatic(TextUtils.class);
@@ -150,6 +150,8 @@ public class BureauTest {
 
 		bureau01.setSyncDate(null);
 		bureau02.setSyncDate(null);
+		bureau01.setParent(null);
+		bureau02.setParent(null);
 		bureau01.setChildrenDossiers(null);
 		bureau02.setChildrenDossiers(null);
 
@@ -164,6 +166,7 @@ public class BureauTest {
 		Assert.assertEquals(correctArrayParsed.get(0).getLateCount(), bureau01.getLateCount());
 		Assert.assertEquals(correctArrayParsed.get(0).getTodoCount(), bureau01.getTodoCount());
 		Assert.assertEquals(correctArrayParsed.get(0).getSyncDate(), bureau01.getSyncDate());
+		Assert.assertEquals(correctArrayParsed.get(0).getParent(), bureau01.getParent());
 		Assert.assertEquals(correctArrayParsed.get(0).getChildrenDossiers(), bureau01.getChildrenDossiers());
 
 		Assert.assertEquals(correctArrayParsed.get(1).toString(), bureau02.toString());
@@ -172,6 +175,7 @@ public class BureauTest {
 		Assert.assertEquals(correctArrayParsed.get(1).getLateCount(), bureau02.getLateCount());
 		Assert.assertEquals(correctArrayParsed.get(1).getTodoCount(), bureau02.getTodoCount());
 		Assert.assertEquals(correctArrayParsed.get(1).getSyncDate(), bureau02.getSyncDate());
+		Assert.assertEquals(correctArrayParsed.get(1).getParent(), bureau02.getParent());
 		Assert.assertEquals(correctArrayParsed.get(1).getChildrenDossiers(), bureau02.getChildrenDossiers());
 
 		Assert.assertTrue(bureau01.equals(correctArrayParsed.get(0)));

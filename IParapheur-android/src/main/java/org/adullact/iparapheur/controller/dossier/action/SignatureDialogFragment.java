@@ -104,7 +104,7 @@ public class SignatureDialogFragment extends DialogFragment {
 		SignatureDialogFragment fragment = new SignatureDialogFragment();
 
 		Bundle args = new Bundle();
-		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
 		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
@@ -119,7 +119,7 @@ public class SignatureDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			Gson gson = CollectionUtils.buildGsonWithLongToDate();
+			Gson gson = CollectionUtils.buildGsonWithDateParser();
 			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
 
 			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }

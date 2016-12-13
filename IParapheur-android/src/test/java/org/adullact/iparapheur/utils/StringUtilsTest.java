@@ -30,6 +30,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.Date;
+
 import static org.mockito.Matchers.any;
 
 
@@ -66,6 +68,7 @@ public class StringUtilsTest {
 		Assert.assertFalse(StringUtils.areNotEmpty("", "Test"));
 		Assert.assertFalse(StringUtils.areNotEmpty(""));
 		Assert.assertFalse(StringUtils.areNotEmpty(null, ""));
+		Assert.assertFalse(StringUtils.areNotEmpty());
 	}
 
 	@Test public void endsWithIgnoreCase() throws Exception {
@@ -83,6 +86,21 @@ public class StringUtilsTest {
 
 	// </editor-fold desc="TextUtils">
 
+	@Test public void parseIso8601Date() {
+
+		Date parsedDate = StringUtils.parseIso8601Date("2016-12-25T23:45:00");
+		Assert.assertNotNull(parsedDate);
+		Assert.assertEquals(parsedDate.getTime(), 1482705900000L);
+
+		Assert.assertNull(StringUtils.parseIso8601Date("999999"));
+		Assert.assertNull(StringUtils.parseIso8601Date(""));
+		Assert.assertNull(StringUtils.parseIso8601Date(null));
+	}
+
+	@Test public void serializeToIso8601Date() {
+		Assert.assertEquals(StringUtils.serializeToIso8601Date(new Date(1482705900000L)), "2016-12-25T23:45:00");
+	}
+
 	@Test public void fixIssuerDnX500NameStringOrder() throws Exception {
 
 		String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,O=ADULLACT-Projet,ST=Herault,C=FR";
@@ -90,5 +108,43 @@ public class StringUtilsTest {
 		String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
 
 		Assert.assertEquals(value, expected);
+	}
+
+	@Test public void fixUrl() {
+		Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur/iparapheur.plop//"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("http://parapheur.test.adullact.org/parapheur/test"), "parapheur.test.adullact.org");
+		Assert.assertEquals(StringUtils.fixUrl("m.parapheur.test.adullact.org/"), "parapheur.test.adullact.org");
+		Assert.assertEquals(StringUtils.fixUrl("parapheur.test.adullact.org"), "parapheur.test.adullact.org");
+		Assert.assertEquals(StringUtils.fixUrl("https://parapheur"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("m.parapheur"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("parapheur"), "parapheur");
+	}
+
+	@Test public void getLocalizedSmallDate() {
+		Assert.assertEquals(StringUtils.getLocalizedSmallDate(new Date(1482705900000L)), "25/12/16");
+		Assert.assertEquals(StringUtils.getLocalizedSmallDate(null), "???");
+	}
+
+	@Test public void getVerySmallDate() {
+		Assert.assertEquals(StringUtils.getVerySmallDate(new Date(1482705900000L)), "25/12");
+		Assert.assertEquals(StringUtils.getVerySmallDate(null), "???");
+	}
+
+	@Test public void getSmallTime() {
+		Assert.assertEquals(StringUtils.getSmallTime(new Date(1482705900000L)), "23:45");
+		Assert.assertEquals(StringUtils.getSmallTime(null), "???");
+	}
+
+	@Test public void isUrlValid() {
+		Assert.assertTrue(StringUtils.isUrlValid("parapheur"));
+		Assert.assertTrue(StringUtils.isUrlValid("parapheur.test.adullact.org"));
+		Assert.assertFalse(StringUtils.isUrlValid(":::::"));
+		Assert.assertFalse(StringUtils.isUrlValid(""));
+		Assert.assertFalse(StringUtils.isUrlValid(null));
+	}
+
+	@Test public void nullableBooleanValueOf() {
+
 	}
 }

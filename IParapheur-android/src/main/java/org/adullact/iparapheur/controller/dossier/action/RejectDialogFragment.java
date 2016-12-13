@@ -40,7 +40,6 @@ import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
-import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -71,7 +70,7 @@ public class RejectDialogFragment extends DialogFragment {
 		RejectDialogFragment fragment = new RejectDialogFragment();
 
 		Bundle args = new Bundle();
-		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
 		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
@@ -86,7 +85,7 @@ public class RejectDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			Gson gson = CollectionUtils.buildGsonWithLongToDate();
+			Gson gson = CollectionUtils.buildGsonWithDateParser();
 			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
 
 			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }

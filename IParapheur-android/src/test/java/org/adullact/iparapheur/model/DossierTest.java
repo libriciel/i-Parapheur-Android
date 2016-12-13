@@ -60,7 +60,7 @@ import static org.mockito.Matchers.any;
 @PrepareForTest(TextUtils.class)
 public class DossierTest {
 
-	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+	private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
 
 	@Before public void setUp() throws Exception {
 		PowerMockito.mockStatic(TextUtils.class);

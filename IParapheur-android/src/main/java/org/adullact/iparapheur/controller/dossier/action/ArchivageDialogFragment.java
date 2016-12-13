@@ -46,7 +46,7 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
 
 		// Supply parameters as an arguments.
 		Bundle args = new Bundle();
-		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
 		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString("bureauId", bureauId);
 		f.setArguments(args);

@@ -103,7 +103,7 @@ public class CollectionUtilsTest {
 
 	@Test public void buildGsonWithLongToDate() throws Exception {
 
-		Gson gson = CollectionUtils.buildGsonWithLongToDate();
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
 		Date testDate = new Date(1396017643828L);
 
 		// Serialize and deserialize
@@ -115,10 +115,20 @@ public class CollectionUtilsTest {
 		String nullDateString = "{\"date\":null}";
 		DateWrapper nullDeserialized = gson.fromJson(nullDateString, DateWrapper.class);
 
+		String voidDateString = "{}";
+		DateWrapper voidDeserialized = gson.fromJson(voidDateString, DateWrapper.class);
+
+		String iso8601DateString = "{\"date\":\"2016-12-25T23:45:59\"}";
+		DateWrapper iso8601Deserialized = gson.fromJson(iso8601DateString, DateWrapper.class);
+
 		// Checks
 
 		Assert.assertEquals(original.getDate().getTime(), deserialized.getDate().getTime());
+		Assert.assertNotNull(iso8601Deserialized.getDate());
+		Assert.assertEquals(iso8601Deserialized.getDate().getTime(), 1482705959000L);
+
 		Assert.assertNull(nullDeserialized.getDate());
+		Assert.assertNull(voidDeserialized.getDate());
 	}
 
 }

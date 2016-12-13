@@ -32,7 +32,7 @@ import java.util.List;
 
 public class CircuitTest {
 
-	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+	private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
 
 	@Test public void fromJsonObject() throws Exception {
 

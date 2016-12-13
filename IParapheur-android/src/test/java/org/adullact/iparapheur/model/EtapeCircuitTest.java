@@ -32,7 +32,7 @@ import java.util.List;
 
 public class EtapeCircuitTest {
 
-	private static Gson sGson = CollectionUtils.buildGsonWithLongToDate();
+	private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
 
 	@Test public void fromJsonArray() throws Exception {
 

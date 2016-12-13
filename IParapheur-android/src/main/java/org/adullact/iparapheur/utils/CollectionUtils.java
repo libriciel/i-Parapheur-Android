@@ -110,23 +110,19 @@ public class CollectionUtils {
 	}
 
 	/**
-	 * Server sends date in ms, so we have to customize the Gson object to parse them easily.
+	 * Server sends date in ms and/or ISO8601, so we have to customize the Gson object to parse them easily.
 	 * Since the parsing is waiting for long numbers, we customize the serialization too.
 	 *
 	 * @return {@link Gson} object
 	 */
-	public static @NonNull Gson buildGsonWithLongToDate() {
+	public static @NonNull Gson buildGsonWithDateParser() {
 
 		GsonBuilder builder = new GsonBuilder();
 
 		builder.registerTypeAdapter(Date.class, new JsonSerializer<Date>() {
 
 			public JsonElement serialize(Date date, Type typeOfSrc, JsonSerializationContext context) {
-
-				if (date != null)
-					return new JsonPrimitive(date.getTime());
-
-				return null;
+				return new JsonPrimitive(date.getTime());
 			}
 		});
 

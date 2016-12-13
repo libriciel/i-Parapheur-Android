@@ -196,7 +196,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		// Building ASCII String
 
 		Charset asciiCharset;
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
 			asciiCharset = StandardCharsets.US_ASCII;
 		else
@@ -312,7 +311,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		if (date == null)
 			return "???";
 
-		DateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
 		return dateFormat.format(date);
 	}
 

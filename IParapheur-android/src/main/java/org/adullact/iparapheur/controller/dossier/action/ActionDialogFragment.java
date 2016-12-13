@@ -54,7 +54,7 @@ public abstract class ActionDialogFragment extends DialogFragment implements Dia
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getArguments() != null) {
 
-			Gson gson = CollectionUtils.buildGsonWithLongToDate();
+			Gson gson = CollectionUtils.buildGsonWithDateParser();
 			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
 
 			try { mDossiers = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }

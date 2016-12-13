@@ -91,7 +91,7 @@ public class RestClientApi3 extends RestClientApi {
 	// private static final String ACTION_TRANSFERT_SIGNATURE = "/parapheur/dossiers/%s/transfertSignature";
 	// private static final String ACTION_AVIS_COMPLEMENTAIRE = "/parapheur/dossiers/%s/avis";
 
-	private Gson mGson = CollectionUtils.buildGsonWithLongToDate();
+	private Gson mGson = CollectionUtils.buildGsonWithDateParser();
 	private ModelMapper modelMapper = new ModelMapper();
 
 	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {

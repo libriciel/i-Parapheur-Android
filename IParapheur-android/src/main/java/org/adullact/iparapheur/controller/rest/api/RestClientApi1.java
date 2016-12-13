@@ -92,7 +92,7 @@ public class RestClientApi1 extends RestClientApi {
 
 		String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
 		String response = RESTUtils.get(url).getResponse().toString();
-		Dossier dossierParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
+		Dossier dossierParsed = CollectionUtils.buildGsonWithDateParser().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
 
 		Dossier.fixActions(dossierParsed);
 		return dossierParsed;
@@ -121,7 +121,7 @@ public class RestClientApi1 extends RestClientApi {
 		// Parse
 
 		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
-		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithLongToDate().fromJson(new JsonParser().parse(response).getAsJsonObject(),
+		ArrayList<Dossier> dossiersParsed = CollectionUtils.buildGsonWithDateParser().fromJson(new JsonParser().parse(response).getAsJsonObject(),
 																							   listDossierType
 		);
 
