@@ -607,21 +607,20 @@ public class MenuFragment extends Fragment {
 
 				// Cleanup and save in Database
 
-				final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(currentAccount, bureauList);
-
 				try {
+
+					dbHelper.getAccountDao().update(currentAccount);
+
+					final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(currentAccount, bureauList);
+					final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
+					final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
+
+					Log.d("BureauxLoadingTask", "delete Bureaux   : " + bureauxToDelete);
+					Log.d("BureauxLoadingTask", "delete Dossiers  : " + dossierToDeleteList);
+					Log.d("BureauxLoadingTask", "delete Documents : " + documentToDeleteList);
+
 					dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
 						@Override public Void call() throws Exception {
-
-							dbHelper.getAccountDao().update(currentAccount);
-
-							List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
-							List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
-
-							Log.w("Adrien", "Bureaux          : " + bureauList.size());
-							Log.e("Adrien", "delete Bureaux   : " + bureauxToDelete);
-							Log.e("Adrien", "delete Dossiers  : " + dossierToDeleteList);
-							Log.e("Adrien", "delete Documents : " + documentToDeleteList);
 
 							dbHelper.getDocumentDao().delete(documentToDeleteList);
 							dbHelper.getDossierDao().delete(dossierToDeleteList);
@@ -989,7 +988,7 @@ public class MenuFragment extends Fragment {
 		}
 
 		@Override public Dossier getItem(int position) {
-			return mDossierList.get(position); // FIXME = Adrien = OOB
+			return mDossierList.get(position);
 		}
 
 		@Override public int getPosition(Dossier item) {

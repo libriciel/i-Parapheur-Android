@@ -68,7 +68,6 @@ public class CollectionUtils {
 	 * @param <E>   Generic type
 	 */
 	public static <E> void safeAddAll(@NonNull List<E> list, @Nullable Collection<? extends E> toAdd) {
-
 		if (toAdd != null)
 			list.addAll(toAdd);
 	}

@@ -269,33 +269,32 @@ public class DownloadDialogFragment extends DialogFragment {
 
 			// Cleanup and save in database
 
-			final Account finalSelectedAccount = selectedAccount;
-
 			try {
+
+				final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
+
+				// Retrieve cascade deletable content
+
+				final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(selectedAccount, bureauxList);
+
+				final List<Dossier> dossierToDeleteList = new ArrayList<>();
+				dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
+				dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
+
+				final List<Document> documentToDeleteList = new ArrayList<>();
+				documentToDeleteList.addAll(DocumentUtils.getAllChildrenFrom(dossierToDeleteList));
+				documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(dossierList, finalDocumentList));
+
+				// Delete
+
+				Log.d("DownloadTask", "delete Bureaux   : " + bureauToDeleteList);
+				Log.d("DownloadTask", "delete Dossiers  : " + dossierToDeleteList);
+				Log.d("DownloadTask", "delete Documents : " + documentToDeleteList);
+
 				dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
 					@Override public Void call() throws Exception {
-
-						Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-						Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-						Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
-
-						// Retrieve cascade deletable content
-
-						List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(finalSelectedAccount, bureauxList);
-
-						List<Dossier> dossierToDeleteList = new ArrayList<>();
-						dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
-						dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
-
-						List<Document> documentToDeleteList = new ArrayList<>();
-						documentToDeleteList.addAll(DocumentUtils.getAllChildrenFrom(dossierToDeleteList));
-						documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(dossierList, finalDocumentList));
-
-						// Delete
-
-						Log.e("Adrien", "delete Bureaux   : " + bureauToDeleteList);
-						Log.e("Adrien", "delete Dossiers  : " + dossierToDeleteList);
-						Log.e("Adrien", "delete Documents : " + documentToDeleteList);
 
 						documentDao.delete(documentToDeleteList);
 						dossierDao.delete(dossierToDeleteList);
