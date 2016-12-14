@@ -49,6 +49,7 @@ import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Annotation;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
@@ -66,6 +67,7 @@ import org.adullact.iparapheur.utils.ViewUtils;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -700,7 +702,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// TODO : Error messages
 		@Override protected Void doInBackground(Void... params) {
 
-			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
 			// Default case
 
@@ -715,19 +717,51 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 					try {
 						Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
-						mDossier.setDocumentList(retrievedDossier.getDocumentList());
+						final List<Document> documentList = retrievedDossier.getDocumentList();
+						mDossier.setDocumentList(documentList);
+
 						mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+
+						// Retrieve Bureau
+
+						Bureau curentBureau = null;
+						try {
+							Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+							List<Bureau> fetchedBureauList = bureauDao.queryBuilder().where().eq(Bureau.DB_FIELD_ID, mBureauId).query();
+
+							if (fetchedBureauList.isEmpty())
+								return null;
+
+							curentBureau = fetchedBureauList.get(0);
+						}
+						catch (SQLException e) { e.printStackTrace(); }
+
+						if (curentBureau == null)
+							return null;
+
+						final Bureau finalCurrentBureau = curentBureau;
 
 						// Save in Database
 
-						final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+						final List<Document> documentToDeleteList = new ArrayList<>();
+						documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(Collections.singletonList(mDossier), documentList));
 
-						// This callable allow us to insert/update in loops
-						// and calling db only once...
+						final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+						final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
 						dossierDao.callBatchTasks(new Callable<Void>() {
 							@Override public Void call() throws Exception {
+
+								documentDao.delete(documentToDeleteList);
+
+								mDossier.setParent(finalCurrentBureau);
 								mDossier.setSyncDate(new Date());
 								dossierDao.createOrUpdate(mDossier);
+
+								for (Document document : documentList) {
+									document.setParent(mDossier);
+									document.setSyncDate(new Date());
+									documentDao.createOrUpdate(document);
+								}
 
 								return null;
 							}
