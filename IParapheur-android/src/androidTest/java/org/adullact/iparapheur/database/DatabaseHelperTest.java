@@ -274,47 +274,6 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
 	}
 
-	@Test public void order07_saveBureauListWithCleanup() throws Exception {
-
-		Account account01 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_01").query().get(0);
-		Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_01").query().get(0);
-		Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_02").query().get(0);
-
-		// Checks
-
-		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
-		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
-		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
-		Assert.assertEquals(account01.getChildrenBureaux().size(), 2);
-
-		List<Bureau> account01bureauList = new ArrayList<>();
-		account01bureauList.add(bureau01);
-		account01bureauList.add(bureau02);
-
-		sDbHelper.saveBureauListWithCleanup(account01, account01bureauList);
-
-		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
-		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
-		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
-		Assert.assertEquals(account01.getChildrenBureaux().size(), 2);
-
-		account01bureauList.remove(bureau02);
-		sDbHelper.saveBureauListWithCleanup(account01, account01bureauList);
-
-		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 2);
-		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 2);
-		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
-		Assert.assertEquals(account01.getChildrenBureaux().size(), 1);
-
-		account01bureauList.clear();
-		sDbHelper.saveBureauListWithCleanup(account01, account01bureauList);
-
-		Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 1);
-		Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 0);
-		Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 0);
-		Assert.assertEquals(account01.getChildrenBureaux().size(), 0);
-	}
-
 	@Test public void order08_retrieveLegacyAccounts() throws Exception {
 
 		Context context = InstrumentationRegistry.getTargetContext();
@@ -357,5 +316,4 @@ public class DatabaseHelperTest {
 		Assert.assertEquals(legacyAccount.getTitle(), dbAccount.getTitle());
 		Assert.assertEquals(legacyAccount.getApiVersion(), null);
 	}
-
 }

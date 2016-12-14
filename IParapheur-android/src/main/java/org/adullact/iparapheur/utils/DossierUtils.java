@@ -208,23 +208,23 @@ public class DossierUtils {
 
 		final List<Dossier> dossierToDeleteList = new ArrayList<>();
 
-		for (Bureau bureau : parentBureauList)
-			CollectionUtils.safeAddAll(dossierToDeleteList, bureau.getChildrenDossiers());
+		for (Bureau parentBureau : parentBureauList)
+			CollectionUtils.safeAddAll(dossierToDeleteList, parentBureau.getChildrenDossiers());
 
 		dossierToDeleteList.removeAll(newDossierList);
 
 		return dossierToDeleteList;
 	}
 
-	public static @NonNull List<Document> getAllChildrenDocuments(@Nullable List<Dossier> dossierList) {
+	public static @NonNull List<Dossier> getAllChildrenFrom(@Nullable List<Bureau> bureauList) {
 
-		List<Document> result = new ArrayList<>();
+		List<Dossier> result = new ArrayList<>();
 
-		if (dossierList != null)
-			for (Dossier dossier : dossierList)
-				if (dossier.getChildrenDocuments() != null)
-					CollectionUtils.safeAddAll(result, dossier.getChildrenDocuments());
+		if (bureauList != null)
+			for (Bureau bureau : bureauList)
+				CollectionUtils.safeAddAll(result, bureau.getChildrenDossiers());
 
 		return result;
 	}
+
 }

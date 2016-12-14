@@ -70,5 +70,4 @@ public class BureauUtilsTest {
 		//noinspection ConstantConditions
 		org.junit.Assert.assertEquals(BureauUtils.findInList(bureauList, "id_02").getTitle(), "Name 02");
 	}
-
 }

@@ -42,9 +42,9 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
-import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -194,12 +194,10 @@ public class DownloadDialogFragment extends DialogFragment {
 			if (selectedAccount == null)
 				return null;
 
-			// Downloading bureaux
+			// Updating Bureaux
 
 			try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(selectedAccount)); }
 			catch (final IParapheurException exception) { return exception; }
-
-			// Updating Bureaux
 
 			final ArrayList<Dossier> dossierList = new ArrayList<>();
 			List<Dossier> incompleteDossierList = new ArrayList<>();
@@ -271,6 +269,8 @@ public class DownloadDialogFragment extends DialogFragment {
 
 			// Cleanup and save in database
 
+			final Account finalSelectedAccount = selectedAccount;
+
 			try {
 				dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
 					@Override public Void call() throws Exception {
@@ -279,11 +279,29 @@ public class DownloadDialogFragment extends DialogFragment {
 						Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
 						Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
 
-						List<Bureau> bureauListToDelete = BureauUtils.getDeletableBureauList(AccountUtils.SELECTED_ACCOUNT, bureauxList);
+						// Retrieve cascade deletable content
 
-						documentDao.delete(BureauUtils.getAllChildrenDocuments(bureauListToDelete));
-						dossierDao.delete(BureauUtils.getAllChildrenDossiers(bureauListToDelete));
-						bureauDao.delete(bureauListToDelete);
+						List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(finalSelectedAccount, bureauxList);
+
+						List<Dossier> dossierToDeleteList = new ArrayList<>();
+						dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
+						dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
+
+						List<Document> documentToDeleteList = new ArrayList<>();
+						documentToDeleteList.addAll(DocumentUtils.getAllChildrenFrom(dossierToDeleteList));
+						documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(dossierList, finalDocumentList));
+
+						// Delete
+
+						Log.e("Adrien", "delete Bureaux   : " + bureauToDeleteList);
+						Log.e("Adrien", "delete Dossiers  : " + dossierToDeleteList);
+						Log.e("Adrien", "delete Documents : " + documentToDeleteList);
+
+						documentDao.delete(documentToDeleteList);
+						dossierDao.delete(dossierToDeleteList);
+						bureauDao.delete(bureauToDeleteList);
+
+						// Create
 
 						for (Bureau bureau : bureauxList) {
 							bureau.setSyncDate(new Date());

@@ -23,8 +23,6 @@ import android.text.TextUtils;
 
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.model.Document;
-import org.adullact.iparapheur.model.Dossier;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,29 +62,5 @@ public class BureauUtils {
 		bureauToDeleteList.removeAll(newBureauList);
 
 		return bureauToDeleteList;
-	}
-
-	public static @NonNull List<Dossier> getAllChildrenDossiers(@Nullable List<Bureau> bureauList) {
-
-		List<Dossier> result = new ArrayList<>();
-
-		if (bureauList != null)
-			for (Bureau bureau : bureauList)
-				CollectionUtils.safeAddAll(result, bureau.getChildrenDossiers());
-
-		return result;
-	}
-
-	public static @NonNull List<Document> getAllChildrenDocuments(@Nullable List<Bureau> bureauList) {
-
-		List<Document> result = new ArrayList<>();
-
-		if (bureauList != null)
-			for (Bureau bureau : bureauList)
-				if (bureau.getChildrenDossiers() != null)
-					for (Dossier dossier : bureau.getChildrenDossiers())
-						CollectionUtils.safeAddAll(result, dossier.getChildrenDocuments());
-
-		return result;
 	}
 }

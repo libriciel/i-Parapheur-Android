@@ -68,12 +68,14 @@ import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
+import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
@@ -585,7 +587,7 @@ public class MenuFragment extends Fragment {
 
 		@Override protected IParapheurException doInBackground(Account... params) {
 
-			Account currentAccount = params[0];
+			final Account currentAccount = params[0];
 			if (currentAccount == null)
 				return new IParapheurException(-1, "No account selected");
 
@@ -605,14 +607,24 @@ public class MenuFragment extends Fragment {
 
 				// Cleanup and save in Database
 
-				final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(AccountUtils.SELECTED_ACCOUNT, bureauList);
+				final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(currentAccount, bureauList);
 
 				try {
 					dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
 						@Override public Void call() throws Exception {
 
-							dbHelper.getDocumentDao().delete(BureauUtils.getAllChildrenDocuments(bureauxToDelete));
-							dbHelper.getDossierDao().delete(BureauUtils.getAllChildrenDossiers(bureauxToDelete));
+							dbHelper.getAccountDao().update(currentAccount);
+
+							List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
+							List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
+
+							Log.w("Adrien", "Bureaux          : " + bureauList.size());
+							Log.e("Adrien", "delete Bureaux   : " + bureauxToDelete);
+							Log.e("Adrien", "delete Dossiers  : " + dossierToDeleteList);
+							Log.e("Adrien", "delete Documents : " + documentToDeleteList);
+
+							dbHelper.getDocumentDao().delete(documentToDeleteList);
+							dbHelper.getDossierDao().delete(dossierToDeleteList);
 							dbHelper.getBureauDao().delete(bureauxToDelete);
 
 							for (Bureau newBureau : bureauList) {

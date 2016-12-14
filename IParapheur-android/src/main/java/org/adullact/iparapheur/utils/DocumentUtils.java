@@ -26,6 +26,8 @@ import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DocumentUtils {
@@ -72,5 +74,29 @@ public class DocumentUtils {
 
 		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
 		return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
+	}
+
+	public static @NonNull List<Document> getDeletableDossierList(@NonNull List<Dossier> parentDossierList, @NonNull List<Document> newDocumentList) {
+
+		final List<Document> documentsToDeleteList = new ArrayList<>();
+
+		for (Dossier parentDossier : parentDossierList)
+			CollectionUtils.safeAddAll(documentsToDeleteList, parentDossier.getChildrenDocuments());
+
+		documentsToDeleteList.removeAll(newDocumentList);
+
+		return documentsToDeleteList;
+	}
+
+	public static @NonNull List<Document> getAllChildrenFrom(@Nullable List<Dossier> dossierList) {
+
+		List<Document> result = new ArrayList<>();
+
+		if (dossierList != null)
+			for (Dossier dossier : dossierList)
+				if (dossier.getChildrenDocuments() != null)
+					CollectionUtils.safeAddAll(result, dossier.getChildrenDocuments());
+
+		return result;
 	}
 }
