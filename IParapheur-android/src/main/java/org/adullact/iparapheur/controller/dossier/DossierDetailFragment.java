@@ -55,6 +55,7 @@ import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
+import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -515,7 +516,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (document == null)
 			return;
 
-		File documentFile = Document.getFile(getActivity(), mDossier, document);
+		File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
 		if (!documentFile.exists())
 			return;
 
@@ -524,7 +525,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
 		updateStickyNotes(muPdfStickyNotes);
 
-		mIsAnnotable = Document.isMainDocument(mDossier, document);
+		mIsAnnotable = DocumentUtils.isMainDocument(mDossier, document);
 	}
 
 	private void updateCircuitInfoDrawerContent() {
@@ -639,7 +640,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (document == null)
 			return;
 
-		File documentFile = Document.getFile(getActivity(), mDossier, document);
+		File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
 		if (!documentFile.exists())
 			return;
 
@@ -749,7 +750,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 					mDossier = dbRequestResult.get(0);
 					List<Document> documents = new ArrayList<>();
-					documents.addAll(mDossier.getChildrenDocuments());
+					CollectionUtils.safeAddAll(documents, mDossier.getChildrenDocuments());
 					mDossier.setDocumentList(documents);
 				}
 				catch (SQLException e) { e.printStackTrace(); }
@@ -762,11 +763,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return null;
 
 			showSpinnerOnUiThread();
-			File file = Document.getFile(getActivity(), mDossier, currentDocument);
+			File file = DocumentUtils.getFile(getActivity(), mDossier, currentDocument);
 			Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
 
 			if (!file.exists() && DeviceUtils.isConnected(getActivity())) {
-				String downloadUrl = Document.generateContentUrl(currentDocument);
+				String downloadUrl = DocumentUtils.generateContentUrl(currentDocument);
 				if (downloadUrl != null) {
 					try { RESTClient.INSTANCE.downloadFile(downloadUrl, file.getAbsolutePath()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
@@ -784,7 +785,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}
 
-				if (Document.isMainDocument(mDossier, currentDocument)) {
+				if (DocumentUtils.isMainDocument(mDossier, currentDocument)) {
 					try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}

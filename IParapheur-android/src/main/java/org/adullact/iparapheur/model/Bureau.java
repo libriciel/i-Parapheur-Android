@@ -72,27 +72,6 @@ public class Bureau {
 	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
 	private transient ForeignCollection<Dossier> mChildrenDossiers;
 
-	// <editor-fold desc="Static utils">
-
-	public static @Nullable Bureau findInList(@Nullable List<Bureau> bureauList, @Nullable String bureauId) {
-
-		// Default case
-
-		if ((bureauList == null) || (bureauId == null))
-			return null;
-
-		//
-
-		for (Bureau bureau : bureauList)
-			if (bureau != null)
-				if (TextUtils.equals(bureau.getId(), bureauId))
-					return bureau;
-
-		return null;
-	}
-
-	// </editor-fold desc="Static utils">
-
 	/**
 	 * Static parser, useful for Unit tests
 	 *

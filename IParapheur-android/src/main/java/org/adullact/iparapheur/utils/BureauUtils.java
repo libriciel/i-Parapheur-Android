@@ -17,13 +17,10 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
-import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
@@ -32,25 +29,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AccountUtils {
+public class BureauUtils {
 
-	public static final String DEMO_ID = "AccountTest0";
-	public static final String DEMO_TITLE = "iParapheur demo";
-	public static final String DEMO_BASE_URL = "parapheur.demonstrations.adullact.org";
-	public static final String DEMO_LOGIN = "bma";
-	public static final String DEMO_PASSWORD = "secret";
+	public static @Nullable Bureau findInList(@Nullable List<Bureau> bureauList, @Nullable String bureauId) {
 
-	private static final String PREFS_SELECTED_ACCOUNT = "selected_account";
+		// Default case
 
-	public static Account SELECTED_ACCOUNT = null;
+		if ((bureauList == null) || (bureauId == null))
+			return null;
 
-	public static String loadSelectedAccountId(@NonNull Context context) {
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		return sharedPrefs.getString(PREFS_SELECTED_ACCOUNT, null);
+		//
+
+		for (Bureau bureau : bureauList)
+			if (bureau != null)
+				if (TextUtils.equals(bureau.getId(), bureauId))
+					return bureau;
+
+		return null;
 	}
 
-	public static boolean isValid(@NonNull Account account) {
-		return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
+	public static @NonNull List<Dossier> getAllChildrenDossiers(@Nullable List<Bureau> bureauList) {
+
+		List<Dossier> result = new ArrayList<>();
+
+		if (bureauList != null)
+			for (Bureau bureau : bureauList)
+				CollectionUtils.safeAddAll(result, bureau.getChildrenDossiers());
+
+		return result;
 	}
 
+	public static @NonNull List<Document> getAllChildrenDocuments(@Nullable List<Bureau> bureauList) {
+
+		List<Document> result = new ArrayList<>();
+
+		if (bureauList != null)
+			for (Bureau bureau : bureauList)
+				if (bureau.getChildrenDossiers() != null)
+					for (Dossier dossier : bureau.getChildrenDossiers())
+						CollectionUtils.safeAddAll(result, dossier.getChildrenDocuments());
+
+		return result;
+	}
 }

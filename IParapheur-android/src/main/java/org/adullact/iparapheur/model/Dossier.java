@@ -31,6 +31,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.adullact.iparapheur.utils.DocumentUtils;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -408,7 +410,7 @@ public class Dossier {
 
 		ArrayList<Document> result = new ArrayList<>();
 		for (Document document : dossier.getDocumentList())
-			if (Document.isMainDocument(dossier, document))
+			if (DocumentUtils.isMainDocument(dossier, document))
 				result.add(document);
 
 		return result;
@@ -425,7 +427,7 @@ public class Dossier {
 
 		ArrayList<Document> result = new ArrayList<>();
 		for (Document document : dossier.getDocumentList())
-			if (!Document.isMainDocument(dossier, document))
+			if (!DocumentUtils.isMainDocument(dossier, document))
 				result.add(document);
 
 		return result;

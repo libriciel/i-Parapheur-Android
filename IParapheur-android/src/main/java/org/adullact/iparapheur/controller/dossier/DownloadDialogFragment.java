@@ -42,6 +42,8 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.BureauUtils;
+import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -53,7 +55,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static org.adullact.iparapheur.model.Bureau.findInList;
+import static org.adullact.iparapheur.utils.BureauUtils.findInList;
 
 
 public class DownloadDialogFragment extends DialogFragment {
@@ -180,7 +182,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			Long progressBureauxMetadataSize = 0L;
 
 			for (Bureau bureau : bureaux) {
-				Bureau parent = Bureau.findInList(mBureauList, bureau.getId());
+				Bureau parent = findInList(mBureauList, bureau.getId());
 
 				try {
 					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureau.getId());
@@ -216,13 +218,13 @@ public class DownloadDialogFragment extends DialogFragment {
 					try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId())); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 
-					fullDossier.setParent(findInList(mBureauList, incompleteDossier.getParent().getId()));
+					fullDossier.setParent(BureauUtils.findInList(mBureauList, incompleteDossier.getParent().getId()));
 					dossierList.add(fullDossier);
 
 					for (Document document : fullDossier.getDocumentList()) {
 						document.setParent(fullDossier);
 
-						if (Document.isMainDocument(fullDossier, document)) {
+						if (DocumentUtils.isMainDocument(fullDossier, document)) {
 							SerializableSparseArray<PageAnnotations> annotations;
 							annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
 							document.setPagesAnnotations(annotations);
@@ -297,10 +299,10 @@ public class DownloadDialogFragment extends DialogFragment {
 				return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
 
 			for (Document document : documentsToDld) {
-				String downloadUrl = Document.generateContentUrl(document);
+				String downloadUrl = DocumentUtils.generateContentUrl(document);
 
 				if (!TextUtils.isEmpty(downloadUrl)) {
-					File documentFile = Document.getFile(getActivity(), document.getParent(), document);
+					File documentFile = DocumentUtils.getFile(getActivity(), document.getParent(), document);
 
 					try { RESTClient.INSTANCE.downloadFile(downloadUrl, documentFile.getAbsolutePath()); }
 					catch (IParapheurException e) { e.printStackTrace(); }

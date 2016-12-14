@@ -35,9 +35,12 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.BureauUtils;
+import org.adullact.iparapheur.utils.CollectionUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -141,34 +144,77 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	}
 
 	/**
-	 * This will probably call multiples operations at once,
-	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
-	 * and keep respectable performances:
+	 * Safe update, with old data cleanup.
 	 *
-	 * @param instanceToDelete the target
+	 * @param account       the parent account
+	 * @param newBureauList the new full list
 	 * @throws SQLException
 	 */
-	public void deleteCascade(@NonNull Dossier instanceToDelete) throws SQLException {
-		getDocumentDao().delete(instanceToDelete.getChildrenDocuments());
-		getDossierDao().delete(instanceToDelete);
+	public void saveBureauListWithCleanup(@NonNull final Account account, final @NonNull List<Bureau> newBureauList) throws SQLException {
+
+		Dao<Account, Integer> accountDao = getAccountDao();
+		final Dao<Bureau, Integer> bureauDao = getBureauDao();
+		accountDao.createOrUpdate(account);
+
+		// Retrieve cleanable content
+
+		final ArrayList<Bureau> bureauToDeleteList = new ArrayList<>();
+		CollectionUtils.safeAddAll(bureauToDeleteList, account.getChildrenBureaux());
+		bureauToDeleteList.removeAll(newBureauList);
+
+		getDocumentDao().delete(BureauUtils.getAllChildrenDocuments(bureauToDeleteList));
+		getDossierDao().delete(BureauUtils.getAllChildrenDossiers(bureauToDeleteList));
+
+		// This callable allow us to insert/update in loops
+		// and calling db only once...
+		try {
+			bureauDao.callBatchTasks(new Callable<Void>() {
+				@Override public Void call() throws Exception {
+
+					bureauDao.delete(bureauToDeleteList);
+
+					for (Bureau newBureau : newBureauList) {
+						newBureau.setSyncDate(new Date());
+						newBureau.setParent(account);
+						bureauDao.createOrUpdate(newBureau);
+					}
+
+					return null;
+				}
+			});
+		}
+		catch (Exception e) { e.printStackTrace(); }
 	}
 
-	/**
-	 * This will probably call multiples operations at once,
-	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
-	 * and keep respectable performances:
-	 *
-	 * @param instanceToDelete the target
-	 * @throws SQLException
-	 */
-	public void deleteCascade(@NonNull Bureau instanceToDelete) throws SQLException {
-
-		for (Dossier dossier : instanceToDelete.getChildrenDossiers())
-			getDocumentDao().delete(dossier.getChildrenDocuments());
-
-		getDossierDao().delete(instanceToDelete.getChildrenDossiers());
-		getBureauDao().delete(instanceToDelete);
-	}
+//	/**
+//	 * This will probably call multiples operations at once,
+//	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
+//	 * and keep respectable performances:
+//	 *
+//	 * @param instanceToDelete the target
+//	 * @throws SQLException
+//	 */
+//	public void deleteCascade(@NonNull Dossier instanceToDelete) throws SQLException {
+//		getDocumentDao().delete(instanceToDelete.getChildrenDocuments());
+//		getDossierDao().delete(instanceToDelete);
+//	}
+//
+//	/**
+//	 * This will probably call multiples operations at once,
+//	 * You should wrap it in a {@link Dao#callBatchTasks(Callable)} to avoid multiple DB operations at once,
+//	 * and keep respectable performances:
+//	 *
+//	 * @param instanceToDelete the target
+//	 * @throws SQLException
+//	 */
+//	public void deleteCascade(@NonNull Bureau instanceToDelete) throws SQLException {
+//
+//		for (Dossier dossier : instanceToDelete.getChildrenDossiers())
+//			getDocumentDao().delete(dossier.getChildrenDocuments());
+//
+//		getDossierDao().delete(instanceToDelete.getChildrenDossiers());
+//		getBureauDao().delete(instanceToDelete);
+//	}
 
 	// <editor-fold desc="Utils">
 

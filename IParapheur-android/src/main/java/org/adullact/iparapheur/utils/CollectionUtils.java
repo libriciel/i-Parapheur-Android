@@ -61,6 +61,19 @@ public class CollectionUtils {
 	}
 
 	/**
+	 * {@link ArrayList#addAll(Collection)} with a null check.
+	 *
+	 * @param list  the target list
+	 * @param toAdd collection to add
+	 * @param <E>   Generic type
+	 */
+	public static <E> void safeAddAll(@NonNull List<E> list, @Nullable Collection<? extends E> toAdd) {
+
+		if (toAdd != null)
+			list.addAll(toAdd);
+	}
+
+	/**
 	 * Pretty print of every element's method call.
 	 * Only no-parameters methods can be called, otherwise it'll pretty-print an exception.
 	 *

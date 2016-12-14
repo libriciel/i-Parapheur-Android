@@ -77,54 +77,6 @@ public class Document {
 	@DatabaseField(columnName = DB_FIELD_DOSSIER, foreign = true, foreignAutoRefresh = true)  //
 	private Dossier mParent;
 
-	// <editor-fold desc="Static utils">
-
-	public static @Nullable String generateContentUrl(@NonNull Document document) {
-
-		if (document.getId() == null)
-			return null;
-
-		String downloadUrl = "/api/node/workspace/SpacesStore/" + document.getId() + "/content";
-		if (document.isPdfVisual())
-			downloadUrl += ";ph:visuel-pdf";
-
-		return downloadUrl;
-	}
-
-	public static boolean isMainDocument(@NonNull Dossier dossier, @NonNull Document document) {
-
-		// Default case
-
-		if ((dossier.getDocumentList() == null) || !dossier.getDocumentList().contains(document))
-			return false;
-
-		// Api4 case :
-		// If the mainDoc wasn't the first one in the list,
-		// But there is at least one declared main document,
-		// Then the first doc isn't the main one...
-
-		if (document.isMainDocument())
-			return true;
-
-		for (Document doc : dossier.getDocumentList())
-			if (doc.isMainDocument())
-				return false;
-
-		// Api3 case :
-		// We already know here the list isn't empty,
-		// and the first document is the only main one.
-
-		return (TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId()));
-	}
-
-	public static @NonNull File getFile(@NonNull Context context, @NonNull Dossier dossier, @NonNull Document document) {
-
-		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
-		return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
-	}
-
-	// </editor-fold desc="Static utils">
-
 	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;
 		mName = name;

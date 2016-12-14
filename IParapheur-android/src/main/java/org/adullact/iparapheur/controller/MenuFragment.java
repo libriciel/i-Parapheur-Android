@@ -83,7 +83,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 
 /**
@@ -603,28 +602,9 @@ public class MenuFragment extends Fragment {
 
 				// Save in Database
 
-				try {
-					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-					accountDao.createOrUpdate(AccountUtils.SELECTED_ACCOUNT);
-
-					final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-
-					// This callable allow us to insert/update in loops
-					// and calling db only once...
-					bureauDao.callBatchTasks(new Callable<Void>() {
-						@Override public Void call() throws Exception {
-
-							for (Bureau bureau : mBureauList) {
-								bureau.setSyncDate(new Date());
-								bureau.setParent(AccountUtils.SELECTED_ACCOUNT);
-								bureauDao.createOrUpdate(bureau);
-							}
-
-							return null;
-						}
-					});
-				}
+				try { dbHelper.saveBureauListWithCleanup(AccountUtils.SELECTED_ACCOUNT, bureauList); }
 				catch (Exception e) { e.printStackTrace(); }
+
 			}
 			else { // Offline backup
 

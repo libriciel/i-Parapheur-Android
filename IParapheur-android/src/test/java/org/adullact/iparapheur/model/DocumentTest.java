@@ -33,8 +33,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-
 import static org.mockito.Matchers.any;
 
 
@@ -97,54 +95,4 @@ public class DocumentTest {
 		Assert.assertEquals(correctObjectParsed.getSyncDate(), document.getSyncDate());
 		Assert.assertEquals(correctObjectParsed.getParent(), document.getParent());
 	}
-
-	// <editor-fold desc="Static utils">
-
-	@Test public void generateContentUrl() throws Exception {
-
-		Document doc01 = new Document("id_01", null, 0, false, false);
-		Document doc02 = new Document("id_02", null, 0, false, true);
-		Document doc03 = new Document(null, null, 0, false, false);
-
-		// Checks
-
-		Assert.assertEquals(Document.generateContentUrl(doc01), "/api/node/workspace/SpacesStore/id_01/content");
-		Assert.assertEquals(Document.generateContentUrl(doc02), "/api/node/workspace/SpacesStore/id_02/content;ph:visuel-pdf");
-		Assert.assertNull(Document.generateContentUrl(doc03));
-	}
-
-	@Test public void isMainDocument() throws Exception {
-
-		Document doc01 = new Document("id_01", null, 0, false, false);
-		Document doc02 = new Document("id_02", null, 0, true, false);
-		Document doc03 = new Document("id_03", null, 0, false, false);
-
-		ArrayList<Document> documentList01 = new ArrayList<>();
-		documentList01.add(doc01);
-		documentList01.add(doc02);
-
-		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier01.setDocumentList(documentList01);
-
-		ArrayList<Document> documentList02 = new ArrayList<>();
-		documentList02.add(doc01);
-		documentList02.add(doc03);
-
-		Dossier dossier02 = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier02.setDocumentList(documentList02);
-
-		Dossier dossier03 = new Dossier(null, null, null, null, null, null, null, null, false);
-
-		// Checks
-
-		Assert.assertFalse(Document.isMainDocument(dossier01, doc01));
-		Assert.assertTrue(Document.isMainDocument(dossier01, doc02));
-
-		Assert.assertTrue(Document.isMainDocument(dossier02, doc01));
-		Assert.assertFalse(Document.isMainDocument(dossier02, doc02));
-
-		Assert.assertFalse(Document.isMainDocument(dossier03, doc01));
-	}
-
-	// </editor-fold desc="Static utils">
 }
