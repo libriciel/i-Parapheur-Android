@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.adullact.iparapheur.model.Action;
+import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
@@ -203,4 +204,27 @@ public class DossierUtils {
 		return result;
 	}
 
+	public static @NonNull List<Dossier> getDeletableDossierList(@NonNull List<Bureau> parentBureauList, @NonNull List<Dossier> newDossierList) {
+
+		final List<Dossier> dossierToDeleteList = new ArrayList<>();
+
+		for (Bureau bureau : parentBureauList)
+			CollectionUtils.safeAddAll(dossierToDeleteList, bureau.getChildrenDossiers());
+
+		dossierToDeleteList.removeAll(newDossierList);
+
+		return dossierToDeleteList;
+	}
+
+	public static @NonNull List<Document> getAllChildrenDocuments(@Nullable List<Dossier> dossierList) {
+
+		List<Document> result = new ArrayList<>();
+
+		if (dossierList != null)
+			for (Dossier dossier : dossierList)
+				if (dossier.getChildrenDocuments() != null)
+					CollectionUtils.safeAddAll(result, dossier.getChildrenDocuments());
+
+		return result;
+	}
 }

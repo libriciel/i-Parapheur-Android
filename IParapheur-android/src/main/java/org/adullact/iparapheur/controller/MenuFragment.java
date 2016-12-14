@@ -72,6 +72,7 @@ import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -84,6 +85,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -470,7 +472,7 @@ public class MenuFragment extends Fragment {
 
 	private boolean onDownloadItemSelected() {
 
-		DialogFragment actionDialog = DownloadDialogFragment.newInstance(mBureauList);
+		DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
 		actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
 
 		return true;
@@ -587,13 +589,13 @@ public class MenuFragment extends Fragment {
 			if (currentAccount == null)
 				return new IParapheurException(-1, "No account selected");
 
-			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
 				// Download data
 
-				List<Bureau> bureauList = new ArrayList<>();
+				final List<Bureau> bureauList = new ArrayList<>();
 
 				try { bureauList.addAll(RESTClient.INSTANCE.getBureaux(currentAccount)); }
 				catch (final IParapheurException exception) { return exception; }
@@ -601,11 +603,29 @@ public class MenuFragment extends Fragment {
 				mBureauList.clear();
 				mBureauList.addAll(bureauList);
 
-				// Save in Database
+				// Cleanup and save in Database
 
-				try { dbHelper.saveBureauListWithCleanup(AccountUtils.SELECTED_ACCOUNT, bureauList); }
+				final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(AccountUtils.SELECTED_ACCOUNT, bureauList);
+
+				try {
+					dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
+						@Override public Void call() throws Exception {
+
+							dbHelper.getDocumentDao().delete(BureauUtils.getAllChildrenDocuments(bureauxToDelete));
+							dbHelper.getDossierDao().delete(BureauUtils.getAllChildrenDossiers(bureauxToDelete));
+							dbHelper.getBureauDao().delete(bureauxToDelete);
+
+							for (Bureau newBureau : bureauList) {
+								newBureau.setSyncDate(new Date());
+								newBureau.setParent(AccountUtils.SELECTED_ACCOUNT);
+								dbHelper.getBureauDao().createOrUpdate(newBureau);
+							}
+
+							return null;
+						}
+					});
+				}
 				catch (Exception e) { e.printStackTrace(); }
-
 			}
 			else { // Offline backup
 

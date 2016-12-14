@@ -32,16 +32,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.j256.ormlite.dao.Dao;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
+import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.FileUtils;
@@ -49,20 +50,18 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
 
 import java.io.File;
-import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import static org.adullact.iparapheur.utils.BureauUtils.findInList;
 
 
 public class DownloadDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "download_dialog_fragment";
 
-	private static final String ARGUMENT_BUREAU_LIST = "bureauList";
+	private static final String ARGUMENT_ACCOUNT = "account";
 	private static final String LOG_TAG = "DownloadDialogFragment";
 
 	private ProgressBar mBureauProgressBar;
@@ -72,18 +71,18 @@ public class DownloadDialogFragment extends DialogFragment {
 	private TextView mDossierProgressTextView;
 	private TextView mDocumentProgressTextView;
 
-	private List<Bureau> mBureauList;
+	private Account mAccount;
 	private DownloadTask mPendingTask;
 
-	public static DownloadDialogFragment newInstance(@NonNull List<Bureau> bureauList) {
+	public static DownloadDialogFragment newInstance(@NonNull Account account) {
 
 		Gson gson = new Gson();
-		String data = gson.toJson(bureauList);
+		String data = gson.toJson(account);
 
 		DownloadDialogFragment fragment = new DownloadDialogFragment();
 
 		Bundle args = new Bundle();
-		args.putString(ARGUMENT_BUREAU_LIST, data);
+		args.putString(ARGUMENT_ACCOUNT, data);
 		fragment.setArguments(args);
 
 		return fragment;
@@ -96,11 +95,9 @@ public class DownloadDialogFragment extends DialogFragment {
 
 		if (getArguments() != null) {
 
-			Type bureauListType = new TypeToken<List<Bureau>>() {}.getType();
 			Gson gson = new Gson();
-			String data = getArguments().getString(ARGUMENT_BUREAU_LIST);
-
-			mBureauList = gson.fromJson(data, bureauListType);
+			String data = getArguments().getString(ARGUMENT_ACCOUNT);
+			mAccount = gson.fromJson(data, Account.class);
 		}
 	}
 
@@ -136,7 +133,7 @@ public class DownloadDialogFragment extends DialogFragment {
 		super.onResume();
 
 		mPendingTask = new DownloadTask();
-		mPendingTask.execute(mBureauList.toArray(new Bureau[mBureauList.size()]));
+		mPendingTask.execute(mAccount);
 	}
 
 	// </editor-fold desc="LifeCycle">
@@ -149,15 +146,19 @@ public class DownloadDialogFragment extends DialogFragment {
 		dismiss();
 	}
 
-	private class DownloadTask extends AsyncTask<Bureau, Long, IParapheurException> {
+	private class DownloadTask extends AsyncTask<Account, Long, IParapheurException> {
 
 		private final Long STEP_BUREAUX_METADATA = 0L;
 		private final Long STEP_DOSSIERS_METADATA = 1L;
 		private final Long STEP_DOCUMENT_FILES = 2L;
 
-		@Override protected IParapheurException doInBackground(Bureau... bureaux) {
+		@Override protected IParapheurException doInBackground(Account... accounts) {
 
-			// This method does a little bit of Thread pausing.
+			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			Account selectedAccount = null;
+			final List<Bureau> bureauxList = new ArrayList<>();
+
+			// yes, this method does a little bit of Thread pausing.
 			// It may feel weird, but it bring a way better feeling on download,
 			// and this AsyncTask is not on the UI thread anyway.
 			//
@@ -172,17 +173,43 @@ public class DownloadDialogFragment extends DialogFragment {
 			publishProgress(STEP_BUREAUX_METADATA, 0L, 100L);
 			try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
 
+			// Refresh DB Account
+
+			if (accounts == null || accounts.length == 0)
+				return null;
+
+			try {
+				Account deserializedAccount = accounts[0];
+
+				Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
+				List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, deserializedAccount.getId()).query();
+
+				if (fetchedAccountList.isEmpty())
+					return null;
+
+				selectedAccount = fetchedAccountList.get(0);
+			}
+			catch (SQLException e) { e.printStackTrace(); }
+
+			if (selectedAccount == null)
+				return null;
+
+			// Downloading bureaux
+
+			try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(selectedAccount)); }
+			catch (final IParapheurException exception) { return exception; }
+
 			// Updating Bureaux
 
 			final ArrayList<Dossier> dossierList = new ArrayList<>();
 			List<Dossier> incompleteDossierList = new ArrayList<>();
 			final List<Document> finalDocumentList = new ArrayList<>();
 
-			Long totalBureauxMetadataSize = (long) bureaux.length;
+			Long totalBureauxMetadataSize = (long) bureauxList.size();
 			Long progressBureauxMetadataSize = 0L;
 
-			for (Bureau bureau : bureaux) {
-				Bureau parent = findInList(mBureauList, bureau.getId());
+			for (Bureau bureau : bureauxList) {
+				Bureau parent = BureauUtils.findInList(bureauxList, bureau.getId());
 
 				try {
 					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureau.getId());
@@ -218,7 +245,7 @@ public class DownloadDialogFragment extends DialogFragment {
 					try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId())); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 
-					fullDossier.setParent(BureauUtils.findInList(mBureauList, incompleteDossier.getParent().getId()));
+					fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId()));
 					dossierList.add(fullDossier);
 
 					for (Document document : fullDossier.getDocumentList()) {
@@ -242,29 +269,32 @@ public class DownloadDialogFragment extends DialogFragment {
 				publishProgress(STEP_DOSSIERS_METADATA, progressDossiersMetadataSize, totalDossiersMetadataSize);
 			}
 
-			// Saving in database
+			// Cleanup and save in database
 
 			try {
-				DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
-
-				// This callable allow us to insert/update in loops
-				// and calling db only once...
-				dossierDao.callBatchTasks(new Callable<Void>() {
+				dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
 					@Override public Void call() throws Exception {
+
+						Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+						Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+						Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
+
+						List<Bureau> bureauListToDelete = BureauUtils.getDeletableBureauList(AccountUtils.SELECTED_ACCOUNT, bureauxList);
+
+						documentDao.delete(BureauUtils.getAllChildrenDocuments(bureauListToDelete));
+						dossierDao.delete(BureauUtils.getAllChildrenDossiers(bureauListToDelete));
+						bureauDao.delete(bureauListToDelete);
+
+						for (Bureau bureau : bureauxList) {
+							bureau.setSyncDate(new Date());
+							bureauDao.createOrUpdate(bureau);
+						}
 
 						for (Dossier dossier : dossierList) {
 							dossier.setSyncDate(new Date());
 							dossierDao.createOrUpdate(dossier);
 						}
 
-						return null;
-					}
-				});
-
-				documentDao.callBatchTasks(new Callable<Void>() {
-					@Override public Void call() throws Exception {
 						for (Document document : finalDocumentList) {
 							document.setSyncDate(new Date());
 							documentDao.createOrUpdate(document);
