@@ -38,6 +38,7 @@ import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.State;
 import org.adullact.iparapheur.utils.CollectionUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
 import org.json.JSONArray;
@@ -94,7 +95,7 @@ public class RestClientApi1 extends RestClientApi {
 		String response = RESTUtils.get(url).getResponse().toString();
 		Dossier dossierParsed = CollectionUtils.buildGsonWithDateParser().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
 
-		Dossier.fixActions(dossierParsed);
+		DossierUtils.fixActions(dossierParsed);
 		return dossierParsed;
 	}
 
@@ -126,7 +127,7 @@ public class RestClientApi1 extends RestClientApi {
 		);
 
 		for (Dossier dossier : dossiersParsed)
-			Dossier.fixActions(dossier);
+			DossierUtils.fixActions(dossier);
 
 		return dossiersParsed;
 	}
@@ -159,16 +160,7 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotations",
 																			 new JSONArray().put(new JSONObject().put("author", annotation.getAuthor()).put(
@@ -206,21 +198,11 @@ public class RestClientApi1 extends RestClientApi {
 		try {
 			JSONObject rect = new JSONObject().putOpt("bottomRight",
 													  new JSONObject().put("x", centerX + annotwidth / 2).put("y", centerY - annotHeight / 2)
-			).putOpt(
-					"topLeft",
-					new JSONObject().put(
-							"x",
-							centerX - annotwidth / 2
-					).put(
-							"y",
-							centerY + annotHeight / 2
-					)
-			);
+			).putOpt("topLeft", new JSONObject().put("x", centerX - annotwidth / 2).put("y", centerY + annotHeight / 2));
 
 			annot.put("dossier", "workspace://SpacesStore/" + dossierId).put("annotation",
-																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put(
-																					 "text",
-																					 annotation.getText()
+																			 new JSONObject().put("uuid", annotation.getUuid()).put("rect", rect).put("text",
+																																					  annotation.getText()
 																			 )
 			);
 		}

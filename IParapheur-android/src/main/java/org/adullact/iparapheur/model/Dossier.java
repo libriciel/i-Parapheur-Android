@@ -31,17 +31,14 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.adullact.iparapheur.utils.DocumentUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.adullact.iparapheur.model.Action.VISA;
 
 
 @DatabaseTable(tableName = "Folder")
@@ -142,7 +139,7 @@ public class Dossier {
 			// There is no easy way (@annotation) to do it with Gson,
 			// So we're doing it here instead of overriding everything.
 			for (Dossier dossier : dossiersParsed)
-				Dossier.fixActions(dossier);
+				DossierUtils.fixActions(dossier);
 
 			return dossiersParsed;
 		}
@@ -166,7 +163,7 @@ public class Dossier {
 			// There is no easy way (@annotation) to do it with Gson,
 			// So we're doing it here instead of overriding everything.
 			if (dossierParsed != null)
-				Dossier.fixActions(dossierParsed);
+				DossierUtils.fixActions(dossierParsed);
 
 			return dossierParsed;
 		}
@@ -189,7 +186,7 @@ public class Dossier {
 		return mActions;
 	}
 
-	private void setActions(@NonNull HashSet<Action> actions) {
+	public void setActions(@NonNull HashSet<Action> actions) {
 		mActions = actions;
 	}
 
@@ -213,7 +210,7 @@ public class Dossier {
 		return mActionDemandee;
 	}
 
-	private void setActionDemandee(@NonNull Action action) {
+	public void setActionDemandee(@NonNull Action action) {
 		mActionDemandee = action;
 	}
 
@@ -262,178 +259,6 @@ public class Dossier {
 	}
 
 	// </editor-fold desc="Setters / Getters">
-
-	// <editor-fold desc="Static utils">
-
-	public static boolean haveActions(@NonNull Dossier dossier) {
-
-		HashSet<Action> actionsAvailable = new HashSet<>();
-
-		if (dossier.getActions() != null)
-			actionsAvailable.addAll(dossier.getActions());
-
-		actionsAvailable.remove(Action.EMAIL);
-		actionsAvailable.remove(Action.JOURNAL);
-		actionsAvailable.remove(Action.ENREGISTRER);
-
-		return actionsAvailable.size() > 0;
-	}
-
-	public static boolean areDetailsAvailable(@NonNull Dossier dossier) {
-
-		return (dossier.getCircuit() != null)                                     //
-				&& (dossier.getCircuit().getEtapeCircuitList() != null)           //
-				&& (!dossier.getCircuit().getEtapeCircuitList().isEmpty())        //
-				&& (!dossier.getDocumentList().isEmpty());
-	}
-
-	public static @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
-
-		// Default case
-
-		if (dossier == null)
-			return null;
-
-		// Finding doc
-
-		if (!TextUtils.isEmpty(documentId))
-			for (Document document : dossier.getDocumentList())
-				if (TextUtils.equals(document.getId(), documentId))
-					return document;
-
-		// Else, finding any document
-
-		return dossier.getDocumentList().isEmpty() ? null : dossier.getDocumentList().get(0);
-	}
-
-	/**
-	 * Returns the main negative {@link Action} available, by coherent priority.
-	 */
-	public static @Nullable Action getPositiveAction(@NonNull Dossier dossier) {
-
-		// Default case
-
-		if (dossier.getActions() == null)
-			return null;
-
-		// Finding Action
-
-		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
-		actions.retainAll(dossier.getActions());
-
-		if (dossier.getActionDemandee() != null)
-			return dossier.getActionDemandee();
-
-		if (actions.contains(Action.SIGNATURE))
-			return Action.SIGNATURE;
-		else if (actions.contains(VISA))
-			return VISA;
-		else if (actions.contains(Action.ARCHIVAGE))
-			return Action.ARCHIVAGE;
-		else if (actions.contains(Action.MAILSEC))
-			return Action.MAILSEC;
-		else if (actions.contains(Action.TDT_ACTES))
-			return Action.TDT_ACTES;
-		else if (actions.contains(Action.TDT_HELIOS))
-			return Action.TDT_HELIOS;
-		else if (actions.contains(Action.TDT))
-			return Action.TDT;
-
-		return null;
-	}
-
-	/**
-	 * Returns the main negative {@link Action} available, by coherent priority.
-	 */
-	public static @Nullable Action getNegativeAction(@NonNull Dossier dossier) {
-
-		// Default case
-
-		if (dossier.getActions() == null)
-			return null;
-
-		// Finding Action
-
-		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
-		actions.retainAll(dossier.getActions());
-
-		if (actions.contains(Action.REJET))
-			return Action.REJET;
-
-		return null;
-	}
-
-	/**
-	 * Patching a weird Signature case :
-	 * "actionDemandee" can have any "actions" value...
-	 * ... Except when "actionDemandee=SIGNATURE", where "actions" only contains VISA, for some reason
-	 *
-	 * A SIGNATURE action is acceptable in VISA too...
-	 *
-	 * @param dossier , the dossier to fix
-	 */
-	public static void fixActions(@NonNull Dossier dossier) {
-
-		// Default init
-		// (Useful after Gson parsing)
-
-		if (dossier.getActions() == null)
-			dossier.setActions(new HashSet<Action>());
-
-		if (dossier.getActionDemandee() == null)
-			dossier.setActionDemandee(VISA);
-
-		// Yep, sometimes it happens
-
-		if (!dossier.getActions().contains(dossier.getActionDemandee()))
-			dossier.getActions().add(dossier.getActionDemandee());
-
-		// Fixing signature logic
-
-		if (dossier.getActionDemandee() == Action.SIGNATURE) {
-			dossier.getActions().remove(VISA);
-			dossier.getActions().add(Action.SIGNATURE);
-		}
-
-		if (dossier.getActionDemandee() == VISA)
-			dossier.getActions().add(Action.SIGNATURE);
-	}
-
-	public static @NonNull List<Document> getMainDocuments(@Nullable Dossier dossier) {
-
-		// Default case
-
-		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
-			return new ArrayList<>();
-
-		//
-
-		ArrayList<Document> result = new ArrayList<>();
-		for (Document document : dossier.getDocumentList())
-			if (DocumentUtils.isMainDocument(dossier, document))
-				result.add(document);
-
-		return result;
-	}
-
-	public static @NonNull List<Document> getAnnexes(@Nullable Dossier dossier) {
-
-		// Default case
-
-		if ((dossier == null) || (dossier.getDocumentList()) == null || (dossier.getDocumentList().isEmpty()))
-			return new ArrayList<>();
-
-		//
-
-		ArrayList<Document> result = new ArrayList<>();
-		for (Document document : dossier.getDocumentList())
-			if (!DocumentUtils.isMainDocument(dossier, document))
-				result.add(document);
-
-		return result;
-	}
-
-	// </editor-fold desc="Static utils">
 
 	@Override public boolean equals(Object o) {
 

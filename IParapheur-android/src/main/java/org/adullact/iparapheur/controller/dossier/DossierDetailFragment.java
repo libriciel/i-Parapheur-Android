@@ -56,6 +56,7 @@ import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
@@ -257,7 +258,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// Info item
 
 		MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
-		infoItem.setVisible((mDossier != null) && Dossier.areDetailsAvailable(mDossier));
+		infoItem.setVisible((mDossier != null) && DossierUtils.areDetailsAvailable(mDossier));
 
 		// Document selector
 
@@ -269,10 +270,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
 			docSelectorSubMenu.clear();
 
-			for (Document mainDoc : Dossier.getMainDocuments(mDossier))
+			for (Document mainDoc : DossierUtils.getMainDocuments(mDossier))
 				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
-			for (Document annexe : Dossier.getAnnexes(mDossier))
+			for (Document annexe : DossierUtils.getAnnexes(mDossier))
 				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
 		}
 
@@ -371,7 +372,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void onValidateSelected() {
 		collapseFabMenu();
 
-		Action positiveAction = Dossier.getPositiveAction(mDossier);
+		Action positiveAction = DossierUtils.getPositiveAction(mDossier);
 		if (positiveAction != null)
 			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
 	}
@@ -379,7 +380,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void onCancelSelected() {
 		collapseFabMenu();
 
-		Action negativeAction = Dossier.getNegativeAction(mDossier);
+		Action negativeAction = DossierUtils.getNegativeAction(mDossier);
 		if (negativeAction != null)
 			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
 	}
@@ -408,7 +409,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Compute values
 
-		boolean hasNegativeAction = (Dossier.getNegativeAction(mDossier) != null);
+		boolean hasNegativeAction = (DossierUtils.getNegativeAction(mDossier) != null);
 		int mainRank = 0;
 		int cancelRank = 1;
 		int annotationRank = 1 + (hasNegativeAction ? 1 : 0);
@@ -435,7 +436,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Compute values
 
-		boolean hasNegativeAction = (Dossier.getNegativeAction(mDossier) != null);
+		boolean hasNegativeAction = (DossierUtils.getNegativeAction(mDossier) != null);
 		int maxRank = (hasNegativeAction ? 1 : 0) + (mIsAnnotable ? 1 : 0);
 		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
 		int annotationReverseRank = 0;
@@ -463,10 +464,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		//
 
-		Action positiveAction = Dossier.getPositiveAction(dossier);
+		Action positiveAction = DossierUtils.getPositiveAction(dossier);
 		mValidateLabelTextView.setText((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee);
 
-		Action negativeAction = Dossier.getNegativeAction(dossier);
+		Action negativeAction = DossierUtils.getNegativeAction(dossier);
 		mCancelLabelTextView.setText((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee);
 	}
 
@@ -512,7 +513,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void updateReader() {
 		//Adrien - TODO - Error messages
 
-		final Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+		final Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
 		if (document == null)
 			return;
 
@@ -612,11 +613,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		if (dossier == null)
 			return null;
 
-		for (Document mainDocument : Dossier.getMainDocuments(mDossier))
+		for (Document mainDocument : DossierUtils.getMainDocuments(mDossier))
 			if (TextUtils.equals(documentName, mainDocument.getName()))
 				return mainDocument.getId();
 
-		for (Document annexes : Dossier.getAnnexes(mDossier))
+		for (Document annexes : DossierUtils.getAnnexes(mDossier))
 			if (TextUtils.equals(documentName, annexes.getName()))
 				return annexes.getId();
 
@@ -633,7 +634,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private void startShareIntent() {
 
-		Document document = Dossier.findCurrentDocument(mDossier, mDocumentId);
+		Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
 
 		// Default cases
 
@@ -709,7 +710,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			// Download the dossier Metadata
 
 			if (DeviceUtils.isConnected(getActivity())) {
-				if (!Dossier.areDetailsAvailable(mDossier)) {
+				if (!DossierUtils.areDetailsAvailable(mDossier)) {
 					showSpinnerOnUiThread();
 
 					try {
@@ -758,7 +759,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 			// Getting metadata
 
-			Document currentDocument = Dossier.findCurrentDocument(mDossier, mDocumentId);
+			Document currentDocument = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
 			if (currentDocument == null)
 				return null;
 

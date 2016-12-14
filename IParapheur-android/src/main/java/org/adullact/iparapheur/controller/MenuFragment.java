@@ -73,6 +73,7 @@ import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
@@ -899,7 +900,7 @@ public class MenuFragment extends Fragment {
 
 			View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
 
-			if (Dossier.haveActions(mDossierList.get(position))) {
+			if (DossierUtils.haveActions(mDossierList.get(position))) {
 				checkableLayout.setVisibility(View.VISIBLE);
 				checkableLayout.setTag(position);
 				checkableLayout.setOnClickListener(new View.OnClickListener() {
