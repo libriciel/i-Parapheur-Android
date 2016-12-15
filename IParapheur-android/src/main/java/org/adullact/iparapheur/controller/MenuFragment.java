@@ -357,28 +357,30 @@ public class MenuFragment extends Fragment {
 		boolean isBureauList = (mViewSwitcher.getDisplayedChild() == 0);
 		boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 		boolean isListFiltered = (MyFilters.INSTANCE.getSelectedFilter() != null);
+		boolean hasBureaux = (!mBureauList.isEmpty()) && (!mBureauSwipeRefreshLayout.isRefreshing());
+		boolean hasDossiers = (!mDossierList.isEmpty()) && (!mDossierSwipeRefreshLayout.isRefreshing());
 
 		// Download visibility (visible in Landscape)
 
 		MenuItem downloadItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_download_item);
-		downloadItem.setVisible(isBureauList && isInLandscape);
+		downloadItem.setVisible(isBureauList && isInLandscape && hasBureaux);
 
 		// Download visibility (visible in Portrait)
 
 		final ImageButton downloadPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
-		downloadPortraitButton.setVisibility((isBureauList && !isInLandscape) ? View.VISIBLE : View.GONE);
+		downloadPortraitButton.setVisibility((isBureauList && !isInLandscape && hasBureaux) ? View.VISIBLE : View.GONE);
 
 		// Refreshing navigation drawer filter button (visible in portrait)
 
 		final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
 		filterListPortraitButton.setImageResource(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
-		filterListPortraitButton.setVisibility((isDossierList && !isInLandscape) ? View.VISIBLE : View.GONE);
+		filterListPortraitButton.setVisibility((isDossierList && (!isInLandscape) && hasDossiers) ? View.VISIBLE : View.GONE);
 
 		// Refreshing toolbar filter button (visible in landscape)
 
 		MenuItem filterItem = menuToolbar.getMenu().findItem(R.id.menu_fragment_filter_selection_item);
 		filterItem.setIcon(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
-		filterItem.setVisible(isDossierList && isInLandscape);
+		filterItem.setVisible(isDossierList && isInLandscape && hasDossiers);
 
 		inflateFilterSubMenu(filterItem.getSubMenu());
 
@@ -692,6 +694,7 @@ public class MenuFragment extends Fragment {
 
 			// Refreshing views state
 
+			getActivity().invalidateOptionsMenu();
 			mBureauSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty())
@@ -772,6 +775,7 @@ public class MenuFragment extends Fragment {
 
 			// Refreshing views state
 
+			getActivity().invalidateOptionsMenu();
 			mDossierSwipeRefreshLayout.setRefreshing(false);
 
 			if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty())
