@@ -701,7 +701,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null)) {
 			fragment.showProgressLayout();
-			fragment.update(dossier, bureauId);
+			fragment.update(dossier, bureauId, null);
 		}
 	}
 

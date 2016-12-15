@@ -215,7 +215,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		if (mShouldReload) {
 			mShouldReload = false;
-			update(mDossier, mBureauId);
+			update(mDossier, mBureauId, null);
 		}
 	}
 
@@ -474,10 +474,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	}
 
 	// </editor-fold desc="FloatingActionButtons">
-
-	public void update(@Nullable Dossier dossier, @NonNull String bureauId) {
-		update(dossier, bureauId, null);
-	}
 
 	public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
 
@@ -838,6 +834,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		@Override protected void onPostExecute(Void aVoid) {
 			super.onPostExecute(aVoid);
+
+			if (mDocumentId == null)
+				if (!DossierUtils.getMainDocuments(mDossier).isEmpty())
+					mDocumentId = DossierUtils.getMainDocuments(mDossier).get(0).getId();
 
 			updateReader();
 			updateCircuitInfoDrawerContent();

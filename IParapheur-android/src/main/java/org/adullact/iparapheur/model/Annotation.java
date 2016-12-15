@@ -29,6 +29,8 @@ import org.adullact.iparapheur.utils.JsonExplorer;
 import java.io.IOException;
 import java.io.Serializable;
 
+import static android.R.attr.author;
+
 
 public class Annotation implements Parcelable, Serializable {
 
@@ -57,19 +59,19 @@ public class Annotation implements Parcelable, Serializable {
 		}
 	};
 
-	private String uuid;
+	private String mUuid;
 	private int mPage;
-	private String author;
-	private boolean secretaire;
+	private String mAuthor;
+	private boolean mSecretaire;
 	private String mDate;
-	private RectF rect;
-	private String text;
-	private String type;
+	private RectF mRect;
+	private String mText;
+	private String mType;
 	private String mPenColor;
 	private String mFillColor;
 	private int mStep;
-	private boolean updated = false;
-	private boolean deleted = false;
+	private boolean mUpdated = false;
+	private boolean mDeleted = false;
 
 	// <editor-fold desc="Constructors">
 
@@ -77,19 +79,19 @@ public class Annotation implements Parcelable, Serializable {
 
 		JsonExplorer jsonExplorer = new JsonExplorer(json);
 
-		uuid = jsonExplorer.optString(ID);
-		author = jsonExplorer.optString(AUTHOR, "");
+		mUuid = jsonExplorer.optString(ID);
+		mAuthor = jsonExplorer.optString(AUTHOR, "");
 		mPage = page;
-		secretaire = jsonExplorer.optBoolean(IS_SECRETAIRE, false);
+		mSecretaire = jsonExplorer.optBoolean(IS_SECRETAIRE, false);
 		mDate = jsonExplorer.optString(DATE);
-		rect = new RectF(
+		mRect = new RectF(
 				jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(X, 0),
 				jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(Y, 0),
 				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(X, 0),
 				jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(Y, 0)
 		);
-		text = jsonExplorer.optString(TEXT, "");
-		type = jsonExplorer.optString(TYPE, "rect");
+		mText = jsonExplorer.optString(TEXT, "");
+		mType = jsonExplorer.optString(TYPE, "rect");
 		mStep = step;
 		mPenColor = jsonExplorer.optString(PEN_COLOR, "blue");
 		mFillColor = jsonExplorer.optString(FILL_COLOR, "undefined");
@@ -97,40 +99,40 @@ public class Annotation implements Parcelable, Serializable {
 
 	public Annotation(String author, int page, boolean secretaire, String date, RectF rect, String text, int step) {
 
-		this.author = author;
+		mAuthor = author;
 		mPage = page;
-		this.secretaire = secretaire;
+		mSecretaire = secretaire;
 		mDate = date;
-		this.rect = rect;
-		this.text = text;
+		mRect = rect;
+		mText = text;
 		mStep = step;
 	}
 
 	public Annotation(String uuid, String author, int page, boolean secretaire, String date, RectF rect, String text, String type, int step) {
 
-		this.uuid = uuid;
-		this.author = author;
+		mUuid = uuid;
+		mAuthor = author;
 		mPage = page;
-		this.secretaire = secretaire;
+		mSecretaire = secretaire;
 		mDate = date;
-		this.rect = rect;
-		this.text = text;
-		this.type = type;
+		mRect = rect;
+		mText = text;
+		mType = type;
 		mStep = step;
 	}
 
 	private Annotation(Parcel in) {
-		this.uuid = in.readString();
+		mUuid = in.readString();
 		mPage = in.readInt();
-		this.author = in.readString();
-		this.secretaire = in.readByte() != 0;
+		mAuthor = in.readString();
+		mSecretaire = in.readByte() != 0;
 		mDate = in.readString();
-		this.rect = in.readParcelable(((Object) rect).getClass().getClassLoader());
-		this.text = in.readString();
-		this.type = in.readString();
+		mRect = in.readParcelable(((Object) mRect).getClass().getClassLoader());
+		mText = in.readString();
+		mType = in.readString();
 		mStep = in.readInt();
-		this.updated = in.readByte() != 0;
-		this.deleted = in.readByte() != 0;
+		mUpdated = in.readByte() != 0;
+		mDeleted = in.readByte() != 0;
 	}
 
 	// </editor-fold desc="Constructors">
@@ -138,49 +140,49 @@ public class Annotation implements Parcelable, Serializable {
 	// <editor-fold desc="Getters / Setters">
 
 	public String getUuid() {
-		return uuid;
+		return mUuid;
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid = uuid;
+		mUuid = uuid;
 	}
 
 	public RectF getRect() {
-		return rect;
+		return mRect;
 	}
 
 	public void setRect(float x, float y, float r, float b) {
-		this.rect.set(x, y, r, b);
-		this.updated = true;
+		mRect.set(x, y, r, b);
+		mUpdated = true;
 	}
 
 	public String getText() {
-		return this.text;
+		return mText;
 	}
 
 	public void setText(String text) {
-		this.text = text;
-		this.updated = true;
+		mText = text;
+		mUpdated = true;
 	}
 
 	public boolean isUpdated() {
-		return updated;
+		return mUpdated;
 	}
 
 	public void setUpdated(boolean updated) {
-		this.updated = updated;
+		mUpdated = updated;
 	}
 
 	public boolean isDeleted() {
-		return deleted;
+		return mDeleted;
 	}
 
 	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
+		mDeleted = deleted;
 	}
 
 	public String getAuthor() {
-		return author;
+		return mAuthor;
 	}
 
 	public String getDate() {
@@ -204,63 +206,63 @@ public class Annotation implements Parcelable, Serializable {
 	}
 
 	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.uuid);
+		dest.writeString(mUuid);
 		dest.writeInt(mPage);
-		dest.writeString(this.author);
-		dest.writeByte(secretaire ? (byte) 1 : (byte) 0);
+		dest.writeString(mAuthor);
+		dest.writeByte(mSecretaire ? (byte) 1 : (byte) 0);
 		dest.writeString(mDate);
-		dest.writeParcelable(this.rect, 0);
-		dest.writeString(this.text);
-		dest.writeString(this.type);
+		dest.writeParcelable(mRect, 0);
+		dest.writeString(mText);
+		dest.writeString(mType);
 		dest.writeInt(mStep);
-		dest.writeByte(updated ? (byte) 1 : (byte) 0);
-		dest.writeByte(deleted ? (byte) 1 : (byte) 0);
+		dest.writeByte(mUpdated ? (byte) 1 : (byte) 0);
+		dest.writeByte(mDeleted ? (byte) 1 : (byte) 0);
 	}
 
 	// </editor-fold desc="Parcelable">
 
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-		out.writeObject(uuid);
+		out.writeObject(mUuid);
 		out.writeInt(mPage);
 		out.writeObject(author);
-		out.writeBoolean(secretaire);
+		out.writeBoolean(mSecretaire);
 		out.writeObject(mDate);
-		out.writeFloat(rect.left);
-		out.writeFloat(rect.top);
-		out.writeFloat(rect.bottom);
-		out.writeFloat(rect.right);
-		out.writeObject(text);
-		out.writeObject(type);
+		out.writeFloat(mRect.left);
+		out.writeFloat(mRect.top);
+		out.writeFloat(mRect.bottom);
+		out.writeFloat(mRect.right);
+		out.writeObject(mText);
+		out.writeObject(mType);
 		out.writeObject(mPenColor);
 		out.writeObject(mFillColor);
 		out.writeInt(mStep);
-		out.writeBoolean(updated);
-		out.writeBoolean(deleted);
+		out.writeBoolean(mUpdated);
+		out.writeBoolean(mDeleted);
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		uuid = (String) in.readObject();
+		mUuid = (String) in.readObject();
 		mPage = in.readInt();
-		author = (String) in.readObject();
-		secretaire = in.readBoolean();
+		mAuthor = (String) in.readObject();
+		mSecretaire = in.readBoolean();
 		mDate = (String) in.readObject();
 
 		float left = in.readFloat();
 		float top = in.readFloat();
 		float right = in.readFloat();
 		float bottom = in.readFloat();
-		rect = new RectF(left, top, right, bottom);
+		mRect = new RectF(left, top, right, bottom);
 
-		text = (String) in.readObject();
-		type = (String) in.readObject();
+		mText = (String) in.readObject();
+		mType = (String) in.readObject();
 		mPenColor = (String) in.readObject();
 		mFillColor = (String) in.readObject();
 		mStep = in.readInt();
-		updated = in.readBoolean();
-		deleted = in.readBoolean();
+		mUpdated = in.readBoolean();
+		mDeleted = in.readBoolean();
 	}
 
 	@Override public String toString() {
-		return "{Annotation uuid:" + uuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + " text=" + text + "}";
+		return "{Annotation uuid:" + mUuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + " text=" + mText + "}";
 	}
 }

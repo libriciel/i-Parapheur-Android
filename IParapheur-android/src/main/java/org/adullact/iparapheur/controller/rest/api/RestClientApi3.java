@@ -221,7 +221,8 @@ public class RestClientApi3 extends RestClientApi {
 				annotationJson.key("date").value(annotation.getDate());
 				annotationJson.key("page").value(page);
 				annotationJson.key("text").value(annotation.getText() != null ? annotation.getText() : "");
-				annotationJson.key("type").value("rect"); //TODO
+				annotationJson.key("type").value("rect");
+
 			}
 			annotationJson.endObject();
 		}
