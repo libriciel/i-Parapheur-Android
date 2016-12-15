@@ -559,16 +559,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
 
-		return new Annotation(
-				muPdfAnnotation.getId(),
-				muPdfAnnotation.getAuthor(),
-				getCurrentPage(),
-				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
-				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
-				ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
-				muPdfAnnotation.getText(),
-				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
-				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
+		return new Annotation(muPdfAnnotation.getId(),
+							  muPdfAnnotation.getAuthor(),
+							  getCurrentPage(),
+							  (boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
+							  StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
+							  ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+							  muPdfAnnotation.getText(),
+							  (String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
+							  (int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
 		);
 	}
 
@@ -600,15 +599,14 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), AccountUtils.SELECTED_ACCOUNT.getUserFullName());
 
-				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
-						annotation.getUuid(),
-						ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
-						annotation.getText(),
-						annotation.getAuthor(),
-						StringUtils.parseIso8601Date(annotation.getDate()),
-						isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
-						isLocked,
-						payload
+				stickyNoteMap.put(annotation.getUuid(), new StickyNote(annotation.getUuid(),
+																	   ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
+																	   annotation.getText(),
+																	   annotation.getAuthor(),
+																	   StringUtils.parseIso8601Date(annotation.getDate()),
+																	   isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
+																	   isLocked,
+																	   payload
 				));
 			}
 
@@ -860,7 +858,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			mCurrentAnnotation = params[0];
 
 			try {
-				mNewId = RESTClient.INSTANCE.createAnnotation(mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
+				mNewId = RESTClient.INSTANCE.createAnnotation(AccountUtils.SELECTED_ACCOUNT,
+															  mDossier.getId(),
+															  mDocumentId,
+															  mCurrentAnnotation,
+															  getCurrentPage()
+				);
 			}
 			catch (IParapheurException e) {
 				e.printStackTrace();

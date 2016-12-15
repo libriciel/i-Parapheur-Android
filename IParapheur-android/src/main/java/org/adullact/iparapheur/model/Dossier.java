@@ -103,7 +103,7 @@ public class Dossier {
 	private Date mSyncDate;
 
 	@DatabaseField(columnName = DB_FIELD_DESK, foreign = true, foreignAutoRefresh = true)  //
-	private Bureau mParent;
+	private transient Bureau mParent;
 
 	private Circuit mCircuit;
 

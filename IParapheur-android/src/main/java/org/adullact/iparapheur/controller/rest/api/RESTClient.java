@@ -194,9 +194,9 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient().getAnnotations(dossierId, documentId);
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+	@Override public String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
 											 int page) throws IParapheurException {
-		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
+		return getRESTClient().createAnnotation(account, dossierId, documentId, annotation, page);
 	}
 
 	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,

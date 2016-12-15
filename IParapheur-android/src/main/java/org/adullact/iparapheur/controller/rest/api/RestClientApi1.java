@@ -148,9 +148,10 @@ public class RestClientApi1 extends RestClientApi {
 		return modelMapper.getAnnotations(RESTUtils.post(url, body));
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
-											 int page) throws IParapheurException {
-		String url = buildUrl(ACTION_CREATE_ANNOTATION);
+	@Override public String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, //
+											 @NonNull Annotation annotation, int page) throws IParapheurException {
+
+		String url = buildUrl(account, ACTION_CREATE_ANNOTATION);
 		JSONObject annot = new JSONObject();
 		float annotHeight = annotation.getRect().height();
 		float annotwidth = annotation.getRect().width();

@@ -76,7 +76,8 @@ public interface IParapheurAPI {
 	 * @return l'id de l'annotation crééeles annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
-	String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException;
+	String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+							int page) throws IParapheurException;
 
 	void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException;
 

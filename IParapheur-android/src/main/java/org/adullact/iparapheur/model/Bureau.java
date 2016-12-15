@@ -67,7 +67,7 @@ public class Bureau {
 	private Date mSyncDate;
 
 	@DatabaseField(columnName = DB_FIELD_ACCOUNT, foreign = true, foreignAutoRefresh = true)  //
-	private Account mParent;
+	private transient Account mParent;
 
 	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
 	private transient ForeignCollection<Dossier> mChildrenDossiers;

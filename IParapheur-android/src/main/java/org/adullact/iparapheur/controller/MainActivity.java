@@ -752,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	 */
 	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-		public DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
+		private DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
 			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 

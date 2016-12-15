@@ -17,10 +17,6 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
@@ -28,11 +24,8 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
-import org.adullact.iparapheur.utils.StringUtils;
 
-import java.io.File;
 import java.util.Date;
 
 
@@ -75,7 +68,7 @@ public class Document {
 	private Date mSyncDate;
 
 	@DatabaseField(columnName = DB_FIELD_DOSSIER, foreign = true, foreignAutoRefresh = true)  //
-	private Dossier mParent;
+	private transient Dossier mParent;
 
 	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;

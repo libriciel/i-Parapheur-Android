@@ -191,8 +191,8 @@ public class RestClientApi3 extends RestClientApi {
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
-											 int page) throws IParapheurException {
+	@Override public String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, //
+											 @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build json object
 
@@ -231,7 +231,7 @@ public class RestClientApi3 extends RestClientApi {
 
 		// Send request
 
-		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
+		String url = buildUrl(account, getAnnotationsUrlSuffix(dossierId, documentId));
 		RequestResponse response = RESTUtils.post(url, annotationJson.toString());
 
 		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
