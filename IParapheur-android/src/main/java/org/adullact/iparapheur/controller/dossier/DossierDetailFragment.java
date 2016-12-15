@@ -572,8 +572,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		);
 	}
 
-	private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(SparseArray<PageAnnotations> parapheurAnnotations) {
+	private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(@Nullable SparseArray<PageAnnotations> parapheurAnnotations) {
+
+		// Default case
+
 		SparseArray<HashMap<String, StickyNote>> result = new SparseArray<>();
+
+		if (parapheurAnnotations == null)
+			return result;
+
+		//
 
 		for (int i = 0; i < parapheurAnnotations.size(); i++) {
 

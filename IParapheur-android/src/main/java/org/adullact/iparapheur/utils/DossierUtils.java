@@ -206,13 +206,12 @@ public class DossierUtils {
 
 	public static @NonNull List<Dossier> getDeletableDossierList(@NonNull List<Bureau> parentBureauList, @NonNull List<Dossier> newDossierList) {
 
-		final List<Dossier> dossierToDeleteList = new ArrayList<>();
+		List<Dossier> dossierToDeleteList = new ArrayList<>();
 
 		for (Bureau parentBureau : parentBureauList)
 			CollectionUtils.safeAddAll(dossierToDeleteList, parentBureau.getChildrenDossiers());
 
 		dossierToDeleteList.removeAll(newDossierList);
-
 		return dossierToDeleteList;
 	}
 

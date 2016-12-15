@@ -321,6 +321,15 @@ public class DownloadDialogFragment extends DialogFragment {
 					}
 				});
 
+				// Cleanup files
+
+				for (Document documentToDelete : documentToDeleteList)
+					//noinspection ResultOfMethodCallIgnored
+					DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+
+				for (Dossier dossierToDelete : dossierToDeleteList)
+					//noinspection ResultOfMethodCallIgnored
+					FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
 			}
 			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
 

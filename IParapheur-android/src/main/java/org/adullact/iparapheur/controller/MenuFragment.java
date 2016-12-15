@@ -77,6 +77,7 @@ import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
@@ -635,6 +636,16 @@ public class MenuFragment extends Fragment {
 							return null;
 						}
 					});
+
+					// Cleanup files
+
+					for (Document documentToDelete : documentToDeleteList)
+						//noinspection ResultOfMethodCallIgnored
+						DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+
+					for (Dossier dossierToDelete : dossierToDeleteList)
+						//noinspection ResultOfMethodCallIgnored
+						FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
 				}
 				catch (Exception e) { e.printStackTrace(); }
 			}

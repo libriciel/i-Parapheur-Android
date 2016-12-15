@@ -77,7 +77,7 @@ public class FileUtils {
 		}
 	}
 
-	public static @Nullable File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
+	public static @NonNull File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
 
 		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
 		if (!folder.exists())
