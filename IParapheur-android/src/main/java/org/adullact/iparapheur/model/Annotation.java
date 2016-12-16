@@ -29,8 +29,6 @@ import org.adullact.iparapheur.utils.JsonExplorer;
 import java.io.IOException;
 import java.io.Serializable;
 
-import static android.R.attr.author;
-
 
 public class Annotation implements Serializable {
 
@@ -202,7 +200,7 @@ public class Annotation implements Serializable {
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
 		out.writeObject(mUuid);
 		out.writeInt(mPage);
-		out.writeObject(author);
+		out.writeObject(mAuthor);
 		out.writeBoolean(mSecretaire);
 		out.writeObject(mDate);
 		out.writeFloat(mRect.left);
@@ -219,11 +217,11 @@ public class Annotation implements Serializable {
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		mUuid = String.valueOf(in.readObject());
+		mUuid = (String) in.readObject();
 		mPage = in.readInt();
-		mAuthor = String.valueOf(in.readObject());
+		mAuthor = (String) in.readObject();
 		mSecretaire = in.readBoolean();
-		mDate = String.valueOf(in.readObject());
+		mDate = (String) in.readObject();
 
 		float left = in.readFloat();
 		float top = in.readFloat();
@@ -231,16 +229,16 @@ public class Annotation implements Serializable {
 		float bottom = in.readFloat();
 		mRect = new RectF(left, top, right, bottom);
 
-		mText = String.valueOf(in.readObject());
-		mType = String.valueOf(in.readObject());
-		mPenColor = String.valueOf(in.readObject());
-		mFillColor = String.valueOf(in.readObject());
+		mText = (String) in.readObject();
+		mType = (String) in.readObject();
+		mPenColor = (String) in.readObject();
+		mFillColor = (String) in.readObject();
 		mStep = in.readInt();
 		mUpdated = in.readBoolean();
 		mDeleted = in.readBoolean();
 	}
 
 	@Override public String toString() {
-		return "{Annotation uuid:" + mUuid + " author:" + author + " page:" + mPage + " mDate=" + mDate + " text=" + mText + "}";
+		return "{Annotation uuid:" + mUuid + " author:" + mAuthor + " page:" + mPage + " mDate=" + mDate + " text=" + mText + "}";
 	}
 }

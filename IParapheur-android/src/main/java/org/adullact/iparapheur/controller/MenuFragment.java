@@ -91,6 +91,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static org.adullact.iparapheur.utils.AccountUtils.SELECTED_ACCOUNT;
+
 
 /**
  * This fragment manages {@link Bureau} and {@link Dossier} lists on the left panel.
@@ -297,7 +299,7 @@ public class MenuFragment extends Fragment {
 	@Override public void onStart() {
 		super.onStart();
 
-		Log.i("Adrien", "account :: " + AccountUtils.SELECTED_ACCOUNT);
+		Log.i("Adrien", "account :: " + SELECTED_ACCOUNT);
 
 		if (mBureauList.isEmpty())
 			updateBureaux(true);
@@ -370,6 +372,7 @@ public class MenuFragment extends Fragment {
 
 		final ImageButton downloadPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
 		downloadPortraitButton.setVisibility((isBureauList && !isInLandscape && hasBureaux) ? View.VISIBLE : View.GONE);
+		Log.i("Adrien", "??? " + isBureauList + " " + !isInLandscape + " " + hasBureaux);
 
 		// Refreshing navigation drawer filter button (visible in portrait)
 
@@ -479,7 +482,7 @@ public class MenuFragment extends Fragment {
 	private boolean onDownloadItemSelected() {
 
 		if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
-			DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
+			DialogFragment actionDialog = DownloadDialogFragment.newInstance(SELECTED_ACCOUNT);
 			actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
 		}
 
@@ -504,7 +507,7 @@ public class MenuFragment extends Fragment {
 		if (forceReload)
 			mBureauList.clear();
 
-		if ((mBureauList.isEmpty()) && (AccountUtils.SELECTED_ACCOUNT != null)) {
+		if ((mBureauList.isEmpty()) && (SELECTED_ACCOUNT != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 			executeAsyncTask(new BureauxLoadingTask());
@@ -570,7 +573,7 @@ public class MenuFragment extends Fragment {
 			mPendingAsyncTask.cancel(false);
 
 		mPendingAsyncTask = task;
-		mPendingAsyncTask.execute(AccountUtils.SELECTED_ACCOUNT);
+		mPendingAsyncTask.execute(SELECTED_ACCOUNT);
 	}
 
 	// <editor-fold desc="Interface">
@@ -634,7 +637,7 @@ public class MenuFragment extends Fragment {
 
 							for (Bureau newBureau : bureauList) {
 								newBureau.setSyncDate(new Date());
-								newBureau.setParent(AccountUtils.SELECTED_ACCOUNT);
+								newBureau.setParent(SELECTED_ACCOUNT);
 								dbHelper.getBureauDao().createOrUpdate(newBureau);
 							}
 
@@ -665,14 +668,15 @@ public class MenuFragment extends Fragment {
 					List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, selectedId).query();
 
 					if (fetchedAccountList.size() > 0)
-						AccountUtils.SELECTED_ACCOUNT = fetchedAccountList.get(0);
+						SELECTED_ACCOUNT = fetchedAccountList.get(0);
 					else
 						return null;
 
 					// Update Bureaux
 
 					mBureauList.clear();
-					mBureauList.addAll(AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux());
+					List<Bureau> bureauList = new ArrayList<>(AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux());
+					mBureauList.addAll(bureauList);
 				}
 				catch (SQLException e) { e.printStackTrace(); }
 			}
@@ -722,7 +726,7 @@ public class MenuFragment extends Fragment {
 		@Override protected IParapheurException doInBackground(Account... params) {
 
 			mTypology.clear();
-			Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
+			Account selectedAccount = SELECTED_ACCOUNT;
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 			Filter currentFilter = MyFilters.INSTANCE.getSelectedFilter();
 

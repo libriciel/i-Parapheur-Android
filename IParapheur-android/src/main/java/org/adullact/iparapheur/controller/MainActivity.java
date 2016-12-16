@@ -150,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
-		mActionsContainer = findViewById(R.id.navigation_drawer_filters_menu_header_actions_container);
 
 		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
 		if (drawerAccountImageButton != null) {
@@ -166,8 +165,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 					else
 						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-					if (mActionsContainer != null)
-						mActionsContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
+					View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+					View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+
+					filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+					downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
 				}
 			});
 		}
