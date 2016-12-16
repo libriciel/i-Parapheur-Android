@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 				// Collapse the FAB
 
-				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 				if (dossierDetailFragment != null)
 					if (dossierDetailFragment.onBackPressed())
 						return;

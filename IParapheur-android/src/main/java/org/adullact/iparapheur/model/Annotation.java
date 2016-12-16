@@ -32,7 +32,7 @@ import java.io.Serializable;
 import static android.R.attr.author;
 
 
-public class Annotation implements Parcelable, Serializable {
+public class Annotation implements Serializable {
 
 	private static final String ID = "id";
 	private static final String IS_SECRETAIRE = "secretaire";
@@ -198,29 +198,7 @@ public class Annotation implements Parcelable, Serializable {
 	}
 
 	// </editor-fold desc="Getters / Setters">
-
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mUuid);
-		dest.writeInt(mPage);
-		dest.writeString(mAuthor);
-		dest.writeByte(mSecretaire ? (byte) 1 : (byte) 0);
-		dest.writeString(mDate);
-		dest.writeParcelable(mRect, 0);
-		dest.writeString(mText);
-		dest.writeString(mType);
-		dest.writeInt(mStep);
-		dest.writeByte(mUpdated ? (byte) 1 : (byte) 0);
-		dest.writeByte(mDeleted ? (byte) 1 : (byte) 0);
-	}
-
-	// </editor-fold desc="Parcelable">
-
+	
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
 		out.writeObject(mUuid);
 		out.writeInt(mPage);

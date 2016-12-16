@@ -478,7 +478,7 @@ public class MenuFragment extends Fragment {
 
 	private boolean onDownloadItemSelected() {
 
-		if (getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG) == null) {
+		if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
 			DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
 			actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
 		}
