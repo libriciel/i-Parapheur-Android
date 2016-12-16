@@ -18,12 +18,14 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.SignInfo;
@@ -58,7 +60,7 @@ public interface IParapheurAPI {
 
 	Dossier getDossier(String bureauId, String dossierId) throws IParapheurException;
 
-	List<Dossier> getDossiers(String bureauId) throws IParapheurException;
+	List<Dossier> getDossiers(@NonNull Account account, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException;
 
 	List<ParapheurType> getTypologie() throws IParapheurException;
 

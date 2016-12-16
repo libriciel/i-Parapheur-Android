@@ -42,6 +42,7 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
@@ -210,7 +211,7 @@ public class DownloadDialogFragment extends DialogFragment {
 				Bureau parent = BureauUtils.findInList(bureauxList, bureau.getId());
 
 				try {
-					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(bureau.getId());
+					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(AccountUtils.SELECTED_ACCOUNT, bureau.getId(), null);
 					for (Dossier dossier : incompleteDossierTempList)
 						dossier.setParent(parent);
 

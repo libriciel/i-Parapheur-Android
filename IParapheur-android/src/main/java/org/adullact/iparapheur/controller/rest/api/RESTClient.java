@@ -18,6 +18,7 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.adullact.iparapheur.R;
@@ -27,6 +28,7 @@ import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
@@ -178,8 +180,8 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient(AccountUtils.SELECTED_ACCOUNT).getDossier(bureauId, dossierId);
 	}
 
-	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		return getRESTClient(AccountUtils.SELECTED_ACCOUNT).getDossiers(bureauId);
+	@Override public List<Dossier> getDossiers(@NonNull Account account, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException {
+		return getRESTClient(AccountUtils.SELECTED_ACCOUNT).getDossiers(account, bureauId, filter);
 	}
 
 	@Override public List<ParapheurType> getTypologie() throws IParapheurException {

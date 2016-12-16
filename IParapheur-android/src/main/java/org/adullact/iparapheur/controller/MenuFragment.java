@@ -84,6 +84,7 @@ import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -477,8 +478,10 @@ public class MenuFragment extends Fragment {
 
 	private boolean onDownloadItemSelected() {
 
-		DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
-		actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
+		if (getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG) == null) {
+			DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
+			actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
+		}
 
 		return true;
 	}
@@ -719,12 +722,14 @@ public class MenuFragment extends Fragment {
 		@Override protected IParapheurException doInBackground(Account... params) {
 
 			mTypology.clear();
-			DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
+			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			Filter currentFilter = MyFilters.INSTANCE.getSelectedFilter();
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
 				List<Dossier> fetchedDossierList = new ArrayList<>();
-				try { fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(mSelectedBureau.getId())); }
+				try { fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(selectedAccount, mSelectedBureau.getId(), currentFilter)); }
 				catch (IParapheurException exception) { return exception; }
 
 				mDossierList.clear();
@@ -732,6 +737,42 @@ public class MenuFragment extends Fragment {
 
 				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
+
+				// Cleanup data
+
+				if (currentFilter == null) {
+
+					final List<Dossier> dossierToDeleteList = DossierUtils.getDeletableDossierList(Collections.singletonList(mSelectedBureau),
+																								   fetchedDossierList
+					);
+					final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
+
+					Log.d("BureauxLoadingTask", "delete Dossiers  : " + dossierToDeleteList);
+					Log.d("BureauxLoadingTask", "delete Documents : " + documentToDeleteList);
+
+					// Cleanup DB
+
+					try {
+						dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
+							@Override public Void call() throws Exception {
+								dbHelper.getDocumentDao().delete(documentToDeleteList);
+								dbHelper.getDossierDao().delete(dossierToDeleteList);
+								return null;
+							}
+						});
+					}
+					catch (Exception exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
+
+					// Cleanup files
+
+					for (Document documentToDelete : documentToDeleteList)
+						//noinspection ResultOfMethodCallIgnored
+						DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+
+					for (Dossier dossierToDelete : dossierToDeleteList)
+						//noinspection ResultOfMethodCallIgnored
+						FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
+				}
 			}
 			else {  // Offline backup
 

@@ -18,12 +18,12 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.dossier.filter.MyFilters;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.controller.rest.mapper.ModelMapper;
 import org.adullact.iparapheur.model.Account;
@@ -102,9 +102,7 @@ public class RestClientApi3 extends RestClientApi {
 		return Dossier.fromJsonObject(response, mGson);
 	}
 
-	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-
-		Filter filter = MyFilters.INSTANCE.getSelectedFilter();
+	@Override public List<Dossier> getDossiers(@NonNull Account account, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException {
 
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
@@ -119,7 +117,7 @@ public class RestClientApi3 extends RestClientApi {
 
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 
-		String url = buildUrl(RESOURCE_DOSSIERS, params);
+		String url = buildUrl(account, RESOURCE_DOSSIERS, params, true);
 		String response = RESTUtils.get(url).getResponseArray().toString();
 
 		return Dossier.fromJsonArray(response, mGson);
