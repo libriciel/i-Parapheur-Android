@@ -696,6 +696,7 @@ public class MenuFragment extends Fragment {
 			if (isCancelled())
 				return;
 
+			Collections.sort(mBureauList, BureauUtils.buildAlphabeticalComparator());
 			((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
 
 			// Retrieving previous state

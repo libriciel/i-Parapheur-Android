@@ -24,8 +24,8 @@ import android.text.TextUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Bureau;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -48,13 +48,6 @@ public class BureauUtils {
 		return null;
 	}
 
-	/**
-	 * Safe update, with old data cleanup.
-	 *
-	 * @param account       the parent account
-	 * @param newBureauList the new full list
-	 * @throws SQLException
-	 */
 	public static @NonNull List<Bureau> getDeletableBureauList(@NonNull final Account account, final @NonNull List<Bureau> newBureauList) {
 
 		final List<Bureau> bureauToDeleteList = new ArrayList<>();
@@ -62,5 +55,14 @@ public class BureauUtils {
 		bureauToDeleteList.removeAll(newBureauList);
 
 		return bureauToDeleteList;
+	}
+
+	public static @NonNull Comparator<Bureau> buildAlphabeticalComparator() {
+
+		return new Comparator<Bureau>() {
+			@Override public int compare(Bureau lhs, Bureau rhs) {
+				return lhs.getTitle().compareTo(rhs.getTitle());
+			}
+		};
 	}
 }
