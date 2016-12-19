@@ -42,7 +42,6 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
-import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.BureauUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
@@ -152,11 +151,11 @@ public class DownloadDialogFragment extends DialogFragment {
 		private final Long STEP_BUREAUX_METADATA = 0L;
 		private final Long STEP_DOSSIERS_METADATA = 1L;
 		private final Long STEP_DOCUMENT_FILES = 2L;
+		private Account mCurrentAccount;
 
 		@Override protected IParapheurException doInBackground(Account... accounts) {
 
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-			Account selectedAccount = null;
 			final List<Bureau> bureauxList = new ArrayList<>();
 
 			// yes, this method does a little bit of Thread pausing.
@@ -188,16 +187,16 @@ public class DownloadDialogFragment extends DialogFragment {
 				if (fetchedAccountList.isEmpty())
 					return null;
 
-				selectedAccount = fetchedAccountList.get(0);
+				mCurrentAccount = fetchedAccountList.get(0);
 			}
 			catch (SQLException e) { e.printStackTrace(); }
 
-			if (selectedAccount == null)
+			if (mCurrentAccount == null)
 				return null;
 
 			// Updating Bureaux
 
-			try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(selectedAccount)); }
+			try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); }
 			catch (final IParapheurException exception) { return exception; }
 
 			final ArrayList<Dossier> dossierList = new ArrayList<>();
@@ -208,10 +207,12 @@ public class DownloadDialogFragment extends DialogFragment {
 			Long progressBureauxMetadataSize = 0L;
 
 			for (Bureau bureau : bureauxList) {
+				bureau.setParent(mCurrentAccount);
+
 				Bureau parent = BureauUtils.findInList(bureauxList, bureau.getId());
 
 				try {
-					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(AccountUtils.SELECTED_ACCOUNT, bureau.getId(), null);
+					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(mCurrentAccount, bureau.getId(), null);
 					for (Dossier dossier : incompleteDossierTempList)
 						dossier.setParent(parent);
 
@@ -278,7 +279,7 @@ public class DownloadDialogFragment extends DialogFragment {
 
 				// Retrieve cascade deletable content
 
-				final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(selectedAccount, bureauxList);
+				final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(mCurrentAccount, bureauxList);
 
 				final List<Dossier> dossierToDeleteList = new ArrayList<>();
 				dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
@@ -290,9 +291,9 @@ public class DownloadDialogFragment extends DialogFragment {
 
 				// Delete
 
-				Log.d("DownloadTask", "delete Bureaux   : " + bureauToDeleteList);
-				Log.d("DownloadTask", "delete Dossiers  : " + dossierToDeleteList);
-				Log.d("DownloadTask", "delete Documents : " + documentToDeleteList);
+				Log.d(LOG_TAG, "delete Bureaux   : " + bureauToDeleteList);
+				Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+				Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
 				dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
 					@Override public Void call() throws Exception {

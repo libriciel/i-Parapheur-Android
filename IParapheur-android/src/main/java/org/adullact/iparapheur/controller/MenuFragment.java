@@ -55,6 +55,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.ForeignCollection;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.dossier.DownloadDialogFragment;
@@ -90,8 +91,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import static org.adullact.iparapheur.utils.AccountUtils.SELECTED_ACCOUNT;
 
 
 /**
@@ -299,7 +298,7 @@ public class MenuFragment extends Fragment {
 	@Override public void onStart() {
 		super.onStart();
 
-		Log.i("Adrien", "account :: " + SELECTED_ACCOUNT);
+		Log.i("Adrien", "account :: " + AccountUtils.SELECTED_ACCOUNT);
 
 		if (mBureauList.isEmpty())
 			updateBureaux(true);
@@ -372,7 +371,6 @@ public class MenuFragment extends Fragment {
 
 		final ImageButton downloadPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
 		downloadPortraitButton.setVisibility((isBureauList && !isInLandscape && hasBureaux) ? View.VISIBLE : View.GONE);
-		Log.i("Adrien", "??? " + isBureauList + " " + !isInLandscape + " " + hasBureaux);
 
 		// Refreshing navigation drawer filter button (visible in portrait)
 
@@ -482,7 +480,7 @@ public class MenuFragment extends Fragment {
 	private boolean onDownloadItemSelected() {
 
 		if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
-			DialogFragment actionDialog = DownloadDialogFragment.newInstance(SELECTED_ACCOUNT);
+			DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
 			actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
 		}
 
@@ -507,7 +505,7 @@ public class MenuFragment extends Fragment {
 		if (forceReload)
 			mBureauList.clear();
 
-		if ((mBureauList.isEmpty()) && (SELECTED_ACCOUNT != null)) {
+		if ((mBureauList.isEmpty()) && (AccountUtils.SELECTED_ACCOUNT != null)) {
 			mBureauListView.setVisibility(View.INVISIBLE);
 			mBureauEmptyView.setVisibility(View.VISIBLE);
 			executeAsyncTask(new BureauxLoadingTask());
@@ -573,7 +571,7 @@ public class MenuFragment extends Fragment {
 			mPendingAsyncTask.cancel(false);
 
 		mPendingAsyncTask = task;
-		mPendingAsyncTask.execute(SELECTED_ACCOUNT);
+		mPendingAsyncTask.execute(AccountUtils.SELECTED_ACCOUNT);
 	}
 
 	// <editor-fold desc="Interface">
@@ -589,6 +587,8 @@ public class MenuFragment extends Fragment {
 
 	private class BureauxLoadingTask extends AsyncTask<Account, Void, IParapheurException> {
 
+		private Account mCurrentAccount;
+
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mBureauSwipeRefreshLayout.setRefreshing(true);
@@ -596,11 +596,29 @@ public class MenuFragment extends Fragment {
 
 		@Override protected IParapheurException doInBackground(Account... params) {
 
-			final Account currentAccount = params[0];
-			if (currentAccount == null)
+			mCurrentAccount = params[0];
+			if (mCurrentAccount == null)
 				return new IParapheurException(-1, "No account selected");
 
+			// Update Account from DB
+
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+			Dao<Account, Integer> accountDao;
+			try {
+				accountDao = dbHelper.getAccountDao();
+				String selectedId = mCurrentAccount.getId();
+				List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, selectedId).query();
+
+				if (fetchedAccountList.size() > 0)
+					mCurrentAccount = fetchedAccountList.get(0);
+				else
+					return null;
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			//
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
@@ -608,7 +626,7 @@ public class MenuFragment extends Fragment {
 
 				final List<Bureau> bureauList = new ArrayList<>();
 
-				try { bureauList.addAll(RESTClient.INSTANCE.getBureaux(currentAccount)); }
+				try { bureauList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); }
 				catch (final IParapheurException exception) { return exception; }
 
 				mBureauList.clear();
@@ -618,9 +636,9 @@ public class MenuFragment extends Fragment {
 
 				try {
 
-					dbHelper.getAccountDao().update(currentAccount);
+					dbHelper.getAccountDao().update(mCurrentAccount);
 
-					final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(currentAccount, bureauList);
+					final List<Bureau> bureauxToDelete = BureauUtils.getDeletableBureauList(mCurrentAccount, bureauList);
 					final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
 					final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
 
@@ -637,7 +655,7 @@ public class MenuFragment extends Fragment {
 
 							for (Bureau newBureau : bureauList) {
 								newBureau.setSyncDate(new Date());
-								newBureau.setParent(SELECTED_ACCOUNT);
+								newBureau.setParent(mCurrentAccount);
 								dbHelper.getBureauDao().createOrUpdate(newBureau);
 							}
 
@@ -657,28 +675,14 @@ public class MenuFragment extends Fragment {
 				}
 				catch (Exception e) { e.printStackTrace(); }
 			}
-			else { // Offline backup
+			else {
 
-				try {
+				// Offline backup
 
-					// Update Account from DB
+				mBureauList.clear();
+				ForeignCollection<Bureau> bureauForeignList = mCurrentAccount.getChildrenBureaux();
+				mBureauList.addAll(bureauForeignList);
 
-					Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-					String selectedId = currentAccount.getId();
-					List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, selectedId).query();
-
-					if (fetchedAccountList.size() > 0)
-						SELECTED_ACCOUNT = fetchedAccountList.get(0);
-					else
-						return null;
-
-					// Update Bureaux
-
-					mBureauList.clear();
-					List<Bureau> bureauList = new ArrayList<>(AccountUtils.SELECTED_ACCOUNT.getChildrenBureaux());
-					mBureauList.addAll(bureauList);
-				}
-				catch (SQLException e) { e.printStackTrace(); }
 			}
 
 			return null;
@@ -718,6 +722,8 @@ public class MenuFragment extends Fragment {
 
 	private class DossiersLoadingTask extends AsyncTask<Account, Void, IParapheurException> {
 
+		private Account mCurrentAccount;
+
 		@Override protected void onPreExecute() {
 			super.onPreExecute();
 			mDossierSwipeRefreshLayout.setRefreshing(true);
@@ -726,14 +732,14 @@ public class MenuFragment extends Fragment {
 		@Override protected IParapheurException doInBackground(Account... params) {
 
 			mTypology.clear();
-			Account selectedAccount = SELECTED_ACCOUNT;
+			mCurrentAccount = AccountUtils.SELECTED_ACCOUNT;
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 			Filter currentFilter = MyFilters.INSTANCE.getSelectedFilter();
 
 			if (DeviceUtils.isConnected(getActivity())) {
 
 				List<Dossier> fetchedDossierList = new ArrayList<>();
-				try { fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(selectedAccount, mSelectedBureau.getId(), currentFilter)); }
+				try { fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(mCurrentAccount, mSelectedBureau.getId(), currentFilter)); }
 				catch (IParapheurException exception) { return exception; }
 
 				mDossierList.clear();

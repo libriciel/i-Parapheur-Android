@@ -205,7 +205,7 @@ public class FileUtils {
 
 	public static long getFreeSpace(@NonNull Context context) {
 
-		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME); // FIXME: NPE ??
 
 		if (!folder.exists())
 			//noinspection ResultOfMethodCallIgnored
