@@ -166,6 +166,7 @@
     <string name="http_error_405">Méthode de requête non autorisée</string>
     <string name="http_error_503">Le service est actuellement indisponible</string>
 
+    <string name="error_no_internet">Erreur à l\'envoi de la requête : Aucune connexion</string>
     <string name="error_mismatch_versions">Le i-Parapheur associé au compte %s est incompatible avec cette application</string>
     <string name="error_send_request">Erreur à l\'envoi de la requête</string>
     <string name="error_parse">Erreur lors du traitement de la réponse</string>

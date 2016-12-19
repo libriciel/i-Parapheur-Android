@@ -103,6 +103,7 @@ import java.util.concurrent.Callable;
  */
 public class MenuFragment extends Fragment {
 
+	private static final String LOG_TAG = "MenuFragment";
 	public static final String FRAGMENT_TAG = "menu_fragment";
 
 	// Views
@@ -603,7 +604,7 @@ public class MenuFragment extends Fragment {
 			// Update Account from DB
 
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-			Dao<Account, Integer> accountDao;
+			Dao<Account, Integer> accountDao = null;
 			try {
 				accountDao = dbHelper.getAccountDao();
 				String selectedId = mCurrentAccount.getId();
@@ -611,16 +612,39 @@ public class MenuFragment extends Fragment {
 
 				if (fetchedAccountList.size() > 0)
 					mCurrentAccount = fetchedAccountList.get(0);
-				else
-					return null;
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
 			}
 
+			// Default case
+
+			if ((mCurrentAccount == null) || (accountDao == null))
+				return null;
+
 			//
 
 			if (DeviceUtils.isConnected(getActivity())) {
+
+				// Check Api version
+
+				Integer currentApi = mCurrentAccount.getApiVersion();
+				if ((currentApi == null) || (currentApi < RESTClient.API_VERSION_MAX)) {
+					Log.d(LOG_TAG, "current API : " + currentApi + ", checking for update...");
+
+					int newApi = 0;
+					try { newApi = RESTClient.INSTANCE.getApiVersion(mCurrentAccount); }
+					catch (IParapheurException e) { e.printStackTrace(); }
+
+					if (newApi > 0) {
+						mCurrentAccount.setApiVersion(newApi);
+						try { accountDao.createOrUpdate(mCurrentAccount); }
+						catch (SQLException e) { e.printStackTrace(); }
+					}
+				}
+
+				if (mCurrentAccount.getApiVersion() == null)
+					return null;
 
 				// Download data
 
@@ -642,9 +666,9 @@ public class MenuFragment extends Fragment {
 					final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
 					final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
 
-					Log.d("BureauxLoadingTask", "delete Bureaux   : " + bureauxToDelete);
-					Log.d("BureauxLoadingTask", "delete Dossiers  : " + dossierToDeleteList);
-					Log.d("BureauxLoadingTask", "delete Documents : " + documentToDeleteList);
+					Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDelete);
+					Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+					Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
 					dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
 						@Override public Void call() throws Exception {
@@ -682,7 +706,6 @@ public class MenuFragment extends Fragment {
 				mBureauList.clear();
 				ForeignCollection<Bureau> bureauForeignList = mCurrentAccount.getChildrenBureaux();
 				mBureauList.addAll(bureauForeignList);
-
 			}
 
 			return null;
@@ -746,7 +769,7 @@ public class MenuFragment extends Fragment {
 				mDossierList.clear();
 				mDossierList.addAll(fetchedDossierList);
 
-				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie()); }
+				try { mTypology.addAll(RESTClient.INSTANCE.getTypologie(mCurrentAccount)); }
 				catch (IParapheurException exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
 
 				// Cleanup data

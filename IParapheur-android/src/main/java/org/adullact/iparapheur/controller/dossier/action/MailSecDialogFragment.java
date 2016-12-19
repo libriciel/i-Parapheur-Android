@@ -28,6 +28,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
@@ -79,7 +80,7 @@ public class MailSecDialogFragment extends ActionDialogFragment {
 
 	private class MailsecTask extends LoadingWithProgressTask {
 
-		public MailsecTask(Activity activity) {
+		private MailsecTask(Activity activity) {
 			super(activity, (LoadingTask.DataChangeListener) getActivity());
 		}
 
@@ -93,7 +94,7 @@ public class MailSecDialogFragment extends ActionDialogFragment {
 			for (Dossier dossier : mDossiers) {
 				if (isCancelled()) {return;}
 				//Log.d("debug", "Mailsec sur " + dossier.getName());
-				RESTClient.INSTANCE.envoiMailSec(dossier.getId(), null, null, null, "", "", "", false, true, mBureauId);
+				RESTClient.INSTANCE.envoiMailSec(AccountUtils.SELECTED_ACCOUNT, dossier.getId(), null, null, null, "", "", "", false, true, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

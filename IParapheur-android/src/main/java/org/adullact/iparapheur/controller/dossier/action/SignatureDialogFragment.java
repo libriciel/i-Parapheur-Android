@@ -47,6 +47,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -379,7 +380,7 @@ public class SignatureDialogFragment extends DialogFragment {
 				for (Dossier dossier : mDossierList) {
 					if (dossier.getCircuit() == null) {
 						try {
-							Circuit circuit = RESTClient.INSTANCE.getCircuit(dossier.getId());
+							Circuit circuit = RESTClient.INSTANCE.getCircuit(AccountUtils.SELECTED_ACCOUNT, dossier.getId());
 							dossier.setCircuit(circuit);
 						}
 						catch (IParapheurException e) {
@@ -451,7 +452,9 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				String retrievedSignInfo = null;
 
-				try { retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(mDossierList.get(docIndex).getId(), mBureauId).getHash(); }
+				try {
+					retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId).getHash();
+				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
@@ -530,11 +533,13 @@ public class SignatureDialogFragment extends DialogFragment {
 				if (isCancelled())
 					return false;
 
-				try { RESTClient.INSTANCE.signer(mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId); }
+				try {
+					RESTClient.INSTANCE.signer(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId);
+				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
-					mErrorMessage = R.string.signature_error_message_not_sent_to_server;
+					mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.signature_error_message_not_sent_to_server;
 				}
 
 				if (isCancelled())
@@ -587,7 +592,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				// Send request
 
-				try { RESTClient.INSTANCE.signPapier(mDossierList.get(docIndex).getId(), mBureauId); }
+				try { RESTClient.INSTANCE.signPapier(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId); }
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);

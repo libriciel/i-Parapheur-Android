@@ -555,15 +555,16 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
 
-		return new Annotation(muPdfAnnotation.getId(),
-							  muPdfAnnotation.getAuthor(),
-							  getCurrentPage(),
-							  (boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
-							  StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
-							  ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
-							  muPdfAnnotation.getText(),
-							  (String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
-							  (int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
+		return new Annotation(
+				muPdfAnnotation.getId(),
+				muPdfAnnotation.getAuthor(),
+				getCurrentPage(),
+				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
+				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
+				ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+				muPdfAnnotation.getText(),
+				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
+				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
 		);
 	}
 
@@ -595,14 +596,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), AccountUtils.SELECTED_ACCOUNT.getUserFullName());
 
-				stickyNoteMap.put(annotation.getUuid(), new StickyNote(annotation.getUuid(),
-																	   ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
-																	   annotation.getText(),
-																	   annotation.getAuthor(),
-																	   StringUtils.parseIso8601Date(annotation.getDate()),
-																	   isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
-																	   isLocked,
-																	   payload
+				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
+						annotation.getUuid(),
+						ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
+						annotation.getText(),
+						annotation.getAuthor(),
+						StringUtils.parseIso8601Date(annotation.getDate()),
+						isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
+						isLocked,
+						payload
 				));
 			}
 
@@ -704,6 +706,8 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 		// TODO : Error messages
 		@Override protected Void doInBackground(Void... params) {
 
+			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
 			// Default case
@@ -718,11 +722,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 					showSpinnerOnUiThread();
 
 					try {
-						Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(mBureauId, mDossier.getId());
+						Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(currentAccount, mBureauId, mDossier.getId());
 						final List<Document> documentList = retrievedDossier.getDocumentList();
 						mDossier.setDocumentList(documentList);
 
-						mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mDossier.getId()));
+						mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(currentAccount, mDossier.getId()));
 
 						// Retrieve Bureau
 
@@ -806,7 +810,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 			if (!file.exists() && DeviceUtils.isConnected(getActivity())) {
 				String downloadUrl = DocumentUtils.generateContentUrl(currentDocument);
 				if (downloadUrl != null) {
-					try { RESTClient.INSTANCE.downloadFile(downloadUrl, file.getAbsolutePath()); }
+					try { RESTClient.INSTANCE.downloadFile(currentAccount, downloadUrl, file.getAbsolutePath()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}
 			}
@@ -815,7 +819,6 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 			if (DeviceUtils.isConnected(getActivity())) {
 				SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
-				Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
 				if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
 					try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
@@ -823,7 +826,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				}
 
 				if (DocumentUtils.isMainDocument(mDossier, currentDocument)) {
-					try { annotations = RESTClient.INSTANCE.getAnnotations(mDossier.getId(), currentDocument.getId()); }
+					try { annotations = RESTClient.INSTANCE.getAnnotations(currentAccount, mDossier.getId(), currentDocument.getId()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 				}
 				currentDocument.setPagesAnnotations(annotations);
@@ -856,14 +859,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return null;
 
 			mCurrentAnnotation = params[0];
+			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
 			try {
-				mNewId = RESTClient.INSTANCE.createAnnotation(AccountUtils.SELECTED_ACCOUNT,
-															  mDossier.getId(),
-															  mDocumentId,
-															  mCurrentAnnotation,
-															  getCurrentPage()
-				);
+				mNewId = RESTClient.INSTANCE.createAnnotation(currentAccount, mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
 			}
 			catch (IParapheurException e) {
 				e.printStackTrace();
@@ -894,9 +893,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 				return null;
 
 			Annotation currentAnnotation = params[0];
+			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
 			try {
-				RESTClient.INSTANCE.updateAnnotation(mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
+				RESTClient.INSTANCE.updateAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
 			}
 			catch (IParapheurException e) {
 				e.printStackTrace();
@@ -918,13 +918,15 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		@Override protected Boolean doInBackground(Annotation... params) {
 
+			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+
 			if (params.length < 1)
 				return null;
 
 			Annotation currentAnnotation = params[0];
 
 			try {
-				RESTClient.INSTANCE.deleteAnnotation(mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
+				RESTClient.INSTANCE.deleteAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
 			}
 			catch (IParapheurException e) {
 				e.printStackTrace();

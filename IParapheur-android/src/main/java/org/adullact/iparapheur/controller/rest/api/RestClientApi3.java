@@ -94,7 +94,7 @@ public class RestClientApi3 extends RestClientApi {
 	private Gson mGson = CollectionUtils.buildGsonWithDateParser();
 	private ModelMapper modelMapper = new ModelMapper();
 
-	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
+	@Override public Dossier getDossier(@NonNull Account currentAccount, String bureauId, String dossierId) throws IParapheurException {
 
 		String url = buildUrl(RESOURCE_DOSSIERS + "/" + dossierId, "bureauCourant=" + bureauId);
 		String response = RESTUtils.get(url).getResponse().toString();
@@ -102,7 +102,7 @@ public class RestClientApi3 extends RestClientApi {
 		return Dossier.fromJsonObject(response, mGson);
 	}
 
-	@Override public List<Dossier> getDossiers(@NonNull Account account, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException {
+	@Override public List<Dossier> getDossiers(@NonNull Account currentAccount, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException {
 
 		String params = "asc=true" +
 				"&bureau=" + bureauId +
@@ -117,21 +117,21 @@ public class RestClientApi3 extends RestClientApi {
 
 		//Log.d( IParapheurHttpClient.class, "REQUEST on " + FOLDERS_PATH + ": " + requestBody );
 
-		String url = buildUrl(account, RESOURCE_DOSSIERS, params, true);
+		String url = buildUrl(currentAccount, RESOURCE_DOSSIERS, params, true);
 		String response = RESTUtils.get(url).getResponseArray().toString();
 
 		return Dossier.fromJsonArray(response, mGson);
 	}
 
-	@Override public List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException {
+	@Override public List<Bureau> getBureaux(@NonNull Account currentAccount) throws IParapheurException {
 
-		String url = buildUrl(account, RESOURCE_BUREAUX);
+		String url = buildUrl(currentAccount, RESOURCE_BUREAUX);
 		RequestResponse result = RESTUtils.get(url);
 
 		return Bureau.fromJsonArray(result.getResponseArray().toString(), mGson);
 	}
 
-	@Override public List<ParapheurType> getTypologie() throws IParapheurException {
+	@Override public List<ParapheurType> getTypologie(@NonNull Account currentAccount) throws IParapheurException {
 
 		String url = buildUrl(RESOURCE_TYPES);
 		RequestResponse result = RESTUtils.get(url);
@@ -139,7 +139,7 @@ public class RestClientApi3 extends RestClientApi {
 		return ParapheurType.fromJsonArray(result.getResponseArray().toString(), mGson);
 	}
 
-	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
+	@Override public Circuit getCircuit(@NonNull Account currentAccount, String dossierId) throws IParapheurException {
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_DOSSIER_CIRCUIT, dossierId));
 		String response = String.valueOf(RESTUtils.get(url).getResponse());
@@ -148,17 +148,17 @@ public class RestClientApi3 extends RestClientApi {
 		return Circuit.fromJsonObject(responseCircuit, mGson);
 	}
 
-	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
+	@Override public SignInfo getSignInfo(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException {
 
 		String url = buildUrl(String.format(Locale.US, RESOURCE_SIGN_INFO, dossierId), "bureauCourant=" + bureauId);
 		RequestResponse response = RESTUtils.get(url);
 		return modelMapper.getSignInfo(response);
 	}
 
-	@Override public boolean updateAccountInformations(@NonNull Account account) throws IParapheurException {
+	@Override public boolean updateAccountInformations(@NonNull Account currentAccount) throws IParapheurException {
 
-		String params = "user=" + account.getLogin();
-		String url = buildUrl(account, RESOURCE_USER_INFO, params, true);
+		String params = "user=" + currentAccount.getLogin();
+		String url = buildUrl(currentAccount, RESOURCE_USER_INFO, params, true);
 		RequestResponse response = RESTUtils.get(url);
 
 		if (response.getResponse() != null) {
@@ -168,7 +168,7 @@ public class RestClientApi3 extends RestClientApi {
 			String lastName = json.findObject("data").findObject("properties").optString(USER_INFO_LAST_NAME);
 
 			if (StringUtils.areNotEmpty(firstName, lastName))
-				account.setUserFullName(firstName + " " + lastName);
+				currentAccount.setUserFullName(firstName + " " + lastName);
 		}
 
 		return true;
@@ -184,12 +184,13 @@ public class RestClientApi3 extends RestClientApi {
 		return String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, annotationId);
 	}
 
-	@Override public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
-		String url = buildUrl(getAnnotationsUrlSuffix(dossierId, documentId));
+	@Override public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull Account currentAccount, @NonNull String dossierId,
+																			 @NonNull String documentId) throws IParapheurException {
+		String url = buildUrl(currentAccount, getAnnotationsUrlSuffix(dossierId, documentId));
 		return modelMapper.getAnnotations(RESTUtils.get(url));
 	}
 
-	@Override public String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, //
+	@Override public String createAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, //
 											 @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build json object
@@ -230,7 +231,7 @@ public class RestClientApi3 extends RestClientApi {
 
 		// Send request
 
-		String url = buildUrl(account, getAnnotationsUrlSuffix(dossierId, documentId));
+		String url = buildUrl(currentAccount, getAnnotationsUrlSuffix(dossierId, documentId));
 		RequestResponse response = RESTUtils.post(url, annotationJson.toString());
 
 		if (response != null && response.getCode() == HttpURLConnection.HTTP_OK) {
@@ -243,8 +244,8 @@ public class RestClientApi3 extends RestClientApi {
 		return null;
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
-										   int page) throws IParapheurException {
+	@Override public void updateAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId,
+										   @NonNull Annotation annotation, int page) throws IParapheurException {
 
 		// Build Json object
 
@@ -292,7 +293,7 @@ public class RestClientApi3 extends RestClientApi {
 			throw new IParapheurException(R.string.Error_on_annotation_update, "");
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+	@Override public void deleteAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
 										   int page) throws IParapheurException {
 
 		String url = buildUrl(getAnnotationUrlSuffix(dossierId, documentId, annotationId));
@@ -303,14 +304,15 @@ public class RestClientApi3 extends RestClientApi {
 
 	// <editor-fold desc="Actions">
 
-	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean viser(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv,
+								   String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_VISA, dossier.getId());
 		try {
 			JSONObject json = new JSONObject();
 			json.put("bureauCourant", bureauId);
 			json.put("annotPub", annotPub);
 			json.put("annotPriv", annotPriv);
-			RequestResponse response = RESTUtils.post(buildUrl(actionUrl), json.toString());
+			RequestResponse response = RESTUtils.post(buildUrl(currentAccount, actionUrl), json.toString());
 			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 		}
 		catch (JSONException e) {
@@ -318,7 +320,8 @@ public class RestClientApi3 extends RestClientApi {
 		}
 	}
 
-	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
+									String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
 
 		JSONStringer jsonStringer = new JSONStringer();
@@ -340,7 +343,7 @@ public class RestClientApi3 extends RestClientApi {
 		return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 	}
 
-	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
+	@Override public boolean signPapier(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_SIGNATURE_PAPIER, dossierId);
 
 		JSONStringer jsonStringer = new JSONStringer();
@@ -357,7 +360,8 @@ public class RestClientApi3 extends RestClientApi {
 		return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
 	}
 
-	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
+	@Override public boolean archiver(@NonNull Account currentAccount, String dossierId, String archiveTitle, boolean withAnnexes,
+									  String bureauId) throws IParapheurException {
 		/** FIXME : weird copy/paste. Maybe it has no utility too.
 		 String actionUrl = String.format(Locale.US, ACTION_SIGNATURE, dossierId);
 		 try {
@@ -374,7 +378,8 @@ public class RestClientApi3 extends RestClientApi {
 		return false;
 	}
 
-	@Override public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtHelios(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv,
+											String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_HELIOS, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -390,8 +395,8 @@ public class RestClientApi3 extends RestClientApi {
 		}
 	}
 
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
-										   String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean envoiTdtActes(@NonNull Account currentAccount, String dossierId, String nature, String classification, String numero,
+										   long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_TDT_ACTES, dossierId);
 		try {
 			JSONObject json = new JSONObject();
@@ -412,9 +417,9 @@ public class RestClientApi3 extends RestClientApi {
 		}
 	}
 
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
-										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
-										  String bureauId) throws IParapheurException {
+	@Override public boolean envoiMailSec(@NonNull Account currentAccount, String dossierId, List<String> destinataires, List<String> destinatairesCC,
+										  List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword,
+										  boolean annexesIncluded, String bureauId) throws IParapheurException {
 
 		String actionUrl = String.format(Locale.US, ACTION_MAILSEC, dossierId);
 		try {
@@ -437,7 +442,8 @@ public class RestClientApi3 extends RestClientApi {
 		}
 	}
 
-	@Override public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+	@Override public boolean rejeter(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv,
+									 String bureauId) throws IParapheurException {
 		String actionUrl = String.format(Locale.US, ACTION_REJET, dossierId);
 		try {
 			JSONObject json = new JSONObject();

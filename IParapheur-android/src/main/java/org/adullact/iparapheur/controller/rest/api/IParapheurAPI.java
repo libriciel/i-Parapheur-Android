@@ -45,7 +45,7 @@ public interface IParapheurAPI {
 	 * @param account le compte à tester.
 	 * @return l'id d'une ressource (string) indiquant l'état d'accessibilité du compte.
 	 */
-	int test(Account account) throws IParapheurException;
+	int test(@NonNull Account account) throws IParapheurException;
 
 	/**
 	 * Retourne un ticket d'authentification associé au compte passé en paramètre
@@ -54,58 +54,63 @@ public interface IParapheurAPI {
 	 * @return un ticket d'authentification
 	 * @throws IParapheurException
 	 */
-	String getTicket(Account account) throws IParapheurException;
+	String getTicket(@NonNull Account account) throws IParapheurException;
 
-	List<Bureau> getBureaux(@NonNull Account account) throws IParapheurException;
+	List<Bureau> getBureaux(@NonNull Account currentAccount) throws IParapheurException;
 
-	Dossier getDossier(String bureauId, String dossierId) throws IParapheurException;
+	Dossier getDossier(@NonNull Account currentAccount, String bureauId, String dossierId) throws IParapheurException;
 
-	List<Dossier> getDossiers(@NonNull Account account, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException;
+	List<Dossier> getDossiers(@NonNull Account currentAccount, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException;
 
-	List<ParapheurType> getTypologie() throws IParapheurException;
+	List<ParapheurType> getTypologie(@NonNull Account currentAccount) throws IParapheurException;
 
-	Circuit getCircuit(String dossierId) throws IParapheurException;
+	Circuit getCircuit(@NonNull Account currentAccount, String dossierId) throws IParapheurException;
 
-	SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException;
+	SignInfo getSignInfo(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException;
 
 	/**
 	 * @return les annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
-	SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException;
+	SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull Account currentAccount, @NonNull String dossierId,
+															@NonNull String documentId) throws IParapheurException;
 
 	/**
 	 * @return l'id de l'annotation crééeles annotations graphiques déposées sur le document principal du dossier
 	 * @throws IParapheurException
 	 */
-	String createAnnotation(@NonNull Account account, @NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+	String createAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
 							int page) throws IParapheurException;
 
-	void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation, int page) throws IParapheurException;
+	void updateAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+						  int page) throws IParapheurException;
 
-	void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId, int page) throws IParapheurException;
+	void deleteAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
+						  int page) throws IParapheurException;
 
-	boolean updateAccountInformations(@NonNull Account account) throws IParapheurException;
+	boolean updateAccountInformations(@NonNull Account currentAccount) throws IParapheurException;
 
-	boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException;
+	boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException;
 
-	boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException;
+	boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException;
 
-	boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean viser(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
+				   String bureauId) throws IParapheurException;
 
-	boolean signPapier(String dossierId, String bureauId) throws IParapheurException;
+	boolean signPapier(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException;
 
-	boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException;
+	boolean archiver(@NonNull Account currentAccount, String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException;
 
-	boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean envoiTdtHelios(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
-						  String annotPriv, String bureauId) throws IParapheurException;
+	boolean envoiTdtActes(@NonNull Account currentAccount, String dossierId, String nature, String classification, String numero, long dateActes, String objet,
+						  String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
-	boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI, String sujet,
-						 String message, String password, boolean showPassword, boolean annexesIncluded, String bureauId) throws IParapheurException;
+	boolean envoiMailSec(@NonNull Account currentAccount, String dossierId, List<String> destinataires, List<String> destinatairesCC,
+						 List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
+						 String bureauId) throws IParapheurException;
 
-	boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+	boolean rejeter(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 }

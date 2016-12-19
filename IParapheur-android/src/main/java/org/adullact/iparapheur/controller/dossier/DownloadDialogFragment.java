@@ -240,9 +240,9 @@ public class DownloadDialogFragment extends DialogFragment {
 			for (Dossier incompleteDossier : incompleteDossierList) {
 
 				try {
-					Dossier fullDossier = RESTClient.INSTANCE.getDossier(incompleteDossier.getParent().getId(), incompleteDossier.getId());
+					Dossier fullDossier = RESTClient.INSTANCE.getDossier(mCurrentAccount, incompleteDossier.getParent().getId(), incompleteDossier.getId());
 
-					try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(incompleteDossier.getId())); }
+					try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mCurrentAccount, incompleteDossier.getId())); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 
 					fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId()));
@@ -253,7 +253,7 @@ public class DownloadDialogFragment extends DialogFragment {
 
 						if (DocumentUtils.isMainDocument(fullDossier, document)) {
 							SerializableSparseArray<PageAnnotations> annotations;
-							annotations = RESTClient.INSTANCE.getAnnotations(fullDossier.getId(), document.getId());
+							annotations = RESTClient.INSTANCE.getAnnotations(mCurrentAccount, fullDossier.getId(), document.getId());
 							document.setPagesAnnotations(annotations);
 						}
 
@@ -362,7 +362,7 @@ public class DownloadDialogFragment extends DialogFragment {
 				if (!TextUtils.isEmpty(downloadUrl)) {
 					File documentFile = DocumentUtils.getFile(getActivity(), document.getParent(), document);
 
-					try { RESTClient.INSTANCE.downloadFile(downloadUrl, documentFile.getAbsolutePath()); }
+					try { RESTClient.INSTANCE.downloadFile(mCurrentAccount, downloadUrl, documentFile.getAbsolutePath()); }
 					catch (IParapheurException e) { e.printStackTrace(); }
 
 					if (document.getSize() > 0)

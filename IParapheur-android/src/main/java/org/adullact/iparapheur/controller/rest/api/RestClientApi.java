@@ -159,7 +159,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return stringBuilder.toString();
 	}
 
-	@Override public boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException {
+	@Override public boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException {
 
 		String state = Environment.getExternalStorageState();
 
@@ -200,7 +200,8 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return file.exists();
 	}
 
-	@Override public boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException {
+	@Override public boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString,
+												 @NonNull String certificateLocalPath) throws IParapheurException {
 
 		InputStream input = null;
 		OutputStream output = null;

@@ -26,6 +26,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
@@ -80,7 +81,7 @@ public class ArchivageDialogFragment extends ActionDialogFragment {
 			for (Dossier dossier : mDossiers) {
 				if (isCancelled()) {return;}
 				//Log.d("debug", "Archivage du dossier " + dossier.getName());
-				RESTClient.INSTANCE.archiver(dossier.getId(), dossier.getName() + "pdf", false, mBureauId);
+				RESTClient.INSTANCE.archiver(AccountUtils.SELECTED_ACCOUNT, dossier.getId(), dossier.getName() + "pdf", false, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

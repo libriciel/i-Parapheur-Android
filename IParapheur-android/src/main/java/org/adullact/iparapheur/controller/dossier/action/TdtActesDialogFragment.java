@@ -28,6 +28,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
@@ -98,7 +99,7 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 				if (isCancelled()) {return;}
 				// TODO : distinguer Actes et Helios
 				//Log.d("debug", "Mailsec sur " + dossier.getName());
-				RESTClient.INSTANCE.envoiTdtActes(dossier.getId(), "", "", "", 0L, "", annotPub, annotPriv, mBureauId);
+				RESTClient.INSTANCE.envoiTdtActes(AccountUtils.SELECTED_ACCOUNT, dossier.getId(), "", "", "", 0L, "", annotPub, annotPriv, mBureauId);
 				i++;
 				publishProgress(i * 100 / total);
 			}

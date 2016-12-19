@@ -40,6 +40,7 @@ import com.google.gson.reflect.TypeToken;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
@@ -190,13 +191,13 @@ public class VisaDialogFragment extends DialogFragment {
 			for (Dossier dossier : mDossierList) {
 
 				try {
-					RESTClient.INSTANCE.viser(dossier, mAnnotPub, mAnnotPriv, mBureauId);
+					RESTClient.INSTANCE.viser(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
 					Log.d(LOG_TAG, "VISA on : " + dossier.getName());
 				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
-					mErrorMessage = R.string.visa_error_message_not_sent_to_server;
+					mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.visa_error_message_not_sent_to_server;
 				}
 
 				if (isCancelled())

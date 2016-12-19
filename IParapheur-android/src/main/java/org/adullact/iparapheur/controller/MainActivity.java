@@ -584,7 +584,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			@Override protected Void doInBackground(Void... params) {
 
 				try {
-					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(url, certificateLocalPath);
+					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(AccountUtils.SELECTED_ACCOUNT, url, certificateLocalPath);
 
 					if (!downloadSuccessful)
 						mErrorMessageResource = R.string.import_error_message_cant_download_certificate;

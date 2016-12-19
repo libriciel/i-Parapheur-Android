@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -131,6 +132,10 @@ public class RESTUtils {
 		catch (GeneralSecurityException e) {
 			e.printStackTrace();
 			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (UnknownHostException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.error_no_internet, null);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
