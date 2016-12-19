@@ -254,7 +254,7 @@ public class PreferencesAccountFragment extends Fragment {
 		try { accountList.addAll(mDatabaseHelper.getAccountDao().queryForAll()); }
 		catch (SQLException e) { e.printStackTrace(); }
 
-		Collections.sort(accountList, StringUtils.buildAccountAlphabeticalComparator());
+		Collections.sort(accountList, AccountUtils.buildAlphabeticalComparator());
 
 		// Build map
 

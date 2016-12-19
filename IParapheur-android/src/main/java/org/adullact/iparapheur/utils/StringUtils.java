@@ -25,7 +25,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
-import org.adullact.iparapheur.model.Account;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +39,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -93,22 +91,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 	}
 
 	// </editor-fold desc="TextUtils">
-
-	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator() {
-
-		return new Comparator<Account>() {
-			@Override public int compare(Account lhs, Account rhs) {
-
-				if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
-					return Integer.MIN_VALUE;
-
-				if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
-					return Integer.MAX_VALUE;
-
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		};
-	}
 
 	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)

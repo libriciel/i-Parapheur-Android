@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private FrameLayout mLeftDrawerMenu;
 	private ActionBarDrawerToggle mLeftDrawerToggle;
 	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
-	private View mActionsContainer;
 
 	private boolean mSouldShowAccountAfterRotation = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
@@ -130,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Loading indicator
 
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.main_activity);
 
 		mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);

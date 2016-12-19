@@ -817,6 +817,7 @@ public class MenuFragment extends Fragment {
 			if (isCancelled())
 				return;
 
+			Collections.sort(mDossierList, DossierUtils.buildCreationDateComparator());
 			((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
 			// Retrieving previous state

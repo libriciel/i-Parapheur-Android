@@ -21,15 +21,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.adullact.iparapheur.model.Account;
-import org.adullact.iparapheur.model.Bureau;
-import org.adullact.iparapheur.model.Document;
-import org.adullact.iparapheur.model.Dossier;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 
 
 public class AccountUtils {
@@ -51,6 +47,22 @@ public class AccountUtils {
 
 	public static boolean isValid(@NonNull Account account) {
 		return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
+	}
+
+	public static @NonNull Comparator<Account> buildAlphabeticalComparator() {
+
+		return new Comparator<Account>() {
+			@Override public int compare(Account lhs, Account rhs) {
+
+				if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
+					return Integer.MIN_VALUE;
+
+				if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
+					return Integer.MAX_VALUE;
+
+				return lhs.getTitle().compareTo(rhs.getTitle());
+			}
+		};
 	}
 
 }

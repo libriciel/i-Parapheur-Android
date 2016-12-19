@@ -28,6 +28,7 @@ import org.adullact.iparapheur.model.Dossier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -224,6 +225,22 @@ public class DossierUtils {
 				CollectionUtils.safeAddAll(result, bureau.getChildrenDossiers());
 
 		return result;
+	}
+
+	public static @NonNull Comparator<Dossier> buildCreationDateComparator() {
+
+		return new Comparator<Dossier>() {
+			@Override public int compare(Dossier lhs, Dossier rhs) {
+
+				if (lhs.getDateCreation() == null)
+					return Integer.MIN_VALUE;
+
+				if (rhs.getDateCreation() == null)
+					return Integer.MAX_VALUE;
+
+				return lhs.getDateCreation().compareTo(rhs.getDateCreation());
+			}
+		};
 	}
 
 }
