@@ -345,6 +345,11 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	@Override protected void onStickyNoteChanged(@NonNull final StickyNote stickyNote, boolean deleteInvoked) {
 
+		if (!DeviceUtils.isConnected(getActivity())) {
+			Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		final Annotation newStickyNote = muPdfStickyNoteToParapheurAnnotation(stickyNote);
 
 		if (deleteInvoked)
@@ -389,6 +394,12 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 	private void onAnnotationSelected() {
 		collapseFabMenu();
+
+		if (!DeviceUtils.isConnected(getActivity())) {
+			Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+			return;
+		}
+
 		startCreateStickyNoteOnNextMove(true);
 	}
 
