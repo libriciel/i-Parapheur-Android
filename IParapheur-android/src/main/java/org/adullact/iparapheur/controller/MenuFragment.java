@@ -85,6 +85,7 @@ import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -395,6 +396,13 @@ public class MenuFragment extends Fragment {
 
 	@Override public boolean onOptionsItemSelected(MenuItem item) {
 
+		if (Arrays.asList(R.id.action_no_filter, R.id.action_add_filter, R.id.action_filter).contains(item.getItemId())) {
+			if (!DeviceUtils.isConnected(getActivity())) {
+				Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+				return true;
+			}
+		}
+
 		if (item.getItemId() == R.id.menu_fragment_filter_selection_item)
 			return onFilterItemSelected(item);
 
@@ -441,6 +449,13 @@ public class MenuFragment extends Fragment {
 
 	private boolean onFilterItemSelected(@NonNull MenuItem item) {
 
+		if (Arrays.asList(R.id.action_no_filter, R.id.action_add_filter, R.id.action_filter).contains(item.getItemId())) {
+			if (!DeviceUtils.isConnected(getActivity())) {
+				Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+				return true;
+			}
+		}
+
 		switch (item.getItemId()) {
 
 			case R.id.action_no_filter:
@@ -480,7 +495,11 @@ public class MenuFragment extends Fragment {
 
 	private boolean onDownloadItemSelected() {
 
-		if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
+		if (!DeviceUtils.isConnected(getActivity())) {
+			Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+			return true;
+		}
+		else if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
 			DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
 			actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
 		}

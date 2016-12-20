@@ -22,6 +22,7 @@
     <string name="Download">Télécharger</string>
     <string name="Offline_content">Préparation du mode hors ligne</string>
     <string name="Filter_selection">Sélection du filtre</string>
+    <string name="Action_unavailable_offline">Action indisponible : Pas de connexion</string>
     <string name="password">Mot de passe</string>
     <string name="Mandatory">Obligatoire</string>
     <string name="Optional">Facultatif</string>
