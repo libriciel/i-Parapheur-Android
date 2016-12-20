@@ -548,6 +548,14 @@ public class MenuFragment extends Fragment {
 		Bureau bureauClicked = ((BureauListAdapter) mBureauListView.getAdapter()).getItem(position);
 
 		if (bureauClicked != null) {
+
+			// Cleanup previous views data
+
+			mDossierList.clear();
+			((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+
+			// Update bureau
+
 			mSelectedBureau = bureauClicked;
 			executeAsyncTask(new DossiersLoadingTask());
 
