@@ -143,7 +143,7 @@ public class DownloadDialogFragment extends DialogFragment {
 		if (mPendingTask != null)
 			mPendingTask.cancel(false);
 
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 	private class DownloadTask extends AsyncTask<Account, Long, IParapheurException> {
@@ -410,7 +410,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			if (e != null)
 				Log.e("", "" + e.getComplement());
 			else
-				dismiss();
+				dismissAllowingStateLoss();
 		}
 	}
 

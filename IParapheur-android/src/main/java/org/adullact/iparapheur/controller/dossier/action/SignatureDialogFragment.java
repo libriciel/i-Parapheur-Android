@@ -273,7 +273,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 	private void onCancelButtonClicked() {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 	private void onSignPapierButtonClicked() {
@@ -555,7 +555,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(),
@@ -609,7 +609,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_CODE_SIGN_PAPIER, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_papier_unknown_error), Toast.LENGTH_SHORT).show();

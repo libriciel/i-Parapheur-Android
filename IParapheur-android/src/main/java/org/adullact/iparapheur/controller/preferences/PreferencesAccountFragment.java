@@ -45,7 +45,14 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Bureau;
+import org.adullact.iparapheur.model.Document;
+import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.BureauUtils;
+import org.adullact.iparapheur.utils.DocumentUtils;
+import org.adullact.iparapheur.utils.DossierUtils;
+import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.StringUtils;
 
@@ -56,6 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -201,14 +209,48 @@ public class PreferencesAccountFragment extends Fragment {
 		catch (SQLException e) { e.printStackTrace(); }
 
 		if (currentAccount == null)
-			currentAccount = new Account(UUID.randomUUID().toString());
+			return;
 
-		// Delete
+		// Delete cascade
+
+		final Account finalCurrentAccount = currentAccount;
+		final List<Bureau> bureauxToDeleteList = BureauUtils.getDeletableBureauList(finalCurrentAccount, new ArrayList<Bureau>());
+		final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDeleteList);
+		final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
+
+		Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDeleteList);
+		Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+		Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
+
+		try {
+			mDatabaseHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
+				@Override public Void call() throws Exception {
+
+					mDatabaseHelper.getDocumentDao().delete(documentToDeleteList);
+					mDatabaseHelper.getDossierDao().delete(dossierToDeleteList);
+					mDatabaseHelper.getBureauDao().delete(bureauxToDeleteList);
+					mDatabaseHelper.getAccountDao().delete(finalCurrentAccount);
+
+					return null;
+				}
+			});
+		}
+		catch (Exception e) { e.printStackTrace(); }
+
+		// Cleanup files
+
+		for (Document documentToDelete : documentToDeleteList)
+			//noinspection ResultOfMethodCallIgnored
+			DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+
+		for (Dossier dossierToDelete : dossierToDeleteList)
+			//noinspection ResultOfMethodCallIgnored
+			FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
+
+		// Refresh UI
 
 		mAccountData.remove(position);
 		Log.i(LOG_TAG, "Delete account " + currentAccount);
-		try { mDatabaseHelper.getAccountDao().delete(currentAccount); }
-		catch (SQLException e) { e.printStackTrace(); }
 
 		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 		Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();

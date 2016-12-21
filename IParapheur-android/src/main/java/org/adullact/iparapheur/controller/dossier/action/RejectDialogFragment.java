@@ -219,7 +219,7 @@ public class RejectDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.reject_error_message_unknown_error), Toast.LENGTH_SHORT).show();

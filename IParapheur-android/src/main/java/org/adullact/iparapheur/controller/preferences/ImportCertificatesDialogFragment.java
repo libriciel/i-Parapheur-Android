@@ -135,11 +135,11 @@ public class ImportCertificatesDialogFragment extends DialogFragment {
 		boolean success = FileUtils.importCertificate(getActivity(), mCertificateFile, mPasswordEditText.getText().toString());
 
 		if (success)
-			dismiss();
+			dismissAllowingStateLoss();
 	}
 
 	private void onCancelButtonClicked() {
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 }
