@@ -17,7 +17,6 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,9 +24,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.IParapheurAPI;
-import org.adullact.iparapheur.model.Account;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +39,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -56,21 +52,45 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-	public static @NonNull Comparator<Account> buildAccountAlphabeticalComparator(@NonNull final Context context) {
+	// <editor-fold desc="TextUtils">
 
-		return new Comparator<Account>() {
-			@Override public int compare(Account lhs, Account rhs) {
+	/**
+	 * Returns true every {@link String} given is not null or empty.
+	 *
+	 * @param strings a list of String instances.
+	 */
+	public static boolean areNotEmpty(@Nullable String... strings) {
 
-				if (TextUtils.equals(lhs.getId(), context.getString(R.string.demo_account_id)))
-					return 1;
+		if ((strings == null) || (strings.length == 0))
+			return false;
 
-				if (TextUtils.equals(rhs.getId(), context.getString(R.string.demo_account_id)))
-					return -1;
+		for (String string : strings)
+			if (TextUtils.isEmpty(string))
+				return false;
 
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		};
+		return true;
 	}
+
+	/**
+	 * Helper functions to query a strings end portion. The comparison is case insensitive.
+	 *
+	 * @param base the base string.
+	 * @param end  the ending text.
+	 * @return true, if the string ends with the given ending text.
+	 */
+	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+
+		// Default case
+
+		if ((base == null) || (end == null))
+			return false;
+
+		//
+
+		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
+	}
+
+	// </editor-fold desc="TextUtils">
 
 	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
 		if (bundle == null)
@@ -129,7 +149,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
 
-		if (TextUtils.isEmpty(iso8601Date))
+		if ((iso8601Date == null) || (iso8601Date.length() == 0))
 			return null;
 
 		try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); }
@@ -138,18 +158,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 	public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
 		return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
-	}
-
-	public static boolean areNotEmpty(@Nullable String... strings) {
-
-		if ((strings == null) || (strings.length == 0))
-			return false;
-
-		for (String string : strings)
-			if (TextUtils.isEmpty(string))
-				return false;
-
-		return true;
 	}
 
 	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
@@ -170,7 +178,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		// Building ASCII String
 
 		Charset asciiCharset;
-
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
 			asciiCharset = StandardCharsets.US_ASCII;
 		else
@@ -186,7 +193,6 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 	 *
 	 * @param issuerDnName DN name, with attributes in any order
 	 * @return fixed DN, that please OpenSSL
-	 * @coveredInLocalUnitTest
 	 */
 	public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 
@@ -273,6 +279,24 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		return dateFormat.format(date);
 	}
 
+	public static @NonNull String getVerySmallDate(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+		return dateFormat.format(date);
+	}
+
+	public static @NonNull String getSmallTime(@Nullable Date date) {
+
+		if (date == null)
+			return "???";
+
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+		return dateFormat.format(date);
+	}
+
 	public static boolean isUrlValid(@Nullable String url) {
 
 		if (TextUtils.isEmpty(url))
@@ -295,22 +319,4 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 		return null;
 	}
 
-	/**
-	 * Helper functions to query a strings end portion. The comparison is case insensitive.
-	 *
-	 * @param base the base string.
-	 * @param end  the ending text.
-	 * @return true, if the string ends with the given ending text.
-	 */
-	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
-
-		// Default case
-
-		if ((base == null) || (end == null))
-			return false;
-
-		//
-
-		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
-	}
 }

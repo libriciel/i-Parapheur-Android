@@ -113,8 +113,8 @@ public final class PKCS7Signer {
 		return result;
 	}
 
-	public String sign(
-			byte[] dataToSign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IllegalStateException, IllegalArgumentException, KeyStoreException, IOException {
+	public String sign(byte[] dataToSign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, //
+			SignatureException, IllegalStateException, IllegalArgumentException, KeyStoreException, IOException {
 
 		// Init checking
 

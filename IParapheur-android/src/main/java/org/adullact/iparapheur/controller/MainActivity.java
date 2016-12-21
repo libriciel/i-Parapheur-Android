@@ -56,7 +56,6 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
@@ -72,6 +71,7 @@ import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -97,7 +97,7 @@ import java.util.Set;
  * {@link MenuFragment.MenuFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountFragmentListener,
+public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountListFragmentListener,
 		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
 	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private FrameLayout mLeftDrawerMenu;
 	private ActionBarDrawerToggle mLeftDrawerToggle;
 	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
-	private View mNavigationDrawerFilterContainer;
 
 	private boolean mSouldShowAccountAfterRotation = false;
 	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
@@ -130,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		// Loading indicator
 
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.main_activity);
 
 		mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
@@ -150,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
-		mNavigationDrawerFilterContainer = findViewById(R.id.navigation_drawer_filters_menu_header_filters_container);
+
 		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
 		if (drawerAccountImageButton != null) {
 			drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
@@ -165,8 +163,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 					else
 						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-					if (mNavigationDrawerFilterContainer != null)
-						mNavigationDrawerFilterContainer.setVisibility(switchToAccountView ? View.INVISIBLE : View.VISIBLE);
+					View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+					View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+
+					filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+					downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
 				}
 			});
 		}
@@ -219,12 +220,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
 			actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
 		}
-
-		// Selecting the first account by default, the demo one
-
-		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
-		if (selectedAccount == null)
-			MyAccounts.INSTANCE.selectAccount(MyAccounts.INSTANCE.getAccounts().get(0).getId());
 	}
 
 	@Override public void onResume() {
@@ -343,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 				// Collapse the FAB
 
-				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 				if (dossierDetailFragment != null)
 					if (dossierDetailFragment.onBackPressed())
 						return;
@@ -385,14 +380,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		}
 
 		super.onBackPressed();
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-
-		// Save accounts state for later use. In our case, the latest selected account
-		// will be automatically selected if the application is killed and relaunched.
-		MyAccounts.INSTANCE.saveState();
 	}
 
 	@Override protected void onSaveInstanceState(Bundle outState) {
@@ -570,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	private void refreshNavigationDrawerHeader() {
 
-		Account account = MyAccounts.INSTANCE.getSelectedAccount();
+		Account account = AccountUtils.SELECTED_ACCOUNT;
 
 		TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
 		TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
@@ -586,7 +573,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	private void importCertificate(@NonNull final String url, @Nullable final String password) {
 
 		String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
-		final String certificateLocalPath = new File(IParapheurApplication.getContext().getExternalCacheDir(), certificateFileName).getAbsolutePath();
+		final String certificateLocalPath = new File(getExternalCacheDir(), certificateFileName).getAbsolutePath();
 
 		// Download and import
 
@@ -597,7 +584,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			@Override protected Void doInBackground(Void... params) {
 
 				try {
-					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(url, certificateLocalPath);
+					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(AccountUtils.SELECTED_ACCOUNT, url, certificateLocalPath);
 
 					if (!downloadSuccessful)
 						mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
@@ -675,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 	@Override public void onAccountSelected(@NonNull Account account) {
 
-		MyAccounts.INSTANCE.selectAccount(account.getId());
+		AccountUtils.SELECTED_ACCOUNT = account;
 		refreshNavigationDrawerHeader();
 
 		// Close the drawer
@@ -714,7 +701,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
 		if ((fragment != null)) {
 			fragment.showProgressLayout();
-			fragment.update(dossier, bureauId);
+			fragment.update(dossier, bureauId, null);
 		}
 	}
 
@@ -765,14 +752,14 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 	 */
 	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-		public DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
+		private DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
 			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
 		}
 
 		@Override public void onDrawerClosed(View view) {
 
 			if (getSupportActionBar() != null) {
-				Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
+				Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
 				if (selectedAccount != null)
 					getSupportActionBar().setTitle(selectedAccount.getTitle());
 			}

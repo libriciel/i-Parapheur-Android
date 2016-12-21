@@ -122,7 +122,7 @@ public class PreferencesFiltersFragment extends Fragment {
 
 		String currentFilterId = mFiltersData.get(position).get(LIST_FIELD_ID).toString();
 		Filter currentFilter = MyFilters.INSTANCE.getFilter(currentFilterId);
-		MyFilters.INSTANCE.delete(currentFilter);
+		MyFilters.INSTANCE.delete(getActivity(), currentFilter);
 		Log.i(LOG_TAG, "Delete filer " + currentFilter);
 
 		// Refresh UI
@@ -136,7 +136,7 @@ public class PreferencesFiltersFragment extends Fragment {
 
 		mFiltersData.clear();
 
-		List<Filter> filterList = MyFilters.INSTANCE.getFilters();
+		List<Filter> filterList = MyFilters.INSTANCE.getFilters(getActivity());
 		for (Filter filter : filterList) {
 
 			// Mapping results
@@ -164,7 +164,7 @@ public class PreferencesFiltersFragment extends Fragment {
 		 * @param to       The views that should display column in the "from" parameter. These should all be
 		 *                 TextViews. The first N views in this list are given the values of the first N columns
 		 */
-		public FiltersSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+		FiltersSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
 			super(context, data, resource, from, to);
 		}
 

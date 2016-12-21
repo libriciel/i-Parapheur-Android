@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -131,6 +132,10 @@ public class RESTUtils {
 		catch (GeneralSecurityException e) {
 			e.printStackTrace();
 			throw new IParapheurException(R.string.http_error_ssl_failed, null);
+		}
+		catch (UnknownHostException e) {
+			e.printStackTrace();
+			throw new IParapheurException(R.string.error_no_internet, null);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -310,7 +315,7 @@ public class RESTUtils {
 		String ticket = account.getTicket();
 		Long time = new Date().getTime();
 
-		return ((!TextUtils.isEmpty(ticket)) && ((time - account.getLastRequest()) < RestClientApi.SESSION_TIMEOUT));
+		return ((!TextUtils.isEmpty(ticket)) && (account.getLastRequest() != null) && ((time - account.getLastRequest().getTime()) < RestClientApi.SESSION_TIMEOUT));
 	}
 
 	public static IParapheurException getExceptionForError(int code, String message) {

@@ -17,56 +17,69 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+import org.adullact.iparapheur.utils.SerializableSparseArray;
+
+import java.util.Date;
 
 
+@DatabaseTable(tableName = "Document")
 public class Document {
 
-	@SerializedName("id") private String mId;
-	@SerializedName("name") private String mName;
-	@SerializedName("size") private int mSize;                          // TODO : download image instead of too heavy files
-	@SerializedName("isLocked") private boolean mIsLocked;
-	@SerializedName("visuelPdf") private boolean mIsPdfVisual;
-	@SerializedName("canDelete") private boolean mCanDelete;
-	@SerializedName("isMainDocument") private boolean mIsMainDocument;
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_NAME = "Name";
+	private static final String DB_FIELD_SIZE = "Size";
+	private static final String DB_FIELD_IS_PDF_VISUAL = "IsPdfVisual";
+	private static final String DB_FIELD_IS_MAIN_DOCUMENT = "IsMainDocument";
+	private static final String DB_FIELD_ANNOTATIONS = "Annotations";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_DOSSIER = "Dossier";
 
-	private String mPath;                                               // Path of the file (if downloaded) on the device's storage
-	private SparseArray<PageAnnotations> mPagesAnnotations;
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+	@SerializedName("id")  //
+	private String mId;
 
-	// <editor-fold desc="Static utils">
+	@DatabaseField(columnName = DB_FIELD_NAME, canBeNull = false, defaultValue = "")  //
+	@SerializedName("name")  //
+	private String mName;
 
-	public static @NonNull String generateContentUrl(@NonNull Document document) {
+	@DatabaseField(columnName = DB_FIELD_SIZE, defaultValue = "-1")  //
+	@SerializedName("size")  //
+	private int mSize;                          // TODO : download image instead of too heavy files
 
-		String downloadUrl = "/api/node/workspace/SpacesStore/" + document.getId() + "/content";
-		if (document.isPdfVisual())
-			downloadUrl += ";ph:visuel-pdf";
+	@DatabaseField(columnName = DB_FIELD_IS_PDF_VISUAL, defaultValue = "false")  //
+	@SerializedName("visuelPdf")  //
+	private boolean mIsPdfVisual;
 
-		return downloadUrl;
-	}
+	@DatabaseField(columnName = DB_FIELD_IS_MAIN_DOCUMENT)  //
+	@SerializedName("isMainDocument")  //
+	private boolean mIsMainDocument;
 
-	public static boolean isMainDocument(@NonNull Dossier dossier, @NonNull Document document) {
+	@DatabaseField(columnName = DB_FIELD_ANNOTATIONS, dataType = DataType.SERIALIZABLE)  //
+	private SerializableSparseArray<PageAnnotations> mPagesAnnotations;
 
-		return document.isMainDocument()                                                            // Api4 case
-				|| (dossier.getDocumentList().size() == 1)                                          // Api3 default case
-				|| TextUtils.equals(dossier.getDocumentList().get(0).getId(), document.getId());    // Api3 other case
-	}
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
+	private Date mSyncDate;
 
-	// </editor-fold desc="Static utils">
+	@DatabaseField(columnName = DB_FIELD_DOSSIER, foreign = true, foreignAutoRefresh = true)  //
+	private transient Dossier mParent;
 
-	public Document() {}
-
-	public Document(String id, String name, int size, boolean isLocked, boolean isMainDocument) {
+	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;
 		mName = name;
 		mSize = size;
-		mPagesAnnotations = new SparseArray<>();
-		mIsLocked = isLocked;
+		mPagesAnnotations = new SerializableSparseArray<>();
 		mIsMainDocument = isMainDocument;
+		mIsPdfVisual = isPdfVisual;
 	}
+
+	public Document() {}
 
 	// <editor-fold desc="Setters / Getters">
 
@@ -82,18 +95,6 @@ public class Document {
 		return mSize;
 	}
 
-	public String getPath() {
-		return mPath;
-	}
-
-	public void setPath(String path) {
-		mPath = path;
-	}
-
-	public boolean isLocked() {
-		return mIsLocked;
-	}
-
 	public boolean isMainDocument() {
 		return mIsMainDocument;
 	}
@@ -106,8 +107,24 @@ public class Document {
 		return mPagesAnnotations;
 	}
 
-	public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
+	public void setPagesAnnotations(SerializableSparseArray<PageAnnotations> pagesAnnotations) {
 		mPagesAnnotations = pagesAnnotations;
+	}
+
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date syncDate) {
+		mSyncDate = syncDate;
+	}
+
+	public Dossier getParent() {
+		return mParent;
+	}
+
+	public void setParent(Dossier parent) {
+		mParent = parent;
 	}
 
 	// </editor-fold desc="Setters / Getters">
@@ -119,4 +136,5 @@ public class Document {
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Document) && (mId.contentEquals(((Document) o).getId()));
 	}
+
 }

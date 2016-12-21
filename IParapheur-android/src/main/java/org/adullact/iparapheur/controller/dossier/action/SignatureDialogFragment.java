@@ -19,13 +19,13 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -39,11 +39,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.PKCS7Signer;
@@ -52,6 +57,7 @@ import org.adullact.iparapheur.utils.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -99,7 +105,8 @@ public class SignatureDialogFragment extends DialogFragment {
 		SignatureDialogFragment fragment = new SignatureDialogFragment();
 
 		Bundle args = new Bundle();
-		args.putParcelableArrayList(ARGUMENTS_DOSSIERS, dossiers);
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
+		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
 		fragment.setArguments(args);
@@ -113,7 +120,12 @@ public class SignatureDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			mDossierList = getArguments().getParcelableArrayList(ARGUMENTS_DOSSIERS);
+			Gson gson = CollectionUtils.buildGsonWithDateParser();
+			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+
+			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }
+			catch (JsonSyntaxException e) { mDossierList = new ArrayList<>(); }
+
 			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
 		}
 
@@ -261,7 +273,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 	private void onCancelButtonClicked() {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 	private void onSignPapierButtonClicked() {
@@ -368,7 +380,7 @@ public class SignatureDialogFragment extends DialogFragment {
 				for (Dossier dossier : mDossierList) {
 					if (dossier.getCircuit() == null) {
 						try {
-							Circuit circuit = RESTClient.INSTANCE.getCircuit(dossier.getId());
+							Circuit circuit = RESTClient.INSTANCE.getCircuit(AccountUtils.SELECTED_ACCOUNT, dossier.getId());
 							dossier.setCircuit(circuit);
 						}
 						catch (IParapheurException e) {
@@ -440,7 +452,9 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				String retrievedSignInfo = null;
 
-				try { retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(mDossierList.get(docIndex).getId(), mBureauId).getHash(); }
+				try {
+					retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId).getHash();
+				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
@@ -519,11 +533,13 @@ public class SignatureDialogFragment extends DialogFragment {
 				if (isCancelled())
 					return false;
 
-				try { RESTClient.INSTANCE.signer(mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId); }
+				try {
+					RESTClient.INSTANCE.signer(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId);
+				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
-					mErrorMessage = R.string.signature_error_message_not_sent_to_server;
+					mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.signature_error_message_not_sent_to_server;
 				}
 
 				if (isCancelled())
@@ -539,7 +555,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(),
@@ -576,7 +592,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 				// Send request
 
-				try { RESTClient.INSTANCE.signPapier(mDossierList.get(docIndex).getId(), mBureauId); }
+				try { RESTClient.INSTANCE.signPapier(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId); }
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
@@ -593,7 +609,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_CODE_SIGN_PAPIER, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.signature_papier_unknown_error), Toast.LENGTH_SHORT).show();

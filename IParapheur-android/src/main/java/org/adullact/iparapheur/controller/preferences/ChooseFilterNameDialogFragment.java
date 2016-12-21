@@ -71,11 +71,11 @@ public class ChooseFilterNameDialogFragment extends DialogFragment {
 		resultIntent.putExtra(RESULT_BUNDLE_TITLE, String.valueOf(mEditText.getText()));
 
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, resultIntent);
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 	private void onCancelButtonClicked() {
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 }

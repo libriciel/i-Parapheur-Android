@@ -15,15 +15,19 @@
  * <p>You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
  */
-package org.adullact.iparapheur.controller.account;
+/**
+ * @return
+ * @coveredInInstrumentedUnitTest
+ */
+package org.adullact.iparapheur.legacy;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Account;
 
 import java.util.ArrayList;
@@ -47,10 +51,15 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 	private ArrayList<Account> mAccounts = null;
 	private Account mSelectedAccount;
 
-	public @NonNull List<Account> getAccounts() {
+	public @NonNull List<Account> getAccounts(@NonNull Context context) {
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		return getAccounts(sharedPreferences);
+	}
+
+	public @NonNull List<Account> getAccounts(@NonNull SharedPreferences sharedPreferences) {
 		if (mAccounts == null) {
 			mAccounts = new ArrayList<>();
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 
 			for (String pref : sharedPreferences.getAll().keySet()) {
 				if (pref.startsWith(PREFS_ACCOUNT_PREFIX)) {
@@ -78,21 +87,18 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		return mAccounts;
 	}
 
-	public @NonNull Account addAccount() {
+	public @NonNull Account addAccount(@NonNull Context context) {
 
 		Account account = new Account(UUID.randomUUID().toString());
 		mAccounts.add(account);
-		save(account);
+		save(context, account);
 
 		return account;
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
-	public void save(@NonNull Account account) {
+	public void save(@NonNull Context context, @NonNull Account account) {
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_TITLE_SUFFIX, account.getTitle());
@@ -103,13 +109,10 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		editor.apply();
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
-	public void delete(@NonNull Account account) {
+	public void delete(@NonNull Context context, @NonNull Account account) {
 
 		String id = account.getId();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Set<String> keySet = sharedPreferences.getAll().keySet();
 
 		if (keySet.contains(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX)) {
@@ -128,31 +131,9 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 			mSelectedAccount = null;
 	}
 
-	/**
-	 * @coveredInInstrumentedUnitTest
-	 */
 	public @Nullable Account getAccount(@NonNull String id) {
 		int index = mAccounts.indexOf(new Account(id));
 		return (index != -1) ? mAccounts.get(index) : null;
-	}
-
-	public Account getSelectedAccount() {
-		return mSelectedAccount;
-	}
-
-	public void selectAccount(@NonNull String id) {
-		mSelectedAccount = getAccount(id);
-	}
-
-	public void saveState() {
-		if (mSelectedAccount != null) {
-
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-
-			editor.putString(PREFS_SELECTED_ACCOUNT, mSelectedAccount.getId());
-			editor.apply();
-		}
 	}
 
 	// <editor-fold desc="OnSharedPreferenceChangeListener">
@@ -162,7 +143,7 @@ public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeList
 		if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
 
 			mAccounts = null;
-			getAccounts();
+			getAccounts(sharedPreferences);
 
 			// if an Account was previously selected, update it with the new one
 

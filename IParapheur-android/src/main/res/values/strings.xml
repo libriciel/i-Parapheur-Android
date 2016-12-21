@@ -19,7 +19,10 @@
     <string name="action_dossiers">dossiers</string>
     <string name="action_filtrer">Filtrer</string>
     <string name="document_selection">Sélection du document</string>
+    <string name="Download">Télécharger</string>
+    <string name="Offline_content">Préparation du mode hors ligne</string>
     <string name="Filter_selection">Sélection du filtre</string>
+    <string name="Action_unavailable_offline">Action impossible : Pas de connexion</string>
     <string name="password">Mot de passe</string>
     <string name="Mandatory">Obligatoire</string>
     <string name="Optional">Facultatif</string>
@@ -28,9 +31,17 @@
     <string name="drawer_open">Ouvrir le menu contextuel</string>
     <string name="drawer_close">Fermer le menu contextuel</string>
 
+    <string name="Late_since">En retard depuis le %s</string>
+    <string name="Emit_since">Émis le %s</string>
+    <string name="Sync_date">Téléchargé le %1$s à %2$s</string>
+
     <string name="one_dossier">1 dossier</string>
+    <string name="one_late_dossier">1 dossier en retard</string>
     <string name="nb_dossiers">%d dossiers</string>
+    <string name="nb_late_dossiers">%d dossiers en retard</string>
+    <string name="nb_dossiers_nb_late">%1$d dossiers, %2$d en retard</string>
     <string name="no_dossier">Aucun dossier</string>
+    <string name="no_late_dossier">Aucun dossier en retard</string>
 
     <!-- Share -->
     <string name="Share">Partager</string>
@@ -117,6 +128,10 @@
     <string name="visa_error_message_not_sent_to_server">Un problème est survenu à l\'envoi du visa au serveur.</string>
     <string name="visa_error_message_unknown_error">Erreur inconnue lors du visa.</string>
 
+    <string name="download_bureau">Métadatas des bureaux</string>
+    <string name="download_dossier">Métadatas des dossiers</string>
+    <string name="download_document">Téléchargement des documents</string>
+
     <!-- MuPDF strings -->
     <string name="add_annotation">Annoter</string>
 
@@ -152,6 +167,7 @@
     <string name="http_error_405">Méthode de requête non autorisée</string>
     <string name="http_error_503">Le service est actuellement indisponible</string>
 
+    <string name="error_no_internet">Erreur à l\'envoi de la requête : Aucune connexion</string>
     <string name="error_mismatch_versions">Le i-Parapheur associé au compte %s est incompatible avec cette application</string>
     <string name="error_send_request">Erreur à l\'envoi de la requête</string>
     <string name="error_parse">Erreur lors du traitement de la réponse</string>

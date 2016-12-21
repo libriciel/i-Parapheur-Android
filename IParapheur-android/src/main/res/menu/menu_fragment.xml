@@ -11,4 +11,12 @@
         <menu />
     </item>
 
+    <item
+        android:id="@+id/menu_fragment_download_item"
+        android:icon="@drawable/ic_file_download_white_24dp"
+        android:title="@string/Download"
+        iparapheur:showAsAction="ifRoom">
+        <menu />
+    </item>
+
 </menu>

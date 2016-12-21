@@ -17,48 +17,51 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
 import java.util.List;
 
 
-public class Circuit implements Parcelable {
-
-	public static Parcelable.Creator<Circuit> CREATOR = new Parcelable.Creator<Circuit>() {
-
-		public Circuit createFromParcel(Parcel source) {
-			return new Circuit(source);
-		}
-
-		public Circuit[] newArray(int size) {
-			return new Circuit[size];
-		}
-	};
+public class Circuit {
 
 	@SerializedName("sigFormat") private String mSigFormat;
 	@SerializedName("isDigitalSignatureMandatory") private boolean mIsDigitalSignatureMandatory;
-	@SerializedName("hasSelectionScript") private boolean mHasSelectionScript;
 	@SerializedName("etapes") private List<EtapeCircuit> mEtapeCircuitList;
 
-	public Circuit() {}
-
-	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory, boolean hasSelectionScript) {
+	public Circuit(List<EtapeCircuit> etapeCircuitList, String sigFormat, boolean isDigitalSignatureMandatory) {
 		mEtapeCircuitList = etapeCircuitList;
 		mSigFormat = sigFormat;
 		mIsDigitalSignatureMandatory = isDigitalSignatureMandatory;
-		mHasSelectionScript = hasSelectionScript;
 	}
 
-	private Circuit(Parcel in) {
-		EtapeCircuit[] etapesParcelableArray = (EtapeCircuit[]) in.readParcelableArray(EtapeCircuit.class.getClassLoader());
-		mEtapeCircuitList = Arrays.asList(etapesParcelableArray);
-		mSigFormat = in.readString();
-		mIsDigitalSignatureMandatory = in.readByte() != 0;
-		mHasSelectionScript = in.readByte() != 0;
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 */
+	public static @Nullable Circuit fromJsonObject(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		try {
+			Circuit circuit = gson.fromJson(jsonArrayString, Circuit.class);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (EtapeCircuit etape : circuit.getEtapeCircuitList())
+				if (etape.getAction() == null)
+					etape.setAction(Action.VISA);
+
+			return circuit;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -75,28 +78,10 @@ public class Circuit implements Parcelable {
 		return mIsDigitalSignatureMandatory;
 	}
 
-	public boolean hasSelectionScript() {
-		return mHasSelectionScript;
-	}
-
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return "{Circuit etapeCircuitList=" + mEtapeCircuitList + " sigFormat=" + mSigFormat + " isDigitalsignMandatory=" + isDigitalSignatureMandatory()  //
-				+ "hasSelectScript=" + mHasSelectionScript + "}";
-	}
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-
-		Parcelable[] parcelableArray = new Parcelable[mEtapeCircuitList.size()];
-		dest.writeParcelableArray(mEtapeCircuitList.toArray(parcelableArray), 0);
-		dest.writeString(mSigFormat);
-		dest.writeByte(mIsDigitalSignatureMandatory ? (byte) 1 : (byte) 0);
-		dest.writeByte(mHasSelectionScript ? (byte) 1 : (byte) 0);
+		return "{Circuit etapeList=" + mEtapeCircuitList + " sigFormat=" + mSigFormat + " isDigitalSignMandatory=" + isDigitalSignatureMandatory() + "}";
 	}
 
 }

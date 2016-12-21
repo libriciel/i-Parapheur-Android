@@ -31,6 +31,8 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 
+import static org.adullact.iparapheur.R.string.about_version_number;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,8 +77,7 @@ public class PreferencesAboutFragment extends Fragment {
 		// Set current version in the TextView
 
 		TextView versionTextView = (TextView) v.findViewById(R.id.about_version_number_textview);
-		String versionText = String.valueOf(versionTextView.getText());
-		versionText = versionText.replaceAll("-version-", currentVersion);
+		String versionText = getString(R.string.about_version_number, currentVersion);
 		versionTextView.setText(versionText);
 
 		return v;

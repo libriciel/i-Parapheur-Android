@@ -18,7 +18,8 @@
 package org.adullact.iparapheur.utils;
 
 import android.content.Context;
-import android.graphics.RectF;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
@@ -40,4 +41,13 @@ public class DeviceUtils {
 	public static boolean isDebugSslForced() {
 		return DEBUG_FORCE_SSL;
 	}
+
+	public static boolean isConnected(@NonNull Context context) {
+
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo network = connectivityManager.getActiveNetworkInfo();
+
+		return (network != null);
+	}
+
 }

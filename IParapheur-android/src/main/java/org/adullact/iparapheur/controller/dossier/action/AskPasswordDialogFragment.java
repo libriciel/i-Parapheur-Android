@@ -19,11 +19,11 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.View;
@@ -88,7 +88,7 @@ public class AskPasswordDialogFragment extends DialogFragment {
 		mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				onValidButtonClicked();
-				dismiss();
+				dismissAllowingStateLoss();
 				return true;
 			}
 		});
@@ -123,7 +123,7 @@ public class AskPasswordDialogFragment extends DialogFragment {
 	}
 
 	private void onCancelButtonClicked() {
-		dismiss();
+		dismissAllowingStateLoss();
 	}
 
 }

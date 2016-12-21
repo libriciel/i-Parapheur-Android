@@ -3,13 +3,13 @@
 <FrameLayout android:id="@+id/dossiers_list_item_selectable_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="88dp"
     android:background="@drawable/list_background_secondary100">
 
     <FrameLayout
         android:id="@+id/dossiers_list_item_checkable_layout"
         android:layout_width="72dp"
-        android:layout_height="56dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:duplicateParentState="true"
         android:paddingEnd="16dp"
@@ -19,9 +19,9 @@
 
         <FrameLayout
             android:id="@+id/dossiers_list_item_image_main_container"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/icon_background_round"
             android:duplicateParentState="true">
 
@@ -36,9 +36,9 @@
 
         <FrameLayout
             android:id="@+id/dossiers_list_item_image_selector_container"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/icon_background_round_grey600">
 
             <ImageView
@@ -54,35 +54,44 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="72dp"
+        android:layout_marginTop="12dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/dossiers_list_item_title"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/listPreferredItemHeightSmall"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:gravity="bottom"
             android:maxLines="1"
             android:text="@string/mockup_dossier_title"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:textColor="@color/text_black"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/dossiers_list_item_extras"
+            android:id="@+id/dossiers_list_item_typology"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/listPreferredItemHeightSmall"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/mockup_dossier_subtitle"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/text_black_secondary"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/dossiers_list_item_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/mockup_dossier_date"
+            android:textColor="@color/text_black_secondary"
+            android:textSize="13sp" />
+
     </LinearLayout>
 
 </FrameLayout>
