@@ -1,12 +1,19 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
-  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
+    - eval $(ssh-agent -s)
+    # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$SECRET_VARIABLES_ID_RSA")
+    # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
+    # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
+    - mkdir -p ~/.ssh 
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
+    - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
 
 stages:
-  - submodules
-  - test
-  - build
+    - submodules
+    - test
+    - build
 
 
 # Jobs fetch_submodules
