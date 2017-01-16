@@ -23,17 +23,21 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.adullact.iparapheur.R;
+import org.adullact.iparapheur.database.DatabaseHelper;
 import org.adullact.iparapheur.model.Account;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.AccountUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +79,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 		View footerView = inflater.inflate(R.layout.account_list_fragment_footer, mListView, false);
 		footerView.setOnClickListener(new View.OnClickListener() {
 			@Override public void onClick(View v) {
-				((AccountFragmentListener) getActivity()).onCreateAccountInvoked();
+				((AccountListFragmentListener) getActivity()).onCreateAccountInvoked();
 			}
 		});
 		mListView.addFooterView(footerView, null, false);
@@ -98,12 +102,8 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		// Setting selected view
 
-		Account selectedAccount = MyAccounts.INSTANCE.getSelectedAccount();
-		if (selectedAccount == null)
-			selectedAccount = MyAccounts.INSTANCE.getAccounts().get(0);
-
 		for (int i = 0; i < mAccounts.size(); i++)
-			if (selectedAccount.getId().contentEquals(mAccounts.get(i).getId()))
+			if (TextUtils.equals(AccountUtils.SELECTED_ACCOUNT.getId(), mAccounts.get(i).getId()))
 				mListView.setItemChecked(i, true);
 	}
 
@@ -112,12 +112,16 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 	private void updateAccounts() {
 		mAccounts.clear();
 
-		for (Account account : MyAccounts.INSTANCE.getAccounts())
-			if (account.isValid())
+		ArrayList<Account> accountList = new ArrayList<>();
+		try { accountList.addAll(new DatabaseHelper(getActivity()).getAccountDao().queryForAll()); }
+		catch (SQLException e) { e.printStackTrace(); }
+
+		for (Account account : accountList)
+			if (AccountUtils.isValid(account))
 				if (account.isActivated())
 					mAccounts.add(account);
 
-		Collections.sort(mAccounts, StringUtils.buildAccountAlphabeticalComparator(getActivity()));
+		Collections.sort(mAccounts, AccountUtils.buildAlphabeticalComparator());
 
 		if (mAccountListAdapter != null)
 			mAccountListAdapter.notifyDataSetChanged();
@@ -131,14 +135,14 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	@Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (isAdded())
-			((AccountFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
+			((AccountListFragmentListener) getActivity()).onAccountSelected(mAccounts.get(position));
 	}
 
 	// </editor-fold desc="OnItemClickListener">
 
 	// <editor-fold desc="AccountSelectedListener">
 
-	public interface AccountFragmentListener {
+	public interface AccountListFragmentListener {
 
 		void onAccountSelected(@NonNull Account account);
 
@@ -150,7 +154,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 	private class AccountListAdapter extends ArrayAdapter<Account> {
 
-		public AccountListAdapter(Context context) {
+		private AccountListAdapter(Context context) {
 			super(context, R.layout.account_list_fragment_cell, android.R.id.text1);
 		}
 
@@ -160,6 +164,18 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
 
 		@Override public Account getItem(int position) {
 			return mAccounts.get(position);
+		}
+
+		@Override public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent) {
+
+			View cell = super.getView(position, convertView, parent);
+			TextView bureauTitleTextView = (TextView) cell.findViewById(android.R.id.text1);
+			Account account = mAccounts.get(position);
+
+			if (account != null)
+				bureauTitleTextView.setText(account.getTitle());
+
+			return cell;
 		}
 
 		@Override public int getPosition(Account item) {

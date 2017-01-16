@@ -17,12 +17,23 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.text.DateFormat;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+
+import org.adullact.iparapheur.utils.DossierUtils;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -30,33 +41,75 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Dossier implements Parcelable {
+@DatabaseTable(tableName = "Folder")
+public class Dossier {
 
-	public static Creator<Dossier> CREATOR = new Creator<Dossier>() {
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_NAME = "Name";
+	private static final String DB_FIELD_ACTION_ASKED = "ActionAsked";
+	private static final String DB_FIELD_TYPE = "Type";
+	private static final String DB_FIELD_SUBTYPE = "SubType";
+	private static final String DB_FIELD_CREATION_DATE = "CreationDate";
+	private static final String DB_FIELD_LATE_DATE = "LateDate";
+	private static final String DB_FIELD_ACTIONS = "Actions";
+	private static final String DB_FIELD_IS_PAPER_SIGN = "IsPaperSign";
+	private static final String DB_FIELD_DOCUMENTS = "Documents";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_DESK = "Desk";
 
-		public Dossier createFromParcel(Parcel source) {
-			return new Dossier(source);
-		}
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+	@SerializedName("id")  //
+	private String mId;
 
-		public Dossier[] newArray(int size) {
-			return new Dossier[size];
-		}
-	};
+	@DatabaseField(columnName = DB_FIELD_NAME, canBeNull = false, defaultValue = "")  //
+	@SerializedName("title")  //
+	private String mName;
 
-	private final String mId;
-	private final String mName;
-	private final Action mActionDemandee;
-	private final String mType;
-	private final String mSousType;
-	private final Date mDateCreation;
-	private final Date mDateLimite;
-	private final List<Document> mMainDocuments = new ArrayList<>();
-	private final List<Document> mAnnexes = new ArrayList<>();
-	private Set<Action> mActions;
-	private Circuit mCircuit;
+	@DatabaseField(columnName = DB_FIELD_ACTION_ASKED, dataType = DataType.ENUM_STRING, canBeNull = false, defaultValue = "VISA")  //
+	@SerializedName("actionDemandee")  //
+	private Action mActionDemandee;
+
+	@DatabaseField(columnName = DB_FIELD_TYPE)  //
+	@SerializedName("type")  //
+	private String mType;
+
+	@DatabaseField(columnName = DB_FIELD_SUBTYPE)  //
+	@SerializedName("sousType")  //
+	private String mSousType;
+
+	@DatabaseField(columnName = DB_FIELD_CREATION_DATE)  //
+	@SerializedName("dateEmission")  //
+	private Date mDateCreation;
+
+	@DatabaseField(columnName = DB_FIELD_LATE_DATE)  //
+	@SerializedName("dateLimite")  //
+	private Date mDateLimite;
+
+	@DatabaseField(columnName = DB_FIELD_ACTIONS, dataType = DataType.SERIALIZABLE)  //
+	@SerializedName("actions")  //
+	private HashSet<Action> mActions;
+
+	@DatabaseField(columnName = DB_FIELD_IS_PAPER_SIGN)  //
+	@SerializedName("isSignPapier")  //
 	private boolean mIsSignPapier;
 
-	public Dossier(String id, String name, Action actionDemandee, Set<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
+	@SerializedName("documents")  //
+	private List<Document> mDocumentList = new ArrayList<>();
+
+	@ForeignCollectionField(columnName = DB_FIELD_DOCUMENTS)  //
+	private transient ForeignCollection<Document> mChildrenDocuments;
+
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
+	private Date mSyncDate;
+
+	@DatabaseField(columnName = DB_FIELD_DESK, foreign = true, foreignAutoRefresh = true)  //
+	private transient Bureau mParent;
+
+	private Circuit mCircuit;
+
+	public Dossier() {}
+
+	public Dossier(String id, String name, Action actionDemandee, HashSet<Action> actions, String type, String sousType, Date dateCreation, Date dateLimite,
 				   boolean isSignPapier) {
 		mId = id;
 		mName = name;
@@ -69,26 +122,54 @@ public class Dossier implements Parcelable {
 		mIsSignPapier = isSignPapier;
 	}
 
-	private Dossier(Parcel in) {
-		mId = in.readString();
-		mName = in.readString();
-		int tmpActionDemandee = in.readInt();
-		mActionDemandee = tmpActionDemandee == -1 ? null : Action.values()[tmpActionDemandee];
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 */
+	public static @Nullable List<Dossier> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
-		List<Action> actions = new ArrayList<>();
-		in.readTypedList(actions, Action.CREATOR);
-		mActions = new HashSet<>(actions);
+		Type listDossierType = new TypeToken<ArrayList<Dossier>>() {}.getType();
 
-		mType = in.readString();
-		mSousType = in.readString();
-		long tmpDateCreation = in.readLong();
-		mDateCreation = tmpDateCreation == -1 ? null : new Date(tmpDateCreation);
-		long tmpDateLimite = in.readLong();
-		mDateLimite = tmpDateLimite == -1 ? null : new Date(tmpDateLimite);
-		in.readTypedList(mMainDocuments, Document.CREATOR);
-		in.readTypedList(mAnnexes, Document.CREATOR);
-		mCircuit = in.readParcelable(Circuit.class.getClassLoader());
-		mIsSignPapier = in.readByte() != 0;
+		try {
+			ArrayList<Dossier> dossiersParsed = gson.fromJson(jsonArrayString, listDossierType);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (Dossier dossier : dossiersParsed)
+				DossierUtils.fixActions(dossier);
+
+			return dossiersParsed;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonObjectString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson             passed statically to prevent re-creating it.
+	 */
+	public static @Nullable Dossier fromJsonObject(@NonNull String jsonObjectString, @NonNull Gson gson) {
+
+		try {
+			Dossier dossierParsed = gson.fromJson(jsonObjectString, Dossier.class);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			if (dossierParsed != null)
+				DossierUtils.fixActions(dossierParsed);
+
+			return dossierParsed;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
 
 	// <editor-fold desc="Setters / Getters">
@@ -105,28 +186,16 @@ public class Dossier implements Parcelable {
 		return mActions;
 	}
 
+	public void setActions(@NonNull HashSet<Action> actions) {
+		mActions = actions;
+	}
+
 	public String getType() {
 		return mType;
 	}
 
 	public String getSousType() {
 		return mSousType;
-	}
-
-	public String getDateCreation() {
-		return DateFormat.getDateInstance().format(mDateCreation);
-	}
-
-	public String getDateLimite() {
-		return (mDateLimite == null) ? "" : DateFormat.getDateInstance().format(mDateLimite);
-	}
-
-	public List<Document> getMainDocuments() {
-		return mMainDocuments;
-	}
-
-	public List<Document> getAnnexes() {
-		return mAnnexes;
 	}
 
 	public Circuit getCircuit() {
@@ -141,89 +210,55 @@ public class Dossier implements Parcelable {
 		return mActionDemandee;
 	}
 
+	public void setActionDemandee(@NonNull Action action) {
+		mActionDemandee = action;
+	}
+
 	public boolean isSignPapier() {
 		return mIsSignPapier;
 	}
 
+	public List<Document> getDocumentList() {
+		return mDocumentList;
+	}
+
+	public Date getDateLimite() {
+		return mDateLimite;
+	}
+
+	public Date getDateCreation() {
+		return mDateCreation;
+	}
+
+	public void setDocumentList(@NonNull List<Document> documentList) {
+		mDocumentList.addAll(documentList);
+	}
+
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date date) {
+		mSyncDate = date;
+	}
+
+	public Bureau getParent() {
+		return mParent;
+	}
+
+	public void setParent(Bureau parent) {
+		mParent = parent;
+	}
+
+	public ForeignCollection<Document> getChildrenDocuments() {
+		return mChildrenDocuments;
+	}
+
+	public void setChildrenDocuments(ForeignCollection<Document> childrenDocuments) {
+		mChildrenDocuments = childrenDocuments;
+	}
+
 	// </editor-fold desc="Setters / Getters">
-
-	public void addDocument(@Nullable Document document) {
-
-		if (document == null)
-			return;
-
-		if (document.isMainDocument())
-			mMainDocuments.add(document);
-		else
-			mAnnexes.add(document);
-	}
-
-	public void saveDetails(Dossier dossier) {
-		mMainDocuments.addAll(dossier.getMainDocuments());
-		mAnnexes.addAll(dossier.getAnnexes());
-	}
-
-	public void clearDetails() {
-		mMainDocuments.clear();
-		mAnnexes.clear();
-		mCircuit = null;
-	}
-
-	public boolean isDetailsAvailable() {
-		return (mCircuit != null) && (mCircuit.getEtapeCircuitList() != null) && (!mCircuit.getEtapeCircuitList().isEmpty()) && (!mMainDocuments.isEmpty());
-	}
-
-	public boolean hasActions() {
-		return ((mActions != null) && (mActions.size() > 3)); // Pour ne pas compter EMAIL, JOURNAL et ENREGISTRER
-	}
-
-	// <editor-fold desc="Static utils">
-
-	public static @Nullable Document findCurrentDocument(@Nullable Dossier dossier, @Nullable String documentId) {
-
-		// Default case
-
-		if (dossier == null)
-			return null;
-
-		// Finding doc
-
-		List<Document> documents = new ArrayList<>();
-		documents.addAll(dossier.getMainDocuments());
-		documents.addAll(dossier.getAnnexes());
-
-		if (!TextUtils.isEmpty(documentId))
-			for (Document document : documents)
-				if (TextUtils.equals(document.getId(), documentId))
-					return document;
-
-		return dossier.getMainDocuments().isEmpty() ? null : dossier.getMainDocuments().get(0);
-	}
-
-	// </editor-fold desc="Static utils">
-
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mId);
-		dest.writeString(mName);
-		dest.writeInt(mActionDemandee == null ? -1 : mActionDemandee.ordinal());
-		dest.writeTypedList(new ArrayList<Parcelable>(mActions));
-		dest.writeString(mType);
-		dest.writeString(mSousType);
-		dest.writeLong(mDateCreation != null ? mDateCreation.getTime() : -1);
-		dest.writeLong(mDateLimite != null ? mDateLimite.getTime() : -1);
-		dest.writeTypedList(mMainDocuments);
-		dest.writeTypedList(mAnnexes);
-		dest.writeParcelable(mCircuit, 0);
-		dest.writeByte(mIsSignPapier ? (byte) 1 : (byte) 0);
-	}
-
-	// </editor-fold desc="Parcelable">
 
 	@Override public boolean equals(Object o) {
 
@@ -240,10 +275,13 @@ public class Dossier implements Parcelable {
 	}
 
 	@Override public String toString() {
-		return mName;
+		return "{Dossier id=" + mId + " name=" + mName + " actionsDemandees=" + mActionDemandee + " type=" + mType + " subType=" + mSousType     //
+				+ " dateCrea=" + mDateCreation + " dateLimite=" + mDateLimite + " docs=" + mDocumentList                                         //
+				+ " actions=" + (mActions == null ? "null" : mActions.size()) + " circuit=" + mCircuit + " isSignPapier=" + mIsSignPapier + "}";
 	}
 
 	@Override public int hashCode() {
-		return mId.hashCode();
+		return (mId != null) ? mId.hashCode() : -1;
 	}
+
 }

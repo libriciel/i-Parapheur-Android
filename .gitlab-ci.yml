@@ -23,7 +23,8 @@ refresh_submodule_develop:
   except:
     - master
   script:
-    - git -C mupdffragment checkout develop
+    - rm -rf ./mupdffragment
+    - git clone -b develop https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
 
 
 refresh_submodule_master:
@@ -31,15 +32,24 @@ refresh_submodule_master:
   only:
     - master
   script:
-    - git -C mupdffragment checkout master
+    - rm -rf ./mupdffragment
+    - git clone -b master https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
 
 
 # Jobs test
 
-unittest:
+local_unit_test:
   stage: test
+  allow_failure: true
   script:
-    - ./gradlew test
+    - ./gradlew test --continue
+
+
+instrumented_unit_test:
+  stage: test
+  allow_failure: true
+  script:
+    - ./gradlew connectedCheck --continue
 
 
 # Jobs build

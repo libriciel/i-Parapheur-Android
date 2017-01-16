@@ -18,40 +18,41 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
-import android.util.SparseArray;
+import android.support.annotation.Nullable;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.Annotation;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.PageAnnotations;
+import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public enum RESTClient implements IParapheurAPI {
 
 	INSTANCE;
 	private static final String RESOURCE_API_VERSION = "/parapheur/api/getApiLevel";
-	private static final int API_VERSION_MAX = 4;
+
+	public static final int API_VERSION_MAX = 4;
 
 	private final RestClientApi1 restClientAPI1 = new RestClientApi1();
-	private final RestClientApi2 restClientAPI2 = new RestClientApi2();
 	private final RestClientApi3 restClientAPI3 = new RestClientApi3();
 	private final RestClientApi3 restClientAPI4 = new RestClientApi4();
 
-	private int getAPIVersion(@NonNull Account account) throws IParapheurException {
-		return getAPIVersion(account, true, false);
+	public int getApiVersion(@NonNull Account account) throws IParapheurException {
+		return getApiVersion(account, true, false);
 	}
 
 	/**
@@ -62,7 +63,7 @@ public enum RESTClient implements IParapheurAPI {
 	 * @param account le compte pour lequel on veur récupérer la version de l'API
 	 * @return in entier représentant la version de l'API.
 	 */
-	private int getAPIVersion(@NonNull Account account, boolean withTenant, boolean withAuthentication) throws IParapheurException {
+	private int getApiVersion(@NonNull Account account, boolean withTenant, boolean withAuthentication) throws IParapheurException {
 
 		// Default check
 
@@ -85,7 +86,7 @@ public enum RESTClient implements IParapheurAPI {
 			if ((e.getResId() == R.string.http_error_404) && withTenant) {
 
 				boolean isReachableWithoutTenant = true;
-				try { getAPIVersion(account, false, withAuthentication); }
+				try { getApiVersion(account, false, withAuthentication); }
 				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.http_error_404); }
 
 				if (isReachableWithoutTenant)
@@ -99,7 +100,7 @@ public enum RESTClient implements IParapheurAPI {
 			if ((e.getResId() == R.string.error_server_not_configured) && withTenant) {
 
 				boolean isReachableWithoutTenant = true;
-				try { getAPIVersion(account, false, withAuthentication); }
+				try { getApiVersion(account, false, withAuthentication); }
 				catch (IParapheurException subEx) { isReachableWithoutTenant = (subEx.getResId() != R.string.error_server_not_configured); }
 
 				if (isReachableWithoutTenant)
@@ -113,7 +114,7 @@ public enum RESTClient implements IParapheurAPI {
 			else if ((e.getResId() == R.string.http_error_401) && !withAuthentication) {
 
 				restClientAPI1.getTicket(account);
-				apiVersion = getAPIVersion(account, withTenant, true);
+				apiVersion = getApiVersion(account, withTenant, true);
 			}
 
 			else {
@@ -140,133 +141,145 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient(account).updateAccountInformations(account);
 	}
 
-	@Override public List<Bureau> getBureaux() throws IParapheurException {
-		return getRESTClient().getBureaux();
+	@Override public List<Bureau> getBureaux(@NonNull Account currentAccount) throws IParapheurException {
+		return getRESTClient(currentAccount).getBureaux(currentAccount);
 	}
 
-	private IParapheurAPI getRESTClient() throws IParapheurException {
-		return getRESTClient(MyAccounts.INSTANCE.getSelectedAccount());
-	}
+	private IParapheurAPI getRESTClient(@NonNull Account account) throws IParapheurException {
 
-	private IParapheurAPI getRESTClient(Account account) throws IParapheurException {
-		Integer apiVersion = getAPIVersion(account);
-		IParapheurAPI apiClient;
+		Integer apiVersion = account.getApiVersion();
+		IParapheurAPI apiClient = null;
+
+		if ((account.getApiVersion() == null) || (account.getApiVersion() < 0))
+			apiVersion = this.getApiVersion(account);
 
 		if (apiVersion > API_VERSION_MAX)
-			throw new IParapheurException(R.string.Error_forward_parapheur_version, MyAccounts.INSTANCE.getSelectedAccount().getTitle());
+			throw new IParapheurException(R.string.Error_forward_parapheur_version, AccountUtils.SELECTED_ACCOUNT.getTitle());
 
 		switch (apiVersion) {
-			case 1:
-				apiClient = restClientAPI1;
-				break;
-			case 2:
-				apiClient = restClientAPI2;
-				break;
 			case 3:
 				apiClient = restClientAPI3;
 				break;
 			case 4:
 				apiClient = restClientAPI4;
 				break;
-			default:
-				apiClient = restClientAPI2;
-				break;
 		}
+
+		if (apiClient == null)
+			throw new IParapheurException(-1, "Unsupported API");
 
 		return apiClient;
 	}
 
-	@Override public Dossier getDossier(String bureauId, String dossierId) throws IParapheurException {
-		return getRESTClient().getDossier(bureauId, dossierId);
+	@Override public Dossier getDossier(@NonNull Account currentAccount, String bureauId, String dossierId) throws IParapheurException {
+		return getRESTClient(currentAccount).getDossier(currentAccount, bureauId, dossierId);
 	}
 
-	@Override public List<Dossier> getDossiers(String bureauId) throws IParapheurException {
-		return getRESTClient().getDossiers(bureauId);
+	@Override public List<Dossier> getDossiers(@NonNull Account currentAccount, @NonNull String bureauId, @Nullable Filter filter) throws IParapheurException {
+		return getRESTClient(currentAccount).getDossiers(currentAccount, bureauId, filter);
 	}
 
-	@Override public Map<String, ArrayList<String>> getTypologie() throws IParapheurException {
-		return getRESTClient().getTypologie();
+	@Override public List<ParapheurType> getTypologie(@NonNull Account currentAccount) throws IParapheurException {
+		return getRESTClient(currentAccount).getTypologie(currentAccount);
 	}
 
-	@Override public Circuit getCircuit(String dossierId) throws IParapheurException {
-		return getRESTClient().getCircuit(dossierId);
+	@Override public Circuit getCircuit(@NonNull Account currentAccount, String dossierId) throws IParapheurException {
+		return getRESTClient(currentAccount).getCircuit(currentAccount, dossierId);
 	}
 
-	public SparseArray<PageAnnotations> getAnnotations(@NonNull String dossierId, @NonNull String documentId) throws IParapheurException {
-		return getRESTClient().getAnnotations(dossierId, documentId);
+	public SerializableSparseArray<PageAnnotations> getAnnotations(@NonNull Account currentAccount, @NonNull String dossierId,
+																   @NonNull String documentId) throws IParapheurException {
+		return getRESTClient(currentAccount).getAnnotations(currentAccount, dossierId, documentId);
 	}
 
-	@Override public String createAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
-											 int page) throws IParapheurException {
-		return getRESTClient().createAnnotation(dossierId, documentId, annotation, page);
+	@Override public String createAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId,
+											 @NonNull Annotation annotation, int page) throws IParapheurException {
+		return getRESTClient(currentAccount).createAnnotation(currentAccount, dossierId, documentId, annotation, page);
 	}
 
-	@Override public void updateAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull Annotation annotation,
+	@Override public void updateAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId,
+										   @NonNull Annotation annotation, int page) throws IParapheurException {
+		getRESTClient(currentAccount).updateAnnotation(currentAccount, dossierId, documentId, annotation, page);
+	}
+
+	@Override public void deleteAnnotation(@NonNull Account currentAccount, @NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
 										   int page) throws IParapheurException {
-		getRESTClient().updateAnnotation(dossierId, documentId, annotation, page);
+		getRESTClient(currentAccount).deleteAnnotation(currentAccount, dossierId, documentId, annotationId, page);
 	}
 
-	@Override public void deleteAnnotation(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId,
-										   int page) throws IParapheurException {
-		getRESTClient().deleteAnnotation(dossierId, documentId, annotationId, page);
+	@Override public boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException {
+		return getRESTClient(currentAccount).downloadFile(currentAccount, url, path);
 	}
 
-	@Override public boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException {
-		return getRESTClient().downloadFile(url, path);
+	@Override public boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString,
+												 @NonNull String certificateLocalPath) throws IParapheurException {
+		return getRESTClient(currentAccount).downloadCertificate(currentAccount, urlString, certificateLocalPath);
 	}
 
-	@Override public boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException {
-		return getRESTClient().downloadCertificate(urlString, certificateLocalPath);
+	@Override public boolean viser(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv,
+								   String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).viser(currentAccount, dossier, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean viser(Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-		return getRESTClient().viser(dossier, annotPub, annotPriv, bureauId);
+	@Override public boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
+									String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).signer(currentAccount, dossierId, signValue, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean signer(String dossierId, String signValue, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-		return getRESTClient().signer(dossierId, signValue, annotPub, annotPriv, bureauId);
+	@Override public boolean signPapier(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).signPapier(currentAccount, dossierId, bureauId);
 	}
 
-	@Override public boolean signPapier(String dossierId, String bureauId) throws IParapheurException {
-		return getRESTClient().signPapier(dossierId, bureauId);
+	@Override public boolean archiver(@NonNull Account currentAccount, String dossierId, String archiveTitle, boolean withAnnexes,
+									  String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).archiver(currentAccount, dossierId, archiveTitle, withAnnexes, bureauId);
 	}
 
-	@Override public boolean archiver(String dossierId, String archiveTitle, boolean withAnnexes, String bureauId) throws IParapheurException {
-		return getRESTClient().archiver(dossierId, archiveTitle, withAnnexes, bureauId);
+	@Override public boolean envoiTdtHelios(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv,
+											String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).envoiTdtHelios(currentAccount, dossierId, annotPub, annotPriv, bureauId);
 	}
 
-	@Override public boolean envoiTdtHelios(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-		return getRESTClient().envoiTdtHelios(dossierId, annotPub, annotPriv, bureauId);
-	}
-
-	@Override public boolean envoiTdtActes(String dossierId, String nature, String classification, String numero, long dateActes, String objet, String annotPub,
-										   String annotPriv, String bureauId) throws IParapheurException {
-		return getRESTClient().envoiTdtActes(dossierId, nature, classification, numero, dateActes, objet, annotPub, annotPriv, bureauId);
-	}
-
-	@Override public boolean envoiMailSec(String dossierId, List<String> destinataires, List<String> destinatairesCC, List<String> destinatairesCCI,
-										  String sujet, String message, String password, boolean showPassword, boolean annexesIncluded,
-										  String bureauId) throws IParapheurException {
-		// TODO : manage annexes
-		return getRESTClient().envoiMailSec(dossierId,
-											destinataires,
-											destinatairesCC,
-											destinatairesCCI,
-											sujet,
-											message,
-											password,
-											showPassword,
-											annexesIncluded,
-											bureauId
+	@Override public boolean envoiTdtActes(@NonNull Account currentAccount, String dossierId, String nature, String classification, String numero,
+										   long dateActes, String objet, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).envoiTdtActes(currentAccount,
+														   dossierId,
+														   nature,
+														   classification,
+														   numero,
+														   dateActes,
+														   objet,
+														   annotPub,
+														   annotPriv,
+														   bureauId
 		);
 	}
 
-	@Override public boolean rejeter(String dossierId, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
-		return getRESTClient().rejeter(dossierId, annotPub, annotPriv, bureauId);
+	@Override public boolean envoiMailSec(@NonNull Account currentAccount, String dossierId, List<String> destinataires, List<String> destinatairesCC,
+										  List<String> destinatairesCCI, String sujet, String message, String password, boolean showPassword,
+										  boolean annexesIncluded, String bureauId) throws IParapheurException {
+		// TODO : manage annexes
+		return getRESTClient(currentAccount).envoiMailSec(currentAccount,
+														  dossierId,
+														  destinataires,
+														  destinatairesCC,
+														  destinatairesCCI,
+														  sujet,
+														  message,
+														  password,
+														  showPassword,
+														  annexesIncluded,
+														  bureauId
+		);
 	}
 
-	@Override public SignInfo getSignInfo(String dossierId, String bureauId) throws IParapheurException {
-		return getRESTClient().getSignInfo(dossierId, bureauId);
+	@Override public boolean rejeter(@NonNull Account currentAccount, String dossierId, String annotPub, String annotPriv,
+									 String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).rejeter(currentAccount, dossierId, annotPub, annotPriv, bureauId);
+	}
+
+	@Override public SignInfo getSignInfo(@NonNull Account currentAccount, String dossierId, String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).getSignInfo(currentAccount, dossierId, bureauId);
 	}
 
 }

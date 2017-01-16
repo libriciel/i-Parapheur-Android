@@ -19,20 +19,23 @@ package org.adullact.iparapheur.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.IParapheurApplication;
-import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,35 +49,78 @@ import java.util.List;
 
 public class FileUtils {
 
-	public static final String LOG = "FileUtils";
+	private static final String LOG = "FileUtils";
 	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
+	private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
 
-	public static @Nullable File getDirectoryForDossier(@NonNull Dossier dossier) {
-		File directory = new File(IParapheurApplication.getContext().getExternalCacheDir(), dossier.getId());
+	private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
+
+	private static void copy(@NonNull File src, @NonNull File dst) {
+
+		try {
+			InputStream in = new FileInputStream(src);
+			OutputStream out = new FileOutputStream(dst);
+
+			// Transfer bytes from in to out
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+		catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static @NonNull File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
+
+		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+		if (!folder.exists())
+			//noinspection ResultOfMethodCallIgnored
+			folder.mkdirs();
+
+		File directory = new File(folder.getAbsolutePath(), dossier.getId());
 
 		if (!directory.mkdirs())
 			if (!directory.exists())
 				Log.e(LOG, "getDirectoryForDossier failed");
 
-		Log.e(LOG, "directory : " + directory.getAbsolutePath() + " " + directory.exists());
-
 		return directory;
 	}
 
-	@SuppressWarnings("ConstantConditions") public static @NonNull File getFileForDocument(@NonNull Context context, @NonNull Dossier dossier,
-																						   @NonNull Document document) {
+	public static void launchCertificateTutoPdfIntent(@NonNull Context context) {
 
-		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
+		File pdfFile = createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
+		File fileFolder = context.getExternalFilesDir(null);
 
-		if (!DeviceUtils.isDebugOffline())
-			return new File(FileUtils.getDirectoryForDossier(dossier), documentName);
-		else
-			return createFileFromAsset(context, ASSET_DEMO_PDF_FILE_NAME);
+		// Default case
+		// Should never happen, but hides IDE warnings
+
+		if ((pdfFile == null) || (fileFolder == null))
+			return;
+
+		// The Asset file is in the internal folder, and cannot be shared directly.
+		// We have to declare a FileProvider, and manage exported files or not...
+		// Here, we simply move this asset into the external data folder.
+		// That's easier, and takes way less code to manage.
+
+		File exportablePdfFile = new File(fileFolder.getAbsolutePath() + File.separator + pdfFile.getName());
+		if (!exportablePdfFile.exists())
+			copy(pdfFile, exportablePdfFile);
+
+		// View Intent, calling any PDF viewer
+
+		Intent intentShareFile = new Intent(Intent.ACTION_VIEW);
+		intentShareFile.setDataAndType(Uri.fromFile(exportablePdfFile), "application/pdf");
+		context.startActivity(Intent.createChooser(intentShareFile, context.getString(R.string.Choose_an_app)));
 	}
 
-	public static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
+	private static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
 
 		boolean accessible = false;
 		File rootFolder = context.getExternalFilesDir(null);
@@ -98,7 +144,7 @@ public class FileUtils {
 		return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
 	}
 
-	public static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
+	private static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
 
 		List<File> jks = new ArrayList<>();
 
@@ -157,6 +203,23 @@ public class FileUtils {
 		}
 	}
 
+	public static long getFreeSpace(@NonNull Context context) {
+
+		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME); // FIXME: NPE ??
+
+		if (!folder.exists())
+			//noinspection ResultOfMethodCallIgnored
+			folder.mkdirs();
+
+		StatFs statFs = new StatFs(folder.getAbsolutePath());
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+			//noinspection deprecation
+			return (statFs.getAvailableBlocks() * statFs.getBlockSize());
+		else
+			return (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
+	}
+
 	/**
 	 * Creates a file form an Asset, through {@link #createFileFromInputStream}.
 	 */
@@ -191,11 +254,12 @@ public class FileUtils {
 
 		try {
 			File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
+			//noinspection ResultOfMethodCallIgnored
 			file.delete(); // removing previous file, if exists.
 
 			OutputStream outputStream = new FileOutputStream(file);
 			byte buffer[] = new byte[1024];
-			int length = 0;
+			int length;
 
 			while ((length = inputStream.read(buffer)) > 0)
 				outputStream.write(buffer, 0, length);
@@ -211,5 +275,4 @@ public class FileUtils {
 
 		return null;
 	}
-
 }

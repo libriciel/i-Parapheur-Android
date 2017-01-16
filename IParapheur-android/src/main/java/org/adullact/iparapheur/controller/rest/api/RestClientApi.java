@@ -25,10 +25,10 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
-import org.adullact.iparapheur.controller.account.MyAccounts;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.model.Account;
 import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.HttpException;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
@@ -48,7 +48,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 
 	public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
 
-	protected static final String ACTION_LOGIN = "/parapheur/api/login";
+	private static final String ACTION_LOGIN = "/parapheur/api/login";
 
 	@Override public int test(Account account) throws IParapheurException {
 
@@ -105,12 +105,16 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return account.getTicket();
 	}
 
-	public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
+	@Deprecated public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
 		return buildUrl(action, null);
 	}
 
-	public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
-		return buildUrl(MyAccounts.INSTANCE.getSelectedAccount(), action, params, true);
+	@Deprecated public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
+		return buildUrl(AccountUtils.SELECTED_ACCOUNT, action, params, true);
+	}
+
+	public @NonNull String buildUrl(@NonNull Account account, @NonNull String action) throws IParapheurException {
+		return buildUrl(account, action, null, true);
 	}
 
 	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
@@ -132,7 +136,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 		if (withTicket && TextUtils.isEmpty(ticket))
 			throw new IParapheurException(R.string.error_no_ticket, null);
 
-		account.setLastRequest(new Date().getTime());
+		account.setLastRequest(new Date());
 
 		// Build URL
 
@@ -155,7 +159,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return stringBuilder.toString();
 	}
 
-	@Override public boolean downloadFile(@NonNull String url, @NonNull String path) throws IParapheurException {
+	@Override public boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException {
 
 		String state = Environment.getExternalStorageState();
 
@@ -175,7 +179,7 @@ public abstract class RestClientApi implements IParapheurAPI {
 			while ((bufferLength = response.read(buffer)) > 0)
 				fileOutput.write(buffer, 0, bufferLength);
 
-			//close the output stream when done
+			// Close the output stream when done
 			fileOutput.close();
 		}
 		catch (FileNotFoundException e) {
@@ -196,7 +200,8 @@ public abstract class RestClientApi implements IParapheurAPI {
 		return file.exists();
 	}
 
-	@Override public boolean downloadCertificate(@NonNull String urlString, @NonNull String certificateLocalPath) throws IParapheurException {
+	@Override public boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString,
+												 @NonNull String certificateLocalPath) throws IParapheurException {
 
 		InputStream input = null;
 		OutputStream output = null;

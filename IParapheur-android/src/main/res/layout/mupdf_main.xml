@@ -1,67 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/canvas">
 
-    <FrameLayout
+    <RelativeLayout
+        android:id="@+id/mupdffragment_main_content_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <RelativeLayout
-            android:id="@+id/mupdffragment_main_content_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:id="@+id/mupdffragment_main_fabbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            fab:fab_addButtonColorNormal="@color/brown_500"
-            fab:fab_addButtonColorPressed="@color/brown_700"
-            fab:fab_addButtonPlusIconColor="@color/text_white"
-            fab:fab_addButtonSize="normal"
-            fab:fab_expandDirection="up"
-            fab:fab_labelStyle="@style/fab_menu_labels_style"
-            fab:fab_labelsPosition="left">
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/mupdffragment_main_fabbutton_annotation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/grey_200"
-                fab:fab_colorPressed="@color/grey_400"
-                fab:fab_icon="@drawable/ic_speaker_notes_black_24dp"
-                fab:fab_size="mini"
-                fab:fab_title="@string/add_annotation" />
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/mupdffragment_main_fabbutton_validate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/green_500"
-                fab:fab_colorPressed="@color/green_700"
-                fab:fab_icon="@drawable/ic_done_white_24dp"
-                fab:fab_size="mini"
-                fab:fab_title="@string/action_viser" />
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/mupdffragment_main_fabbutton_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/red_500"
-                fab:fab_colorPressed="@color/red_700"
-                fab:fab_icon="@drawable/ic_clear_white_24dp"
-                fab:fab_size="mini"
-                fab:fab_title="@string/action_rejeter" />
-
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
-    </FrameLayout>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/mupdffragment_main_error_layout"
@@ -128,5 +76,7 @@
             android:indeterminateTintMode="src_in"
             tools:ignore="UnusedAttribute" />
     </FrameLayout>
+
+    <include layout="@layout/mupdf_main_floating_action_button_layout" />
 
 </FrameLayout>

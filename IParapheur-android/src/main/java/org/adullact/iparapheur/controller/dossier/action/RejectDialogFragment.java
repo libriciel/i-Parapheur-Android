@@ -19,11 +19,11 @@ package org.adullact.iparapheur.controller.dossier.action;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,12 +34,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
 import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -65,7 +71,8 @@ public class RejectDialogFragment extends DialogFragment {
 		RejectDialogFragment fragment = new RejectDialogFragment();
 
 		Bundle args = new Bundle();
-		args.putParcelableArrayList(ARGUMENTS_DOSSIERS, dossiers);
+		Gson gson = CollectionUtils.buildGsonWithDateParser();
+		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
 		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
 		fragment.setArguments(args);
@@ -79,7 +86,12 @@ public class RejectDialogFragment extends DialogFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments() != null) {
-			mDossierList = getArguments().getParcelableArrayList(ARGUMENTS_DOSSIERS);
+			Gson gson = CollectionUtils.buildGsonWithDateParser();
+			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+
+			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }
+			catch (JsonSyntaxException e) { mDossierList = new ArrayList<>(); }
+
 			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
 		}
 	}
@@ -185,13 +197,13 @@ public class RejectDialogFragment extends DialogFragment {
 			for (Dossier dossier : mDossierList) {
 
 				try {
-					RESTClient.INSTANCE.rejeter(dossier.getId(), mAnnotPub, mAnnotPriv, mBureauId);
+					RESTClient.INSTANCE.rejeter(AccountUtils.SELECTED_ACCOUNT, dossier.getId(), mAnnotPub, mAnnotPriv, mBureauId);
 					Log.d(LOG_TAG, "REJECT on : " + dossier.getName());
 				}
 				catch (IParapheurException e) {
 					e.printStackTrace();
 					Crashlytics.logException(e);
-					mErrorMessage = R.string.reject_error_message_not_sent_to_server;
+					mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.reject_error_message_not_sent_to_server;
 				}
 
 				if (isCancelled())
@@ -207,7 +219,7 @@ public class RejectDialogFragment extends DialogFragment {
 
 			if (success) {
 				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-				dismiss();
+				dismissAllowingStateLoss();
 			}
 			else if (getActivity() != null) {
 				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.reject_error_message_unknown_error), Toast.LENGTH_SHORT).show();

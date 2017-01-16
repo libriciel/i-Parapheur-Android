@@ -17,116 +17,105 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.utils.StringUtils;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
-public class EtapeCircuit implements Parcelable {
+public class EtapeCircuit {
 
-	public static Parcelable.Creator<EtapeCircuit> CREATOR = new Parcelable.Creator<EtapeCircuit>() {
-
-		public EtapeCircuit createFromParcel(Parcel source) {
-			return new EtapeCircuit(source);
-		}
-
-		public EtapeCircuit[] newArray(int size) {
-			return new EtapeCircuit[size];
-		}
-	};
-
-	private final Date dateValidation;
-	private final boolean isApproved;
-	private final boolean isRejected;
-	private final String bureauName;
-	private final String signataire;
-	private final Action action;
-	private final String publicAnnotation;
-
-	// <editor-fold desc="Setters / Getters">
-
-	public EtapeCircuit(Long dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
-						String publicAnnotation) {
-		this.dateValidation = new Date(dateValidation);
-		this.isApproved = isApproved;
-		this.isRejected = isRejected;
-		this.bureauName = bureauName;
-		this.signataire = signataire == null ? "" : signataire;
-		this.action = Action.valueOf(action);
-		this.publicAnnotation = publicAnnotation;
-	}
+	@SerializedName("dateValidation") private Date mDateValidation;
+	@SerializedName("approved") private boolean mIsApproved;
+	@SerializedName("rejected") private boolean mIsRejected;
+	@SerializedName("parapheurName") private String mBureauName;
+	@SerializedName("signataire") private String mSignataire;
+	@SerializedName("actionDemandee") private Action mAction;
+	@SerializedName("annotPub") private String mPublicAnnotation;
 
 	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
 						String publicAnnotation) {
-		this.dateValidation = StringUtils.parseIso8601Date(dateValidation);
-		this.isApproved = isApproved;
-		this.isRejected = isRejected;
-		this.bureauName = bureauName;
-		this.signataire = signataire == null ? "" : signataire;
-		this.action = Action.valueOf(action);
-		this.publicAnnotation = publicAnnotation;
+
+		mDateValidation = StringUtils.parseIso8601Date(dateValidation);
+		mIsApproved = isApproved;
+		mIsRejected = isRejected;
+		mBureauName = bureauName;
+		mSignataire = signataire;
+		mAction = (action != null) ? Action.valueOf(action) : Action.VISA;
+		mPublicAnnotation = publicAnnotation;
 	}
 
-	private EtapeCircuit(Parcel in) {
-		long tmpDateValidation = in.readLong();
-		this.dateValidation = tmpDateValidation == -1 ? null : new Date(tmpDateValidation);
-		this.isApproved = in.readByte() != 0;
-		this.isRejected = in.readByte() != 0;
-		this.bureauName = in.readString();
-		this.signataire = in.readString();
-		int tmpAction = in.readInt();
-		this.action = tmpAction == -1 ? null : Action.values()[tmpAction];
-		this.publicAnnotation = in.readString();
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 */
+	public static @Nullable List<EtapeCircuit> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		Type typologyType = new TypeToken<ArrayList<EtapeCircuit>>() {}.getType();
+
+		try {
+			List<EtapeCircuit> etapeCircuitList = gson.fromJson(jsonArrayString, typologyType);
+
+			// Fix default value on parse.
+			// There is no easy way (@annotation) to do it with Gson,
+			// So we're doing it here instead of overriding everything.
+			for (EtapeCircuit etapeCircuit : etapeCircuitList)
+				if (etapeCircuit.getAction() == null)
+					etapeCircuit.setAction(Action.VISA);
+
+			return etapeCircuitList;
+		}
+		catch (JsonSyntaxException e) {
+			return null;
+		}
 	}
+
+	// <editor-fold desc="Setters / Getters">
 
 	public Date getDateValidation() {
-		return dateValidation;
+		return mDateValidation;
 	}
 
 	public boolean isApproved() {
-		return isApproved;
+		return mIsApproved;
 	}
 
 	public boolean isRejected() {
-		return isRejected;
+		return mIsRejected;
 	}
 
 	public String getBureauName() {
-		return bureauName;
+		return mBureauName;
 	}
 
 	public String getSignataire() {
-		return signataire;
+		return mSignataire;
 	}
 
 	public Action getAction() {
-		return action;
+		return mAction;
 	}
 
-	public String getPublicAnnotation() {
-		return publicAnnotation;
+	public void setAction(Action action) {
+		mAction = action;
 	}
 
 	// </editor-fold desc="Setters / Getters">
 
 	@Override public String toString() {
-		return bureauName;
-	}
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(dateValidation != null ? dateValidation.getTime() : -1);
-		dest.writeByte(isApproved ? (byte) 1 : (byte) 0);
-		dest.writeByte(isRejected ? (byte) 1 : (byte) 0);
-		dest.writeString(this.bureauName);
-		dest.writeString(this.signataire);
-		dest.writeInt(this.action == null ? -1 : this.action.ordinal());
-		dest.writeString(this.publicAnnotation);
+		return "{EtapeCircuit dateValidation=" + mDateValidation + " isApproved=" + mIsApproved + " isRejected=" + mIsRejected + //
+				" bureauName=" + mBureauName + " signataire=" + mSignataire + " action=" + mAction + " publicAnnot=" + mPublicAnnotation + "}";
 	}
 }

@@ -17,56 +17,69 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.SparseArray;
 
+import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
-public class Document implements Parcelable {
+import org.adullact.iparapheur.utils.SerializableSparseArray;
 
-	public static Creator<Document> CREATOR = new Creator<Document>() {
-		public Document createFromParcel(Parcel source) {
-			return new Document(source);
-		}
+import java.util.Date;
 
-		public Document[] newArray(int size) {
-			return new Document[size];
-		}
-	};
 
-	private final String mId;
-	private final String mDossierId;
-	private final String mName;
-	private final int mSize;                  // TODO : download image instead of too heavy files
-	private final String mUrl;                // URL of the document (its content)
-	private SparseArray<PageAnnotations> mPagesAnnotations;
-	private String mPath;                     // Path of the file (if downloaded) on the device's storage
-	private boolean mIsLocked;
+@DatabaseTable(tableName = "Document")
+public class Document {
+
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_NAME = "Name";
+	private static final String DB_FIELD_SIZE = "Size";
+	private static final String DB_FIELD_IS_PDF_VISUAL = "IsPdfVisual";
+	private static final String DB_FIELD_IS_MAIN_DOCUMENT = "IsMainDocument";
+	private static final String DB_FIELD_ANNOTATIONS = "Annotations";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_DOSSIER = "Dossier";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+	@SerializedName("id")  //
+	private String mId;
+
+	@DatabaseField(columnName = DB_FIELD_NAME, canBeNull = false, defaultValue = "")  //
+	@SerializedName("name")  //
+	private String mName;
+
+	@DatabaseField(columnName = DB_FIELD_SIZE, defaultValue = "-1")  //
+	@SerializedName("size")  //
+	private int mSize;                          // TODO : download image instead of too heavy files
+
+	@DatabaseField(columnName = DB_FIELD_IS_PDF_VISUAL, defaultValue = "false")  //
+	@SerializedName("visuelPdf")  //
+	private boolean mIsPdfVisual;
+
+	@DatabaseField(columnName = DB_FIELD_IS_MAIN_DOCUMENT)  //
+	@SerializedName("isMainDocument")  //
 	private boolean mIsMainDocument;
 
-	public Document(String id, String dossierId, String name, int size, String url, boolean isLocked, boolean isMainDocument) {
+	@DatabaseField(columnName = DB_FIELD_ANNOTATIONS, dataType = DataType.SERIALIZABLE)  //
+	private SerializableSparseArray<PageAnnotations> mPagesAnnotations;
+
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
+	private Date mSyncDate;
+
+	@DatabaseField(columnName = DB_FIELD_DOSSIER, foreign = true, foreignAutoRefresh = true)  //
+	private transient Dossier mParent;
+
+	public Document(String id, String name, int size, boolean isMainDocument, boolean isPdfVisual) {
 		mId = id;
-		mDossierId = dossierId;
 		mName = name;
-		mUrl = url;
 		mSize = size;
-		mPagesAnnotations = new SparseArray<>();
-		mIsLocked = isLocked;
+		mPagesAnnotations = new SerializableSparseArray<>();
 		mIsMainDocument = isMainDocument;
+		mIsPdfVisual = isPdfVisual;
 	}
 
-	@SuppressWarnings("unchecked") private Document(Parcel in) {
-		mId = in.readString();
-		mDossierId = in.readString();
-		mName = in.readString();
-		mPagesAnnotations = (SparseArray<PageAnnotations>) in.readBundle().get("mPagesAnnotations");
-		mUrl = in.readString();
-		mSize = in.readInt();
-		mPath = in.readString();
-		mIsLocked = (in.readByte() != 0);
-		mIsMainDocument = (in.readByte() != 0);
-	}
+	public Document() {}
 
 	// <editor-fold desc="Setters / Getters">
 
@@ -74,77 +87,47 @@ public class Document implements Parcelable {
 		return mId;
 	}
 
-	public String getDossierId() {
-		return mDossierId;
-	}
-
 	public String getName() {
 		return mName;
-	}
-
-	public String getUrl() {
-		return mUrl;
 	}
 
 	public int getSize() {
 		return mSize;
 	}
 
-	public String getPath() {
-		return mPath;
-	}
-
-	public void setPath(String path) {
-		mPath = path;
-	}
-
-	public boolean isLocked() {
-		return mIsLocked;
-	}
-
-	public void setIsLocked(boolean isLocked) {
-		mIsLocked = isLocked;
-	}
-
 	public boolean isMainDocument() {
 		return mIsMainDocument;
 	}
 
-	public void setIsMainDocument(boolean isLocked) {
-		mIsLocked = isLocked;
+	public boolean isPdfVisual() {
+		return mIsPdfVisual;
 	}
 
 	public SparseArray<PageAnnotations> getPagesAnnotations() {
 		return mPagesAnnotations;
 	}
 
-	public void setPagesAnnotations(SparseArray<PageAnnotations> pagesAnnotations) {
+	public void setPagesAnnotations(SerializableSparseArray<PageAnnotations> pagesAnnotations) {
 		mPagesAnnotations = pagesAnnotations;
 	}
 
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date syncDate) {
+		mSyncDate = syncDate;
+	}
+
+	public Dossier getParent() {
+		return mParent;
+	}
+
+	public void setParent(Dossier parent) {
+		mParent = parent;
+	}
+
 	// </editor-fold desc="Setters / Getters">
-
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		Bundle bundle = new Bundle();
-		bundle.putSparseParcelableArray("mPagesAnnotations", mPagesAnnotations);
-		dest.writeString(mId);
-		dest.writeString(mDossierId);
-		dest.writeString(mName);
-		dest.writeBundle(bundle);
-		dest.writeString(mUrl);
-		dest.writeInt(mSize);
-		dest.writeString(mPath);
-		dest.writeByte((byte) (mIsLocked ? 1 : 0));
-		dest.writeByte((byte) (mIsMainDocument ? 1 : 0));
-	}
-
-	// </editor-fold desc="Parcelable">
 
 	@Override public String toString() {
 		return "{Document id:" + mId + " name:" + mName + " isMainDoc:" + mIsMainDocument + "}";
@@ -153,4 +136,5 @@ public class Document implements Parcelable {
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Document) && (mId.contentEquals(((Document) o).getId()));
 	}
+
 }

@@ -17,11 +17,12 @@
  */
 package org.adullact.iparapheur.controller.dossier.filter;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.adullact.iparapheur.controller.IParapheurApplication;
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.State;
 
@@ -46,10 +47,16 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 	private ArrayList<Filter> filters = null;
 	private Filter selectedFilter;
 
-	public List<Filter> getFilters() {
+	public List<Filter> getFilters(@NonNull Context context) {
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		return getFilters(sharedPreferences);
+	}
+
+	public List<Filter> getFilters(@NonNull SharedPreferences sharedPreferences) {
+
 		if (filters == null) {
 			filters = new ArrayList<>();
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
 
 			for (String pref : sharedPreferences.getAll().keySet()) {
 				if (pref.startsWith(PREFS_PREFIX)) {
@@ -86,9 +93,9 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 		return filters;
 	}
 
-	public void save(Filter filter) {
+	public void save(@NonNull Context context, @NonNull Filter filter) {
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 
 		editor.putString(PREFS_PREFIX + filter.getId() + PREFS_NOM_SUFFIX, filter.getName());
@@ -105,13 +112,13 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 
 		editor.apply();
 		filters = null;
-		getFilters();
+		getFilters(sharedPreferences);
 	}
 
-	public void delete(Filter filter) {
+	public void delete(@NonNull Context context, Filter filter) {
 
 		String id = filter.getId();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(IParapheurApplication.getContext());
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Set<String> keySet = sharedPreferences.getAll().keySet();
 
 		if (keySet.contains(PREFS_PREFIX + id + PREFS_NOM_SUFFIX)) {
@@ -129,13 +136,13 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
 			selectedFilter = null;
 		}
 		filters = null;
-		getFilters();
+		getFilters(sharedPreferences);
 	}
 
 	@Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
 		if (s.startsWith(PREFS_PREFIX)) {
 			filters = null;
-			getFilters();
+			getFilters(sharedPreferences);
 
 			// if an Account was previously selected, update it with the new one
 			if (selectedFilter != null)

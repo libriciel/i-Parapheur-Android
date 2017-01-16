@@ -13,8 +13,6 @@
     <string name="pref_header_certificates">Certificats</string>
     <string name="pref_header_filters">Filtres</string>
 
-    <!-- Account -->
-
     <string name="pref_accounts">Mes Comptes</string>
     <string name="pref_accounts_new">Nouveau compte</string>
 
@@ -29,10 +27,12 @@
     <string name="pref_account_message_save_success">Compte enregistré</string>
     <string name="pref_account_message_delete_success">Compte supprimé</string>
 
+    <string name="pref_filters_message_delete_success">Filtre supprimé</string>
+
     <string name="pref_certificates_message_delete_success">Certificat supprimé</string>
     <string name="pref_certificates_message_delete_failed">Le certificat n\'a pas pu être supprimé</string>
     <string name="pref_certificates_expiration_date">exp. %s</string>
-
-    <string name="pref_filters_message_delete_success">Filtre supprimé</string>
+    <string name="pref_certificates_no_content">Aucun certificat disponible.</string>
+    <string name="pref_certificates_tuto_import">Comment importer un certificat ?</string>
 
 </resources>

@@ -17,30 +17,85 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
 
-public class Bureau implements Parcelable {
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-	public static Parcelable.Creator<Bureau> CREATOR = new Parcelable.Creator<Bureau>() {
-		public Bureau createFromParcel(Parcel source) {
-			return new Bureau(source);
-		}
 
-		public Bureau[] newArray(int size) {
-			return new Bureau[size];
-		}
-	};
+@DatabaseTable(tableName = "Desk")
+public class Bureau {
 
+	public static final String DB_FIELD_ID = "Id";
+	private static final String DB_FIELD_TITLE = "Title";
+	private static final String DB_FIELD_TODO = "Todo";
+	private static final String DB_FIELD_LATE = "Late";
+	private static final String DB_FIELD_SYNC = "Sync";
+	private static final String DB_FIELD_ACCOUNT = "Account";
+	private static final String DB_FIELD_FOLDERS = "Folders";
+
+	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+	@SerializedName(value = "id", alternate = {"nodeRef"})  //
 	private String mId;
+
+	@DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
+	@SerializedName("name")  //
 	private String mTitle;
+
+	@DatabaseField(columnName = DB_FIELD_TODO, defaultValue = "0")  //
+	@SerializedName("a-traiter") //
 	private int mTodoCount;
+
+	@DatabaseField(columnName = DB_FIELD_LATE, defaultValue = "0")  //
+	@SerializedName("en-retard")  //
 	private int mLateCount;
 
-	public Bureau(String id, String title) {
-		this(id, title, 0, 0);
+	@DatabaseField(columnName = DB_FIELD_SYNC)  //
+	private Date mSyncDate;
+
+	@DatabaseField(columnName = DB_FIELD_ACCOUNT, foreign = true, foreignAutoRefresh = true)  //
+	private transient Account mParent;
+
+	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
+	private transient ForeignCollection<Dossier> mChildrenDossiers;
+
+	/**
+	 * Static parser, useful for Unit tests
+	 *
+	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+	 * @param gson            passed statically to prevent re-creating it.
+	 */
+	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+
+		List<Bureau> bureauList;
+		Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
+
+		try { bureauList = gson.fromJson(jsonArrayString, typologyType); }
+		catch (JsonSyntaxException e) { return null; }
+
+		// Fixes
+
+		if (bureauList != null)
+			for (Bureau bureau : bureauList)
+				if (bureau.getLateCount() > bureau.getTodoCount())
+					bureau.setLateCount(bureau.getTodoCount());
+
+		//
+
+		return bureauList;
 	}
 
 	public Bureau(String id, String title, int todo, int late) {
@@ -52,14 +107,12 @@ public class Bureau implements Parcelable {
 		mTitle = title;
 		mTodoCount = todo;
 		mLateCount = late;
+		mSyncDate = null;
 	}
 
-	private Bureau(Parcel in) {
-		mId = in.readString();
-		mTitle = in.readString();
-		mTodoCount = in.readInt();
-		mLateCount = in.readInt();
-	}
+	public Bureau() {}
+
+	// <editor-fold desc="Setters / Getters">
 
 	public String getId() {
 		return mId;
@@ -77,26 +130,42 @@ public class Bureau implements Parcelable {
 		return mLateCount;
 	}
 
+	private void setLateCount(int lateCount) {
+		mLateCount = lateCount;
+	}
+
+	public Account getParent() {
+		return mParent;
+	}
+
+	public void setParent(Account account) {
+		mParent = account;
+	}
+
+	public Date getSyncDate() {
+		return mSyncDate;
+	}
+
+	public void setSyncDate(Date date) {
+		mSyncDate = date;
+	}
+
+	public ForeignCollection<Dossier> getChildrenDossiers() {
+		return mChildrenDossiers;
+	}
+
+	public void setChildrenDossiers(ForeignCollection<Dossier> childrenDossiers) {
+		mChildrenDossiers = childrenDossiers;
+	}
+
+	// </editor-fold desc="Setters / Getters">
+
 	@Override public String toString() {
-		return mTitle;
+		return "{Bureau id=" + mId + " title=" + mTitle + " todo=" + mTodoCount + " late=" + mLateCount + " sync=" + mSyncDate + "}";
 	}
 
 	@Override public boolean equals(Object o) {
 		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
 	}
 
-	// <editor-fold desc="Parcelable">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mId);
-		dest.writeString(mTitle);
-		dest.writeInt(mTodoCount);
-		dest.writeInt(mLateCount);
-	}
-
-	// </editor-fold desc="Parcelable">
 }
