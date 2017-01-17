@@ -23,8 +23,7 @@ refresh_submodule_develop:
   except:
     - master
   script:
-    - rm -rf ./mupdffragment
-    - git clone -b develop https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
+    - git -C mupdffragment checkout develop
 
 
 refresh_submodule_master:
@@ -32,8 +31,7 @@ refresh_submodule_master:
   only:
     - master
   script:
-    - rm -rf ./mupdffragment
-    - git clone -b master https://gitlab.libriciel.fr/librairies/MupdfAndroid.git mupdffragment
+    - git -C mupdffragment checkout master
 
 
 # Jobs test
