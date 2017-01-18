@@ -17,6 +17,7 @@
  */
 package org.adullact.iparapheur.utils;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import junit.framework.Assert;
@@ -37,6 +38,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -258,5 +263,28 @@ public class DossierUtilsTest {
 		Assert.assertEquals(annexesList.size(), 2);
 		Assert.assertEquals(annexesList.get(0).getId(), "id_02");
 		Assert.assertEquals(annexesList.get(1).getId(), "id_03");
+	}
+
+	@Test public void buildCreationDateComparator() throws Exception {
+
+		Dossier dossier01 = new Dossier("dossier01", null, null, null, null, null, new Date(50000L), null, false);
+		Dossier dossier02 = new Dossier("dossier02", null, null, null, null, null, new Date(60000L), null, false);
+		Dossier dossier03 = new Dossier("dossier03", null, null, null, null, null, new Date(70000L), null, false);
+		Dossier dossier04 = new Dossier("dossier04", null, null, null, null, null, new Date(80000L), null, false);
+
+		List<Dossier> dossierList = new ArrayList<>();
+		dossierList.add(dossier03);
+		dossierList.add(null);
+		dossierList.add(dossier04);
+		dossierList.add(dossier02);
+		dossierList.add(dossier01);
+
+		Collections.sort(dossierList, DossierUtils.buildCreationDateComparator());
+
+		Assert.assertNull(dossierList.get(0));
+		Assert.assertEquals(dossierList.get(1), dossier01);
+		Assert.assertEquals(dossierList.get(2), dossier02);
+		Assert.assertEquals(dossierList.get(3), dossier03);
+		Assert.assertEquals(dossierList.get(4), dossier04);
 	}
 }

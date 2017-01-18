@@ -232,10 +232,10 @@ public class DossierUtils {
 		return new Comparator<Dossier>() {
 			@Override public int compare(Dossier lhs, Dossier rhs) {
 
-				if (lhs.getDateCreation() == null)
+				if ((lhs == null) || (lhs.getDateCreation() == null))
 					return Integer.MIN_VALUE;
 
-				if (rhs.getDateCreation() == null)
+				if ((rhs == null) || (rhs.getDateCreation() == null))
 					return Integer.MAX_VALUE;
 
 				return lhs.getDateCreation().compareTo(rhs.getDateCreation());
