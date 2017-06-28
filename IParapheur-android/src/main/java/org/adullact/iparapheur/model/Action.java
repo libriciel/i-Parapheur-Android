@@ -30,6 +30,7 @@ public enum Action {
 	// TODO : all possible actions (secretariat, supprimer, ...)
 	VISA(R.string.action_viser, R.id.action_visa, R.drawable.ic_visa_24dp),
 	SIGNATURE(R.string.action_signer, R.id.action_signature, R.drawable.ic_sign_24dp),
+	CACHET(R.string.action_seal, R.id.action_seal, R.drawable.ic_cachet_color_24dp),
 	TDT(R.string.action_tdt, R.id.action_tdt, R.drawable.ic_tdt_24dp),
 	TDT_ACTES(R.string.action_tdt_actes, R.id.action_tdt_actes, R.drawable.ic_tdt_24dp),
 	TDT_HELIOS(R.string.action_tdt_helios, R.id.action_tdt_helios, R.drawable.ic_tdt_24dp),

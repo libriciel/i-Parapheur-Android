@@ -17,6 +17,11 @@
                 iparapheur:showAsAction="ifRoom"/>
 
             <item
+                android:id="@+id/action_seal"
+                android:title="@string/action_seal"
+                iparapheur:showAsAction="ifRoom"/>
+
+            <item
                 android:id="@+id/action_mailsec"
                 android:title="@string/action_mailsec"
                 iparapheur:showAsAction="ifRoom"/>

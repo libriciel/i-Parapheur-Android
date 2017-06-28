@@ -56,6 +56,7 @@
     <!-- actions de validation -->
     <string name="action_viser">Viser</string>
     <string name="action_signer">Signer</string>
+    <string name="action_seal">Cacheter</string>
     <string name="action_sign_papier">Sign. papier</string>
     <string name="action_tdt">Envoyer au TdT</string>
     <string name="action_tdt_actes">Envoyer au TdT - ACTES</string>
