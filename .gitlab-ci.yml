@@ -40,14 +40,14 @@ local_unit_test:
   stage: test
   allow_failure: true
   script:
-    - ./gradlew clean test --continue
+    - ./gradlew test --continue
 
 
 instrumented_unit_test:
   stage: test
   allow_failure: true
   script:
-    - ./gradlew clean connectedCheck --continue
+    - ./gradlew connectedCheck --continue
 
 
 # Jobs build
@@ -57,7 +57,7 @@ build_develop:
   except:
     - master
   script:
-    - ./gradlew clean assembleDebug
+    - ./gradlew assembleDebug
 
 
 build_release:
@@ -65,5 +65,5 @@ build_release:
   only:
     - master
   script:
-    - ./gradlew clean assembleDebug
+    - ./gradlew assembleDebug
 
