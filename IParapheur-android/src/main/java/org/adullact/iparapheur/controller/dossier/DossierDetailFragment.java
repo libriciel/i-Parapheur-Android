@@ -54,6 +54,7 @@ import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.PageAnnotations;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.ActionUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DeviceUtils;
 import org.adullact.iparapheur.utils.DocumentUtils;
@@ -379,7 +380,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void onValidateSelected() {
 		collapseFabMenu();
 
-		Action positiveAction = DossierUtils.getPositiveAction(mDossier);
+		Action positiveAction = ActionUtils.getPositiveAction(mDossier);
 		if (positiveAction != null)
 			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
 	}
@@ -387,7 +388,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 	private void onCancelSelected() {
 		collapseFabMenu();
 
-		Action negativeAction = DossierUtils.getNegativeAction(mDossier);
+		Action negativeAction = ActionUtils.getNegativeAction(mDossier);
 		if (negativeAction != null)
 			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
 	}
@@ -422,7 +423,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Compute values
 
-		boolean hasNegativeAction = (DossierUtils.getNegativeAction(mDossier) != null);
+		boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
 		int mainRank = 0;
 		int cancelRank = 1;
 		int annotationRank = 1 + (hasNegativeAction ? 1 : 0);
@@ -449,7 +450,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		// Compute values
 
-		boolean hasNegativeAction = (DossierUtils.getNegativeAction(mDossier) != null);
+		boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
 		int maxRank = (hasNegativeAction ? 1 : 0) + (mIsAnnotable ? 1 : 0);
 		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
 		int annotationReverseRank = 0;
@@ -477,10 +478,10 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
 		//
 
-		Action positiveAction = DossierUtils.getPositiveAction(dossier);
+		Action positiveAction = ActionUtils.getPositiveAction(dossier);
 		mValidateLabelTextView.setText((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee);
 
-		Action negativeAction = DossierUtils.getNegativeAction(dossier);
+		Action negativeAction = ActionUtils.getNegativeAction(dossier);
 		mCancelLabelTextView.setText((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee);
 	}
 

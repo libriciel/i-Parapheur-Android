@@ -31,6 +31,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.adullact.iparapheur.utils.ActionUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 
 import java.lang.reflect.Type;
@@ -139,7 +140,7 @@ public class Dossier {
 			// There is no easy way (@annotation) to do it with Gson,
 			// So we're doing it here instead of overriding everything.
 			for (Dossier dossier : dossiersParsed)
-				DossierUtils.fixActions(dossier);
+				ActionUtils.fixActions(dossier);
 
 			return dossiersParsed;
 		}
@@ -163,7 +164,7 @@ public class Dossier {
 			// There is no easy way (@annotation) to do it with Gson,
 			// So we're doing it here instead of overriding everything.
 			if (dossierParsed != null)
-				DossierUtils.fixActions(dossierParsed);
+				ActionUtils.fixActions(dossierParsed);
 
 			return dossierParsed;
 		}

@@ -480,10 +480,17 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		// Get available actions from Dossiers
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
-		boolean sign = false;
+
+		boolean hasSignature = false;
 		for (Dossier dossier : checkedDossiers) {
 			actions.retainAll(dossier.getActions());
-			sign = sign || (dossier.getActionDemandee() == Action.SIGNATURE) && !dossier.isSignPapier();
+			hasSignature = hasSignature || (dossier.getActionDemandee() == Action.SIGNATURE) && !dossier.isSignPapier();
+		}
+
+		boolean hasCachet = false;
+		for (Dossier dossier : checkedDossiers) {
+			actions.retainAll(dossier.getActions());
+			hasCachet = hasCachet || (dossier.getActionDemandee() == Action.CACHET);
 		}
 
 		// Compute visibility
@@ -499,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			String menuTitle;
 
 			// If we have a mixed set of VISA and SIGNATURE, then we have a general SIGNATURE
-			if (action.equals(Action.VISA) && (sign)) {
+			if (action.equals(Action.VISA) && hasSignature) {
 				menuItemId = Action.SIGNATURE.getMenuItemId();
 				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
 			}
@@ -509,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			}
 
 			// If we only have signPapier type, we only have a VISA, actually
-			boolean isVisible = !(action.equals(Action.SIGNATURE) && !sign);
+			boolean isVisible = !(action.equals(Action.SIGNATURE) && !hasSignature);
 
 			// Set current state
 
