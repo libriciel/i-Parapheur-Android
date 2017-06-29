@@ -39,6 +39,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
+import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
@@ -191,7 +192,12 @@ public class SealDialogFragment extends DialogFragment {
 			for (Dossier dossier : mDossierList) {
 
 				try {
-					RESTClient.INSTANCE.seal(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
+
+					if (dossier.getActions().contains(Action.CACHET))
+						RESTClient.INSTANCE.seal(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
+					else
+						RESTClient.INSTANCE.viser(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
+
 					Log.d(LOG_TAG, "CACHET on : " + dossier.getName());
 				}
 				catch (IParapheurException e) {

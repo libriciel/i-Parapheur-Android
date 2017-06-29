@@ -73,6 +73,7 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.ActionUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -481,17 +482,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
 
-		boolean hasSignature = false;
-		for (Dossier dossier : checkedDossiers) {
-			actions.retainAll(dossier.getActions());
-			hasSignature = hasSignature || (dossier.getActionDemandee() == Action.SIGNATURE) && !dossier.isSignPapier();
-		}
-
-		boolean hasCachet = false;
-		for (Dossier dossier : checkedDossiers) {
-			actions.retainAll(dossier.getActions());
-			hasCachet = hasCachet || (dossier.getActionDemandee() == Action.CACHET);
-		}
+		HashSet availableActions = new HashSet();
+		availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
+		availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers));
+		availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
 
 		// Compute visibility
 
@@ -501,29 +495,39 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		for (Action action : actions) {
 
-			MenuItem item;
-			int menuItemId;
-			String menuTitle;
-
-			// If we have a mixed set of VISA and SIGNATURE, then we have a general SIGNATURE
-			if (action.equals(Action.VISA) && hasSignature) {
-				menuItemId = Action.SIGNATURE.getMenuItemId();
-				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
-			}
-			else {
-				menuItemId = action.getMenuItemId();
-				menuTitle = getString(action.getTitle());
-			}
-
-			// If we only have signPapier type, we only have a VISA, actually
-			boolean isVisible = !(action.equals(Action.SIGNATURE) && !hasSignature);
-
+//			MenuItem item;
+//			int menuItemId;
+//			String menuTitle;
+//
+//			// Mixed sets
+//
+//			if (action.equals(Action.VISA) && hasCachet) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.CACHET.getTitle());
+//			}
+//			else if (action.equals(Action.VISA) && hasSignature) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
+//			}
+//			else if (action.equals(Action.CACHET) && hasSignature) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.CACHET.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
+//			}
+//			else {
+//				menuItemId = action.getMenuItemId();
+//				menuTitle = getString(action.getTitle());
+//			}
+//
+//			// If we only have signPapier type, we only have a VISA, actually
+//			boolean isVisible = !(action.equals(Action.SIGNATURE) && !hasSignature);
+//
 			// Set current state
 
-			item = menu.findItem(menuItemId);
+			MenuItem item = menu.findItem(action.getMenuItemId());
+
 			if (item != null) {
-				item.setTitle(menuTitle);
-				item.setVisible(isVisible);
+//				item.setTitle(menuTitle);
+				item.setVisible(availableActions.contains(action));
 			}
 		}
 

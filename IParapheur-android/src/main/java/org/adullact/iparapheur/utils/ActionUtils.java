@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Dossier;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
 import static org.adullact.iparapheur.model.Action.CACHET;
+import static org.adullact.iparapheur.model.Action.JOURNAL;
 import static org.adullact.iparapheur.model.Action.MAILSEC;
 import static org.adullact.iparapheur.model.Action.REJET;
 import static org.adullact.iparapheur.model.Action.SECRETARIAT;
@@ -46,7 +48,7 @@ public class ActionUtils {
 	/**
 	 * Returns the main negative {@link Action} available, by coherent priority.
 	 */
-	public static @Nullable Action computePositiveAction(@NonNull List<Dossier> dossierList) {
+	public static @Nullable Action computePositiveAction(@NonNull Iterable<Dossier> dossierList) {
 
 		LinkedHashSet<Action> results = new LinkedHashSet<>();
 		results.addAll(Arrays.asList(VISA, CACHET, SIGNATURE, TDT_ACTES, TDT_HELIOS, TDT, ARCHIVAGE, MAILSEC, SECRETARIAT));
@@ -67,7 +69,7 @@ public class ActionUtils {
 		return (results.isEmpty() ? null : results.iterator().next());
 	}
 
-	public static @Nullable Action computeNegativeAction(@NonNull List<Dossier> dossierList) {
+	public static @Nullable Action computeNegativeAction(@NonNull Iterable<Dossier> dossierList) {
 
 		LinkedHashSet<Action> results = new LinkedHashSet<>();
 		results.addAll(Collections.singletonList(REJET));
@@ -78,6 +80,20 @@ public class ActionUtils {
 		}
 
 		return (results.isEmpty() ? null : results.iterator().next());
+	}
+
+	public static @NonNull List<Action> computeSecondaryActions(@NonNull Iterable<Dossier> dossierList) {
+
+		LinkedHashSet<Action> results = new LinkedHashSet<>();
+		results.addAll(new ArrayList<>(Arrays.asList(Action.values())));
+
+		for (Dossier dossier : dossierList) {
+			LinkedHashSet<Action> tempSet = new LinkedHashSet<>(dossier.getActions());
+			results.retainAll(tempSet);
+		}
+
+		results.removeAll(Arrays.asList(VISA, CACHET, SIGNATURE, REJET));
+		return new ArrayList<>(results);
 	}
 
 	/**

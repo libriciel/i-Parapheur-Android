@@ -28,8 +28,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
+import static org.adullact.iparapheur.model.Action.CACHET;
+import static org.adullact.iparapheur.model.Action.EMAIL;
+import static org.adullact.iparapheur.model.Action.ENCHAINER_CIRCUIT;
+import static org.adullact.iparapheur.model.Action.JOURNAL;
 import static org.adullact.iparapheur.model.Action.MAILSEC;
 import static org.adullact.iparapheur.model.Action.REJET;
+import static org.adullact.iparapheur.model.Action.SECRETARIAT;
 import static org.adullact.iparapheur.model.Action.SIGNATURE;
 import static org.adullact.iparapheur.model.Action.TDT;
 import static org.adullact.iparapheur.model.Action.TDT_ACTES;
@@ -46,16 +51,16 @@ public class ActionUtilsTest {
 		Dossier dossierWithRejetSign = new Dossier();
 		dossierWithRejetSign.setActions(new HashSet<>(Arrays.asList(REJET, SIGNATURE)));
 		Dossier dossierWithRejetSeal = new Dossier();
-		dossierWithRejetSeal.setActions(new HashSet<>(Arrays.asList(REJET, Action.CACHET)));
+		dossierWithRejetSeal.setActions(new HashSet<>(Arrays.asList(REJET, CACHET)));
 		Dossier dossierWithVisa = new Dossier();
-		dossierWithVisa.setActions(new HashSet<>(Collections.singletonList(Action.CACHET)));
+		dossierWithVisa.setActions(new HashSet<>(Collections.singletonList(VISA)));
 		Dossier dossierWithTdt = new Dossier();
 		dossierWithTdt.setActions(new HashSet<>(Collections.singletonList(TDT)));
 
 		//
 
 		List<Dossier> dossierList01 = Arrays.asList(dossierWithRejetVisa, dossierWithRejetSeal);
-		Assert.assertEquals(ActionUtils.computePositiveAction(dossierList01), Action.CACHET);
+		Assert.assertEquals(ActionUtils.computePositiveAction(dossierList01), CACHET);
 
 		List<Dossier> dossierList02 = Arrays.asList(dossierWithRejetVisa, dossierWithRejetSign);
 		Assert.assertEquals(ActionUtils.computePositiveAction(dossierList02), SIGNATURE);
@@ -73,9 +78,9 @@ public class ActionUtilsTest {
 	@Test public void computeNegativeAction() throws Exception {
 
 		Dossier dossierWithRejetSeal = new Dossier();
-		dossierWithRejetSeal.setActions(new HashSet<>(Arrays.asList(REJET, Action.CACHET)));
+		dossierWithRejetSeal.setActions(new HashSet<>(Arrays.asList(REJET, CACHET)));
 		Dossier dossierWithVisa = new Dossier();
-		dossierWithVisa.setActions(new HashSet<>(Collections.singletonList(Action.CACHET)));
+		dossierWithVisa.setActions(new HashSet<>(Collections.singletonList(CACHET)));
 
 		//
 
@@ -84,6 +89,35 @@ public class ActionUtilsTest {
 
 		List<Dossier> dossierList02 = Arrays.asList(dossierWithRejetSeal, dossierWithVisa);
 		Assert.assertNull(ActionUtils.computeNegativeAction(dossierList02));
+	}
+
+	@Test public void computeSecondaryActions() throws Exception {
+
+		Dossier dossierWithVisaSecretary = new Dossier();
+		dossierWithVisaSecretary.setActions(new HashSet<>(Arrays.asList(VISA, SECRETARIAT)));
+		Dossier dossierWithVisaSecretaryChain = new Dossier();
+		dossierWithVisaSecretaryChain.setActions(new HashSet<>(Arrays.asList(VISA, SECRETARIAT, ENCHAINER_CIRCUIT)));
+		Dossier dossierWithVisaSecretaryChainJournal = new Dossier();
+		dossierWithVisaSecretaryChainJournal.setActions(new HashSet<>(Arrays.asList(VISA, SECRETARIAT, ENCHAINER_CIRCUIT, JOURNAL)));
+		Dossier dossierWithVisa = new Dossier();
+		dossierWithVisa.setActions(new HashSet<>(Collections.singletonList(CACHET)));
+
+		//
+
+		List<Dossier> dossierList01 = Arrays.asList(dossierWithVisaSecretary, dossierWithVisaSecretaryChain);
+		Assert.assertTrue(ActionUtils.computeSecondaryActions(dossierList01).contains(SECRETARIAT));
+		Assert.assertEquals(ActionUtils.computeSecondaryActions(dossierList01).size(), 1);
+
+		List<Dossier> dossierList02 = Arrays.asList(dossierWithVisaSecretaryChain, dossierWithVisaSecretaryChainJournal);
+		Assert.assertTrue(ActionUtils.computeSecondaryActions(dossierList02).contains(SECRETARIAT));
+		Assert.assertTrue(ActionUtils.computeSecondaryActions(dossierList02).contains(ENCHAINER_CIRCUIT));
+		Assert.assertEquals(ActionUtils.computeSecondaryActions(dossierList02).size(), 2);
+
+		List<Dossier> dossierList03 = Arrays.asList(dossierWithVisaSecretaryChain, dossierWithVisa);
+		Assert.assertTrue(ActionUtils.computeSecondaryActions(dossierList03).isEmpty());
+
+		List<Dossier> dossierList04 = Arrays.asList(dossierWithVisaSecretaryChainJournal, dossierWithVisaSecretaryChainJournal);
+		Assert.assertEquals(ActionUtils.computeSecondaryActions(dossierList04).size(), 3);
 	}
 
 	@Test public void getPositiveAction() throws Exception {
