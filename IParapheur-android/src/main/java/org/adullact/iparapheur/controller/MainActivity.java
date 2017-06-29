@@ -58,6 +58,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SealDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
@@ -72,6 +73,7 @@ import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
+import org.adullact.iparapheur.utils.ActionUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -479,11 +481,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 		// Get available actions from Dossiers
 
 		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
-		boolean sign = false;
-		for (Dossier dossier : checkedDossiers) {
-			actions.retainAll(dossier.getActions());
-			sign = sign || (dossier.getActionDemandee() == Action.SIGNATURE) && !dossier.isSignPapier();
-		}
+
+		HashSet availableActions = new HashSet();
+		availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
+		availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers));
+		availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
 
 		// Compute visibility
 
@@ -493,29 +495,39 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 		for (Action action : actions) {
 
-			MenuItem item;
-			int menuItemId;
-			String menuTitle;
-
-			// If we have a mixed set of VISA and SIGNATURE, then we have a general SIGNATURE
-			if (action.equals(Action.VISA) && (sign)) {
-				menuItemId = Action.SIGNATURE.getMenuItemId();
-				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
-			}
-			else {
-				menuItemId = action.getMenuItemId();
-				menuTitle = getString(action.getTitle());
-			}
-
-			// If we only have signPapier type, we only have a VISA, actually
-			boolean isVisible = !(action.equals(Action.SIGNATURE) && !sign);
-
+//			MenuItem item;
+//			int menuItemId;
+//			String menuTitle;
+//
+//			// Mixed sets
+//
+//			if (action.equals(Action.VISA) && hasCachet) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.CACHET.getTitle());
+//			}
+//			else if (action.equals(Action.VISA) && hasSignature) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.VISA.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
+//			}
+//			else if (action.equals(Action.CACHET) && hasSignature) {
+//				menuItemId = Action.SIGNATURE.getMenuItemId();
+//				menuTitle = getString(Action.CACHET.getTitle()) + "/" + getString(Action.SIGNATURE.getTitle());
+//			}
+//			else {
+//				menuItemId = action.getMenuItemId();
+//				menuTitle = getString(action.getTitle());
+//			}
+//
+//			// If we only have signPapier type, we only have a VISA, actually
+//			boolean isVisible = !(action.equals(Action.SIGNATURE) && !hasSignature);
+//
 			// Set current state
 
-			item = menu.findItem(menuItemId);
+			MenuItem item = menu.findItem(action.getMenuItemId());
+
 			if (item != null) {
-				item.setTitle(menuTitle);
-				item.setVisible(isVisible);
+//				item.setTitle(menuTitle);
+				item.setVisible(availableActions.contains(action));
 			}
 		}
 
@@ -634,6 +646,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
 			actionDialog.show(getFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.CACHET) {
+			actionDialog = SealDialogFragment.newInstance(dossierList, bureauId);
+			actionDialog.setTargetFragment(menuFragment, SealDialogFragment.REQUEST_CODE_SEAL);
+			actionDialog.show(getFragmentManager(), SealDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.SIGNATURE) {
 			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);

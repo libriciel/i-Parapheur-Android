@@ -221,6 +221,11 @@ public enum RESTClient implements IParapheurAPI {
 		return getRESTClient(currentAccount).viser(currentAccount, dossier, annotPub, annotPriv, bureauId);
 	}
 
+	@Override public boolean seal(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv,
+								   String bureauId) throws IParapheurException {
+		return getRESTClient(currentAccount).seal(currentAccount, dossier, annotPub, annotPriv, bureauId);
+	}
+
 	@Override public boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
 									String bureauId) throws IParapheurException {
 		return getRESTClient(currentAccount).signer(currentAccount, dossierId, signValue, annotPub, annotPriv, bureauId);

@@ -1078,6 +1078,8 @@ public class MenuFragment extends Fragment {
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
 					else if (actionName.contentEquals(getString(R.string.action_viser)))
 						iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+					else if (actionName.contentEquals(getString(R.string.action_seal)))
+						iconImageView.setImageResource(R.drawable.ic_cachet_color_24dp);
 					else if (actionName.contentEquals(getString(R.string.action_archiver)))
 						iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
 					else if (actionName.contentEquals(getString(R.string.action_mailsec)))

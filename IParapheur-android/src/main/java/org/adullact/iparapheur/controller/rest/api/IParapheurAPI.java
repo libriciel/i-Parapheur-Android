@@ -96,6 +96,8 @@ public interface IParapheurAPI {
 
 	boolean viser(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
 
+	boolean seal(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException;
+
 	boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
 				   String bureauId) throws IParapheurException;
 

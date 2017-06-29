@@ -37,6 +37,7 @@ import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.RequestResponse;
 import org.adullact.iparapheur.model.SignInfo;
 import org.adullact.iparapheur.model.State;
+import org.adullact.iparapheur.utils.ActionUtils;
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
@@ -95,7 +96,7 @@ public class RestClientApi1 extends RestClientApi {
 		String response = RESTUtils.get(url).getResponse().toString();
 		Dossier dossierParsed = CollectionUtils.buildGsonWithDateParser().fromJson(new JsonParser().parse(response).getAsJsonObject(), Dossier.class);
 
-		DossierUtils.fixActions(dossierParsed);
+		ActionUtils.fixActions(dossierParsed);
 		return dossierParsed;
 	}
 
@@ -125,7 +126,7 @@ public class RestClientApi1 extends RestClientApi {
 		);
 
 		for (Dossier dossier : dossiersParsed)
-			DossierUtils.fixActions(dossier);
+			ActionUtils.fixActions(dossier);
 
 		return dossiersParsed;
 	}
@@ -267,6 +268,12 @@ public class RestClientApi1 extends RestClientApi {
 			throw new RuntimeException("Une erreur est survenue lors du visa", e);
 		}
 		return true;
+	}
+
+	@Override public boolean seal(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv,
+								   String bureauId) throws IParapheurException {
+
+		throw new IParapheurException(R.string.Error_forward_version_action, null);
 	}
 
 	@Override public boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
