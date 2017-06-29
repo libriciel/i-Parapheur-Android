@@ -269,6 +269,12 @@ public class RestClientApi1 extends RestClientApi {
 		return true;
 	}
 
+	@Override public boolean seal(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv,
+								   String bureauId) throws IParapheurException {
+
+		throw new IParapheurException(R.string.Error_forward_version_action, null);
+	}
+
 	@Override public boolean signer(@NonNull Account currentAccount, String dossierId, String signValue, String annotPub, String annotPriv,
 									String bureauId) throws IParapheurException {
 		return false;

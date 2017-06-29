@@ -58,6 +58,7 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SealDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
@@ -634,6 +635,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
 			actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
 			actionDialog.show(getFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+		}
+		else if (action == Action.CACHET) {
+			actionDialog = SealDialogFragment.newInstance(dossierList, bureauId);
+			actionDialog.setTargetFragment(menuFragment, SealDialogFragment.REQUEST_CODE_SEAL);
+			actionDialog.show(getFragmentManager(), SealDialogFragment.FRAGMENT_TAG);
 		}
 		else if (action == Action.SIGNATURE) {
 			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);

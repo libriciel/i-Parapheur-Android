@@ -18,11 +18,24 @@
 package org.adullact.iparapheur.controller.rest.api;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutCompat;
 
+import org.adullact.iparapheur.controller.rest.RESTUtils;
+import org.adullact.iparapheur.model.Account;
+import org.adullact.iparapheur.model.Dossier;
+import org.adullact.iparapheur.model.RequestResponse;
+import org.adullact.iparapheur.utils.IParapheurException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
 import java.util.Locale;
 
 
 public class RestClientApi4 extends RestClientApi3 {
+
+
+	private static final String ACTION_SEAL = "/parapheur/dossiers/%s/seal";
 
 	private static final String RESOURCE_ANNOTATIONS = "/parapheur/dossiers/%s/%s/annotations";
 	private static final String RESOURCE_ANNOTATION = "/parapheur/dossiers/%s/%s/annotations/%s";
@@ -34,5 +47,22 @@ public class RestClientApi4 extends RestClientApi3 {
 	@Override protected @NonNull String getAnnotationUrlSuffix(@NonNull String dossierId, @NonNull String documentId, @NonNull String annotationId) {
 		return String.format(Locale.US, RESOURCE_ANNOTATION, dossierId, documentId, annotationId);
 	}
+
+	public boolean seal(@NonNull Account currentAccount, Dossier dossier, String annotPub, String annotPriv, String bureauId) throws IParapheurException {
+
+		String actionUrl = String.format(Locale.US, ACTION_SEAL, dossier.getId());
+		try {
+			JSONObject json = new JSONObject();
+			json.put("bureauCourant", bureauId);
+			json.put("annotPub", annotPub);
+			json.put("annotPriv", annotPriv);
+			RequestResponse response = RESTUtils.post(buildUrl(currentAccount, actionUrl), json.toString());
+			return (response != null && response.getCode() == HttpURLConnection.HTTP_OK);
+		}
+		catch (JSONException e) {
+			throw new RuntimeException("Une erreur est survenue lors du cachet", e);
+		}
+	}
+
 
 }
