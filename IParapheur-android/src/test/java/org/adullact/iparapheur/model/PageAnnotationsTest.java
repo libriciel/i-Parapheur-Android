@@ -19,7 +19,7 @@ package org.adullact.iparapheur.model;
 
 import android.graphics.RectF;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.mockito.Mockito;

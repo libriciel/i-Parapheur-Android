@@ -20,7 +20,7 @@ package org.adullact.iparapheur.utils;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Circuit;

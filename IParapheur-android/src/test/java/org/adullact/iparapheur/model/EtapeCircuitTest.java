@@ -19,7 +19,7 @@ package org.adullact.iparapheur.model;
 
 import com.google.gson.Gson;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.StringUtils;

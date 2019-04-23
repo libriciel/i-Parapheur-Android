@@ -19,7 +19,7 @@ package org.adullact.iparapheur.utils;
 
 import android.text.TextUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Test;

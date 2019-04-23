@@ -21,7 +21,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.junit.Before;

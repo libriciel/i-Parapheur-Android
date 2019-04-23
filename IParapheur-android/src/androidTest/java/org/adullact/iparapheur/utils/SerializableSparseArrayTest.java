@@ -20,7 +20,7 @@ package org.adullact.iparapheur.utils;
 import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
