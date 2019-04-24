@@ -37,7 +37,7 @@ import java.util.List;
 
 public interface IParapheurAPI {
 
-	String BASE_PATH = "https://m.";
+	String BASE_PATH = "https://m-";
 
 	/**
 	 * Test si un compte est accessible.

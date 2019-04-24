@@ -32,9 +32,9 @@ public class AccountUtils {
 
 	public static final String DEMO_ID = "AccountTest0";
 	public static final String DEMO_TITLE = "iParapheur demo";
-	public static final String DEMO_BASE_URL = "parapheur.demonstrations.adullact.org";
-	public static final String DEMO_LOGIN = "bma";
-	public static final String DEMO_PASSWORD = "secret";
+	public static final String DEMO_BASE_URL = "iparapheur-partenaires.libriciel.fr";
+	public static final String DEMO_LOGIN = "admin@demo";
+	public static final String DEMO_PASSWORD = "admin";
 
 	private static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 

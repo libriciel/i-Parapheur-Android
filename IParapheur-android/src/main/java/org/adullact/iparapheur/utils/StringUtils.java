@@ -256,10 +256,10 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
 		// Getting the server name
 		// Regex :	- ignore everything before "://" (if exists)					^(?:.*://)*
-		//			- then ignore following "m." (if exists)						(?:m\.)?
+		//			- then ignore following "m." or "m-" (if exists)				(?:m\.|m-)?
 		//			- then catch every char but "/"	(not geedy)						(.*?)
 		//			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
-		String regex = "^(?:.*://)*(?:m\\.)?(.*?)(?:/.*)*$";
+		String regex = "^(?:.*://)*(?:m\\.|m-)?(.*?)(?:/.*)*$";
 		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(url.trim());
 

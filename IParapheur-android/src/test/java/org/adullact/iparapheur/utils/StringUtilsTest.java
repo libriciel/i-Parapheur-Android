@@ -117,7 +117,9 @@ public class StringUtilsTest {
 		Assert.assertEquals(StringUtils.fixUrl("parapheur.test.adullact.org"), "parapheur.test.adullact.org");
 		Assert.assertEquals(StringUtils.fixUrl("https://parapheur"), "parapheur");
 		Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("https://m-parapheur"), "parapheur");
 		Assert.assertEquals(StringUtils.fixUrl("m.parapheur"), "parapheur");
+		Assert.assertEquals(StringUtils.fixUrl("m-parapheur"), "parapheur");
 		Assert.assertEquals(StringUtils.fixUrl("parapheur"), "parapheur");
 	}
 
