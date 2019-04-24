@@ -1,19 +1,19 @@
 /*
- * <p>iParapheur Android<br/>
- * Copyright (C) 2016 Adullact-Projet.</p>
+ * iParapheur Android
+ * Copyright (C) 2016-2019 Libriciel
  *
- * <p>This program is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.</p>
+ * License, or (at your option) any later version.
  *
- * <p>This program is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.</p>
+ * GNU Affero General Public License for more details.
  *
- * <p>You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.</p>
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.adullact.iparapheur.utils;
 
@@ -21,10 +21,12 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.X509TrustManager;
 
+
 /**
  * This Trust Manager is "naive" because it trusts everyone.
  **/
 public class NaiveTrustManager implements X509TrustManager {
+
 
     /**
      * Doesn't throw an exception, so this is how it approves a certificate.
@@ -33,6 +35,7 @@ public class NaiveTrustManager implements X509TrustManager {
      **/
     public void checkClientTrusted(X509Certificate[] cert, String authType) {}
 
+
     /**
      * Doesn't throw an exception, so this is how it approves a certificate.
      *
@@ -40,10 +43,12 @@ public class NaiveTrustManager implements X509TrustManager {
      **/
     public void checkServerTrusted(X509Certificate[] cert, String authType) {}
 
+
     /**
      * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
      **/
     public X509Certificate[] getAcceptedIssuers() {
         return null;  // I've seen someone return new X509Certificate[ 0 ];
     }
+
 }
