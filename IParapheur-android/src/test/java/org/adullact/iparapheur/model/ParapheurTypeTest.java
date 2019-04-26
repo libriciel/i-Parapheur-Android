@@ -19,9 +19,8 @@ package org.adullact.iparapheur.model;
 
 import com.google.gson.Gson;
 
-import org.junit.Assert;
-
 import org.adullact.iparapheur.utils.CollectionUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,42 +29,42 @@ import java.util.List;
 
 public class ParapheurTypeTest {
 
-	private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
+    private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
 
-	@Test public void fromJsonArray() throws Exception {
+    @Test public void fromJsonArray() {
 
-		// Parsed data
+        // Parsed data
 
-		String incorrectArrayJsonString = "[[{]   \"id\": \"Value 01\" , \"sousTypes\": [\"Value 01-01\"  ]]";
-		String correctArrayJsonString = "[{" +
-				"    \"id\": \"Value 01 \\\"\\\\/%@&éè\"," +
-				"    \"sousTypes\": [\"Value 01-01\", \"Value 01-02\"]" +
-				"}, {" +
-				"    \"id\": \"Value 02 \\\"\\\\/%@&éè\"," +
-				"    \"sousTypes\": [\"Value 02-01\", \"Value 02-02\", \"Value 02-03\"]" +
-				"}]";
+        String incorrectArrayJsonString = "[[{]   \"id\": \"Value 01\" , \"sousTypes\": [\"Value 01-01\"  ]]";
+        String correctArrayJsonString = "[{" +
+                "    \"id\": \"Value 01 \\\"\\\\/%@&éè\"," +
+                "    \"sousTypes\": [\"Value 01-01\", \"Value 01-02\"]" +
+                "}, {" +
+                "    \"id\": \"Value 02 \\\"\\\\/%@&éè\"," +
+                "    \"sousTypes\": [\"Value 02-01\", \"Value 02-02\", \"Value 02-03\"]" +
+                "}]";
 
-		List<ParapheurType> incorrectArrayParsed = ParapheurType.fromJsonArray(incorrectArrayJsonString, sGson);
-		List<ParapheurType> correctArrayParsed = ParapheurType.fromJsonArray(correctArrayJsonString, sGson);
+        List<ParapheurType> incorrectArrayParsed = ParapheurType.fromJsonArray(incorrectArrayJsonString, sGson);
+        List<ParapheurType> correctArrayParsed = ParapheurType.fromJsonArray(correctArrayJsonString, sGson);
 
-		// Valid types
+        // Valid types
 
-		ParapheurType type01 = new ParapheurType("Value 01 \"\\/%@&éè", Arrays.asList("Value 01-01", "Value 01-02"));
-		ParapheurType type02 = new ParapheurType("Value 02 \"\\/%@&éè", Arrays.asList("Value 02-01", "Value 02-02", "Value 02-03"));
+        ParapheurType type01 = new ParapheurType("Value 01 \"\\/%@&éè", Arrays.asList("Value 01-01", "Value 01-02"));
+        ParapheurType type02 = new ParapheurType("Value 02 \"\\/%@&éè", Arrays.asList("Value 02-01", "Value 02-02", "Value 02-03"));
 
-		// Checks
+        // Checks
 
-		Assert.assertNull(incorrectArrayParsed);
-		Assert.assertNotNull(correctArrayParsed);
+        Assert.assertNull(incorrectArrayParsed);
+        Assert.assertNotNull(correctArrayParsed);
 
-		Assert.assertEquals(correctArrayParsed.get(0).toString(), type01.toString());
-		Assert.assertEquals(correctArrayParsed.get(0).getName(), type01.getName());
-		Assert.assertEquals(correctArrayParsed.get(0).getSubTypes().toString(), type01.getSubTypes().toString());
+        Assert.assertEquals(correctArrayParsed.get(0).toString(), type01.toString());
+        Assert.assertEquals(correctArrayParsed.get(0).getName(), type01.getName());
+        Assert.assertEquals(correctArrayParsed.get(0).getSubTypes().toString(), type01.getSubTypes().toString());
 
-		Assert.assertEquals(correctArrayParsed.get(1).toString(), type02.toString());
-		Assert.assertEquals(correctArrayParsed.get(1).getName(), type02.getName());
-		Assert.assertEquals(correctArrayParsed.get(1).getSubTypes().toString(), type02.getSubTypes().toString());
+        Assert.assertEquals(correctArrayParsed.get(1).toString(), type02.toString());
+        Assert.assertEquals(correctArrayParsed.get(1).getName(), type02.getName());
+        Assert.assertEquals(correctArrayParsed.get(1).getSubTypes().toString(), type02.getSubTypes().toString());
 
-	}
+    }
 
 }
