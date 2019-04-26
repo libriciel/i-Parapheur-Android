@@ -47,6 +47,24 @@ android {
     //        universalApk false
     //    }
     // }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+    }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
 }
 
 
@@ -55,7 +73,7 @@ dependencies {
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support:multidex:1.0.3'
+    androidTestImplementation 'com.android.support:multidex:1.0.2'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test:core:1.1.0'
@@ -85,4 +103,30 @@ dependencies {
     implementation('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;
     }
+}
+
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug/compileDebugJavaWithJavac/classes", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = fileTree(dir: "$buildDir", includes: [
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/code_coverage/debugAndroidTest/connected/*coverage.ec"
+    ])
+}
+
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
 }
