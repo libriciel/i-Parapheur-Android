@@ -20,7 +20,6 @@ package org.adullact.iparapheur.model;
 import android.graphics.RectF;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -29,50 +28,50 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 @PrepareForTest(RectF.class)
 public class PageAnnotationsTest {
 
-	@Test public void add() throws Exception {
+    @Test public void add() {
 
-		// Fake RectF
+        // Fake RectF
 
-		RectF mockedRect01 = Mockito.mock(RectF.class);
-		Mockito.when(mockedRect01.height()).thenReturn(1F);
-		Mockito.when(mockedRect01.width()).thenReturn(1F);
+        RectF mockedRect01 = Mockito.mock(RectF.class);
+        Mockito.when(mockedRect01.height()).thenReturn(1F);
+        Mockito.when(mockedRect01.width()).thenReturn(1F);
 
-		RectF mockedRect02 = Mockito.mock(RectF.class);
-		Mockito.when(mockedRect02.height()).thenReturn(10F);
-		Mockito.when(mockedRect02.width()).thenReturn(10F);
+        RectF mockedRect02 = Mockito.mock(RectF.class);
+        Mockito.when(mockedRect02.height()).thenReturn(10F);
+        Mockito.when(mockedRect02.width()).thenReturn(10F);
 
-		RectF mockedRect03 = Mockito.mock(RectF.class);
-		Mockito.when(mockedRect03.height()).thenReturn(-15F);
-		Mockito.when(mockedRect03.width()).thenReturn(-15F);
+        RectF mockedRect03 = Mockito.mock(RectF.class);
+        Mockito.when(mockedRect03.height()).thenReturn(-15F);
+        Mockito.when(mockedRect03.width()).thenReturn(-15F);
 
-		RectF mockedRect04 = Mockito.mock(RectF.class);
-		Mockito.when(mockedRect04.height()).thenReturn(20F);
-		Mockito.when(mockedRect04.width()).thenReturn(-20F);
+        RectF mockedRect04 = Mockito.mock(RectF.class);
+        Mockito.when(mockedRect04.height()).thenReturn(20F);
+        Mockito.when(mockedRect04.width()).thenReturn(-20F);
 
-		// Build objects
+        // Build objects
 
-		PageAnnotations pageAnnotationsRandomOrder = new PageAnnotations();
-		pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect03, "03", 0));
-		pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect01, "01", 0));
-		pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect02, "02", 0));
-		pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect04, "04", 0));
+        PageAnnotations pageAnnotationsRandomOrder = new PageAnnotations();
+        pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect03, "03", 0));
+        pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect01, "01", 0));
+        pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect02, "02", 0));
+        pageAnnotationsRandomOrder.add(new Annotation(null, 0, false, null, mockedRect04, "04", 0));
 
-		PageAnnotations pageAnnotationsOrdered = new PageAnnotations();
-		pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect04, "04", 0));
-		pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect03, "03", 0));
-		pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect02, "02", 0));
-		pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect01, "01", 0));
+        PageAnnotations pageAnnotationsOrdered = new PageAnnotations();
+        pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect04, "04", 0));
+        pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect03, "03", 0));
+        pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect02, "02", 0));
+        pageAnnotationsOrdered.add(new Annotation(null, 0, false, null, mockedRect01, "01", 0));
 
-		// Checks
+        // Checks
 
-		Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(0).getText(), "04");
-		Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(1).getText(), "03");
-		Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(2).getText(), "02");
-		Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(3).getText(), "01");
+        Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(0).getText(), "04");
+        Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(1).getText(), "03");
+        Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(2).getText(), "02");
+        Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().get(3).getText(), "01");
 
-		Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().size(), 4);
-		Assert.assertEquals(pageAnnotationsRandomOrder.toString(), pageAnnotationsOrdered.toString());
+        Assert.assertEquals(pageAnnotationsRandomOrder.getAnnotations().size(), 4);
+        Assert.assertEquals(pageAnnotationsRandomOrder.toString(), pageAnnotationsOrdered.toString());
 
-	}
+    }
 
 }

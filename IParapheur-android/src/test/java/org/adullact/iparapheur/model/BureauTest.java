@@ -124,8 +124,8 @@ public class BureauTest {
         Assert.assertEquals(correctArrayParsed.get(1).getParent(), bureau02.getParent());
         Assert.assertEquals(correctArrayParsed.get(1).getChildrenDossiers(), bureau02.getChildrenDossiers());
 
-        Assert.assertTrue(bureau01.equals(correctArrayParsed.get(0)));
-        Assert.assertTrue(bureau02.equals(correctArrayParsed.get(1)));
+        Assert.assertEquals(bureau01, correctArrayParsed.get(0));
+        Assert.assertEquals(bureau02, correctArrayParsed.get(1));
     }
 
 }
