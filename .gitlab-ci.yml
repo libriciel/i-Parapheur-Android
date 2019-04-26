@@ -1,37 +1,18 @@
 image: gitlab.libriciel.fr:4567/docker/android-builder:latest
 
 before_script:
-    - eval $(ssh-agent -s)
-    # add ssh key stored in SECRET_VARIABLES_ID_RSA variable to the agent store
-    - ssh-add <(echo "$SECRET_VARIABLES_ID_RSA")
-    # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
-    # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
-    - mkdir -p ~/.ssh 
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
-    - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
+  - eval $(ssh-agent -s)
+  # add ssh key stored in SECRET_VARIABLES_ID_RSA variable to the agent store
+  - ssh-add <(echo "$SECRET_VARIABLES_ID_RSA")
+  # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
+  # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
 
 stages:
-    - submodules
-    - test
-    - build
-
-
-# Jobs fetch_submodules
-
-refresh_submodule_develop:
-  stage: submodules
-  except:
-    - master
-  script:
-    - git -C mupdffragment checkout develop
-
-
-refresh_submodule_master:
-  stage: submodules
-  only:
-    - master
-  script:
-    - git -C mupdffragment checkout master
+  - test
+  - build
 
 
 # Jobs test

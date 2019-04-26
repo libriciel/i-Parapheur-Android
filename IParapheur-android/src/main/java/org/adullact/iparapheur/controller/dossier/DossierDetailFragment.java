@@ -85,119 +85,119 @@ import coop.adullactprojet.mupdffragment.stickynotes.StickyNote;
  */
 public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.DataChangeListener, SeekBar.OnSeekBarChangeListener {
 
-	public static final String FRAGMENT_TAG = "dossier_details_fragment";
-	public static final String LOG_TAG = "DossierDetailFragment";
+    public static final String FRAGMENT_TAG = "dossier_details_fragment";
+    public static final String LOG_TAG = "DossierDetailFragment";
 
-	private static final int FAB_ANIM_DELAY_IN_MS = 75;
-	private static final String ANNOTATION_PAYLOAD_STEP = "step";
-	private static final String ANNOTATION_PAYLOAD_TYPE = "type";
-	private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
+    private static final int FAB_ANIM_DELAY_IN_MS = 75;
+    private static final String ANNOTATION_PAYLOAD_STEP = "step";
+    private static final String ANNOTATION_PAYLOAD_TYPE = "type";
+    private static final String ANNOTATION_PAYLOAD_IS_SECRETAIRE = "is_secretaire";
 
-	private View mFabWhiteBackground;
-	private ViewSwitcher mMainButtonViewSwitcher;
-	private FloatingActionButton mMainMenuFab;
-	private FloatingActionButton mCancelFab;
-	private FloatingActionButton mAnnotationFab;
-	private TextView mValidateLabelTextView;
-	private TextView mCancelLabelTextView;
-	private View mValidateLabel;
-	private View mCancelLabel;
-	private View mAnnotationLabel;
+    private View mFabWhiteBackground;
+    private ViewSwitcher mMainButtonViewSwitcher;
+    private FloatingActionButton mMainMenuFab;
+    private FloatingActionButton mCancelFab;
+    private FloatingActionButton mAnnotationFab;
+    private TextView mValidateLabelTextView;
+    private TextView mCancelLabelTextView;
+    private View mValidateLabel;
+    private View mCancelLabel;
+    private View mAnnotationLabel;
 
-	private String mBureauId;                // The Bureau where the dossier belongs.
-	private Dossier mDossier;                // The Dossier this fragment is presenting.
-	private String mDocumentId;              // The Document this fragment is presenting.
-	private boolean mIsAnnotable;
-	private int mCurrentPage;
-	private boolean mShouldReload = false;
+    private String mBureauId;                // The Bureau where the dossier belongs.
+    private Dossier mDossier;                // The Dossier this fragment is presenting.
+    private String mDocumentId;              // The Document this fragment is presenting.
+    private boolean mIsAnnotable;
+    private int mCurrentPage;
+    private boolean mShouldReload = false;
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
-	@Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+    @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-		// Retrieve views
+        // Retrieve views
 
-		mMainButtonViewSwitcher = (ViewSwitcher) view.findViewById(R.id.mupdf_main_fab_viewswitcher);
-		mMainMenuFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_menu_fabbutton);
-		mCancelFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
-		mAnnotationFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
-		mValidateLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_fab_viewswitcher_label_textview);
-		mCancelLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_cancel_fabbutton_label_textview);
-		mValidateLabel = view.findViewById(R.id.mupdf_main_fab_viewswitcher_label);
-		mCancelLabel = view.findViewById(R.id.mupdf_main_cancel_fabbutton_label);
-		mAnnotationLabel = view.findViewById(R.id.mupdf_main_annotation_fabbutton_label);
-		mFabWhiteBackground = view.findViewById(R.id.mupdf_main_fabbutton_white_background);
-		FloatingActionButton validateFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_validate_fabbutton);
+        mMainButtonViewSwitcher = (ViewSwitcher) view.findViewById(R.id.mupdf_main_fab_viewswitcher);
+        mMainMenuFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_menu_fabbutton);
+        mCancelFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_cancel_fabbutton);
+        mAnnotationFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_annotation_fabbutton);
+        mValidateLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_fab_viewswitcher_label_textview);
+        mCancelLabelTextView = (TextView) view.findViewById(R.id.mupdf_main_cancel_fabbutton_label_textview);
+        mValidateLabel = view.findViewById(R.id.mupdf_main_fab_viewswitcher_label);
+        mCancelLabel = view.findViewById(R.id.mupdf_main_cancel_fabbutton_label);
+        mAnnotationLabel = view.findViewById(R.id.mupdf_main_annotation_fabbutton_label);
+        mFabWhiteBackground = view.findViewById(R.id.mupdf_main_fabbutton_white_background);
+        FloatingActionButton validateFab = (FloatingActionButton) view.findViewById(R.id.mupdf_main_validate_fabbutton);
 
-		// Default state
+        // Default state
 
-		mCancelFab.setVisibility(View.GONE);
-		mAnnotationFab.setVisibility(View.GONE);
-		mValidateLabel.setVisibility(View.GONE);
-		mCancelLabel.setVisibility(View.GONE);
-		mAnnotationLabel.setVisibility(View.GONE);
+        mCancelFab.setVisibility(View.GONE);
+        mAnnotationFab.setVisibility(View.GONE);
+        mValidateLabel.setVisibility(View.GONE);
+        mCancelLabel.setVisibility(View.GONE);
+        mAnnotationLabel.setVisibility(View.GONE);
 
-		// Set listeners
+        // Set listeners
 
-		mFabWhiteBackground.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onWhiteBackgroundClicked();
-			}
-		});
+        mFabWhiteBackground.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onWhiteBackgroundClicked();
+            }
+        });
 
-		mMainMenuFab.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				toggleFabMenuVisibility();
-			}
-		});
+        mMainMenuFab.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                toggleFabMenuVisibility();
+            }
+        });
 
-		mAnnotationFab.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onAnnotationSelected();
-			}
-		});
-		mAnnotationLabel.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onAnnotationSelected();
-			}
-		});
+        mAnnotationFab.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onAnnotationSelected();
+            }
+        });
+        mAnnotationLabel.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onAnnotationSelected();
+            }
+        });
 
-		validateFab.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onValidateSelected();
-			}
-		});
-		mValidateLabel.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onValidateSelected();
-			}
-		});
+        validateFab.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onValidateSelected();
+            }
+        });
+        mValidateLabel.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onValidateSelected();
+            }
+        });
 
-		mCancelFab.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onCancelSelected();
-			}
-		});
-		mCancelLabel.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onCancelSelected();
-			}
-		});
+        mCancelFab.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onCancelSelected();
+            }
+        });
+        mCancelLabel.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onCancelSelected();
+            }
+        });
 
-		// Reload data after rotation
+        // Reload data after rotation
 
-		if (savedInstanceState != null)
-			mShouldReload = true;
-	}
+        if (savedInstanceState != null)
+            mShouldReload = true;
+    }
 
-	@Override public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
+    @Override public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
 //		String state = Environment.getExternalStorageState();
 //		if (!Environment.MEDIA_MOUNTED.equals(state)) {
@@ -205,754 +205,752 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 //			isReaderEnabled = false;
 //		}
 
-		if (mDossier != null)
-			getDossierDetails(false);
+        if (mDossier != null)
+            getDossierDetails(false);
 
-		setHasOptionsMenu(true);
-	}
+        setHasOptionsMenu(true);
+    }
 
-	@Override public void onStart() {
-		super.onStart();
+    @Override public void onStart() {
+        super.onStart();
 
-		if (mShouldReload) {
-			mShouldReload = false;
-			update(mDossier, mBureauId, null);
-		}
-	}
+        if (mShouldReload) {
+            mShouldReload = false;
+            update(mDossier, mBureauId, null);
+        }
+    }
 
-	/**
-	 * Called manually from parent Activity.
-	 *
-	 * @return true if the event was consumed.
-	 */
-	public final boolean onBackPressed() {
+    /**
+     * Called manually from parent Activity.
+     *
+     * @return true if the event was consumed.
+     */
+    public final boolean onBackPressed() {
 
-		if (mMainButtonViewSwitcher.getDisplayedChild() == 1) {
-			collapseFabMenu();
-			return true;
-		}
+        if (mMainButtonViewSwitcher.getDisplayedChild() == 1) {
+            collapseFabMenu();
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	// </editor-fold desc="LifeCycle">
+    // </editor-fold desc="LifeCycle">
 
-	// <editor-fold desc="ActionBar">
+    // <editor-fold desc="ActionBar">
 
-	@Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
+    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
 
-		Toolbar actionsToolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+        Toolbar actionsToolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
 
-		if (actionsToolbar != null) {
-			actionsToolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
-			actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-				@Override public boolean onMenuItemClick(MenuItem item) {
-					return onOptionsItemSelected(item);
-				}
-			});
-		}
-	}
+        if (actionsToolbar != null) {
+            actionsToolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
+            actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override public boolean onMenuItemClick(MenuItem item) {
+                    return onOptionsItemSelected(item);
+                }
+            });
+        }
+    }
 
-	@Override public void onPrepareOptionsMenu(Menu menu) {
+    @Override public void onPrepareOptionsMenu(Menu menu) {
 
-		Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+        Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
 
-		// Info item
+        // Info item
 
-		MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
-		infoItem.setVisible((mDossier != null) && DossierUtils.areDetailsAvailable(mDossier));
+        MenuItem infoItem = actions_toolbar.getMenu().findItem(R.id.action_details);
+        infoItem.setVisible((mDossier != null) && DossierUtils.areDetailsAvailable(mDossier));
 
-		// Document selector
+        // Document selector
 
-		MenuItem documentSelectorItem = actions_toolbar.getMenu().findItem(R.id.action_document_selection);
-		boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getDocumentList().size() > 1));
-		documentSelectorItem.setVisible(hasMultipleDoc);
+        MenuItem documentSelectorItem = actions_toolbar.getMenu().findItem(R.id.action_document_selection);
+        boolean hasMultipleDoc = (mDossier != null) && ((mDossier.getDocumentList().size() > 1));
+        documentSelectorItem.setVisible(hasMultipleDoc);
 
-		if (hasMultipleDoc) {
-			SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
-			docSelectorSubMenu.clear();
+        if (hasMultipleDoc) {
+            SubMenu docSelectorSubMenu = documentSelectorItem.getSubMenu();
+            docSelectorSubMenu.clear();
 
-			for (Document mainDoc : DossierUtils.getMainDocuments(mDossier))
-				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
+            for (Document mainDoc : DossierUtils.getMainDocuments(mDossier))
+                docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, mainDoc.getName()).setIcon(R.drawable.ic_description_black_24dp);
 
-			for (Document annexe : DossierUtils.getAnnexes(mDossier))
-				docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
-		}
+            for (Document annexe : DossierUtils.getAnnexes(mDossier))
+                docSelectorSubMenu.add(Menu.NONE, R.id.action_document_selected, Menu.NONE, annexe.getName()).setIcon(R.drawable.ic_attachment_black_24dp);
+        }
 
-		// Share
+        // Share
 
-		MenuItem shareItem = actions_toolbar.getMenu().findItem(R.id.action_share);
-		shareItem.setVisible((mDossier != null));
+        MenuItem shareItem = actions_toolbar.getMenu().findItem(R.id.action_share);
+        shareItem.setVisible((mDossier != null));
 
-		//
+        //
 
-		super.onPrepareOptionsMenu(menu);
-	}
+        super.onPrepareOptionsMenu(menu);
+    }
 
-	@Override public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
 
-		// Handle presses on the action bar items
+        // Handle presses on the action bar items
 
-		switch (item.getItemId()) {
+        switch (item.getItemId()) {
 
-			case R.id.action_details:
-				((DossierDetailsFragmentListener) getActivity()).toggleInfoDrawer();
-				return true;
+            case R.id.action_details:
+                ((DossierDetailsFragmentListener) getActivity()).toggleInfoDrawer();
+                return true;
 
-			case R.id.action_document_selected:
-				String name = String.valueOf(item.getTitle());
-				String documentId = findDocumentId(mDossier, name);
+            case R.id.action_document_selected:
+                String name = String.valueOf(item.getTitle());
+                String documentId = findDocumentId(mDossier, name);
 
-				if (!TextUtils.isEmpty(documentId))
-					if (!TextUtils.equals(mDocumentId, documentId))
-						update(mDossier, mBureauId, documentId);
+                if (!TextUtils.isEmpty(documentId))
+                    if (!TextUtils.equals(mDocumentId, documentId))
+                        update(mDossier, mBureauId, documentId);
 
-				return true;
+                return true;
 
-			case R.id.action_share:
-				startShareIntent();
-				return true;
+            case R.id.action_share:
+                startShareIntent();
+                return true;
 
-			default:
-				return getActivity().onOptionsItemSelected(item);
-		}
-	}
+            default:
+                return getActivity().onOptionsItemSelected(item);
+        }
+    }
 
-	// </editor-fold desc="ActionBar">
+    // </editor-fold desc="ActionBar">
 
-	// <editor-fold desc="MuPdfFragment">
+    // <editor-fold desc="MuPdfFragment">
 
-	@Override protected boolean areGesturesLocked() {
-		return ((DossierDetailsFragmentListener) getActivity()).isAnyDrawerOpened();
-	}
+    @Override protected boolean areGesturesLocked() {
+        return ((DossierDetailsFragmentListener) getActivity()).isAnyDrawerOpened();
+    }
 
-	@Override public void showProgressLayout() {
-		mMainMenuFab.hide();
-		super.showProgressLayout();
+    @Override public void showProgressLayout() {
+        mMainMenuFab.hide();
+        super.showProgressLayout();
 
-	}
+    }
 
-	@Override public void showContentLayout() {
-		mMainButtonViewSwitcher.setVisibility(View.VISIBLE);
-		mMainMenuFab.show();
-		super.showContentLayout();
-	}
+    @Override public void showContentLayout() {
+        mMainButtonViewSwitcher.setVisibility(View.VISIBLE);
+        mMainMenuFab.show();
+        super.showContentLayout();
+    }
 
-	@Override public void showErrorLayout() {
-		mMainMenuFab.hide();
-		super.showErrorLayout();
-	}
+    @Override public void showErrorLayout() {
+        mMainMenuFab.hide();
+        super.showErrorLayout();
+    }
 
-	@Override protected void onStickyNoteChanged(@NonNull final StickyNote stickyNote, boolean deleteInvoked) {
+    @Override protected void onStickyNoteChanged(@NonNull final StickyNote stickyNote, boolean deleteInvoked) {
 
-		if (!DeviceUtils.isConnected(getActivity())) {
-			Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
-			return;
-		}
+        if (!DeviceUtils.isConnected(getActivity())) {
+            Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+            return;
+        }
 
-		final Annotation newStickyNote = muPdfStickyNoteToParapheurAnnotation(stickyNote);
+        final Annotation newStickyNote = muPdfStickyNoteToParapheurAnnotation(stickyNote);
 
-		if (deleteInvoked)
-			new DeleteAnnotationAsyncTask().execute(newStickyNote);
-		else if (stickyNote.getId().startsWith("new_"))
-			new CreateAnnotationAsyncTask().execute(newStickyNote);
-		else
-			new UpdateAnnotationAsyncTask().execute(newStickyNote);
-	}
+        if (deleteInvoked)
+            new DeleteAnnotationAsyncTask().execute(newStickyNote);
+        else if (stickyNote.getId().startsWith("new_"))
+            new CreateAnnotationAsyncTask().execute(newStickyNote);
+        else
+            new UpdateAnnotationAsyncTask().execute(newStickyNote);
+    }
 
-	@Override protected @NonNull String getStickyNoteAuthorName() {
-		return AccountUtils.SELECTED_ACCOUNT.getLogin();
-	}
+    @Override protected @NonNull String getStickyNoteAuthorName() {
+        return AccountUtils.SELECTED_ACCOUNT.getLogin();
+    }
 
-	@Override protected @NonNull String generateNewStickyNoteId() {
-		return "new_" + UUID.randomUUID();
-	}
+    @Override protected @NonNull String generateNewStickyNoteId() {
+        return "new_" + UUID.randomUUID();
+    }
 
-	// </editor-fold desc="MuPdfFragment">
+    // </editor-fold desc="MuPdfFragment">
 
-	// <editor-fold desc="FloatingActionButtons">
+    // <editor-fold desc="FloatingActionButtons">
 
-	private void onWhiteBackgroundClicked() {
-		onBackPressed();
-	}
+    private void onWhiteBackgroundClicked() {
+        onBackPressed();
+    }
 
-	private void onValidateSelected() {
-		collapseFabMenu();
+    private void onValidateSelected() {
+        collapseFabMenu();
 
-		Action positiveAction = ActionUtils.getPositiveAction(mDossier);
-		if (positiveAction != null)
-			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
-	}
+        Action positiveAction = ActionUtils.getPositiveAction(mDossier);
+        if (positiveAction != null)
+            ((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, positiveAction);
+    }
 
-	private void onCancelSelected() {
-		collapseFabMenu();
+    private void onCancelSelected() {
+        collapseFabMenu();
 
-		Action negativeAction = ActionUtils.getNegativeAction(mDossier);
-		if (negativeAction != null)
-			((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
-	}
+        Action negativeAction = ActionUtils.getNegativeAction(mDossier);
+        if (negativeAction != null)
+            ((DossierDetailsFragmentListener) getActivity()).onActionButtonClicked(mDossier, mBureauId, negativeAction);
+    }
 
-	private void onAnnotationSelected() {
-		collapseFabMenu();
+    private void onAnnotationSelected() {
+        collapseFabMenu();
 
-		if (!DeviceUtils.isConnected(getActivity())) {
-			Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
-			return;
-		}
+        if (!DeviceUtils.isConnected(getActivity())) {
+            Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
+            return;
+        }
 
-		startCreateStickyNoteOnNextMove(true);
-	}
+        startCreateStickyNoteOnNextMove(true);
+    }
 
-	private void toggleFabMenuVisibility() {
+    private void toggleFabMenuVisibility() {
 
-		if (mDossier == null)
-			return;
+        if (mDossier == null)
+            return;
 
-		if (mMainButtonViewSwitcher.getDisplayedChild() == 0)
-			expanseFabMenu();
-		else
-			collapseFabMenu();
-	}
+        if (mMainButtonViewSwitcher.getDisplayedChild() == 0)
+            expanseFabMenu();
+        else
+            collapseFabMenu();
+    }
 
-	private void expanseFabMenu() {
+    private void expanseFabMenu() {
 
-		mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_clockwise_in);
-		mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_clockwise_out);
-		mMainButtonViewSwitcher.setDisplayedChild(1);
+        mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_clockwise_in);
+        mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_clockwise_out);
+        mMainButtonViewSwitcher.setDisplayedChild(1);
 
-		// Compute values
+        // Compute values
 
-		boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
-		int mainRank = 0;
-		int cancelRank = 1;
-		int annotationRank = 1 + (hasNegativeAction ? 1 : 0);
+        boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
+        int mainRank = 0;
+        int cancelRank = 1;
+        int annotationRank = 1 + (hasNegativeAction ? 1 : 0);
 
-		// Animate
+        // Animate
 
-		ViewUtils.showAfterDelay(mFabWhiteBackground, 0);
-		ViewUtils.showAfterDelay(mValidateLabel, mainRank * FAB_ANIM_DELAY_IN_MS);
+        ViewUtils.showAfterDelay(mFabWhiteBackground, 0);
+        ViewUtils.showAfterDelay(mValidateLabel, mainRank * FAB_ANIM_DELAY_IN_MS);
 
-		if (hasNegativeAction) {
-			ViewUtils.showAfterDelay(mCancelFab, cancelRank * FAB_ANIM_DELAY_IN_MS);
-			ViewUtils.showAfterDelay(mCancelLabel, cancelRank * FAB_ANIM_DELAY_IN_MS);
-		}
+        if (hasNegativeAction) {
+            ViewUtils.showAfterDelay(mCancelFab, cancelRank * FAB_ANIM_DELAY_IN_MS);
+            ViewUtils.showAfterDelay(mCancelLabel, cancelRank * FAB_ANIM_DELAY_IN_MS);
+        }
 
-		ViewUtils.showAfterDelay(mAnnotationFab, annotationRank * FAB_ANIM_DELAY_IN_MS);
-		ViewUtils.showAfterDelay(mAnnotationLabel, annotationRank * FAB_ANIM_DELAY_IN_MS);
-	}
+        ViewUtils.showAfterDelay(mAnnotationFab, annotationRank * FAB_ANIM_DELAY_IN_MS);
+        ViewUtils.showAfterDelay(mAnnotationLabel, annotationRank * FAB_ANIM_DELAY_IN_MS);
+    }
 
-	private void collapseFabMenu() {
+    private void collapseFabMenu() {
 
-		mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_anticlockwise_in);
-		mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_anticlockwise_out);
-		mMainButtonViewSwitcher.setDisplayedChild(0);
+        mMainButtonViewSwitcher.setInAnimation(getActivity(), R.anim.rotation_anticlockwise_in);
+        mMainButtonViewSwitcher.setOutAnimation(getActivity(), R.anim.rotation_anticlockwise_out);
+        mMainButtonViewSwitcher.setDisplayedChild(0);
 
-		// Compute values
+        // Compute values
 
-		boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
-		int maxRank = (hasNegativeAction ? 1 : 0) + (mIsAnnotable ? 1 : 0);
-		int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
-		int annotationReverseRank = 0;
+        boolean hasNegativeAction = (ActionUtils.getNegativeAction(mDossier) != null);
+        int maxRank = (hasNegativeAction ? 1 : 0) + (mIsAnnotable ? 1 : 0);
+        int cancelReverseRank = maxRank - (mIsAnnotable ? 1 : 0);
+        int annotationReverseRank = 0;
 
-		// Animate
+        // Animate
 
-		ViewUtils.hideAfterDelay(mFabWhiteBackground, 0);
-		ViewUtils.hideAfterDelay(mValidateLabel, maxRank * FAB_ANIM_DELAY_IN_MS);
+        ViewUtils.hideAfterDelay(mFabWhiteBackground, 0);
+        ViewUtils.hideAfterDelay(mValidateLabel, maxRank * FAB_ANIM_DELAY_IN_MS);
 
-		if (hasNegativeAction) {
-			ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
-			ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
-		}
+        if (hasNegativeAction) {
+            ViewUtils.hideAfterDelay(mCancelFab, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
+            ViewUtils.hideAfterDelay(mCancelLabel, cancelReverseRank * FAB_ANIM_DELAY_IN_MS);
+        }
 
-		ViewUtils.hideAfterDelay(mAnnotationFab, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
-		ViewUtils.hideAfterDelay(mAnnotationLabel, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
-	}
+        ViewUtils.hideAfterDelay(mAnnotationFab, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
+        ViewUtils.hideAfterDelay(mAnnotationLabel, annotationReverseRank * FAB_ANIM_DELAY_IN_MS);
+    }
 
-	private void updateFab(@Nullable Dossier dossier) {
+    private void updateFab(@Nullable Dossier dossier) {
 
-		// Default cases
+        // Default cases
 
-		if ((dossier == null) || (getView() == null))
-			return;
+        if ((dossier == null) || (getView() == null))
+            return;
 
-		//
+        //
 
-		Action positiveAction = ActionUtils.getPositiveAction(dossier);
-		mValidateLabelTextView.setText((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee);
+        Action positiveAction = ActionUtils.getPositiveAction(dossier);
+        mValidateLabelTextView.setText((positiveAction != null) ? positiveAction.getTitle() : R.string.action_non_implementee);
 
-		Action negativeAction = ActionUtils.getNegativeAction(dossier);
-		mCancelLabelTextView.setText((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee);
-	}
+        Action negativeAction = ActionUtils.getNegativeAction(dossier);
+        mCancelLabelTextView.setText((negativeAction != null) ? negativeAction.getTitle() : R.string.action_non_implementee);
+    }
 
-	// </editor-fold desc="FloatingActionButtons">
+    // </editor-fold desc="FloatingActionButtons">
 
-	public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
+    public void update(@Nullable Dossier dossier, @NonNull String bureauId, @Nullable String documentId) {
 
-		mBureauId = bureauId;
-		mDossier = dossier;
-		mDocumentId = documentId;
+        mBureauId = bureauId;
+        mDossier = dossier;
+        mDocumentId = documentId;
 
-		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
+        ((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(true);
 
-		if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
-			showProgressLayout();
-			getDossierDetails(false);
-		}
-		else {
-			updateReader();
-		}
+        if ((dossier != null) && (!TextUtils.isEmpty(dossier.getId()))) {
+            showProgressLayout();
+            getDossierDetails(false);
+        } else {
+            updateReader();
+        }
 
-		updateFab(dossier);
-	}
+        updateFab(dossier);
+    }
 
-	private void getDossierDetails(boolean forceReload) {
+    private void getDossierDetails(boolean forceReload) {
 
-		// To force reload dossier details, just delete its main document path (on local storage).
+        // To force reload dossier details, just delete its main document path (on local storage).
 
-		if (forceReload) {
-			mDossier.getDocumentList().clear();
-			mDossier.setCircuit(null);
-		}
+        if (forceReload) {
+            mDossier.getDocumentList().clear();
+            mDossier.setCircuit(null);
+        }
 
-		// Download information only if details aren't already available
+        // Download information only if details aren't already available
 
-		new DossierLoadingAsyncTask().execute();
-	}
+        new DossierLoadingAsyncTask().execute();
+    }
 
-	private void updateReader() {
-		//Adrien - TODO - Error messages
+    private void updateReader() {
+        //Adrien - TODO - Error messages
 
-		final Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
-		if (document == null)
-			return;
+        final Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
+        if (document == null)
+            return;
 
-		File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
-		if (!documentFile.exists())
-			return;
+        File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
+        if (!documentFile.exists())
+            return;
 
-		openFile(documentFile.getAbsolutePath());
+        openFile(documentFile.getAbsolutePath());
 
-		SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
-		updateStickyNotes(muPdfStickyNotes);
+        SparseArray<HashMap<String, StickyNote>> muPdfStickyNotes = parapheurToMuPdfStickyNote(document.getPagesAnnotations());
+        updateStickyNotes(muPdfStickyNotes);
 
-		mIsAnnotable = DocumentUtils.isMainDocument(mDossier, document);
-	}
+        mIsAnnotable = DocumentUtils.isMainDocument(mDossier, document);
+    }
 
-	private void updateCircuitInfoDrawerContent() {
+    private void updateCircuitInfoDrawerContent() {
 
-		View infoLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
+        View infoLayout = getActivity().findViewById(R.id.activity_dossiers_right_drawer);
 
-		// Default case (this should not happen !)
+        // Default case (this should not happen !)
 
-		if (infoLayout == null)
-			return;
+        if (infoLayout == null)
+            return;
 
-		// Updating info
+        // Updating info
 
-		ListView circuitView = (ListView) infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
-		TextView title = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_title);
-		TextView typology = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
+        ListView circuitView = (ListView) infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
+        TextView title = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_title);
+        TextView typology = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
 
-		title.setText(mDossier.getName());
-		String typeString = mDossier.getType() + " / " + mDossier.getSousType();
-		typology.setText(typeString);
+        title.setText(mDossier.getName());
+        String typeString = mDossier.getType() + " / " + mDossier.getSousType();
+        typology.setText(typeString);
 
-		if (mDossier.getCircuit() != null) // FIXME Why NPE ???
-			circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
+        if (mDossier.getCircuit() != null) // FIXME Why NPE ???
+            circuitView.setAdapter(new CircuitAdapter(getActivity(), mDossier.getCircuit().getEtapeCircuitList()));
 
-		((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
-		getActivity().invalidateOptionsMenu();
-	}
+        ((DossierDetailsFragmentListener) getActivity()).lockInfoDrawer(false);
+        getActivity().invalidateOptionsMenu();
+    }
 
-	private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
+    private @NonNull Annotation muPdfStickyNoteToParapheurAnnotation(@NonNull StickyNote muPdfAnnotation) {
 
-		return new Annotation(
-				muPdfAnnotation.getId(),
-				muPdfAnnotation.getAuthor(),
-				getCurrentPage(),
-				(boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
-				StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
-				ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
-				muPdfAnnotation.getText(),
-				(String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
-				(int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
-		);
-	}
+        return new Annotation(
+                muPdfAnnotation.getId(),
+                muPdfAnnotation.getAuthor(),
+                getCurrentPage(),
+                (boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
+                StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
+                ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
+                muPdfAnnotation.getText(),
+                (String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
+                (int) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_STEP, 0)
+        );
+    }
 
-	private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(@Nullable SparseArray<PageAnnotations> parapheurAnnotations) {
+    private static @NonNull SparseArray<HashMap<String, StickyNote>> parapheurToMuPdfStickyNote(@Nullable SparseArray<PageAnnotations> parapheurAnnotations) {
 
-		// Default case
+        // Default case
 
-		SparseArray<HashMap<String, StickyNote>> result = new SparseArray<>();
+        SparseArray<HashMap<String, StickyNote>> result = new SparseArray<>();
 
-		if (parapheurAnnotations == null)
-			return result;
+        if (parapheurAnnotations == null)
+            return result;
 
-		//
+        //
 
-		for (int i = 0; i < parapheurAnnotations.size(); i++) {
+        for (int i = 0; i < parapheurAnnotations.size(); i++) {
 
-			HashMap<String, StickyNote> stickyNoteMap = new HashMap<>();
-			int pageIndex = parapheurAnnotations.keyAt(i);
-			PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
+            HashMap<String, StickyNote> stickyNoteMap = new HashMap<>();
+            int pageIndex = parapheurAnnotations.keyAt(i);
+            PageAnnotations pageAnnotation = parapheurAnnotations.get(pageIndex);
 
-			for (Annotation annotation : pageAnnotation.getAnnotations()) {
+            for (Annotation annotation : pageAnnotation.getAnnotations()) {
 
-				// Payload, to ease irrelevants MuPdf lib data
+                // Payload, to ease irrelevants MuPdf lib data
 
-				HashMap<String, Object> payload = new HashMap<>();
-				payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
+                HashMap<String, Object> payload = new HashMap<>();
+                payload.put(ANNOTATION_PAYLOAD_STEP, annotation.getStep());
 
-				// Building final StickyNote object
+                // Building final StickyNote object
 
-				boolean isLocked = !TextUtils.equals(annotation.getAuthor(), AccountUtils.SELECTED_ACCOUNT.getUserFullName());
+                boolean isLocked = !TextUtils.equals(annotation.getAuthor(), AccountUtils.SELECTED_ACCOUNT.getUserFullName());
 
-				stickyNoteMap.put(annotation.getUuid(), new StickyNote(
-						annotation.getUuid(),
-						ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
-						annotation.getText(),
-						annotation.getAuthor(),
-						StringUtils.parseIso8601Date(annotation.getDate()),
-						isLocked ? StickyNote.Color.BLUE_GREY : StickyNote.Color.BLUE,
-						isLocked,
-						payload
-				));
-			}
+                stickyNoteMap.put(annotation.getUuid(), new StickyNote(
+                        annotation.getUuid(),
+                        ViewUtils.translateDpiRect(annotation.getRect(), 150, 144),
+                        StickyNote.Color.BLUE,
+                        annotation.getText(),
+                        annotation.getAuthor(),
+                        null,
+                        StringUtils.parseIso8601Date(annotation.getDate()),
+                        isLocked,
+                        payload
+                ));
+            }
 
-			result.put(pageIndex, stickyNoteMap);
-		}
+            result.put(pageIndex, stickyNoteMap);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
+    private @Nullable String findDocumentId(@Nullable Dossier dossier, @Nullable String documentName) {
 
-		if (dossier == null)
-			return null;
+        if (dossier == null)
+            return null;
 
-		for (Document mainDocument : DossierUtils.getMainDocuments(mDossier))
-			if (TextUtils.equals(documentName, mainDocument.getName()))
-				return mainDocument.getId();
+        for (Document mainDocument : DossierUtils.getMainDocuments(mDossier))
+            if (TextUtils.equals(documentName, mainDocument.getName()))
+                return mainDocument.getId();
 
-		for (Document annexes : DossierUtils.getAnnexes(mDossier))
-			if (TextUtils.equals(documentName, annexes.getName()))
-				return annexes.getId();
+        for (Document annexes : DossierUtils.getAnnexes(mDossier))
+            if (TextUtils.equals(documentName, annexes.getName()))
+                return annexes.getId();
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override public void onDataChanged() {
+    @Override public void onDataChanged() {
 
-		if (!DeviceUtils.isDebugOffline())
-			updateCircuitInfoDrawerContent();
+        if (!DeviceUtils.isDebugOffline())
+            updateCircuitInfoDrawerContent();
 
-		updateReader();
-	}
+        updateReader();
+    }
 
-	private void startShareIntent() {
+    private void startShareIntent() {
 
-		Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
+        Document document = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
 
-		// Default cases
+        // Default cases
 
-		if (document == null)
-			return;
+        if (document == null)
+            return;
 
-		File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
-		if (!documentFile.exists())
-			return;
+        File documentFile = DocumentUtils.getFile(getActivity(), mDossier, document);
+        if (!documentFile.exists())
+            return;
 
-		// Start share
+        // Start share
 
-		Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-		intentShareFile.setType("application/pdf");
-		intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
-		intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), mDossier.getName()));
-		// FIXME : uncomment this when Dropbox will fix its API.
-		// FIXME : dropboxforum.com/hc/en-us/community/posts/203352359-Dropbox-should-respond-to-Android-Intent-ACTION-SEND
-		// intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
-		startActivity(Intent.createChooser(intentShareFile, getString(R.string.Choose_an_app)));
-	}
+        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
+        intentShareFile.setType("application/pdf");
+        intentShareFile.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(documentFile));
+        intentShareFile.putExtra(Intent.EXTRA_SUBJECT, String.format(getString(R.string.action_share_subject), mDossier.getName()));
+        // FIXME : uncomment this when Dropbox will fix its API.
+        // FIXME : dropboxforum.com/hc/en-us/community/posts/203352359-Dropbox-should-respond-to-Android-Intent-ACTION-SEND
+        // intentShareFile.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.action_share_text), document.getName(), dossier.getName()));
+        startActivity(Intent.createChooser(intentShareFile, getString(R.string.Choose_an_app)));
+    }
 
-	// <editor-fold desc="SeekBar Listener">
+    // <editor-fold desc="SeekBar Listener">
 
-	@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
+    @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
 
-	@Override public void onStartTrackingTouch(SeekBar seekBar) { }
+    @Override public void onStartTrackingTouch(SeekBar seekBar) { }
 
-	@Override public void onStopTrackingTouch(SeekBar seekBar) {
-		if (mCurrentPage != seekBar.getProgress()) {
-			mCurrentPage = seekBar.getProgress();
-			//reader.setDisplayedViewIndex(mCurrentPage);
-		}
-	}
+    @Override public void onStopTrackingTouch(SeekBar seekBar) {
+        if (mCurrentPage != seekBar.getProgress()) {
+            mCurrentPage = seekBar.getProgress();
+            //reader.setDisplayedViewIndex(mCurrentPage);
+        }
+    }
 
-	// </editor-fold desc="SeekBar Listener">
+    // </editor-fold desc="SeekBar Listener">
 
-	// <editor-fold desc="DossierDetailsFragmentListener">
+    // <editor-fold desc="DossierDetailsFragmentListener">
 
-	public interface DossierDetailsFragmentListener {
+    public interface DossierDetailsFragmentListener {
 
-		boolean isAnyDrawerOpened();
+        boolean isAnyDrawerOpened();
 
-		void toggleInfoDrawer();
+        void toggleInfoDrawer();
 
-		void lockInfoDrawer(boolean lock);
+        void lockInfoDrawer(boolean lock);
 
-		void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action);
-	}
+        void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action);
 
-	// </editor-fold desc="DossierDetailsFragmentListener">
+    }
 
-	private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
+    // </editor-fold desc="DossierDetailsFragmentListener">
 
-		private void showSpinnerOnUiThread() {
-			getActivity().runOnUiThread(new Runnable() {
-				@Override public void run() {
-					showProgressLayout();
-				}
-			});
-		}
+    private class DossierLoadingAsyncTask extends AsyncTask<Void, Void, Void> {
 
-		// TODO : Error messages
-		@Override protected Void doInBackground(Void... params) {
+        private void showSpinnerOnUiThread() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    showProgressLayout();
+                }
+            });
+        }
 
-			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+        // TODO : Error messages
+        @Override protected Void doInBackground(Void... params) {
 
-			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+            Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
-			// Default case
+            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
 
-			if (mDossier == null)
-				return null;
+            // Default case
 
-			// Download the dossier Metadata
+            if (mDossier == null)
+                return null;
 
-			if (DeviceUtils.isConnected(getActivity())) {
-				if (!DossierUtils.areDetailsAvailable(mDossier)) {
-					showSpinnerOnUiThread();
+            // Download the dossier Metadata
 
-					try {
-						Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(currentAccount, mBureauId, mDossier.getId());
-						final List<Document> documentList = retrievedDossier.getDocumentList();
-						mDossier.setDocumentList(documentList);
+            if (DeviceUtils.isConnected(getActivity())) {
+                if (!DossierUtils.areDetailsAvailable(mDossier)) {
+                    showSpinnerOnUiThread();
 
-						mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(currentAccount, mDossier.getId()));
+                    try {
+                        Dossier retrievedDossier = RESTClient.INSTANCE.getDossier(currentAccount, mBureauId, mDossier.getId());
+                        final List<Document> documentList = retrievedDossier.getDocumentList();
+                        mDossier.setDocumentList(documentList);
 
-						// Retrieve Bureau
+                        mDossier.setCircuit(RESTClient.INSTANCE.getCircuit(currentAccount, mDossier.getId()));
 
-						Bureau curentBureau = null;
-						try {
-							Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-							List<Bureau> fetchedBureauList = bureauDao.queryBuilder().where().eq(Bureau.DB_FIELD_ID, mBureauId).query();
+                        // Retrieve Bureau
 
-							if (fetchedBureauList.isEmpty())
-								return null;
+                        Bureau curentBureau = null;
+                        try {
+                            Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+                            List<Bureau> fetchedBureauList = bureauDao.queryBuilder().where().eq(Bureau.DB_FIELD_ID, mBureauId).query();
 
-							curentBureau = fetchedBureauList.get(0);
-						}
-						catch (SQLException e) { e.printStackTrace(); }
+                            if (fetchedBureauList.isEmpty())
+                                return null;
 
-						if (curentBureau == null)
-							return null;
+                            curentBureau = fetchedBureauList.get(0);
+                        } catch (SQLException e) { e.printStackTrace(); }
 
-						final Bureau finalCurrentBureau = curentBureau;
+                        if (curentBureau == null)
+                            return null;
 
-						// Save in Database
+                        final Bureau finalCurrentBureau = curentBureau;
 
-						final List<Document> documentToDeleteList = new ArrayList<>();
-						documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(Collections.singletonList(mDossier), documentList));
+                        // Save in Database
 
-						final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-						final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
-						dossierDao.callBatchTasks(new Callable<Void>() {
-							@Override public Void call() throws Exception {
+                        final List<Document> documentToDeleteList = new ArrayList<>();
+                        documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(Collections.singletonList(mDossier), documentList));
 
-								documentDao.delete(documentToDeleteList);
+                        final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+                        final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
+                        dossierDao.callBatchTasks(new Callable<Void>() {
+                            @Override public Void call() throws Exception {
 
-								mDossier.setParent(finalCurrentBureau);
-								mDossier.setSyncDate(new Date());
-								dossierDao.createOrUpdate(mDossier);
+                                documentDao.delete(documentToDeleteList);
 
-								for (Document document : documentList) {
-									document.setParent(mDossier);
-									document.setSyncDate(new Date());
-									documentDao.createOrUpdate(document);
-								}
+                                mDossier.setParent(finalCurrentBureau);
+                                mDossier.setSyncDate(new Date());
+                                dossierDao.createOrUpdate(mDossier);
 
-								return null;
-							}
-						});
-					}
-					catch (IParapheurException e) {
-						e.printStackTrace();
-					}
-					catch (Exception e) {
-						new IParapheurException(-1, "DB error").printStackTrace();
-					}
-				}
-			}
-			else { // Offline backup
+                                for (Document document : documentList) {
+                                    document.setParent(mDossier);
+                                    document.setSyncDate(new Date());
+                                    documentDao.createOrUpdate(document);
+                                }
 
-				try {
-					List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, mDossier.getId()).query();
+                                return null;
+                            }
+                        });
+                    } catch (IParapheurException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        new IParapheurException(-1, "DB error").printStackTrace();
+                    }
+                }
+            } else { // Offline backup
 
-					if (dbRequestResult.isEmpty())
-						return null;
+                try {
+                    List<Dossier> dbRequestResult = dbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, mDossier.getId()).query();
 
-					mDossier = dbRequestResult.get(0);
-					List<Document> documents = new ArrayList<>();
-					CollectionUtils.safeAddAll(documents, mDossier.getChildrenDocuments());
-					mDossier.setDocumentList(documents);
-				}
-				catch (SQLException e) { e.printStackTrace(); }
-			}
+                    if (dbRequestResult.isEmpty())
+                        return null;
 
-			// Getting metadata
+                    mDossier = dbRequestResult.get(0);
+                    List<Document> documents = new ArrayList<>();
+                    CollectionUtils.safeAddAll(documents, mDossier.getChildrenDocuments());
+                    mDossier.setDocumentList(documents);
+                } catch (SQLException e) { e.printStackTrace(); }
+            }
 
-			Document currentDocument = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
-			if (currentDocument == null)
-				return null;
+            // Getting metadata
 
-			showSpinnerOnUiThread();
-			File file = DocumentUtils.getFile(getActivity(), mDossier, currentDocument);
-			Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
+            Document currentDocument = DossierUtils.findCurrentDocument(mDossier, mDocumentId);
+            if (currentDocument == null)
+                return null;
 
-			if (!file.exists() && DeviceUtils.isConnected(getActivity())) {
-				String downloadUrl = DocumentUtils.generateContentUrl(currentDocument);
-				if (downloadUrl != null) {
-					try { RESTClient.INSTANCE.downloadFile(currentAccount, downloadUrl, file.getAbsolutePath()); }
-					catch (IParapheurException e) { e.printStackTrace(); }
-				}
-			}
+            showSpinnerOnUiThread();
+            File file = DocumentUtils.getFile(getActivity(), mDossier, currentDocument);
+            Log.v(LOG_TAG, file.exists() ? "Dossier loaded from cache" : "Downloading dossier...");
 
-			// Loading user data and annotations
+            if (!file.exists() && DeviceUtils.isConnected(getActivity())) {
+                String downloadUrl = DocumentUtils.generateContentUrl(currentDocument);
+                if (downloadUrl != null) {
+                    try { RESTClient.INSTANCE.downloadFile(currentAccount, downloadUrl, file.getAbsolutePath()); } catch (IParapheurException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-			if (DeviceUtils.isConnected(getActivity())) {
-				SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
+            // Loading user data and annotations
 
-				if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
-					try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); }
-					catch (IParapheurException e) { e.printStackTrace(); }
-				}
+            if (DeviceUtils.isConnected(getActivity())) {
+                SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
 
-				if (DocumentUtils.isMainDocument(mDossier, currentDocument)) {
-					try { annotations = RESTClient.INSTANCE.getAnnotations(currentAccount, mDossier.getId(), currentDocument.getId()); }
-					catch (IParapheurException e) { e.printStackTrace(); }
-				}
-				currentDocument.setPagesAnnotations(annotations);
-			}
+                if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
+                    try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); } catch (IParapheurException e) { e.printStackTrace(); }
+                }
 
-			return null;
-		}
+                if (DocumentUtils.isMainDocument(mDossier, currentDocument)) {
+                    try {
+                        annotations = RESTClient.INSTANCE.getAnnotations(currentAccount, mDossier.getId(), currentDocument.getId());
+                    } catch (IParapheurException e) { e.printStackTrace(); }
+                }
+                currentDocument.setPagesAnnotations(annotations);
+            }
 
-		@Override protected void onPostExecute(Void aVoid) {
-			super.onPostExecute(aVoid);
+            return null;
+        }
 
-			if (mDocumentId == null)
-				if (!DossierUtils.getMainDocuments(mDossier).isEmpty())
-					mDocumentId = DossierUtils.getMainDocuments(mDossier).get(0).getId();
+        @Override protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
 
-			updateReader();
-			updateCircuitInfoDrawerContent();
-			showContentLayout();
-		}
-	}
+            if (mDocumentId == null)
+                if (!DossierUtils.getMainDocuments(mDossier).isEmpty())
+                    mDocumentId = DossierUtils.getMainDocuments(mDossier).get(0).getId();
 
-	private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+            updateReader();
+            updateCircuitInfoDrawerContent();
+            showContentLayout();
+        }
 
-		private String mNewId = null;
-		private Annotation mCurrentAnnotation = null;
+    }
 
-		@Override protected Boolean doInBackground(Annotation... params) {
+    private class CreateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
-			if (params.length < 1)
-				return null;
+        private String mNewId = null;
+        private Annotation mCurrentAnnotation = null;
 
-			mCurrentAnnotation = params[0];
-			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+        @Override protected Boolean doInBackground(Annotation... params) {
 
-			try {
-				mNewId = RESTClient.INSTANCE.createAnnotation(currentAccount, mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
-			}
-			catch (IParapheurException e) {
-				e.printStackTrace();
-				return false;
-			}
+            if (params.length < 1)
+                return null;
 
-			return true;
-		}
+            mCurrentAnnotation = params[0];
+            Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
-		@Override protected void onPostExecute(Boolean success) {
-			super.onPostExecute(success);
+            try {
+                mNewId = RESTClient.INSTANCE.createAnnotation(currentAccount, mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
+            } catch (IParapheurException e) {
+                e.printStackTrace();
+                return false;
+            }
 
-			if ((!success) || TextUtils.isEmpty(mNewId)) {
-				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
-			}
-			else {
-				updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null, null);
-				mCurrentAnnotation.setUuid(mNewId);
-			}
-		}
-	}
+            return true;
+        }
 
-	private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+        @Override protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
 
-		@Override protected Boolean doInBackground(Annotation... params) {
+            if ((!success) || TextUtils.isEmpty(mNewId)) {
+                Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
+            } else {
+                updateStickyNoteData(mCurrentAnnotation.getUuid(), mNewId, null, null);
+                mCurrentAnnotation.setUuid(mNewId);
+            }
+        }
 
-			if (params.length < 1)
-				return null;
+    }
 
-			Annotation currentAnnotation = params[0];
-			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+    private class UpdateAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
-			try {
-				RESTClient.INSTANCE.updateAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
-			}
-			catch (IParapheurException e) {
-				e.printStackTrace();
-				return false;
-			}
+        @Override protected Boolean doInBackground(Annotation... params) {
 
-			return true;
-		}
+            if (params.length < 1)
+                return null;
 
-		@Override protected void onPostExecute(Boolean success) {
-			super.onPostExecute(success);
+            Annotation currentAnnotation = params[0];
+            Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
-			if (!success)
-				Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
-		}
-	}
+            try {
+                RESTClient.INSTANCE.updateAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
+            } catch (IParapheurException e) {
+                e.printStackTrace();
+                return false;
+            }
 
-	private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
+            return true;
+        }
 
-		@Override protected Boolean doInBackground(Annotation... params) {
+        @Override protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
 
-			Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
+            if (!success)
+                Toast.makeText(getActivity(), R.string.Error_on_annotation_update, Toast.LENGTH_LONG).show();
+        }
 
-			if (params.length < 1)
-				return null;
+    }
 
-			Annotation currentAnnotation = params[0];
+    private class DeleteAnnotationAsyncTask extends AsyncTask<Annotation, Void, Boolean> {
 
-			try {
-				RESTClient.INSTANCE.deleteAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
-			}
-			catch (IParapheurException e) {
-				e.printStackTrace();
-				return false;
-			}
+        @Override protected Boolean doInBackground(Annotation... params) {
 
-			return true;
-		}
+            Account currentAccount = AccountUtils.SELECTED_ACCOUNT;
 
-		@Override protected void onPostExecute(Boolean success) {
-			super.onPostExecute(success);
+            if (params.length < 1)
+                return null;
 
-			if (!success)
-				Toast.makeText(getActivity(), R.string.Error_on_annotation_delete, Toast.LENGTH_LONG).show();
-		}
-	}
+            Annotation currentAnnotation = params[0];
+
+            try {
+                RESTClient.INSTANCE.deleteAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
+            } catch (IParapheurException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+
+            if (!success)
+                Toast.makeText(getActivity(), R.string.Error_on_annotation_delete, Toast.LENGTH_LONG).show();
+        }
+
+    }
+
 }

@@ -50,273 +50,269 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringUtils {
 
-	private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-	// <editor-fold desc="TextUtils">
+    // <editor-fold desc="TextUtils">
 
-	/**
-	 * Returns true every {@link String} given is not null or empty.
-	 *
-	 * @param strings a list of String instances.
-	 */
-	public static boolean areNotEmpty(@Nullable String... strings) {
+    /**
+     * Returns true every {@link String} given is not null or empty.
+     *
+     * @param strings a list of String instances.
+     */
+    public static boolean areNotEmpty(@Nullable String... strings) {
 
-		if ((strings == null) || (strings.length == 0))
-			return false;
+        if ((strings == null) || (strings.length == 0))
+            return false;
 
-		for (String string : strings)
-			if (TextUtils.isEmpty(string))
-				return false;
+        for (String string : strings)
+            if (TextUtils.isEmpty(string))
+                return false;
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Helper functions to query a strings end portion. The comparison is case insensitive.
-	 *
-	 * @param base the base string.
-	 * @param end  the ending text.
-	 * @return true, if the string ends with the given ending text.
-	 */
-	public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+    /**
+     * Helper functions to query a strings end portion. The comparison is case insensitive.
+     *
+     * @param base the base string.
+     * @param end  the ending text.
+     * @return true, if the string ends with the given ending text.
+     */
+    public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
 
-		// Default case
+        // Default case
 
-		if ((base == null) || (end == null))
-			return false;
+        if ((base == null) || (end == null))
+            return false;
 
-		//
+        //
 
-		return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
-	}
+        return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
+    }
 
-	// </editor-fold desc="TextUtils">
+    // </editor-fold desc="TextUtils">
 
-	public static @NonNull String bundleToString(@Nullable Bundle bundle) {
-		if (bundle == null)
-			return "(Bundle null)";
+    public static @NonNull String bundleToString(@Nullable Bundle bundle) {
+        if (bundle == null)
+            return "(Bundle null)";
 
-		if (bundle.isEmpty())
-			return "(Bundle empty)";
+        if (bundle.isEmpty())
+            return "(Bundle empty)";
 
-		StringBuilder stringBuilder = new StringBuilder("(Bundle");
-		for (String key : bundle.keySet()) {
-			stringBuilder.append(" ");
-			stringBuilder.append(key);
-			stringBuilder.append(":");
-			stringBuilder.append(bundle.get(key));
-		}
-		stringBuilder.append(")");
+        StringBuilder stringBuilder = new StringBuilder("(Bundle");
+        for (String key : bundle.keySet()) {
+            stringBuilder.append(" ");
+            stringBuilder.append(key);
+            stringBuilder.append(":");
+            stringBuilder.append(bundle.get(key));
+        }
+        stringBuilder.append(")");
 
-		return stringBuilder.toString();
-	}
+        return stringBuilder.toString();
+    }
 
-	public static @Nullable String urlEncode(@Nullable String string) {
+    public static @Nullable String urlEncode(@Nullable String string) {
 
-		// Default value
+        // Default value
 
-		if (string == null)
-			return null;
+        if (string == null)
+            return null;
 
-		// Encoding
+        // Encoding
 
-		String result;
+        String result;
 
-		try {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-				result = URLEncoder.encode(string, StandardCharsets.UTF_8.name());
-			else
-				result = URLEncoder.encode(string, "UTF-8");
-		}
-		catch (UnsupportedEncodingException exception) {
-			result = null;
-		}
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                result = URLEncoder.encode(string, StandardCharsets.UTF_8.name());
+            else
+                result = URLEncoder.encode(string, "UTF-8");
+        } catch (UnsupportedEncodingException exception) {
+            result = null;
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public static @NonNull String inputStreamToString(@NonNull InputStream is) throws IOException {
-		String line;
-		StringBuilder total = new StringBuilder();
-		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+    public static @NonNull String inputStreamToString(@NonNull InputStream is) throws IOException {
+        String line;
+        StringBuilder total = new StringBuilder();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
-		// Read response until the end
-		while ((line = rd.readLine()) != null)
-			total.append(line);
+        // Read response until the end
+        while ((line = rd.readLine()) != null)
+            total.append(line);
 
-		return total.toString();
-	}
+        return total.toString();
+    }
 
-	public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
+    public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
 
-		if ((iso8601Date == null) || (iso8601Date.length() == 0))
-			return null;
-
-		try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); }
-		catch (ParseException ex) { return null; }
-	}
+        if ((iso8601Date == null) || (iso8601Date.length() == 0))
+            return null;
 
-	public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
-		return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
-	}
-
-	public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
-
-		// Default value
-
-		if (utf8String == null)
-			return null;
-
-		// Wrapping result
-
-		String temp = "-----BEGIN PKCS7-----\n";
-		temp += utf8String + "\n";
-		temp += "-----END PKCS7-----";
+        try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); } catch (ParseException ex) { return null; }
+    }
 
-		byte[] bytes = Base64.encode(temp.getBytes(), Base64.NO_WRAP);
+    public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
+        return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
+    }
 
-		// Building ASCII String
+    public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
+
+        // Default value
 
-		Charset asciiCharset;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-			asciiCharset = StandardCharsets.US_ASCII;
-		else
-			asciiCharset = Charset.forName("US-ASCII");
+        if (utf8String == null)
+            return null;
 
-		return new String(bytes, asciiCharset);
-	}
+        // Wrapping result
 
-	/**
-	 * Force the DN name, to pass the OpenSSL validation.
-	 * OpenSSL validation crashes if the attributes are not in this exact name/order :
-	 * "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR"
-	 *
-	 * @param issuerDnName DN name, with attributes in any order
-	 * @return fixed DN, that please OpenSSL
-	 */
-	public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
+        String temp = "-----BEGIN PKCS7-----\n";
+        temp += utf8String + "\n";
+        temp += "-----END PKCS7-----";
 
-		// Regex, without anti-slash escapes : ([A-Z]+)=(.*?(?<!\\)(?:\\{2})*)(?:,|$)
-		//
-		//  	([A-Z]+)=				Catches "AC=", "O=", etc.
-		// 		(.*?)					Catches everything, "*?" makes it non-greedy
-		//		(?<!\\)(?:\\{2})*		Checks if not followed by a odd number of \ (to keep escaped commas)
-		// 		(?:,\s*|$)				Ending with a comma, or the end of the string
+        byte[] bytes = Base64.encode(temp.getBytes(), Base64.NO_WRAP);
 
-		String regex = "([A-Z]+)=(.*?(?<!\\\\)(?:\\\\{2})*)(?:,\\s*|$)";
+        // Building ASCII String
 
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(issuerDnName);
-		Map<String, String> parsedData = new HashMap<>();
+        Charset asciiCharset;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            asciiCharset = StandardCharsets.US_ASCII;
+        else
+            asciiCharset = Charset.forName("US-ASCII");
 
-		while (matcher.find())
-			parsedData.put(matcher.group(1), matcher.group(2));
+        return new String(bytes, asciiCharset);
+    }
 
-		// Building result in the right order
+    /**
+     * Force the DN name, to pass the OpenSSL validation.
+     * OpenSSL validation crashes if the attributes are not in this exact name/order :
+     * "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR"
+     *
+     * @param issuerDnName DN name, with attributes in any order
+     * @return fixed DN, that please OpenSSL
+     */
+    public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 
-		String res = "";
+        // Regex, without anti-slash escapes : ([A-Z]+)=(.*?(?<!\\)(?:\\{2})*)(?:,|$)
+        //
+        //  	([A-Z]+)=				Catches "AC=", "O=", etc.
+        // 		(.*?)					Catches everything, "*?" makes it non-greedy
+        //		(?<!\\)(?:\\{2})*		Checks if not followed by a odd number of \ (to keep escaped commas)
+        // 		(?:,\s*|$)				Ending with a comma, or the end of the string
 
-		res += "EMAIL=" + parsedData.get("E") + ",";
-		res += "CN=" + parsedData.get("CN") + ",";
-		res += "OU=" + parsedData.get("OU") + ",";
-		res += "O=" + parsedData.get("O") + ",";
-		res += "ST=" + parsedData.get("ST") + ",";
-		res += "C=" + parsedData.get("C");
+        String regex = "([A-Z]+)=(.*?(?<!\\\\)(?:\\\\{2})*)(?:,\\s*|$)";
 
-		return res;
-	}
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(issuerDnName);
+        Map<String, String> parsedData = new HashMap<>();
 
-	/**
-	 * Decode the Hexadecimal char sequence (as string) into Byte Array.
-	 *
-	 * @param data The Hex encoded sequence to be decoded.
-	 * @return Decoded byte array.
-	 * @throws IllegalArgumentException <var>data</var> when wrong number of chars is given or invalid chars.
-	 */
-	public static byte[] hexDecode(@NonNull String data) throws IllegalArgumentException {
+        while (matcher.find())
+            parsedData.put(matcher.group(1), matcher.group(2));
 
-		int length = data.length();
-		if ((length % 2) != 0)
-			throw new IllegalArgumentException("Odd number of characters.");
+        // Building result in the right order
 
-		try {
-			byte[] bytes = new byte[length / 2];
+        String res = "";
 
-			for (int i = 0, j = 0; i < length; i = i + 2)
-				bytes[j++] = (byte) Integer.parseInt(data.substring(i, i + 2), 16);
+        res += "EMAIL=" + parsedData.get("E") + ",";
+        res += "CN=" + parsedData.get("CN") + ",";
+        res += "OU=" + parsedData.get("OU") + ",";
+        res += "O=" + parsedData.get("O") + ",";
+        res += "ST=" + parsedData.get("ST") + ",";
+        res += "C=" + parsedData.get("C");
 
-			return bytes;
-		}
-		catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Illegal hexadecimal character.", e);
-		}
-	}
+        return res;
+    }
 
-	public static @NonNull String fixUrl(@NonNull String url) {
+    /**
+     * Decode the Hexadecimal char sequence (as string) into Byte Array.
+     *
+     * @param data The Hex encoded sequence to be decoded.
+     * @return Decoded byte array.
+     * @throws IllegalArgumentException <var>data</var> when wrong number of chars is given or invalid chars.
+     */
+    public static byte[] hexDecode(@NonNull String data) throws IllegalArgumentException {
 
-		// Getting the server name
-		// Regex :	- ignore everything before "://" (if exists)					^(?:.*://)*
-		//			- then ignore following "m." or "m-" (if exists)				(?:m\.|m-)?
-		//			- then catch every char but "/"	(not geedy)						(.*?)
-		//			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
-		String regex = "^(?:.*://)*(?:m\\.|m-)?(.*?)(?:/.*)*$";
-		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(url.trim());
+        int length = data.length();
+        if ((length % 2) != 0)
+            throw new IllegalArgumentException("Odd number of characters.");
 
-		String result = url;
-		if (matcher.find() && !TextUtils.isEmpty(matcher.group(1)))
-			result = matcher.group(1);
+        try {
+            byte[] bytes = new byte[length / 2];
 
-		return result;
-	}
+            for (int i = 0, j = 0; i < length; i = i + 2)
+                bytes[j++] = (byte) Integer.parseInt(data.substring(i, i + 2), 16);
 
-	public static @NonNull String getLocalizedSmallDate(@Nullable Date date) {
+            return bytes;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Illegal hexadecimal character.", e);
+        }
+    }
 
-		if (date == null)
-			return "???";
+    public static @NonNull String fixUrl(@NonNull String url) {
 
-		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
-		return dateFormat.format(date);
-	}
+        // Getting the server name
+        // Regex :	- ignore everything before "://" (if exists)					^(?:.*://)*
+        //			- then ignore following "m." or "m-" (if exists)				(?:m\.|m-)?
+        //			- then catch every char but "/"	(not geedy)						(.*?)
+        //			- then, ignore everything after the first "/" (if exists)		(?:/.*)*$
+        String regex = "^(?:.*://)*(?:m\\.|m-)?(.*?)(?:/.*)*$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(url.trim());
 
-	public static @NonNull String getVerySmallDate(@Nullable Date date) {
+        String result = url;
+        if (matcher.find() && !TextUtils.isEmpty(matcher.group(1)))
+            result = matcher.group(1);
 
-		if (date == null)
-			return "???";
+        return result;
+    }
 
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
-		return dateFormat.format(date);
-	}
+    public static @NonNull String getLocalizedSmallDate(@Nullable Date date) {
 
-	public static @NonNull String getSmallTime(@Nullable Date date) {
+        if (date == null)
+            return "???";
 
-		if (date == null)
-			return "???";
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+        return dateFormat.format(date);
+    }
 
-		DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-		return dateFormat.format(date);
-	}
+    public static @NonNull String getVerySmallDate(@Nullable Date date) {
 
-	public static boolean isUrlValid(@Nullable String url) {
+        if (date == null)
+            return "???";
 
-		if (TextUtils.isEmpty(url))
-			return false;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        return dateFormat.format(date);
+    }
 
-		try {
-			new URL(IParapheurAPI.BASE_PATH + url);
-			return true;
-		}
-		catch (MalformedURLException ignored) {
-			return false;
-		}
-	}
+    public static @NonNull String getSmallTime(@Nullable Date date) {
 
-	public static @Nullable Boolean nullableBooleanValueOf(@NonNull Map<String, String> map, @NonNull String key) {
+        if (date == null)
+            return "???";
 
-		if (map.containsKey(key) && (map.get(key) != null))
-			return Boolean.valueOf(map.get(key));
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return dateFormat.format(date);
+    }
 
-		return null;
-	}
+    public static boolean isUrlValid(@Nullable String url) {
+
+        if (TextUtils.isEmpty(url))
+            return false;
+
+        try {
+            new URL(IParapheurAPI.BASE_PATH + url);
+            return true;
+        } catch (MalformedURLException ignored) {
+            return false;
+        }
+    }
+
+    public static @Nullable Boolean nullableBooleanValueOf(@NonNull Map<String, String> map, @NonNull String key) {
+
+        if (map.containsKey(key) && (map.get(key) != null))
+            return Boolean.valueOf(map.get(key));
+
+        return null;
+    }
 
 }
