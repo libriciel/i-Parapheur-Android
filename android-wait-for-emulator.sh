@@ -13,13 +13,13 @@ until [[ "$bootanim" =~ "stopped" ]]; do
   if [[ "$bootanim" =~ "device not found" || "$bootanim" =~ "device offline"
     || "$bootanim" =~ "running" ]]; then
     let "failcounter += 1"
-    echo "Waiting for emulator to start"
+    echo "$(date)  -  Waiting for emulator to start..."
     if [[ $failcounter -gt timeout_in_sec ]]; then
       echo "Timeout ($timeout_in_sec seconds) reached; failed to start emulator"
       exit 1
     fi
   fi
-  sleep 1
+  sleep 10
 done
 
 echo "Emulator is ready"
