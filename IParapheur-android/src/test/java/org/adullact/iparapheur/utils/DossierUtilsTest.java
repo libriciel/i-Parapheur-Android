@@ -17,175 +17,150 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
-import org.junit.Assert;
-
 import org.adullact.iparapheur.model.Action;
 import org.adullact.iparapheur.model.Circuit;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.model.EtapeCircuit;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.adullact.iparapheur.model.Action.ARCHIVAGE;
 import static org.adullact.iparapheur.model.Action.EMAIL;
 import static org.adullact.iparapheur.model.Action.ENREGISTRER;
 import static org.adullact.iparapheur.model.Action.JOURNAL;
-import static org.adullact.iparapheur.model.Action.MAILSEC;
 import static org.adullact.iparapheur.model.Action.REJET;
-import static org.adullact.iparapheur.model.Action.SIGNATURE;
-import static org.adullact.iparapheur.model.Action.TDT;
-import static org.adullact.iparapheur.model.Action.TDT_ACTES;
-import static org.adullact.iparapheur.model.Action.TDT_HELIOS;
 import static org.adullact.iparapheur.model.Action.VISA;
-import static org.mockito.Matchers.any;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(RobolectricTestRunner.class)
 public class DossierUtilsTest {
 
-	@Before public void setUp() throws Exception {
-		PowerMockito.mockStatic(TextUtils.class);
 
-		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
-			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
-				CharSequence a = (CharSequence) invocation.getArguments()[0];
-				CharSequence b = (CharSequence) invocation.getArguments()[1];
-				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
-			}
-		});
-	}
+    @Test public void areDetailsAvailable() {
 
-	@Test public void areDetailsAvailable() throws Exception {
+        List<EtapeCircuit> etapes = new ArrayList<>();
+        etapes.add(new EtapeCircuit(null, true, false, "Bureau 01", "Signataire 01", Action.SIGNATURE.toString(), null));
+        etapes.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
+        Circuit circuit = new Circuit(etapes, "PKCS#7\\/single", true);
 
-		List<EtapeCircuit> etapes = new ArrayList<>();
-		etapes.add(new EtapeCircuit(null, true, false, "Bureau 01", "Signataire 01", Action.SIGNATURE.toString(), null));
-		etapes.add(new EtapeCircuit(null, false, true, null, null, Action.VISA.toString(), null));
-		Circuit circuit = new Circuit(etapes, "PKCS#7\\/single", true);
+        ArrayList<Document> documentList = new ArrayList<>();
+        documentList.add(new Document("id_01", null, 0, false, false));
+        documentList.add(new Document("id_02", null, 0, true, false));
 
-		ArrayList<Document> documentList = new ArrayList<>();
-		documentList.add(new Document("id_01", null, 0, false, false));
-		documentList.add(new Document("id_02", null, 0, true, false));
+        Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
+        dossier01.setCircuit(circuit);
+        dossier01.setDocumentList(documentList);
 
-		Dossier dossier01 = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier01.setCircuit(circuit);
-		dossier01.setDocumentList(documentList);
+        Dossier dossier02 = new Dossier(null, null, null, null, null, null, null, null, false);
+        dossier02.setCircuit(circuit);
 
-		Dossier dossier02 = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier02.setCircuit(circuit);
+        Dossier dossier03 = new Dossier(null, null, null, null, null, null, null, null, false);
+        dossier03.setDocumentList(documentList);
 
-		Dossier dossier03 = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier03.setDocumentList(documentList);
+        // Checks
 
-		// Checks
+        Assert.assertTrue(DossierUtils.areDetailsAvailable(dossier01));
+        Assert.assertFalse(DossierUtils.areDetailsAvailable(dossier02));
+        Assert.assertFalse(DossierUtils.areDetailsAvailable(dossier03));
+    }
 
-		Assert.assertTrue(DossierUtils.areDetailsAvailable(dossier01));
-		Assert.assertFalse(DossierUtils.areDetailsAvailable(dossier02));
-		Assert.assertFalse(DossierUtils.areDetailsAvailable(dossier03));
-	}
 
-	@SuppressWarnings("ConstantConditions") @Test public void findCurrentDocument() throws Exception {
+    @SuppressWarnings("ConstantConditions") @Test public void findCurrentDocument() {
 
-		ArrayList<Document> documentList = new ArrayList<>();
-		documentList.add(new Document("id_01", null, 0, false, false));
-		documentList.add(new Document("id_02", null, 0, true, false));
+        ArrayList<Document> documentList = new ArrayList<>();
+        documentList.add(new Document("id_01", null, 0, false, false));
+        documentList.add(new Document("id_02", null, 0, true, false));
 
-		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier.setDocumentList(documentList);
+        Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
+        dossier.setDocumentList(documentList);
 
-		// Checks
+        // Checks
 
-		Assert.assertNull(DossierUtils.findCurrentDocument(null, "id_01"));
-		Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, null).getId(), "id_01");
-		Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, "id_01").getId(), "id_01");
-		Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, "id_02").getId(), "id_02");
-	}
+        Assert.assertNull(DossierUtils.findCurrentDocument(null, "id_01"));
+        Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, null).getId(), "id_01");
+        Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, "id_01").getId(), "id_01");
+        Assert.assertEquals(DossierUtils.findCurrentDocument(dossier, "id_02").getId(), "id_02");
+    }
 
-	@Test public void haveActions() throws Exception {
 
-		Dossier dossier01 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
-		Dossier dossier02 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(VISA, EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
-		Dossier dossier03 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(REJET, EMAIL, ENREGISTRER)), null, null, null, null, false);
-		Dossier dossier04 = new Dossier(null, null, null, null, null, null, null, null, false);
+    @Test public void haveActions() {
 
-		// Checks
+        Dossier dossier01 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
+        Dossier dossier02 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(VISA, EMAIL, JOURNAL, ENREGISTRER)), null, null, null, null, false);
+        Dossier dossier03 = new Dossier(null, null, null, new HashSet<>(Arrays.asList(REJET, EMAIL, ENREGISTRER)), null, null, null, null, false);
+        Dossier dossier04 = new Dossier(null, null, null, null, null, null, null, null, false);
 
-		Assert.assertFalse(DossierUtils.haveActions(dossier01));
-		Assert.assertTrue(DossierUtils.haveActions(dossier02));
-		Assert.assertTrue(DossierUtils.haveActions(dossier03));
-		Assert.assertFalse(DossierUtils.haveActions(dossier04));
-	}
+        // Checks
 
-	@Test public void getMainDocumentsAndAnnexes() throws Exception {
+        Assert.assertFalse(DossierUtils.haveActions(dossier01));
+        Assert.assertTrue(DossierUtils.haveActions(dossier02));
+        Assert.assertTrue(DossierUtils.haveActions(dossier03));
+        Assert.assertFalse(DossierUtils.haveActions(dossier04));
+    }
 
-		Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
-		emptyDossier.setDocumentList(new ArrayList<Document>());
 
-		ArrayList<Document> documentList = new ArrayList<>();
-		documentList.add(new Document("id_01", null, 0, true, false));
-		documentList.add(new Document("id_02", null, 0, false, false));
-		documentList.add(new Document("id_03", null, 0, false, false));
-		documentList.add(new Document("id_04", null, 0, true, false));
+    @Test public void getMainDocumentsAndAnnexes() {
 
-		Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
-		dossier.setDocumentList(documentList);
+        Dossier emptyDossier = new Dossier(null, null, null, null, null, null, null, null, false);
+        emptyDossier.setDocumentList(new ArrayList<Document>());
 
-		List<Document> mainDocumentList = DossierUtils.getMainDocuments(dossier);
-		List<Document> annexesList = DossierUtils.getAnnexes(dossier);
+        ArrayList<Document> documentList = new ArrayList<>();
+        documentList.add(new Document("id_01", null, 0, true, false));
+        documentList.add(new Document("id_02", null, 0, false, false));
+        documentList.add(new Document("id_03", null, 0, false, false));
+        documentList.add(new Document("id_04", null, 0, true, false));
 
-		// Checks
+        Dossier dossier = new Dossier(null, null, null, null, null, null, null, null, false);
+        dossier.setDocumentList(documentList);
 
-		Assert.assertEquals(DossierUtils.getMainDocuments(emptyDossier), new ArrayList<Document>());
-		Assert.assertEquals(DossierUtils.getAnnexes(emptyDossier), new ArrayList<Document>());
+        List<Document> mainDocumentList = DossierUtils.getMainDocuments(dossier);
+        List<Document> annexesList = DossierUtils.getAnnexes(dossier);
 
-		Assert.assertEquals(mainDocumentList.size(), 2);
-		Assert.assertEquals(mainDocumentList.get(0).getId(), "id_01");
-		Assert.assertEquals(mainDocumentList.get(1).getId(), "id_04");
+        // Checks
 
-		Assert.assertEquals(annexesList.size(), 2);
-		Assert.assertEquals(annexesList.get(0).getId(), "id_02");
-		Assert.assertEquals(annexesList.get(1).getId(), "id_03");
-	}
+        Assert.assertEquals(DossierUtils.getMainDocuments(emptyDossier), new ArrayList<Document>());
+        Assert.assertEquals(DossierUtils.getAnnexes(emptyDossier), new ArrayList<Document>());
 
-	@Test public void buildCreationDateComparator() throws Exception {
+        Assert.assertEquals(mainDocumentList.size(), 2);
+        Assert.assertEquals(mainDocumentList.get(0).getId(), "id_01");
+        Assert.assertEquals(mainDocumentList.get(1).getId(), "id_04");
 
-		Dossier dossier01 = new Dossier("dossier01", null, null, null, null, null, new Date(50000L), null, false);
-		Dossier dossier02 = new Dossier("dossier02", null, null, null, null, null, new Date(60000L), null, false);
-		Dossier dossier03 = new Dossier("dossier03", null, null, null, null, null, new Date(70000L), null, false);
-		Dossier dossier04 = new Dossier("dossier04", null, null, null, null, null, new Date(80000L), null, false);
+        Assert.assertEquals(annexesList.size(), 2);
+        Assert.assertEquals(annexesList.get(0).getId(), "id_02");
+        Assert.assertEquals(annexesList.get(1).getId(), "id_03");
+    }
 
-		List<Dossier> dossierList = new ArrayList<>();
-		dossierList.add(dossier03);
-		dossierList.add(null);
-		dossierList.add(dossier04);
-		dossierList.add(dossier02);
-		dossierList.add(dossier01);
 
-		Collections.sort(dossierList, DossierUtils.buildCreationDateComparator());
+    @Test public void buildCreationDateComparator() {
 
-		Assert.assertNull(dossierList.get(0));
-		Assert.assertEquals(dossierList.get(1), dossier01);
-		Assert.assertEquals(dossierList.get(2), dossier02);
-		Assert.assertEquals(dossierList.get(3), dossier03);
-		Assert.assertEquals(dossierList.get(4), dossier04);
-	}
+        Dossier dossier01 = new Dossier("dossier01", null, null, null, null, null, new Date(50000L), null, false);
+        Dossier dossier02 = new Dossier("dossier02", null, null, null, null, null, new Date(60000L), null, false);
+        Dossier dossier03 = new Dossier("dossier03", null, null, null, null, null, new Date(70000L), null, false);
+        Dossier dossier04 = new Dossier("dossier04", null, null, null, null, null, new Date(80000L), null, false);
+
+        List<Dossier> dossierList = new ArrayList<>();
+        dossierList.add(dossier03);
+        dossierList.add(null);
+        dossierList.add(dossier04);
+        dossierList.add(dossier02);
+        dossierList.add(dossier01);
+
+        Collections.sort(dossierList, DossierUtils.buildCreationDateComparator());
+
+        Assert.assertNull(dossierList.get(0));
+        Assert.assertEquals(dossierList.get(1), dossier01);
+        Assert.assertEquals(dossierList.get(2), dossier02);
+        Assert.assertEquals(dossierList.get(3), dossier03);
+        Assert.assertEquals(dossierList.get(4), dossier04);
+    }
+
 }

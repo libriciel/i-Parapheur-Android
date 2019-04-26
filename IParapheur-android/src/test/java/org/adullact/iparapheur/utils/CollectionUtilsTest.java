@@ -17,118 +17,101 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.text.TextUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
 
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(RobolectricTestRunner.class)
 public class CollectionUtilsTest {
 
-	// <editor-fold desc="Utils">
 
-	/**
-	 * Simple private class to test serialization
-	 */
-	private class DateWrapper {
+    // <editor-fold desc="Utils">
 
-		@SerializedName("date") private Date mDate;
+    /**
+     * Simple private class to test serialization
+     */
+    private class DateWrapper {
 
-		private DateWrapper(Date date) {
-			mDate = date;
-		}
+        @SerializedName("date") private Date mDate;
 
-		private Date getDate() {
-			return mDate;
-		}
-	}
+        private DateWrapper(Date date) {
+            mDate = date;
+        }
 
-	// </editor-fold desc="Utils">
+        private Date getDate() {
+            return mDate;
+        }
 
-	@Before public void setUp() throws Exception {
-		PowerMockito.mockStatic(TextUtils.class);
+    }
 
-		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
-			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
-				CharSequence a = (CharSequence) invocation.getArguments()[0];
-				CharSequence b = (CharSequence) invocation.getArguments()[1];
-				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
-			}
-		});
-	}
 
-	@Test public void printListReflexionCall() throws Exception {
+    // </editor-fold desc="Utils">
 
-		List<Bureau> bureauList = new ArrayList<>();
-		bureauList.add(new Bureau("b_01", "Name 01", 10, 5));
-		bureauList.add(new Bureau("b_02", "Name 02", 10, 5));
-		bureauList.add(null);
 
-		List<Document> documentList = new ArrayList<>();
-		documentList.add(new Document("d_01", null, 0, false, false));
+    @Test public void printListReflexionCall() {
 
-		List<String> incompatibleList = new ArrayList<>();
-		incompatibleList.add("s_01");
+        List<Bureau> bureauList = new ArrayList<>();
+        bureauList.add(new Bureau("b_01", "Name 01", 10, 5));
+        bureauList.add(new Bureau("b_02", "Name 02", 10, 5));
+        bureauList.add(null);
 
-		List<Document> emptyList = new ArrayList<>();
+        List<Document> documentList = new ArrayList<>();
+        documentList.add(new Document("d_01", null, 0, false, false));
 
-		// Checks
+        List<String> incompatibleList = new ArrayList<>();
+        incompatibleList.add("s_01");
 
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(null, "getId"), "null");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(bureauList, "getId"), "[b_01, b_02, null]");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(documentList, "getId"), "[d_01]");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(incompatibleList, "getId"), "[-class incompatible with getId()-]");
-		Assert.assertEquals(CollectionUtils.printListReflexionCall(emptyList, "getId"), "[]");
-	}
+        List<Document> emptyList = new ArrayList<>();
 
-	@Test public void buildGsonWithLongToDate() throws Exception {
+        // Checks
 
-		Gson gson = CollectionUtils.buildGsonWithDateParser();
-		Date testDate = new Date(1396017643828L);
+        Assert.assertEquals(CollectionUtils.printListReflexionCall(null, "getId"), "null");
+        Assert.assertEquals(CollectionUtils.printListReflexionCall(bureauList, "getId"), "[b_01, b_02, null]");
+        Assert.assertEquals(CollectionUtils.printListReflexionCall(documentList, "getId"), "[d_01]");
+        Assert.assertEquals(CollectionUtils.printListReflexionCall(incompatibleList, "getId"), "[-class incompatible with getId()-]");
+        Assert.assertEquals(CollectionUtils.printListReflexionCall(emptyList, "getId"), "[]");
+    }
 
-		// Serialize and deserialize
 
-		DateWrapper original = new DateWrapper(testDate);
-		String serialized = gson.toJson(original);
-		DateWrapper deserialized = gson.fromJson(serialized, DateWrapper.class);
+    @Test public void buildGsonWithLongToDate() {
 
-		String nullDateString = "{\"date\":null}";
-		DateWrapper nullDeserialized = gson.fromJson(nullDateString, DateWrapper.class);
+        Gson gson = CollectionUtils.buildGsonWithDateParser();
+        Date testDate = new Date(1396017643828L);
 
-		String voidDateString = "{}";
-		DateWrapper voidDeserialized = gson.fromJson(voidDateString, DateWrapper.class);
+        // Serialize and deserialize
 
-		String iso8601DateString = "{\"date\":\"2016-12-25T23:45:59\"}";
-		DateWrapper iso8601Deserialized = gson.fromJson(iso8601DateString, DateWrapper.class);
+        DateWrapper original = new DateWrapper(testDate);
+        String serialized = gson.toJson(original);
+        DateWrapper deserialized = gson.fromJson(serialized, DateWrapper.class);
 
-		// Checks
+        String nullDateString = "{\"date\":null}";
+        DateWrapper nullDeserialized = gson.fromJson(nullDateString, DateWrapper.class);
 
-		Assert.assertEquals(original.getDate().getTime(), deserialized.getDate().getTime());
-		Assert.assertNotNull(iso8601Deserialized.getDate());
-		Assert.assertEquals(iso8601Deserialized.getDate().getTime(), 1482705959000L);
+        String voidDateString = "{}";
+        DateWrapper voidDeserialized = gson.fromJson(voidDateString, DateWrapper.class);
 
-		Assert.assertNull(nullDeserialized.getDate());
-		Assert.assertNull(voidDeserialized.getDate());
-	}
+        String iso8601DateString = "{\"date\":\"2016-12-25T23:45:59\"}";
+        DateWrapper iso8601Deserialized = gson.fromJson(iso8601DateString, DateWrapper.class);
+
+        // Checks
+
+        Assert.assertEquals(original.getDate().getTime(), deserialized.getDate().getTime());
+        Assert.assertNotNull(iso8601Deserialized.getDate());
+        Assert.assertEquals(iso8601Deserialized.getDate().getTime(), 1482705959000L);
+
+        Assert.assertNull(nullDeserialized.getDate());
+        Assert.assertNull(voidDeserialized.getDate());
+    }
 
 }
