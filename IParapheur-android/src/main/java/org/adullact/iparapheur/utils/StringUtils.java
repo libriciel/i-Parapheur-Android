@@ -50,7 +50,9 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringUtils {
 
+
     private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
 
     // <editor-fold desc="TextUtils">
 
@@ -78,7 +80,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
      * @param end  the ending text.
      * @return true, if the string ends with the given ending text.
      */
-    public static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
+    static boolean endsWithIgnoreCase(@Nullable String base, @Nullable String end) {
 
         // Default case
 
@@ -90,7 +92,9 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return (base.length() >= end.length()) && base.regionMatches(true, base.length() - end.length(), end, 0, end.length());
     }
 
+
     // </editor-fold desc="TextUtils">
+
 
     public static @NonNull String bundleToString(@Nullable Bundle bundle) {
         if (bundle == null)
@@ -110,6 +114,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
 
         return stringBuilder.toString();
     }
+
 
     public static @Nullable String urlEncode(@Nullable String string) {
 
@@ -134,6 +139,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return result;
     }
 
+
     public static @NonNull String inputStreamToString(@NonNull InputStream is) throws IOException {
         String line;
         StringBuilder total = new StringBuilder();
@@ -146,6 +152,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return total.toString();
     }
 
+
     public static @Nullable Date parseIso8601Date(@Nullable String iso8601Date) {
 
         if ((iso8601Date == null) || (iso8601Date.length() == 0))
@@ -154,9 +161,11 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         try { return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).parse(iso8601Date); } catch (ParseException ex) { return null; }
     }
 
+
     public static @NonNull String serializeToIso8601Date(@NonNull Date date) {
         return new SimpleDateFormat(ISO_8601_DATE_FORMAT, Locale.FRENCH).format(date);
     }
+
 
     public static @Nullable String utf8SignatureToBase64Ascii(@Nullable String utf8String) {
 
@@ -192,7 +201,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
      * @param issuerDnName DN name, with attributes in any order
      * @return fixed DN, that please OpenSSL
      */
-    public static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
+    static @NonNull String fixIssuerDnX500NameStringOrder(@NonNull String issuerDnName) {
 
         // Regex, without anti-slash escapes : ([A-Z]+)=(.*?(?<!\\)(?:\\{2})*)(?:,|$)
         //
@@ -249,6 +258,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         }
     }
 
+
     public static @NonNull String fixUrl(@NonNull String url) {
 
         // Getting the server name
@@ -267,14 +277,16 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return result;
     }
 
+
     public static @NonNull String getLocalizedSmallDate(@Nullable Date date) {
 
         if (date == null)
             return "???";
 
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE);
         return dateFormat.format(date);
     }
+
 
     public static @NonNull String getVerySmallDate(@Nullable Date date) {
 
@@ -285,6 +297,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return dateFormat.format(date);
     }
 
+
     public static @NonNull String getSmallTime(@Nullable Date date) {
 
         if (date == null)
@@ -294,7 +307,8 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         return dateFormat.format(date);
     }
 
-    public static boolean isUrlValid(@Nullable String url) {
+
+    static boolean isUrlValid(@Nullable String url) {
 
         if (TextUtils.isEmpty(url))
             return false;
@@ -306,6 +320,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
             return false;
         }
     }
+
 
     public static @Nullable Boolean nullableBooleanValueOf(@NonNull Map<String, String> map, @NonNull String key) {
 

@@ -17,20 +17,13 @@
  */
 package org.adullact.iparapheur.model;
 
-import android.text.TextUtils;
-
 import com.google.gson.Gson;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -46,27 +39,12 @@ import static org.adullact.iparapheur.model.Action.SECRETARIAT;
 import static org.adullact.iparapheur.model.Action.SIGNATURE;
 import static org.adullact.iparapheur.model.Action.TRANSFERT_SIGNATURE;
 import static org.adullact.iparapheur.model.Action.VISA;
-import static org.mockito.Matchers.any;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(RobolectricTestRunner.class)
 public class DossierTest {
 
     private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
-
-
-    @Before public void setUp() {
-        PowerMockito.mockStatic(TextUtils.class);
-
-        PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
-            @Override public Object answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                CharSequence b = (CharSequence) invocation.getArguments()[1];
-                return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
-            }
-        });
-    }
 
 
     @Test public void fromJsonArray() {

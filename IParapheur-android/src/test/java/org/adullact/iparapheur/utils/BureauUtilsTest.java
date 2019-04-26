@@ -17,57 +17,37 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.text.TextUtils;
-
 import org.adullact.iparapheur.model.Bureau;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
 
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(RobolectricTestRunner.class)
 public class BureauUtilsTest {
 
-	@Before public void setUp() throws Exception {
-		PowerMockito.mockStatic(TextUtils.class);
 
-		PowerMockito.when(TextUtils.equals(any(CharSequence.class), any(CharSequence.class))).thenAnswer(new Answer<Object>() {
-			@Override public Object answer(InvocationOnMock invocation) throws Throwable {
-				CharSequence a = (CharSequence) invocation.getArguments()[0];
-				CharSequence b = (CharSequence) invocation.getArguments()[1];
-				return org.adullact.iparapheur.mock.TextUtils.equals(a, b);
-			}
-		});
-	}
+    @Test public void findInList() {
 
-	@Test public void findInList() throws Exception {
+        List<Bureau> bureauList = new ArrayList<>();
+        bureauList.add(new Bureau("id_01", "Name 01", 10, 5));
+        bureauList.add(new Bureau("id_02", "Name 02", 10, 5));
+        bureauList.add(null);
+        bureauList.add(new Bureau("id_03", "Name 03", 10, 5));
 
-		List<Bureau> bureauList = new ArrayList<>();
-		bureauList.add(new Bureau("id_01", "Name 01", 10, 5));
-		bureauList.add(new Bureau("id_02", "Name 02", 10, 5));
-		bureauList.add(null);
-		bureauList.add(new Bureau("id_03", "Name 03", 10, 5));
+        List<Bureau> emptyList = new ArrayList<>();
 
-		List<Bureau> emptyList = new ArrayList<>();
+        // Checks
 
-		// Checks
+        org.junit.Assert.assertNull(BureauUtils.findInList(null, null));
+        org.junit.Assert.assertNull(BureauUtils.findInList(bureauList, null));
+        org.junit.Assert.assertNull(BureauUtils.findInList(bureauList, "id_missing"));
+        org.junit.Assert.assertNull(BureauUtils.findInList(emptyList, "id_01"));
+        //noinspection ConstantConditions
+        org.junit.Assert.assertEquals(BureauUtils.findInList(bureauList, "id_02").getTitle(), "Name 02");
+    }
 
-		org.junit.Assert.assertNull(BureauUtils.findInList(null, null));
-		org.junit.Assert.assertNull(BureauUtils.findInList(bureauList, null));
-		org.junit.Assert.assertNull(BureauUtils.findInList(bureauList, "id_missing"));
-		org.junit.Assert.assertNull(BureauUtils.findInList(emptyList, "id_01"));
-		//noinspection ConstantConditions
-		org.junit.Assert.assertEquals(BureauUtils.findInList(bureauList, "id_02").getTitle(), "Name 02");
-	}
 }
