@@ -1,50 +1,85 @@
-image: gitlab.libriciel.fr:4567/docker/android-builder:latest
-
-before_script:
-  - eval $(ssh-agent -s)
-  # add ssh key stored in SECRET_VARIABLES_ID_RSA variable to the agent store
-  - ssh-add <(echo "$SECRET_VARIABLES_ID_RSA")
-  # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
-  # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
-  - mkdir -p ~/.ssh
-  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-  - git clone -b develop https://scm.adullact.net/anonscm/git/mupdfandroid/mupdfandroid.git mupdffragment || echo "Submodule already fetched"
+image: openjdk:8-jdk
 
 stages:
   - test
-  - build
+  - package
+
+variables:
+  ANDROID_COMPILE_SDK: "28"
+  ANDROID_BUILD_TOOLS: "28.0.2"
+  ANDROID_SDK_TOOLS:   "4333796"
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+  PROJECT_NAME: "iparapheur-android"
+
+cache:
+  key: "$CI_COMMIT_REF_NAME"
+  paths:
+    - .gradle/caches
+
+# From https://about.gitlab.com/2018/10/24/setting-up-gitlab-ci-for-android-projects/
+before_script:
+  - apt-get --quiet update --yes
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+  - unzip -q -d android-sdk-linux android-sdk.zip
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+  - chmod +x ./gradlew
+  # temporarily disable checking for EPIPE error and use yes to accept all licenses
+  - set +o pipefail
+  - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
+  - set -o pipefail
 
 
-# Jobs test
+# <editor-fold desc="Test">
 
-local_unit_test:
+
+junit:
   stage: test
-  allow_failure: true
+  coverage: '/Total.*?([0-9]{1,3})%/'
   script:
-    - ./gradlew test --continue
+    - ./gradlew jacocoTestReport
+  after_script:
+    - cat build/reports/jacoco/jacocoTestReport/html/index.html
 
 
-instrumented_unit_test:
+instrumented_unittest:
   stage: test
   allow_failure: true
   script:
     - ./gradlew connectedCheck --continue
 
 
-# Jobs build
-
-build_develop:
-  stage: build
-  except:
-    - master
-  script:
-    - ./gradlew assembleDebug
-
-
-build_release:
-  stage: build
+sonarqube:
+  stage: test
   only:
-    - master
+    - develop
   script:
-    - ./gradlew assembleDebug
+    - ./gradlew sonar -Dsonar.host.url=https://sonarqube.libriciel.fr "-Dsonar.login=$SONAR_TOKEN"
 
+
+# </editor-fold desc="Test">
+
+
+# <editor-fold desc="Package">
+
+
+apk:
+  stage: package
+  script:
+    - sed -i "s/\"develop\"/\"$CI_COMMIT_REF_NAME\"/g" src/main/AndroidManifest.xml
+    - ./gradlew assembleRelease
+  after_script:
+    - mkdir $PROJECT_NAME
+    - mv build/outputs/apk/release/*.apk $PROJECT_NAME/
+    - cd ..
+  artifacts:
+    name: "$PROJECT_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - $PROJECT_NAME/*
+
+
+# </editor-fold desc="Package">
