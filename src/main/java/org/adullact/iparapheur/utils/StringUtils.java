@@ -283,7 +283,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         if (date == null)
             return "???";
 
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE);
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
         return dateFormat.format(date);
     }
 
