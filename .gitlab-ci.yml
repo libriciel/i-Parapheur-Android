@@ -17,12 +17,14 @@ cache:
   paths:
     - .gradle/caches
 
+
 # From https://about.gitlab.com/2018/10/24/setting-up-gitlab-ci-for-android-projects/
 before_script:
   - apt-get --quiet update --yes
   - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
   - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
   - unzip -q -d android-sdk-linux android-sdk.zip
+  - touch ~/.android/repositories.cfg
   - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
@@ -49,7 +51,7 @@ instrumented:
   coverage: '/Total.*?([0-9]{1,3})%/'
   allow_failure: true
   # https://gist.github.com/illuzor/988385c493d3f7ed7193a6e3ce001a68
-  script:
+  before_script:
     - chmod +x android-wait-for-emulator.sh
     - android-sdk-linux/tools/bin/sdkmanager --update > update.log
     - android-sdk-linux/tools/bin/sdkmanager "platform-tools" "emulator" "system-images;android-${ANDROID_EMULATOR_VERSION};default;armeabi-v7a"  > installEmulator.log
@@ -57,6 +59,7 @@ instrumented:
     - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio &
     - ./android-wait-for-emulator.sh
     - adb shell input keyevent 82
+  script:
     - ./gradlew jacocoTestReport
   after_script:
     - cat build/reports/jacoco/jacocoTestReport/html/index.html
