@@ -113,7 +113,7 @@ public class StringUtilsTest {
 
 
     @Test public void getSmallTime() {
-        Assert.assertTrue(StringUtils.getSmallTime(new Date(1482705900000L)).contains("23");
+        Assert.assertTrue(StringUtils.getSmallTime(new Date(1482705900000L)).contains("23"));
         Assert.assertEquals(StringUtils.getSmallTime(null), "???");
     }
 
