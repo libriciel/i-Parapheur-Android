@@ -36,10 +36,10 @@ before_script:
   - set -o pipefail
   # Project specific elements
   - echo $KEYSTORE_BASE64 | base64 -d > release.keystore
-  - echo "RELEASE_STORE_FILE=${KEYSTORE_FILE}" > release-keystore.properties
-  - echo "RELEASE_STORE_PASSWORD=${KEYSTORE_PASSWORD}" >> release-keystore.properties
-  - echo "RELEASE_KEY_ALIAS=${KEYSTORE_ALIAS}" >> release-keystore.properties
-  - echo "RELEASE_KEY_PASSWORD=${KEYSTORE_ALIAS_PASSWORD}" >> release-keystore.properties
+  - echo "storeFile=${KEYSTORE_FILE}" > release-keystore.properties
+  - echo "storePassword=${KEYSTORE_PASSWORD}" >> release-keystore.properties
+  - echo "keyAlias=${KEYSTORE_ALIAS}" >> release-keystore.properties
+  - echo "keyPassword=${KEYSTORE_ALIAS_PASSWORD}" >> release-keystore.properties
 
 
 # <editor-fold desc="Test">
