@@ -83,9 +83,10 @@ apk:
     - sed -i "s/\"develop\"/\"$CI_COMMIT_REF_NAME\"/g" src/main/AndroidManifest.xml
     - ./gradlew assembleRelease
   after_script:
+    - echo $KEYSTORE_BASE64 | base64 -d > release.keystore
+    - echo $KEYSTORE_PROPERTIES > release-keystore.properties
     - mkdir $PROJECT_NAME
-    - mv build/outputs/apk/release/*.apk $PROJECT_NAME/$PROJECT_NAME-$CI_COMMIT_REF_NAME.apk
-    - cd ..
+    - mv build/outputs/apk/release/$PROJECT_NAME-$CI_COMMIT_REF_NAME-signed.apk $PROJECT_NAME/$PROJECT_NAME-$CI_COMMIT_REF_NAME.apk
   artifacts:
     name: "$PROJECT_NAME-$CI_COMMIT_REF_NAME"
     paths:
