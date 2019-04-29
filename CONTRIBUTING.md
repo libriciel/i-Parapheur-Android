@@ -10,7 +10,9 @@
 - Go to Preferences → Build, Execution, Deployment → Compiler → Annotation Processors
 - Check Enable annotation processing
 
-For every Gradle task, you'll need a signing keystore file in the root directory,
+##### Building :
+
+For every Gradle task, you'll need a signing keystore file in the root directory,  
 and the appropriate properties file, looking like this :
 
 ```
@@ -22,7 +24,7 @@ keyPassword=********
 
 Those elements are set in the GitLab CI, but were hidden (using the CI variables).  
 For test/contribute settigns, any other keystore can be used.
-Or the configuration can be removed from the `build.gradle` file
+Or the configuration can be simply removed from the `build.gradle` file.
 
 
 ## Code style and project structure
