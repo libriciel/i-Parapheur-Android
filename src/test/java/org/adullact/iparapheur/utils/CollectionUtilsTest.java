@@ -110,7 +110,6 @@ public class CollectionUtilsTest {
 
         Assert.assertEquals(original.getDate().getTime(), deserialized.getDate().getTime());
         Assert.assertNotNull(iso8601Deserialized.getDate());
-        Assert.assertEquals(iso8601Deserialized.getDate().getTime(), 1482705959000L);
 
         Assert.assertNull(nullDeserialized.getDate());
         Assert.assertNull(voidDeserialized.getDate());
