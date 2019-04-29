@@ -70,6 +70,8 @@ public class StringUtilsTest {
 
 
     @Test public void serializeToIso8601Date() {
+        System.out.println("TESTING :: " + StringUtils.serializeToIso8601Date(new Date(1482705900000L)));
+        System.out.println("EXPECT  :: 2016-12-25T23:45:00");
         Assert.assertEquals(StringUtils.serializeToIso8601Date(new Date(1482705900000L)), "2016-12-25T23:45:00");
     }
 
