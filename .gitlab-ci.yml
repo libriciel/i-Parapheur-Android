@@ -84,7 +84,7 @@ apk:
     - ./gradlew assembleRelease
   after_script:
     - mkdir $PROJECT_NAME
-    - mv build/outputs/apk/release/*.apk $PROJECT_NAME/
+    - mv build/outputs/apk/release/*.apk $PROJECT_NAME/$PROJECT_NAME-$CI_COMMIT_REF_NAME.apk
     - cd ..
   artifacts:
     name: "$PROJECT_NAME-$CI_COMMIT_REF_NAME"
