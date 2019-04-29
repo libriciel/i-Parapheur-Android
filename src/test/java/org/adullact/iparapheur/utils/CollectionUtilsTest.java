@@ -26,12 +26,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 
+@Config(qualifiers = "fr")
 @RunWith(RobolectricTestRunner.class)
 public class CollectionUtilsTest {
 
