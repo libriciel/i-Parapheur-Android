@@ -283,7 +283,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         if (date == null)
             return "???";
 
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRENCH);
         return dateFormat.format(date);
     }
 
@@ -293,7 +293,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         if (date == null)
             return "???";
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.FRENCH);
         return dateFormat.format(date);
     }
 
@@ -303,7 +303,7 @@ public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringU
         if (date == null)
             return "???";
 
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.FRENCH);
         return dateFormat.format(date);
     }
 
