@@ -7,3 +7,5 @@
 IParapheur-android/IParapheur-android-release.apk
 IParapheur-android/manifest-merger-release-report.txt
 mupdffragment
+release-keystore\.properties
+release\.keystore

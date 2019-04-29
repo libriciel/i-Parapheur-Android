@@ -21,7 +21,6 @@ import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Assert;
-
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,40 +39,43 @@ import java.io.ObjectOutputStream;
 @SmallTest
 public class SerializableSparseArrayTest {
 
-	private static byte[] sSerializedBytes;
+    private static byte[] sSerializedBytes;
 
-	@Test public void order01_writeObject() throws Exception {
 
-		SerializableSparseArray<String> serializedSparseArray = new SerializableSparseArray<>();
-		serializedSparseArray.put(1, null);
-		serializedSparseArray.put(3, "");
-		serializedSparseArray.put(4, "Test4");
-		serializedSparseArray.put(5, "Test5");
+    @Test public void order01_writeObject() throws Exception {
 
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput out = new ObjectOutputStream(bos);
-		out.writeObject(serializedSparseArray);
-		out.flush();
-		sSerializedBytes = bos.toByteArray();
-		bos.close();
+        SerializableSparseArray<String> serializedSparseArray = new SerializableSparseArray<>();
+        serializedSparseArray.put(1, null);
+        serializedSparseArray.put(3, "");
+        serializedSparseArray.put(4, "Test4");
+        serializedSparseArray.put(5, "Test5");
 
-		Assert.assertNotNull(sSerializedBytes);
-	}
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = new ObjectOutputStream(bos);
+        out.writeObject(serializedSparseArray);
+        out.flush();
+        sSerializedBytes = bos.toByteArray();
+        bos.close();
 
-	@Test public void order02_readObject() throws Exception {
+        Assert.assertNotNull(sSerializedBytes);
+    }
 
-		ByteArrayInputStream bis = new ByteArrayInputStream(sSerializedBytes);
-		ObjectInput in = new ObjectInputStream(bis);
-		//noinspection unchecked
-		SerializableSparseArray<String> deserializedSparseArray = (SerializableSparseArray<String>) in.readObject();
 
-		in.close();
+    @Test public void order02_readObject() throws Exception {
 
-		Assert.assertNotNull(deserializedSparseArray);
-		Assert.assertEquals(deserializedSparseArray.get(0), null);
-		Assert.assertEquals(deserializedSparseArray.get(1), null);
-		Assert.assertEquals(deserializedSparseArray.get(3), "");
-		Assert.assertEquals(deserializedSparseArray.get(4), "Test4");
-		Assert.assertEquals(deserializedSparseArray.get(5), "Test5");
-	}
+        ByteArrayInputStream bis = new ByteArrayInputStream(sSerializedBytes);
+        ObjectInput in = new ObjectInputStream(bis);
+        //noinspection unchecked
+        SerializableSparseArray<String> deserializedSparseArray = (SerializableSparseArray<String>) in.readObject();
+
+        in.close();
+
+        Assert.assertNotNull(deserializedSparseArray);
+        Assert.assertNull(deserializedSparseArray.get(0));
+        Assert.assertNull(deserializedSparseArray.get(1));
+        Assert.assertEquals(deserializedSparseArray.get(3), "");
+        Assert.assertEquals(deserializedSparseArray.get(4), "Test4");
+        Assert.assertEquals(deserializedSparseArray.get(5), "Test5");
+    }
+
 }

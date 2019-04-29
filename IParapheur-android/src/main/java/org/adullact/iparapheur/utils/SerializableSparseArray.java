@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 
-@SuppressWarnings("unused")
 public class SerializableSparseArray<E> extends android.util.SparseArray<E> implements Serializable {
 
 

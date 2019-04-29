@@ -38,119 +38,129 @@ import java.util.UUID;
 
 public enum MyAccounts implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-	INSTANCE;
+    INSTANCE;
 
-	public static final String PREFS_ACCOUNT_PREFIX = "account_";
-	public static final String PREFS_TITLE_SUFFIX = "_title";
-	public static final String PREFS_URL_SUFFIX = "_url";
-	public static final String PREFS_LOGIN_SUFFIX = "_login";
-	public static final String PREFS_PASSWORD_SUFFIX = "_password";
-	public static final String PREFS_ACTIVATED_SUFFIX = "_activated";
-	public static final String PREFS_SELECTED_ACCOUNT = "selected_account";
+    public static final String PREFS_ACCOUNT_PREFIX = "account_";
+    public static final String PREFS_TITLE_SUFFIX = "_title";
+    public static final String PREFS_URL_SUFFIX = "_url";
+    public static final String PREFS_LOGIN_SUFFIX = "_login";
+    public static final String PREFS_PASSWORD_SUFFIX = "_password";
+    public static final String PREFS_ACTIVATED_SUFFIX = "_activated";
+    public static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
-	private ArrayList<Account> mAccounts = null;
-	private Account mSelectedAccount;
+    private ArrayList<Account> mAccounts = null;
+    private Account mSelectedAccount;
 
-	public @NonNull List<Account> getAccounts(@NonNull Context context) {
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		return getAccounts(sharedPreferences);
-	}
+    public @NonNull List<Account> getAccounts(@NonNull Context context) {
 
-	public @NonNull List<Account> getAccounts(@NonNull SharedPreferences sharedPreferences) {
-		if (mAccounts == null) {
-			mAccounts = new ArrayList<>();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return getAccounts(sharedPreferences);
+    }
 
-			for (String pref : sharedPreferences.getAll().keySet()) {
-				if (pref.startsWith(PREFS_ACCOUNT_PREFIX)) {
 
-					String id = pref.substring(pref.indexOf("_") + 1);
-					id = id.substring(0, id.lastIndexOf("_"));
-					Account account = new Account(id);
+    public @NonNull List<Account> getAccounts(@NonNull SharedPreferences sharedPreferences) {
+        if (mAccounts == null) {
+            mAccounts = new ArrayList<>();
 
-					if (!mAccounts.contains(account)) {
-						account.setTitle(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX, ""));
-						account.setLogin(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX, ""));
-						account.setServerBaseUrl(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX, ""));
-						account.setPassword(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX, ""));
-						account.setActivated(sharedPreferences.getBoolean(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX, true));
-						mAccounts.add(account);
-					}
-				}
-			}
-			if (mSelectedAccount == null) {
-				String selectedDossierId = (sharedPreferences.getString(PREFS_SELECTED_ACCOUNT, null));
-				if (selectedDossierId != null)
-					mSelectedAccount = getAccount(selectedDossierId);
-			}
-		}
-		return mAccounts;
-	}
+            for (String pref : sharedPreferences.getAll().keySet()) {
+                if (pref.startsWith(PREFS_ACCOUNT_PREFIX)) {
 
-	public @NonNull Account addAccount(@NonNull Context context) {
+                    String id = pref.substring(pref.indexOf("_") + 1);
+                    id = id.substring(0, id.lastIndexOf("_"));
+                    Account account = new Account(id);
 
-		Account account = new Account(UUID.randomUUID().toString());
-		mAccounts.add(account);
-		save(context, account);
+                    if (!mAccounts.contains(account)) {
+                        account.setTitle(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX, ""));
+                        account.setLogin(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX, ""));
+                        account.setServerBaseUrl(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX, ""));
+                        account.setPassword(sharedPreferences.getString(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX, ""));
+                        account.setActivated(sharedPreferences.getBoolean(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX, true));
+                        mAccounts.add(account);
+                    }
+                }
+            }
+            if (mSelectedAccount == null) {
+                String selectedDossierId = (sharedPreferences.getString(PREFS_SELECTED_ACCOUNT, null));
+                if (selectedDossierId != null)
+                    mSelectedAccount = getAccount(selectedDossierId);
+            }
+        }
+        return mAccounts;
+    }
 
-		return account;
-	}
 
-	public void save(@NonNull Context context, @NonNull Account account) {
+    public @NonNull Account addAccount(@NonNull Context context) {
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Account account = new Account(UUID.randomUUID().toString());
+        mAccounts.add(account);
+        save(context, account);
 
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_TITLE_SUFFIX, account.getTitle());
-		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_URL_SUFFIX, account.getServerBaseUrl());
-		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_LOGIN_SUFFIX, account.getLogin());
-		editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_PASSWORD_SUFFIX, account.getPassword());
-		editor.putBoolean(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_ACTIVATED_SUFFIX, account.isActivated());
-		editor.apply();
-	}
+        return account;
+    }
 
-	public void delete(@NonNull Context context, @NonNull Account account) {
 
-		String id = account.getId();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Set<String> keySet = sharedPreferences.getAll().keySet();
+    public void save(@NonNull Context context, @NonNull Account account) {
 
-		if (keySet.contains(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX)) {
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX);
-			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX);
-			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX);
-			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX);
-			editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX);
-			editor.apply();
-		}
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-		mAccounts.remove(account);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_TITLE_SUFFIX, account.getTitle());
+        editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_URL_SUFFIX, account.getServerBaseUrl());
+        editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_LOGIN_SUFFIX, account.getLogin());
+        editor.putString(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_PASSWORD_SUFFIX, account.getPassword());
+        editor.putBoolean(PREFS_ACCOUNT_PREFIX + account.getId() + PREFS_ACTIVATED_SUFFIX, account.isActivated());
+        editor.apply();
+    }
 
-		if ((mSelectedAccount != null) && (TextUtils.equals(mSelectedAccount.getId(), id)))
-			mSelectedAccount = null;
-	}
 
-	public @Nullable Account getAccount(@NonNull String id) {
-		int index = mAccounts.indexOf(new Account(id));
-		return (index != -1) ? mAccounts.get(index) : null;
-	}
+    public void delete(@NonNull Context context, @NonNull Account account) {
 
-	// <editor-fold desc="OnSharedPreferenceChangeListener">
+        String id = account.getId();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> keySet = sharedPreferences.getAll().keySet();
 
-	@Override public void onSharedPreferenceChanged(@NonNull SharedPreferences sharedPreferences, @NonNull String s) {
+        if (keySet.contains(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX)) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_TITLE_SUFFIX);
+            editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_URL_SUFFIX);
+            editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_LOGIN_SUFFIX);
+            editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_PASSWORD_SUFFIX);
+            editor.remove(PREFS_ACCOUNT_PREFIX + id + PREFS_ACTIVATED_SUFFIX);
+            editor.apply();
+        }
 
-		if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
+        mAccounts.remove(account);
 
-			mAccounts = null;
-			getAccounts(sharedPreferences);
+        if ((mSelectedAccount != null) && (TextUtils.equals(mSelectedAccount.getId(), id)))
+            mSelectedAccount = null;
+    }
 
-			// if an Account was previously selected, update it with the new one
 
-			if (mSelectedAccount != null)
-				mSelectedAccount = getAccount(mSelectedAccount.getId());
-		}
-	}
+    public @Nullable Account getAccount(@NonNull String id) {
+        int index = mAccounts.indexOf(new Account(id));
+        return (index != -1) ? mAccounts.get(index) : null;
+    }
 
-	// </editor-fold desc="OnSharedPreferenceChangeListener">
+
+    // <editor-fold desc="OnSharedPreferenceChangeListener">
+
+
+    @Override public void onSharedPreferenceChanged(@NonNull SharedPreferences sharedPreferences, @NonNull String s) {
+
+        if (s.startsWith(PREFS_ACCOUNT_PREFIX)) {
+
+            mAccounts = null;
+            getAccounts(sharedPreferences);
+
+            // if an Account was previously selected, update it with the new one
+
+            if (mSelectedAccount != null)
+                mSelectedAccount = getAccount(mSelectedAccount.getId());
+        }
+    }
+
+
+    // </editor-fold desc="OnSharedPreferenceChangeListener">
+
 }

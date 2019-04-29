@@ -70,8 +70,8 @@ public class DatabaseHelperTest {
 
     private static DatabaseHelper sDbHelper;
 
-    @BeforeClass
-    public static void setup() {
+
+    @BeforeClass public static void setup() {
 
         Context context = InstrumentationRegistry.getTargetContext();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -81,16 +81,16 @@ public class DatabaseHelperTest {
         sDbHelper = new DatabaseHelper(context);
     }
 
-    @Test
-    public void order01_createDefaultDemoAccount() throws Exception {
+
+    @Test public void order01_createDefaultDemoAccount() throws Exception {
         Account demoAccount = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, AccountUtils.DEMO_ID).query().get(0);
         Assert.assertNotNull(demoAccount);
         sDbHelper.getAccountDao().delete(demoAccount);
         Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 0);
     }
 
-    @Test
-    public void order02_onCreate() throws Exception {
+
+    @Test public void order02_onCreate() throws Exception {
 
         Dao<Account, Integer> accountDao = sDbHelper.getAccountDao();
         Dao<Bureau, Integer> bureauDao = sDbHelper.getBureauDao();
@@ -105,8 +105,8 @@ public class DatabaseHelperTest {
         Assert.assertEquals(documentDao.getTableName(), "Document");
     }
 
-    @Test
-    public void order03_getAccountDao() throws Exception {
+
+    @Test public void order03_getAccountDao() throws Exception {
 
         Account account01 = new Account("id_01", "Title 01", "parapheur.test01.adullact.org", "login01", "password01", "tenant01", 1);
         Account account02 = new Account("id_02", "Title 02", "parapheur.test02.adullact.org", "login02", "password02", "tenant02", 2);
@@ -124,11 +124,11 @@ public class DatabaseHelperTest {
 
         Assert.assertEquals(account01db.getApiVersion(), account01.getApiVersion());
         Assert.assertEquals(account02db.getApiVersion(), account02.getApiVersion());
-        Assert.assertEquals(account03db.getApiVersion(), null);
+        Assert.assertNull(account03db.getApiVersion());
     }
 
-    @Test
-    public void order04_getBureauDao() throws Exception {
+
+    @Test public void order04_getBureauDao() throws Exception {
 
         Account account01 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_01").query().get(0);
         Account account02 = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, "id_02").query().get(0);
@@ -164,8 +164,8 @@ public class DatabaseHelperTest {
         Assert.assertEquals(account03.getChildrenBureaux().size(), 0);
     }
 
-    @Test
-    public void order05_getDossierDao() throws Exception {
+
+    @Test public void order05_getDossierDao() throws Exception {
 
         Bureau bureau01 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_01").query().get(0);
         Bureau bureau02 = sDbHelper.getBureauDao().queryBuilder().where().eq(Bureau.DB_FIELD_ID, "id_02").query().get(0);
@@ -226,8 +226,8 @@ public class DatabaseHelperTest {
         Assert.assertEquals(bureau03.getChildrenDossiers().size(), 0);
     }
 
-    @Test
-    public void order06_getDocumentDao() throws Exception {
+
+    @Test public void order06_getDocumentDao() throws Exception {
 
         Dossier dossier01 = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_01").query().get(0);
         Dossier dossier02 = sDbHelper.getDossierDao().queryBuilder().where().eq(Dossier.DB_FIELD_ID, "id_02").query().get(0);
@@ -280,16 +280,15 @@ public class DatabaseHelperTest {
         Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
     }
 
-    @Test
-    public void order08_retrieveLegacyAccounts() throws Exception {
+
+    @Test public void order08_retrieveLegacyAccounts() throws Exception {
 
         Context context = InstrumentationRegistry.getTargetContext();
         MyAccounts myAccounts = MyAccounts.INSTANCE;
 
         // Cleanup
 
-        List<Account> legacyAccountList = new ArrayList<>();
-        legacyAccountList.addAll(myAccounts.getAccounts(context));
+        List<Account> legacyAccountList = new ArrayList<>(myAccounts.getAccounts(context));
 
         for (Account legacyAccount : legacyAccountList)
             myAccounts.delete(context, legacyAccount);
@@ -319,8 +318,9 @@ public class DatabaseHelperTest {
         Assert.assertEquals(legacyAccount.getServerBaseUrl(), dbAccount.getServerBaseUrl());
         Assert.assertEquals(legacyAccount.getLogin(), dbAccount.getLogin());
         Assert.assertEquals(legacyAccount.getPassword(), dbAccount.getPassword());
-        Assert.assertEquals(legacyAccount.isActivated(), true);
+        Assert.assertTrue(legacyAccount.isActivated());
         Assert.assertEquals(legacyAccount.getTitle(), dbAccount.getTitle());
-        Assert.assertEquals(legacyAccount.getApiVersion(), null);
+        Assert.assertNull(legacyAccount.getApiVersion());
     }
+
 }
