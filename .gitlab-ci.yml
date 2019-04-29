@@ -54,7 +54,6 @@ junit:
 instrumented:
   stage: test
   coverage: '/Total.*?([0-9]{1,3})%/'
-  allow_failure: true
   script:
     - android-sdk-linux/tools/bin/sdkmanager --update > update.log
     - android-sdk-linux/tools/bin/sdkmanager "platform-tools" "emulator" "system-images;android-${ANDROID_EMULATOR_VERSION};default;armeabi-v7a" > installEmulator.log
