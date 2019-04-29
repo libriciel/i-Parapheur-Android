@@ -1,0 +1,131 @@
+/*
+ * iParapheur Android
+ * Copyright (C) 2016-2019 Libriciel
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.adullact.iparapheur.model;
+
+import com.google.gson.Gson;
+
+import org.adullact.iparapheur.utils.CollectionUtils;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+
+import java.util.List;
+
+
+@RunWith(RobolectricTestRunner.class)
+public class BureauTest {
+
+    private static Gson sGson = CollectionUtils.buildGsonWithDateParser();
+
+
+    @Test public void fromJsonArray() {
+
+        // Parsed data
+
+        String incorrectArrayJsonString = "[[{]   \"id\": \"Value 01\" , \"collectivite\": [\"Value 01-01\"  ]]";
+        String correctArrayJsonString = "[" +
+                "{" +
+                "    \"hasSecretaire\": false," +
+                "    \"collectivite\": \"Collectivité 01 \\\"\\\\/%@&éè\"," +
+                "    \"description\": null," +
+                "    \"en-preparation\": 0," +
+                "    \"nodeRef\": \"workspace:\\/\\/SpacesStore\\/44abe93c-16d7-4e00-b561-f6d1b8b6c1d3\"," +
+                "    \"shortName\": \"C1\"," +
+                "    \"en-retard\": 5," +
+                "    \"image\": \"\"," +
+                "    \"show_a_venir\": null," +
+                "    \"habilitation\": {" +
+                "        \"traiter\": null," +
+                "        \"secretariat\": null," +
+                "        \"archivage\": null," +
+                "        \"transmettre\": null" +
+                "    }," +
+                "    \"a-archiver\": 27," +
+                "    \"a-traiter\": 10," +
+                "    \"id\": \"id_01\"," +
+                "    \"isSecretaire\": false," +
+                "    \"name\": \"Name 01 \\\"\\/%@&éè\"," +
+                "    \"retournes\": 13," +
+                "    \"dossiers-delegues\": 59" +
+                "}, {" +
+                "    \"hasSecretaire\": true," +
+                "    \"collectivite\": \"Collectivité 02 \\\"\\\\/%@&éè\"," +
+                "    \"description\": \"Description 02 \\\"\\\\/%@&éè\"," +
+                "    \"en-preparation\": 1," +
+                "    \"nodeRef\": \"id_02\"," +
+                "    \"shortName\": \"C2\"," +
+                "    \"en-retard\": 5," +
+                "    \"image\": null," +
+                "    \"show_a_venir\": null," +
+                "    \"habilitation\": {" +
+                "        \"traiter\": null," +
+                "        \"secretariat\": null," +
+                "        \"archivage\": null," +
+                "        \"transmettre\": null" +
+                "    }," +
+                "    \"a-archiver\": 33," +
+                "    \"isSecretaire\": false," +
+                "    \"name\": \"Name 02 \\\"\\/%@&éè\"," +
+                "    \"retournes\": 10," +
+                "    \"dossiers-delegues\": 0" +
+                "}]";
+
+        List<Bureau> incorrectArrayParsed = Bureau.fromJsonArray(incorrectArrayJsonString, sGson);
+        List<Bureau> correctArrayParsed = Bureau.fromJsonArray(correctArrayJsonString, sGson);
+
+        // Valid types
+
+        Bureau bureau01 = new Bureau("id_01", "Name 01 \"/%@&éè", 10, 5);
+        Bureau bureau02 = new Bureau("workspace://SpacesStore/id_02", "Name 02 \"/%@&éè", 0, 0);
+
+        bureau01.setSyncDate(null);
+        bureau02.setSyncDate(null);
+        bureau01.setParent(null);
+        bureau02.setParent(null);
+        bureau01.setChildrenDossiers(null);
+        bureau02.setChildrenDossiers(null);
+
+        // Checks
+
+        Assert.assertNull(incorrectArrayParsed);
+        Assert.assertNotNull(correctArrayParsed);
+
+        Assert.assertEquals(correctArrayParsed.get(0).toString(), bureau01.toString());
+        Assert.assertEquals(correctArrayParsed.get(0).getId(), bureau01.getId());
+        Assert.assertEquals(correctArrayParsed.get(0).getTitle(), bureau01.getTitle());
+        Assert.assertEquals(correctArrayParsed.get(0).getLateCount(), bureau01.getLateCount());
+        Assert.assertEquals(correctArrayParsed.get(0).getTodoCount(), bureau01.getTodoCount());
+        Assert.assertEquals(correctArrayParsed.get(0).getSyncDate(), bureau01.getSyncDate());
+        Assert.assertEquals(correctArrayParsed.get(0).getParent(), bureau01.getParent());
+        Assert.assertEquals(correctArrayParsed.get(0).getChildrenDossiers(), bureau01.getChildrenDossiers());
+
+        Assert.assertEquals(correctArrayParsed.get(1).toString(), bureau02.toString());
+        Assert.assertEquals(correctArrayParsed.get(1).getId(), bureau02.getId());
+        Assert.assertEquals(correctArrayParsed.get(1).getTitle(), bureau02.getTitle());
+        Assert.assertEquals(correctArrayParsed.get(1).getLateCount(), bureau02.getLateCount());
+        Assert.assertEquals(correctArrayParsed.get(1).getTodoCount(), bureau02.getTodoCount());
+        Assert.assertEquals(correctArrayParsed.get(1).getSyncDate(), bureau02.getSyncDate());
+        Assert.assertEquals(correctArrayParsed.get(1).getParent(), bureau02.getParent());
+        Assert.assertEquals(correctArrayParsed.get(1).getChildrenDossiers(), bureau02.getChildrenDossiers());
+
+        Assert.assertEquals(bureau01, correctArrayParsed.get(0));
+        Assert.assertEquals(bureau02, correctArrayParsed.get(1));
+    }
+
+}

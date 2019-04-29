@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General -->
+    <color name="primary_100">@color/light_blue_100</color>
+    <color name="primary_500">@color/light_blue_500</color>
+    <color name="primary_700">@color/light_blue_700</color>
+    <color name="primary_900">@color/light_blue_900</color>
+    <color name="secondary_50">@color/brown_50</color>
+    <color name="secondary_100">@color/brown_100</color>
+    <color name="secondary_200">@color/brown_200</color>
+    <color name="secondary_300">@color/brown_300</color>
+    <color name="secondary_400">@color/brown_400</color>
+    <color name="secondary_500">@color/brown_500</color>
+    <color name="secondary_700">@color/brown_700</color>
+    <color name="contextual_500">@color/grey_500</color>
+    <color name="contextual_700">@color/grey_700</color>
+
+    <!-- Settings -->
+    <color name="settings_500">@color/blue_grey_900</color>
+    <color name="settings_700">@color/blue_grey_950</color>
+    <color name="settings_primary_500">@color/teal_500</color>
+
+    <!-- MuPDF -->
+    <color name="canvas">@color/grey_800</color>
+    <color name="bar">@color/primary_100</color>
+    <color name="background_grey_light">@color/grey_400</color>
+    <color name="activated_fab_white_background">#CCFFFFFF</color>
+
+</resources>

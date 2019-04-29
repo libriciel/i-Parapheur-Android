@@ -1,0 +1,11 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header
+        android:fragment="org.adullact.iparapheur.controller.preferences.AccountsPreferenceFragment"
+        android:title="@string/pref_header_accounts" />
+
+    <header
+        android:fragment="org.adullact.iparapheur.controller.preferences.AboutPreferenceFragment"
+        android:title="@string/pref_header_legal" />
+
+</preference-headers>

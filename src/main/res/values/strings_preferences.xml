@@ -1,0 +1,38 @@
+<resources>
+
+    <!-- Strings related to Settings -->
+
+    <string name="title_activity_settings">Paramètres</string>
+
+    <string name="preferences_label_general">Général</string>
+    <string name="preferences_header_about">À propos</string>
+
+    <string name="pref_header_accounts">Comptes</string>
+    <string name="pref_header_legal">Informations légales</string>
+    <string name="pref_header_licenses">Licenses tierces</string>
+    <string name="pref_header_certificates">Certificats</string>
+    <string name="pref_header_filters">Filtres</string>
+
+    <string name="pref_accounts">Mes Comptes</string>
+    <string name="pref_accounts_new">Nouveau compte</string>
+
+    <string name="pref_account_title">Nom du compte</string>
+    <string name="pref_account_url">URL du serveur</string>
+    <string name="pref_account_login">Nom d\'utilisateur</string>
+    <string name="pref_account_password">Mot de passe</string>
+    <string name="delete">Supprimer</string>
+    <string name="disable">Desactiver</string>
+    <string name="enable">Activer</string>
+
+    <string name="pref_account_message_save_success">Compte enregistré</string>
+    <string name="pref_account_message_delete_success">Compte supprimé</string>
+
+    <string name="pref_filters_message_delete_success">Filtre supprimé</string>
+
+    <string name="pref_certificates_message_delete_success">Certificat supprimé</string>
+    <string name="pref_certificates_message_delete_failed">Le certificat n\'a pas pu être supprimé</string>
+    <string name="pref_certificates_expiration_date">exp. %s</string>
+    <string name="pref_certificates_no_content">Aucun certificat disponible.</string>
+    <string name="pref_certificates_tuto_import">Comment importer un certificat ?</string>
+
+</resources>
