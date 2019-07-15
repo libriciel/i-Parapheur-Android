@@ -35,7 +35,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@Setter
+@Getter
+@ToString
+@NoArgsConstructor
 @DatabaseTable(tableName = "Desk")
 public class Bureau {
 
@@ -46,6 +55,7 @@ public class Bureau {
     private static final String DB_FIELD_SYNC = "Sync";
     private static final String DB_FIELD_ACCOUNT = "Account";
     private static final String DB_FIELD_FOLDERS = "Folders";
+
 
     @DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
     @SerializedName(value = "id", alternate = {"nodeRef"})  //
@@ -113,77 +123,13 @@ public class Bureau {
     }
 
 
-    public Bureau() {}
-
-
-    // <editor-fold desc="Setters / Getters">
-
-
-    public String getId() {
-        return id;
-    }
-
-
-    public String getTitle() {
-        return title;
-    }
-
-
-    public int getTodoCount() {
-        return todoCount;
-    }
-
-
-    public int getLateCount() {
-        return lateCount;
-    }
-
-
-    private void setLateCount(int lateCount) {
-        this.lateCount = lateCount;
-    }
-
-
-    public Account getParent() {
-        return parent;
-    }
-
-
-    public void setParent(Account account) {
-        parent = account;
-    }
-
-
-    public Date getSyncDate() {
-        return syncDate;
-    }
-
-
-    public void setSyncDate(Date date) {
-        syncDate = date;
-    }
-
-
-    public ForeignCollection<Dossier> getChildrenDossiers() {
-        return childrenDossiers;
-    }
-
-
-    public void setChildrenDossiers(ForeignCollection<Dossier> childrenDossiers) {
-        this.childrenDossiers = childrenDossiers;
-    }
-
-
-    // </editor-fold desc="Setters / Getters">
-
-
-    @Override public String toString() {
-        return "{Bureau id=" + id + " title=" + title + " todo=" + todoCount + " late=" + lateCount + " sync=" + syncDate + "}";
-    }
-
-
     @Override public boolean equals(Object o) {
-        return (o != null) && (o instanceof Bureau) && TextUtils.equals(id, ((Bureau) o).getId());
+        return (o instanceof Bureau) && TextUtils.equals(id, ((Bureau) o).getId());
+    }
+
+
+    @Override public int hashCode() {
+        return id.hashCode();
     }
 
 }
