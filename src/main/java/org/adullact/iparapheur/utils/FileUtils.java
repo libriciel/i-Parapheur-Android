@@ -49,230 +49,233 @@ import java.util.List;
 
 public class FileUtils {
 
-	private static final String LOG = "FileUtils";
-	public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
+    private static final String LOG = "FileUtils";
+    public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
-	private static final String ASSET_DEMO_PDF_FILE_NAME = "offline_test_file.pdf";
-	private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
+    private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
 
-	private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
+    private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
 
-	private static void copy(@NonNull File src, @NonNull File dst) {
 
-		try {
-			InputStream in = new FileInputStream(src);
-			OutputStream out = new FileOutputStream(dst);
+    private static void copy(@NonNull File src, @NonNull File dst) {
 
-			// Transfer bytes from in to out
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			in.close();
-			out.close();
-		}
-		catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
+        try {
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dst);
 
-	public static @NonNull File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
-		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
-		if (!folder.exists())
-			//noinspection ResultOfMethodCallIgnored
-			folder.mkdirs();
 
-		File directory = new File(folder.getAbsolutePath(), dossier.getId());
+    public static @NonNull File getDirectoryForDossier(@NonNull Context context, @NonNull Dossier dossier) {
 
-		if (!directory.mkdirs())
-			if (!directory.exists())
-				Log.e(LOG, "getDirectoryForDossier failed");
+        File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME);
+        if (!folder.exists())
+            //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
 
-		return directory;
-	}
+        File directory = new File(folder.getAbsolutePath(), dossier.getId());
 
-	public static void launchCertificateTutoPdfIntent(@NonNull Context context) {
+        if (!directory.mkdirs())
+            if (!directory.exists())
+                Log.e(LOG, "getDirectoryForDossier failed");
 
-		File pdfFile = createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
-		File fileFolder = context.getExternalFilesDir(null);
+        return directory;
+    }
 
-		// Default case
-		// Should never happen, but hides IDE warnings
 
-		if ((pdfFile == null) || (fileFolder == null))
-			return;
+    public static void launchCertificateTutoPdfIntent(@NonNull Context context) {
 
-		// The Asset file is in the internal folder, and cannot be shared directly.
-		// We have to declare a FileProvider, and manage exported files or not...
-		// Here, we simply move this asset into the external data folder.
-		// That's easier, and takes way less code to manage.
+        File pdfFile = createFileFromAsset(context, ASSET_CERIFICATES_IMPORT_TUTO);
+        File fileFolder = context.getExternalFilesDir(null);
 
-		File exportablePdfFile = new File(fileFolder.getAbsolutePath() + File.separator + pdfFile.getName());
-		if (!exportablePdfFile.exists())
-			copy(pdfFile, exportablePdfFile);
+        // Default case
+        // Should never happen, but hides IDE warnings
 
-		// View Intent, calling any PDF viewer
+        if ((pdfFile == null) || (fileFolder == null))
+            return;
 
-		Intent intentShareFile = new Intent(Intent.ACTION_VIEW);
-		intentShareFile.setDataAndType(Uri.fromFile(exportablePdfFile), "application/pdf");
-		context.startActivity(Intent.createChooser(intentShareFile, context.getString(R.string.Choose_an_app)));
-	}
+        // The Asset file is in the internal folder, and cannot be shared directly.
+        // We have to declare a FileProvider, and manage exported files or not...
+        // Here, we simply move this asset into the external data folder.
+        // That's easier, and takes way less code to manage.
 
-	private static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
+        File exportablePdfFile = new File(fileFolder.getAbsolutePath() + File.separator + pdfFile.getName());
+        if (!exportablePdfFile.exists())
+            copy(pdfFile, exportablePdfFile);
 
-		boolean accessible = false;
-		File rootFolder = context.getExternalFilesDir(null);
-		File certificateFolder = null;
+        // View Intent, calling any PDF viewer
 
-		if (rootFolder != null) {
-			String certificatePath = rootFolder.getAbsolutePath() + File.separator + "certificates" + File.separator;
-			certificateFolder = new File(certificatePath);
-			accessible = certificateFolder.exists() || certificateFolder.mkdirs();
-		}
+        Intent intentShareFile = new Intent(Intent.ACTION_VIEW);
+        intentShareFile.setDataAndType(Uri.fromFile(exportablePdfFile), "application/pdf");
+        context.startActivity(Intent.createChooser(intentShareFile, context.getString(R.string.Choose_an_app)));
+    }
 
-		return accessible ? certificateFolder : null;
-	}
 
-	public static @NonNull List<File> getBksFromCertificateFolder(@NonNull Context context) {
-		File folder = getInternalCertificateStoragePath(context);
-		return (folder != null ? getBksFromFolder(folder) : new ArrayList<File>());
-	}
+    private static @Nullable File getInternalCertificateStoragePath(@NonNull Context context) {
 
-	public static @NonNull List<File> getBksFromDownloadFolder() {
-		return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
-	}
+        boolean accessible = false;
+        File rootFolder = context.getExternalFilesDir(null);
+        File certificateFolder = null;
 
-	private static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
+        if (rootFolder != null) {
+            String certificatePath = rootFolder.getAbsolutePath() + File.separator + "certificates" + File.separator;
+            certificateFolder = new File(certificatePath);
+            accessible = certificateFolder.exists() || certificateFolder.mkdirs();
+        }
 
-		List<File> jks = new ArrayList<>();
+        return accessible ? certificateFolder : null;
+    }
 
-		if (folder.listFiles() != null)
-			for (File file : folder.listFiles())
-				if (file.getName().endsWith("bks"))
-					jks.add(file);
 
-		return jks;
-	}
+    public static @NonNull List<File> getBksFromCertificateFolder(@NonNull Context context) {
+        File folder = getInternalCertificateStoragePath(context);
+        return (folder != null ? getBksFromFolder(folder) : new ArrayList<File>());
+    }
 
-	public static boolean importCertificate(@NonNull Activity activity, @NonNull File certificateFile, @NonNull String password) {
 
-		// Test password
+    public static @NonNull List<File> getBksFromDownloadFolder() {
+        return getBksFromFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+    }
 
-		boolean bksOpeningSuccess = false;
-		try {
-			PKCS7Signer pkcs7signer = new PKCS7Signer(certificateFile.getAbsolutePath(), password, "", "");
-			pkcs7signer.loadKeyStore();
-			bksOpeningSuccess = true;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			Toast.makeText(activity, R.string.import_error_message_opening_bks_file, Toast.LENGTH_SHORT).show();
-		}
-		catch (NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
-			e.printStackTrace();
-			Toast.makeText(activity, R.string.import_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
-		}
 
-		// Stop on error
+    private static @NonNull List<File> getBksFromFolder(@NonNull File folder) {
 
-		if (!bksOpeningSuccess)
-			return false;
+        List<File> jks = new ArrayList<>();
 
-		// Import to intern memory
+        if (folder.listFiles() != null)
+            for (File file : folder.listFiles())
+                if (file.getName().endsWith("bks"))
+                    jks.add(file);
 
-		boolean movedSuccessfully;
+        return jks;
+    }
 
-		File to = new File(FileUtils.getInternalCertificateStoragePath(activity), certificateFile.getName());
-		movedSuccessfully = certificateFile.renameTo(to);
 
-		if (movedSuccessfully) {
+    public static boolean importCertificate(@NonNull Activity activity, @NonNull File certificateFile, @NonNull String password) {
 
-			SharedPreferences settings = activity.getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(certificateFile.getName(), password);
-			editor.apply();
+        // Test password
 
-			Toast.makeText(activity, R.string.import_successful, Toast.LENGTH_SHORT).show();
-			return true;
-		}
-		else {
-			Toast.makeText(activity, R.string.import_error_message_cant_copy_certificate, Toast.LENGTH_SHORT).show();
-			return false;
-		}
-	}
+        boolean bksOpeningSuccess = false;
+        try {
+            PKCS7Signer pkcs7signer = new PKCS7Signer(certificateFile.getAbsolutePath(), password, "", "");
+            pkcs7signer.loadKeyStore();
+            bksOpeningSuccess = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(activity, R.string.import_error_message_opening_bks_file, Toast.LENGTH_SHORT).show();
+        } catch (NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
+            e.printStackTrace();
+            Toast.makeText(activity, R.string.import_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
+        }
 
-	public static long getFreeSpace(@NonNull Context context) {
+        // Stop on error
 
-		File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME); // FIXME: NPE ??
+        if (!bksOpeningSuccess)
+            return false;
 
-		if (!folder.exists())
-			//noinspection ResultOfMethodCallIgnored
-			folder.mkdirs();
+        // Import to intern memory
 
-		StatFs statFs = new StatFs(folder.getAbsolutePath());
+        boolean movedSuccessfully;
 
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
-			//noinspection deprecation
-			return (statFs.getAvailableBlocks() * statFs.getBlockSize());
-		else
-			return (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
-	}
+        File to = new File(FileUtils.getInternalCertificateStoragePath(activity), certificateFile.getName());
+        movedSuccessfully = certificateFile.renameTo(to);
 
-	/**
-	 * Creates a file form an Asset, through {@link #createFileFromInputStream}.
-	 */
-	private static @Nullable File createFileFromAsset(@NonNull Context context, @NonNull String assetFileName) {
-		AssetManager am = context.getAssets();
+        if (movedSuccessfully) {
 
-		try {
-			InputStream inputStream = am.open(assetFileName);
-			return createFileFromInputStream(context, inputStream, assetFileName);
-		}
-		catch (IOException ioException) {
-			ioException.printStackTrace();
-		}
+            SharedPreferences settings = activity.getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(certificateFile.getName(), password);
+            editor.apply();
 
-		return null;
-	}
+            Toast.makeText(activity, R.string.import_successful, Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            Toast.makeText(activity, R.string.import_error_message_cant_copy_certificate, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
 
-	/**
-	 * Creates a file from a steam in the intern cacheDir/temp_files/ directory.
-	 */
-	private static @Nullable File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
 
-		File fileFolder = new File(context.getCacheDir().getAbsolutePath() + File.separator + "temp_files");
+    public static long getFreeSpace(@NonNull Context context) {
 
-		// Default case
+        File folder = new File(context.getExternalFilesDir(null) + File.separator + DOSSIER_DATA_FOLDER_NAME); // FIXME: NPE ??
 
-		boolean accessible = fileFolder.exists() || fileFolder.mkdirs();
-		if (!accessible)
-			return null;
+        if (!folder.exists())
+            //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
 
-		//
+        StatFs statFs = new StatFs(folder.getAbsolutePath());
 
-		try {
-			File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
-			//noinspection ResultOfMethodCallIgnored
-			file.delete(); // removing previous file, if exists.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+            //noinspection deprecation
+            return (statFs.getAvailableBlocks() * statFs.getBlockSize());
+        else
+            return (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
+    }
 
-			OutputStream outputStream = new FileOutputStream(file);
-			byte buffer[] = new byte[1024];
-			int length;
+    /**
+     * Creates a file form an Asset, through {@link #createFileFromInputStream}.
+     */
+    private static @Nullable File createFileFromAsset(@NonNull Context context, @NonNull String assetFileName) {
+        AssetManager am = context.getAssets();
 
-			while ((length = inputStream.read(buffer)) > 0)
-				outputStream.write(buffer, 0, length);
+        try {
+            InputStream inputStream = am.open(assetFileName);
+            return createFileFromInputStream(context, inputStream, assetFileName);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
 
-			outputStream.close();
-			inputStream.close();
+        return null;
+    }
 
-			return file;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+    /**
+     * Creates a file from a steam in the intern cacheDir/temp_files/ directory.
+     */
+    private static @Nullable File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
 
-		return null;
-	}
+        File fileFolder = new File(context.getCacheDir().getAbsolutePath() + File.separator + "temp_files");
+
+        // Default case
+
+        boolean accessible = fileFolder.exists() || fileFolder.mkdirs();
+        if (!accessible)
+            return null;
+
+        //
+
+        try {
+            File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
+            //noinspection ResultOfMethodCallIgnored
+            file.delete(); // removing previous file, if exists.
+
+            OutputStream outputStream = new FileOutputStream(file);
+            byte buffer[] = new byte[1024];
+            int length;
+
+            while ((length = inputStream.read(buffer)) > 0)
+                outputStream.write(buffer, 0, length);
+
+            outputStream.close();
+            inputStream.close();
+
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }
