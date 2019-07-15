@@ -77,39 +77,39 @@ public class StringUtilsTest {
         String value = StringUtils.fixIssuerDnX500NameStringOrder(input);
         String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
 
-        Assert.assertEquals(value, expected);
+        Assert.assertEquals(expected, value);
     }
 
 
     @Test public void fixUrl() {
-        Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur/iparapheur.plop//"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("http://parapheur.test.adullact.org/parapheur/test"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("m.parapheur.test.adullact.org/"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("parapheur.test.adullact.org"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("https://parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("https://m-parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("m.parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("m-parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("parapheur"), "parapheur");
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("https://m.parapheur/iparapheur.plop//"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringUtils.fixUrl("http://parapheur.test.adullact.org/parapheur/test"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringUtils.fixUrl("m.parapheur.test.adullact.org/"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringUtils.fixUrl("parapheur.test.adullact.org"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("https://parapheur"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("https://m.parapheur"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("https://m-parapheur"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("m.parapheur"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("m-parapheur"));
+        Assert.assertEquals("parapheur", StringUtils.fixUrl("parapheur"));
     }
 
 
     @Test public void getLocalizedSmallDate() {
         Assert.assertNotNull(StringUtils.getLocalizedSmallDate(new Date(1482705900000L)));
-        Assert.assertEquals(StringUtils.getLocalizedSmallDate(null), "???");
+        Assert.assertEquals("???", StringUtils.getLocalizedSmallDate(null));
     }
 
 
     @Test public void getVerySmallDate() {
-        Assert.assertEquals(StringUtils.getVerySmallDate(new Date(1482705900000L)), "25/12");
-        Assert.assertEquals(StringUtils.getVerySmallDate(null), "???");
+        Assert.assertEquals("25/12", StringUtils.getVerySmallDate(new Date(1482705900000L)));
+        Assert.assertEquals("???", StringUtils.getVerySmallDate(null));
     }
 
 
     @Test public void getSmallTime() {
         Assert.assertNotNull(StringUtils.getSmallTime(new Date(1482705900000L)));
-        Assert.assertEquals(StringUtils.getSmallTime(null), "???");
+        Assert.assertEquals("???", StringUtils.getSmallTime(null));
     }
 
 

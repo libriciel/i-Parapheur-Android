@@ -101,9 +101,9 @@ public class PreferencesCertificatesFragment extends Fragment {
     @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.preferences_certificates_fragment, container, false);
 
-        mCertificatesList = (ListView) v.findViewById(R.id.preferences_certificates_fragment_main_list);
+        mCertificatesList = v.findViewById(R.id.preferences_certificates_fragment_main_list);
         mEmptyView = v.findViewById(R.id.preferences_certificates_fragment_empty_view_linearlayout);
-        Button certificateTutoButton = (Button) v.findViewById(R.id.preferences_certificates_fragment_certificate_tuto_button);
+        Button certificateTutoButton = v.findViewById(R.id.preferences_certificates_fragment_certificate_tuto_button);
 
         // Buttons listeners
 
@@ -250,8 +250,8 @@ public class PreferencesCertificatesFragment extends Fragment {
 
             final View v = super.getView(position, convertView, parent);
 
-            final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_imagebutton);
-            final TextView expirationTextView = (TextView) v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
+            final ImageButton deleteButton = v.findViewById(R.id.preferences_certificates_fragment_cell_delete_imagebutton);
+            final TextView expirationTextView = v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
 
             // Cell buttons listener
 

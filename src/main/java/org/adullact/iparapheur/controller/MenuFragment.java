@@ -228,7 +228,7 @@ public class MenuFragment extends Fragment {
         // These buttons aren't directly in this Fragment,
         // they are's in the navigation drawer. But we need to inflate them anyway.
 
-        final ImageButton filterListButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+        final ImageButton filterListButton = getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
         if (filterListButton != null) {
             filterListButton.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
@@ -247,7 +247,7 @@ public class MenuFragment extends Fragment {
             });
         }
 
-        final ImageButton downloadButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+        final ImageButton downloadButton = getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
         if (downloadButton != null) {
             downloadButton.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
@@ -353,7 +353,7 @@ public class MenuFragment extends Fragment {
     @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+        Toolbar menuToolbar = getActivity().findViewById(R.id.menu_toolbar);
         if (menuToolbar != null)
             menuToolbar.inflateMenu(R.menu.menu_fragment);
     }
@@ -361,7 +361,7 @@ public class MenuFragment extends Fragment {
 
     @Override public void onPrepareOptionsMenu(Menu menu) {
 
-        Toolbar menuToolbar = (Toolbar) getActivity().findViewById(R.id.menu_toolbar);
+        Toolbar menuToolbar = getActivity().findViewById(R.id.menu_toolbar);
 
         // Compute main  icon visibility
 
@@ -379,12 +379,12 @@ public class MenuFragment extends Fragment {
 
         // Download visibility (visible in Portrait)
 
-        final ImageButton downloadPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+        final ImageButton downloadPortraitButton = getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
         downloadPortraitButton.setVisibility((isBureauList && !isInLandscape && hasBureaux) ? View.VISIBLE : View.GONE);
 
         // Refreshing navigation drawer filter button (visible in portrait)
 
-        final ImageButton filterListPortraitButton = (ImageButton) getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+        final ImageButton filterListPortraitButton = getActivity().findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
         filterListPortraitButton.setImageResource(isListFiltered ? R.drawable.ic_filter_outline_white_24dp : R.drawable.ic_filter_remove_outline_white_24dp);
         filterListPortraitButton.setVisibility((isDossierList && (!isInLandscape) && hasDossiers) ? View.VISIBLE : View.GONE);
 
@@ -937,9 +937,9 @@ public class MenuFragment extends Fragment {
 
             View cell = super.getView(position, convertView, parent);
 
-            TextView bureauTitleTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_title);
-            TextView todoCountTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_todo);
-            TextView detailsTextView = (TextView) cell.findViewById(R.id.bureau_list_cell_details);
+            TextView bureauTitleTextView = cell.findViewById(R.id.bureau_list_cell_title);
+            TextView todoCountTextView = cell.findViewById(R.id.bureau_list_cell_todo);
+            TextView detailsTextView = cell.findViewById(R.id.bureau_list_cell_details);
 
             Bureau currentBureau = getItem(position);
             if (currentBureau != null) {
@@ -1052,9 +1052,9 @@ public class MenuFragment extends Fragment {
 
             // Text
 
-            TextView nameTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_title);
-            TextView typeTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_typology);
-            TextView dateTextView = (TextView) cellView.findViewById(R.id.dossiers_list_item_date);
+            TextView nameTextView = cellView.findViewById(R.id.dossiers_list_item_title);
+            TextView typeTextView = cellView.findViewById(R.id.dossiers_list_item_typology);
+            TextView dateTextView = cellView.findViewById(R.id.dossiers_list_item_date);
 
             String typologyText = String.format("%s / %s", dossier.getType(), dossier.getSousType());
 
@@ -1104,7 +1104,7 @@ public class MenuFragment extends Fragment {
             Action actionDemandee = dossier.getActionDemandee();
 
             if (actionDemandee != null) {
-                ImageView iconImageView = ((ImageView) cellView.findViewById(R.id.dossiers_list_item_image_main));
+                ImageView iconImageView = cellView.findViewById(R.id.dossiers_list_item_image_main);
 
                 if (!TextUtils.isEmpty(getString(actionDemandee.getTitle()))) {
                     String actionName = getString(actionDemandee.getTitle());

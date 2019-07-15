@@ -111,13 +111,13 @@ public class DownloadDialogFragment extends DialogFragment {
 
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_download, null);
 
-        mBureauProgressBar = (ProgressBar) view.findViewById(R.id.action_download_bureau_progressbar);
-        mDossierProgressBar = (ProgressBar) view.findViewById(R.id.action_download_dossier_progressbar);
-        mDocumentProgressBar = (ProgressBar) view.findViewById(R.id.action_download_document_progressbar);
+        mBureauProgressBar = view.findViewById(R.id.action_download_bureau_progressbar);
+        mDossierProgressBar = view.findViewById(R.id.action_download_dossier_progressbar);
+        mDocumentProgressBar = view.findViewById(R.id.action_download_document_progressbar);
 
-        mBureauProgressTextView = (TextView) view.findViewById(R.id.action_download_bureau_progress_textview);
-        mDossierProgressTextView = (TextView) view.findViewById(R.id.action_download_dossier_progress_textview);
-        mDocumentProgressTextView = (TextView) view.findViewById(R.id.action_download_document_progress_textview);
+        mBureauProgressTextView = view.findViewById(R.id.action_download_bureau_progress_textview);
+        mDossierProgressTextView = view.findViewById(R.id.action_download_dossier_progress_textview);
+        mDocumentProgressTextView = view.findViewById(R.id.action_download_document_progress_textview);
 
         // Build Dialog
 

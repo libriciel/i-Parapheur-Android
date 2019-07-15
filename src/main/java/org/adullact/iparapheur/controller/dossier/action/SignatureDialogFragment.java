@@ -146,14 +146,14 @@ public class SignatureDialogFragment extends DialogFragment {
 
         final View view = View.inflate(getActivity(), R.layout.action_dialog_signature, null);
 
-        mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_public_annotation);
-        mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_signature_private_annotation);
-        mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_signature_public_annotation_label);
-        mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_signature_private_annotation_label);
-        mCertificateSpinner = (Spinner) view.findViewById(R.id.action_signature_choose_certificate_spinner);
-        mCertificateLabel = (TextView) view.findViewById(R.id.action_signature_choose_certificate_label);
-        mAliasesSpinner = (Spinner) view.findViewById(R.id.action_signature_choose_alias_spinner);
-        mAliasesLabel = (TextView) view.findViewById(R.id.action_signature_choose_alias_label);
+        mPublicAnnotationEditText = view.findViewById(R.id.action_signature_public_annotation);
+        mPrivateAnnotationEditText = view.findViewById(R.id.action_signature_private_annotation);
+        mPublicAnnotationLabel = view.findViewById(R.id.action_signature_public_annotation_label);
+        mPrivateAnnotationLabel = view.findViewById(R.id.action_signature_private_annotation_label);
+        mCertificateSpinner = view.findViewById(R.id.action_signature_choose_certificate_spinner);
+        mCertificateLabel = view.findViewById(R.id.action_signature_choose_certificate_label);
+        mAliasesSpinner = view.findViewById(R.id.action_signature_choose_alias_spinner);
+        mAliasesLabel = view.findViewById(R.id.action_signature_choose_alias_label);
 
         // Set Spinner adapters
 

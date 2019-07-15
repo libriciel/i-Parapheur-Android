@@ -65,7 +65,7 @@ public class AccountListFragment extends Fragment implements AdapterView.OnItemC
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View content = inflater.inflate(R.layout.account_list_fragment, container, false);
 
-        mListView = (ListView) content.findViewById(R.id.account_list);
+        mListView = content.findViewById(R.id.account_list);
 
         // UI tuning
 
