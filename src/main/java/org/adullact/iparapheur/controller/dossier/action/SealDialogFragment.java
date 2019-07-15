@@ -51,179 +51,180 @@ import java.util.ArrayList;
 
 public class SealDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "seal_dialog_fragment";
-	public static final int REQUEST_CODE_SEAL = 19050112;    // Because S-E-A-L = 19-05-01-12
+    public static final String FRAGMENT_TAG = "seal_dialog_fragment";
+    public static final int REQUEST_CODE_SEAL = 19050112;    // Because S-E-A-L = 19-05-01-12
 
-	private static final String LOG_TAG = "SealDialogFragment";
-	private static final String ARGUMENTS_DOSSIERS = "dossiers";
-	private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
+    private static final String LOG_TAG = "SealDialogFragment";
+    private static final String ARGUMENTS_DOSSIERS = "dossiers";
+    private static final String ARGUMENTS_BUREAU_ID = "bureau_id";
 
-	protected EditText mPublicAnnotationEditText;
-	protected EditText mPrivateAnnotationEditText;
-	protected TextView mPublicAnnotationLabel;
-	protected TextView mPrivateAnnotationLabel;
+    protected EditText mPublicAnnotationEditText;
+    protected EditText mPrivateAnnotationEditText;
+    protected TextView mPublicAnnotationLabel;
+    protected TextView mPrivateAnnotationLabel;
 
-	private String mBureauId;
-	private ArrayList<Dossier> mDossierList;
+    private String mBureauId;
+    private ArrayList<Dossier> mDossierList;
 
-	public static @NonNull SealDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
+    public static @NonNull SealDialogFragment newInstance(@NonNull ArrayList<Dossier> dossiers, @NonNull String bureauId) {
 
-		SealDialogFragment fragment = new SealDialogFragment();
+        SealDialogFragment fragment = new SealDialogFragment();
 
-		Bundle args = new Bundle();
-		Gson gson = CollectionUtils.buildGsonWithDateParser();
-		args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
-		args.putString(ARGUMENTS_BUREAU_ID, bureauId);
+        Bundle args = new Bundle();
+        Gson gson = CollectionUtils.buildGsonWithDateParser();
+        args.putString(ARGUMENTS_DOSSIERS, gson.toJson(dossiers));
+        args.putString(ARGUMENTS_BUREAU_ID, bureauId);
 
-		fragment.setArguments(args);
+        fragment.setArguments(args);
 
-		return fragment;
-	}
+        return fragment;
+    }
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		if (getArguments() != null) {
-			Gson gson = CollectionUtils.buildGsonWithDateParser();
-			Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
+        if (getArguments() != null) {
+            Gson gson = CollectionUtils.buildGsonWithDateParser();
+            Type typologyType = new TypeToken<ArrayList<Dossier>>() {}.getType();
 
-			try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); }
-			catch (JsonSyntaxException e) { mDossierList = new ArrayList<>(); }
+            try { mDossierList = gson.fromJson(getArguments().getString(ARGUMENTS_DOSSIERS), typologyType); } catch (JsonSyntaxException e) {
+                mDossierList = new ArrayList<>();
+            }
 
-			mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
-		}
-	}
+            mBureauId = getArguments().getString(ARGUMENTS_BUREAU_ID);
+        }
+    }
 
-	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+    @Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		// Create view
+        // Create view
 
-		View view = View.inflate(getActivity(), R.layout.action_dialog_seal, null);
+        View view = View.inflate(getActivity(), R.layout.action_dialog_seal, null);
 
-		mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_seal_public_annotation);
-		mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_seal_private_annotation);
-		mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_seal_public_annotation_label);
-		mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_seal_private_annotation_label);
+        mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_seal_public_annotation);
+        mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_seal_private_annotation);
+        mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_seal_public_annotation_label);
+        mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_seal_private_annotation_label);
 
-		// Set listeners
+        // Set listeners
 
-		mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override public void onFocusChange(View v, boolean hasFocus) {
-				mPublicAnnotationLabel.setActivated(hasFocus);
-			}
-		});
+        mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override public void onFocusChange(View v, boolean hasFocus) {
+                mPublicAnnotationLabel.setActivated(hasFocus);
+            }
+        });
 
-		mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override public void onFocusChange(View v, boolean hasFocus) {
-				mPrivateAnnotationLabel.setActivated(hasFocus);
-			}
-		});
+        mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override public void onFocusChange(View v, boolean hasFocus) {
+                mPrivateAnnotationLabel.setActivated(hasFocus);
+            }
+        });
 
-		// Build Dialog
+        // Build Dialog
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
-		builder.setView(view);
-		builder.setPositiveButton(R.string.action_seal, new DialogInterface.OnClickListener() {
-			@Override public void onClick(DialogInterface dialog, int which) {
-				// Do nothing here because we override this button in the onStart() to change the close behaviour.
-				// However, we still need this because on older versions of Android :
-				// unless we pass a handler the button doesn't get instantiated
-			}
-		});
-		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				onCancelButtonClicked();
-			}
-		});
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
+        builder.setView(view);
+        builder.setPositiveButton(R.string.action_seal, new DialogInterface.OnClickListener() {
+            @Override public void onClick(DialogInterface dialog, int which) {
+                // Do nothing here because we override this button in the onStart() to change the close behaviour.
+                // However, we still need this because on older versions of Android :
+                // unless we pass a handler the button doesn't get instantiated
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                onCancelButtonClicked();
+            }
+        });
 
-		return builder.create();
-	}
+        return builder.create();
+    }
 
-	@Override public void onStart() {
-		super.onStart();
+    @Override public void onStart() {
+        super.onStart();
 
-		// Overriding the AlertDialog.Builder#setPositiveButton
-		// To be able to manage a click without dismissing the popup.
+        // Overriding the AlertDialog.Builder#setPositiveButton
+        // To be able to manage a click without dismissing the popup.
 
-		AlertDialog dialog = (AlertDialog) getDialog();
-		if (dialog != null) {
-			Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-			positiveButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					onSealButtonClicked();
-				}
-			});
-		}
-	}
+        AlertDialog dialog = (AlertDialog) getDialog();
+        if (dialog != null) {
+            Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    onSealButtonClicked();
+                }
+            });
+        }
+    }
 
-	// </editor-fold desc="LifeCycle">
+    // </editor-fold desc="LifeCycle">
 
-	private void onSealButtonClicked() {
+    private void onSealButtonClicked() {
 
-		new SealTask().execute();
-		// See VisaTask#onPostExecute for popup dismiss.
-	}
+        new SealTask().execute();
+        // See VisaTask#onPostExecute for popup dismiss.
+    }
 
-	private void onCancelButtonClicked() {
-		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
-	}
+    private void onCancelButtonClicked() {
+        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+    }
 
-	private class SealTask extends AsyncTask<Void, Void, Boolean> {
+    private class SealTask extends AsyncTask<Void, Void, Boolean> {
 
-		private String mAnnotPub;
-		private String mAnnotPriv;
-		private int mErrorMessage;
+        private String mAnnotPub;
+        private String mAnnotPriv;
+        private int mErrorMessage;
 
-		@Override protected void onPreExecute() {
-			super.onPreExecute();
+        @Override protected void onPreExecute() {
+            super.onPreExecute();
 
-			mAnnotPub = mPublicAnnotationEditText.getText().toString();
-			mAnnotPriv = mPrivateAnnotationEditText.getText().toString();
-			mErrorMessage = -1;
-		}
+            mAnnotPub = mPublicAnnotationEditText.getText().toString();
+            mAnnotPriv = mPrivateAnnotationEditText.getText().toString();
+            mErrorMessage = -1;
+        }
 
-		@Override protected Boolean doInBackground(Void... args) {
+        @Override protected Boolean doInBackground(Void... args) {
 
-			if (isCancelled())
-				return false;
+            if (isCancelled())
+                return false;
 
-			for (Dossier dossier : mDossierList) {
+            for (Dossier dossier : mDossierList) {
 
-				try {
+                try {
 
-					if (dossier.getActions().contains(Action.CACHET))
-						RESTClient.INSTANCE.seal(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
-					else
-						RESTClient.INSTANCE.viser(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
+                    if (dossier.getActions().contains(Action.CACHET))
+                        RESTClient.INSTANCE.seal(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
+                    else
+                        RESTClient.INSTANCE.viser(AccountUtils.SELECTED_ACCOUNT, dossier, mAnnotPub, mAnnotPriv, mBureauId);
 
-					Log.d(LOG_TAG, "CACHET on : " + dossier.getName());
-				}
-				catch (IParapheurException e) {
-					e.printStackTrace();
-					Crashlytics.logException(e);
-					mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.visa_error_message_not_sent_to_server;
-				}
+                    Log.d(LOG_TAG, "CACHET on : " + dossier.getName());
+                } catch (IParapheurException e) {
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
+                    Crashlytics.logException(e);
+                    mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.visa_error_message_not_sent_to_server;
+                }
 
-				if (isCancelled())
-					return false;
-			}
+                if (isCancelled())
+                    return false;
+            }
 
-			// If no error message, then the signature is successful.
-			return (mErrorMessage == -1);
-		}
+            // If no error message, then the signature is successful.
+            return (mErrorMessage == -1);
+        }
 
-		@Override protected void onPostExecute(Boolean success) {
-			super.onPostExecute(success);
+        @Override protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
 
-			if (success) {
-				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
-				dismissAllowingStateLoss();
-			}
-			else if (getActivity() != null) {
-				Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.visa_error_message_unknown_error), Toast.LENGTH_SHORT).show();
-			}
-		}
-	}
+            if (success) {
+                getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
+                dismissAllowingStateLoss();
+            } else if (getActivity() != null) {
+                Toast.makeText(getActivity(), ((mErrorMessage != -1) ? mErrorMessage : R.string.visa_error_message_unknown_error), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
 }

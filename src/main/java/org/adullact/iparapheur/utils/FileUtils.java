@@ -49,12 +49,11 @@ import java.util.List;
 
 public class FileUtils {
 
-    private static final String LOG = "FileUtils";
-    public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
-
+    private static final String LOG_TAG = "FileUtils";
     private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
-
     private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
+
+    public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 
     private static void copy(@NonNull File src, @NonNull File dst) {
@@ -70,7 +69,7 @@ public class FileUtils {
             }
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.e(LOG_TAG, ex.getLocalizedMessage());
         }
     }
 
@@ -86,7 +85,7 @@ public class FileUtils {
 
         if (!directory.mkdirs())
             if (!directory.exists())
-                Log.e(LOG, "getDirectoryForDossier failed");
+                Log.e(LOG_TAG, "getDirectoryForDossier failed");
 
         return directory;
     }
@@ -170,10 +169,10 @@ public class FileUtils {
             pkcs7signer.loadKeyStore();
             bksOpeningSuccess = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             Toast.makeText(activity, R.string.import_error_message_opening_bks_file, Toast.LENGTH_SHORT).show();
         } catch (NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             Toast.makeText(activity, R.string.import_error_message_incompatible_device, Toast.LENGTH_SHORT).show();
         }
 
@@ -232,7 +231,7 @@ public class FileUtils {
             InputStream inputStream = am.open(assetFileName);
             return createFileFromInputStream(context, inputStream, assetFileName);
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            Log.e(LOG_TAG, ioException.getLocalizedMessage());
         }
 
         return null;
@@ -248,32 +247,40 @@ public class FileUtils {
         // Default case
 
         boolean accessible = fileFolder.exists() || fileFolder.mkdirs();
-        if (!accessible)
+        if (!accessible) {
             return null;
-
-        //
-
-        try {
-            File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
-            //noinspection ResultOfMethodCallIgnored
-            file.delete(); // removing previous file, if exists.
-
-            OutputStream outputStream = new FileOutputStream(file);
-            byte buffer[] = new byte[1024];
-            int length;
-
-            while ((length = inputStream.read(buffer)) > 0)
-                outputStream.write(buffer, 0, length);
-
-            outputStream.close();
-            inputStream.close();
-
-            return file;
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        return null;
+        // Copying input into a new file
+
+        File file = new File(fileFolder.getAbsolutePath() + File.separator + fileName);
+        //noinspection ResultOfMethodCallIgnored
+        file.delete(); // removing previous file, if exists.
+
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+            file = null;
+        }
+
+        // Closing given input
+
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+        }
+
+        // Return result
+
+        return file;
     }
 
 }

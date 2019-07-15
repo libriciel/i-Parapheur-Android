@@ -58,9 +58,9 @@ import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.account.AccountListFragment;
 import org.adullact.iparapheur.controller.dossier.DossierDetailFragment;
 import org.adullact.iparapheur.controller.dossier.action.ArchivageDialogFragment;
-import org.adullact.iparapheur.controller.dossier.action.SealDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.MailSecDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.RejectDialogFragment;
+import org.adullact.iparapheur.controller.dossier.action.SealDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.SignatureDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.TdtActesDialogFragment;
 import org.adullact.iparapheur.controller.dossier.action.VisaDialogFragment;
@@ -100,400 +100,397 @@ import java.util.Set;
  * to listen for item selections.
  */
 public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountListFragmentListener,
-		ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+        ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
-	private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
-	private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
-	private static final String SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION = "should_show_account_after_rotation";
+    private static final String LOG_TAG = "MainActivity";
+    private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
+    private static final String SHARED_PREFERENCES_IS_DRAWER_KNOWN = "is_drawer_known";
+    private static final String SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION = "should_show_account_after_rotation";
 
-	private static final String SCHEME_URI = "iparapheur";
-	private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
-	private static final String SCHEME_URI_IMPORTCERTIFICATE_URL = "AndroidUrl";
-	private static final String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
+    private static final String SCHEME_URI = "iparapheur";
+    private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
+    private static final String SCHEME_URI_IMPORTCERTIFICATE_URL = "AndroidUrl";
+    private static final String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
 
-	private DrawerLayout mLeftDrawerLayout;
-	private DrawerLayout mRightDrawerLayout;
-	private FrameLayout mLeftDrawerMenu;
-	private ActionBarDrawerToggle mLeftDrawerToggle;
-	private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
+    private DrawerLayout mLeftDrawerLayout;
+    private DrawerLayout mRightDrawerLayout;
+    private FrameLayout mLeftDrawerMenu;
+    private ActionBarDrawerToggle mLeftDrawerToggle;
+    private ViewSwitcher mNavigationDrawerAccountViewSwitcher;
 
-	private boolean mSouldShowAccountAfterRotation = false;
-	private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
+    private boolean mSouldShowAccountAfterRotation = false;
+    private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// To have a transparent StatusBar, and a background color behind
+        // To have a transparent StatusBar, and a background color behind
 
-		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-		// Loading indicator
+        // Loading indicator
 
-		setContentView(R.layout.main_activity);
+        setContentView(R.layout.main_activity);
 
-		mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
-		mRightDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_right_drawer_layout);
-		mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
+        mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
+        mRightDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_right_drawer_layout);
+        mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.menu_toolbar);
-		setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.menu_toolbar);
+        setSupportActionBar(toolbar);
 
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// Drawers
+        // Drawers
 
-		mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
-		mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
-		mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
+        mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
+        mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-		mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
+        mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
 
-		ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
-		if (drawerAccountImageButton != null) {
-			drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
+        ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
+        if (drawerAccountImageButton != null) {
+            drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
 
-					if (mNavigationDrawerAccountViewSwitcher == null)
-						return;
+                    if (mNavigationDrawerAccountViewSwitcher == null)
+                        return;
 
-					boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
-					if (switchToAccountView)
-						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
-					else
-						mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+                    boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
+                    if (switchToAccountView)
+                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+                    else
+                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-					View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-					View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+                    View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+                    View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
 
-					filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-					downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-				}
-			});
-		}
+                    filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+                    downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+                }
+            });
+        }
 
-		// ContentView Fragment restore
+        // ContentView Fragment restore
 
-		Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		if (contentFragment == null)
-			contentFragment = new DossierDetailFragment();
-		contentFragment.setRetainInstance(true);
+        Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+        if (contentFragment == null)
+            contentFragment = new DossierDetailFragment();
+        contentFragment.setRetainInstance(true);
 
-		FragmentTransaction contentTransaction = getFragmentManager().beginTransaction();
-		contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
-		contentTransaction.commit();
-	}
+        FragmentTransaction contentTransaction = getFragmentManager().beginTransaction();
+        contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
+        contentTransaction.commit();
+    }
 
-	@Override protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
+    @Override protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
-		// Sync the toggle state after onRestoreInstanceState has occurred.
+        // Sync the toggle state after onRestoreInstanceState has occurred.
 
-		mLeftDrawerToggle.syncState();
-		refreshNavigationDrawerHeader();
+        mLeftDrawerToggle.syncState();
+        refreshNavigationDrawerHeader();
 
-		// Default FAB visibility
+        // Default FAB visibility
 
-		View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher);
-		FloatingActionButton mainFab = (FloatingActionButton) findViewById(R.id.mupdf_main_menu_fabbutton);
+        View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher);
+        FloatingActionButton mainFab = (FloatingActionButton) findViewById(R.id.mupdf_main_menu_fabbutton);
 
-		if (fabSwitcher != null)
-			fabSwitcher.setVisibility(View.GONE);
-
-		if (mainFab != null)
-			mainFab.hide();
-
-		//
-
-		if (savedInstanceState != null)
-			mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
-	}
-
-	@Override protected void onStart() {
-		super.onStart();
-
-		// Starting checks
+        if (fabSwitcher != null)
+            fabSwitcher.setVisibility(View.GONE);
+
+        if (mainFab != null)
+            mainFab.hide();
+
+        //
+
+        if (savedInstanceState != null)
+            mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
+    }
 
-		List<File> certificatesFoundList = FileUtils.getBksFromDownloadFolder();
-		if (!certificatesFoundList.isEmpty()) {
-			File certificateFound = certificatesFoundList.get(0);
-			DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
-			actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
-		}
-	}
+    @Override protected void onStart() {
+        super.onStart();
 
-	@Override public void onResume() {
-		super.onResume();
+        // Starting checks
 
-		// Check possible Scheme URI call.
-		// Waiting arguments like :
-		//
-		// iparapheur://importCertificate?AndroidUrl=https%3A%2F%2Fcurl.adullact.org%2FsC4VU%2Fbma.p12      (mandatory)
-		//                               &AndroidPwd=bma                                                    (optional)
-		//                               &iOsUrl=https%3A%2F%2Fcurl.adullact.org%2FSUZI2%2Fbma.p12          (ignored)
-		//                               &iOsPwd=bma                                                        (ignored)
-		Uri schemeUri = getIntent().getData();
-		boolean isValidUriScheme = (schemeUri != null && TextUtils.equals(schemeUri.getScheme(), SCHEME_URI));
+        List<File> certificatesFoundList = FileUtils.getBksFromDownloadFolder();
+        if (!certificatesFoundList.isEmpty()) {
+            File certificateFound = certificatesFoundList.get(0);
+            DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
+            actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+        }
+    }
 
-		if (isValidUriScheme) {
-			if (TextUtils.equals(schemeUri.getHost(), SCHEME_URI_IMPORTCERTIFICATE)) {
+    @Override public void onResume() {
+        super.onResume();
 
-				String certifUrl = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_URL);
-				String certifPassword = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_PASSWORD);
+        // Check possible Scheme URI call.
+        // Waiting arguments like :
+        //
+        // iparapheur://importCertificate?AndroidUrl=https%3A%2F%2Fcurl.adullact.org%2FsC4VU%2Fbma.p12      (mandatory)
+        //                               &AndroidPwd=bma                                                    (optional)
+        //                               &iOsUrl=https%3A%2F%2Fcurl.adullact.org%2FSUZI2%2Fbma.p12          (ignored)
+        //                               &iOsPwd=bma                                                        (ignored)
+        Uri schemeUri = getIntent().getData();
+        boolean isValidUriScheme = (schemeUri != null && TextUtils.equals(schemeUri.getScheme(), SCHEME_URI));
 
-				if (!TextUtils.isEmpty(certifUrl))
-					importCertificate(certifUrl, certifPassword);
-				else
-					Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
-			}
+        if (isValidUriScheme) {
+            if (TextUtils.equals(schemeUri.getHost(), SCHEME_URI_IMPORTCERTIFICATE)) {
 
-			// If we let the intent data, it can try to re-import certificate, back from history.
-			getIntent().setData(null);
-		}
+                String certifUrl = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_URL);
+                String certifPassword = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_PASSWORD);
 
-		// On first launch, we have to open the NavigationDrawer.
-		// It's in the Android guidelines, the user have to know it's here.
-		// (And we want to open it in portrait in any case, otherwise the user sees a weird grey panel)
+                if (!TextUtils.isEmpty(certifUrl))
+                    importCertificate(certifUrl, certifPassword);
+                else
+                    Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
+            }
 
-		SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES_MAIN, 0);
-		boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
-		boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
+            // If we let the intent data, it can try to re-import certificate, back from history.
+            getIntent().setData(null);
+        }
 
-		if (!isDrawerKnown) {
-			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+        // On first launch, we have to open the NavigationDrawer.
+        // It's in the Android guidelines, the user have to know it's here.
+        // (And we want to open it in portrait in any case, otherwise the user sees a weird grey panel)
 
-			// Registering the fact that the user knows the drawer
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
-			editor.apply();
-		}
-		else if (mSouldShowAccountAfterRotation) {
+        SharedPreferences settings = getSharedPreferences(SHARED_PREFERENCES_MAIN, 0);
+        boolean isDrawerKnown = settings.getBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, false);
+        boolean isDeviceInPortrait = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
 
-			mSouldShowAccountAfterRotation = false;
-			mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+        if (!isDrawerKnown) {
+            mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
-			if (isDeviceInPortrait)
-				if (mNavigationDrawerAccountViewSwitcher != null)
-					mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
-		}
-		else {
-			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-		}
+            // Registering the fact that the user knows the drawer
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
+            editor.apply();
+        } else if (mSouldShowAccountAfterRotation) {
 
-		// Restoring proper Drawer state on selected dossiers
+            mSouldShowAccountAfterRotation = false;
+            mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
-			mActionMode = startSupportActionMode(this);
+            if (isDeviceInPortrait)
+                if (mNavigationDrawerAccountViewSwitcher != null)
+                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+        } else {
+            mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+        }
 
-			if (isDeviceInPortrait)
-				mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
-			else
-				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-		}
-	}
+        // Restoring proper Drawer state on selected dossiers
 
-	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
+            mActionMode = startSupportActionMode(this);
 
-		if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
+            if (isDeviceInPortrait)
+                mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+            else
+                mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+        }
+    }
 
-			// Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
-			AccountListFragment accountListFragment = (AccountListFragment) getFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-			if (accountListFragment != null) {
-				accountListFragment.accountsChanged();
-			}
-		}
-	}
+        if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
-	@Override public void onBackPressed() {
+            // Notify BureauxFragments to update accounts list (the bureau will update back this Activity if needed)
+            AccountListFragment accountListFragment = (AccountListFragment) getFragmentManager().findFragmentByTag(AccountListFragment.FRAGMENT_TAG);
 
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (accountListFragment != null) {
+                accountListFragment.accountsChanged();
+            }
+        }
+    }
 
-			// Drawer account back
+    @Override public void onBackPressed() {
 
-			if (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1) {
-				mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
-				return;
-			}
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
+            // Drawer account back
 
-				// Menu back
+            if (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1) {
+                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+                return;
+            }
 
-				MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-				if (bureauxFragment != null)
-					if (bureauxFragment.onBackPressed())
-						return;
+            if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
 
-				// Close the drawer
+                // Menu back
 
-				if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
-					mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-					return;
-				}
+                MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+                if (bureauxFragment != null)
+                    if (bureauxFragment.onBackPressed())
+                        return;
 
-			}
-			else {
+                // Close the drawer
 
-				// Collapse the FAB
+                if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
+                    mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+                    return;
+                }
 
-				DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-				if (dossierDetailFragment != null)
-					if (dossierDetailFragment.onBackPressed())
-						return;
+            } else {
 
-				// Menu back
+                // Collapse the FAB
 
-				MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-				if (bureauxFragment != null) {
-					if (bureauxFragment.onBackPressed()) {
-						mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
-						return;
-					}
-				}
+                DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+                if (dossierDetailFragment != null)
+                    if (dossierDetailFragment.onBackPressed())
+                        return;
 
-			}
-		}
-		else {
+                // Menu back
 
-			// First, close the drawer
+                MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+                if (bureauxFragment != null) {
+                    if (bureauxFragment.onBackPressed()) {
+                        mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+                        return;
+                    }
+                }
 
-			if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
-				mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-				return;
-			}
+            }
+        } else {
 
-			// Collapse the FAB
+            // First, close the drawer
 
-			DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-			if (dossierDetailFragment != null)
-				if (dossierDetailFragment.onBackPressed())
-					return;
+            if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
+                mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+                return;
+            }
 
-			// Then, try to pop backstack
+            // Collapse the FAB
 
-			MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-			if (bureauxFragment != null)
-				if (bureauxFragment.onBackPressed())
-					return;
-		}
+            DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+            if (dossierDetailFragment != null)
+                if (dossierDetailFragment.onBackPressed())
+                    return;
 
-		super.onBackPressed();
-	}
+            // Then, try to pop backstack
 
-	@Override protected void onSaveInstanceState(Bundle outState) {
+            MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+            if (bureauxFragment != null)
+                if (bureauxFragment.onBackPressed())
+                    return;
+        }
 
-		boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
-		boolean isInLandscape = mNavigationDrawerAccountViewSwitcher == null;
-		boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
-		boolean isAccountShown = isDrawerOpened && (isInLandscape || isAccountViewSelected);
+        super.onBackPressed();
+    }
 
-		outState.putBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION, isAccountShown);
+    @Override protected void onSaveInstanceState(Bundle outState) {
 
-		super.onSaveInstanceState(outState);
-	}
+        boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
+        boolean isInLandscape = mNavigationDrawerAccountViewSwitcher == null;
+        boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
+        boolean isAccountShown = isDrawerOpened && (isInLandscape || isAccountViewSelected);
 
-	// </editor-fold desc="LifeCycle">
+        outState.putBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION, isAccountShown);
 
-	// <editor-fold desc="ActionBar">
+        super.onSaveInstanceState(outState);
+    }
 
-	@Override public boolean onCreateOptionsMenu(Menu menu) {
+    // </editor-fold desc="LifeCycle">
 
-		Toolbar actionsToolbar = (Toolbar) findViewById(R.id.actions_toolbar);
-		if (actionsToolbar != null) {
+    // <editor-fold desc="ActionBar">
 
-			actionsToolbar.getMenu().clear();
-			actionsToolbar.inflateMenu(R.menu.main_activity);
-			actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-				@Override public boolean onMenuItemClick(MenuItem item) {
-					return onOptionsItemSelected(item);
-				}
-			});
-		}
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
 
-		return super.onCreateOptionsMenu(menu);
-	}
+        Toolbar actionsToolbar = (Toolbar) findViewById(R.id.actions_toolbar);
+        if (actionsToolbar != null) {
 
-	@Override public boolean onPrepareOptionsMenu(Menu menu) {
-		return false;
-	}
+            actionsToolbar.getMenu().clear();
+            actionsToolbar.inflateMenu(R.menu.main_activity);
+            actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override public boolean onMenuItemClick(MenuItem item) {
+                    return onOptionsItemSelected(item);
+                }
+            });
+        }
 
-	@Override public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onCreateOptionsMenu(menu);
+    }
 
-		// Pass the event to ActionBarDrawerToggle, if it returns
-		// true, then it has handled the app icon touch event
+    @Override public boolean onPrepareOptionsMenu(Menu menu) {
+        return false;
+    }
 
-		if (mLeftDrawerToggle.onOptionsItemSelected(item))
-			return true;
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
 
-		// TODO : handle dossier(s) actions
-		// Handle presses on the action bar items
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
 
-		switch (item.getItemId()) {
+        if (mLeftDrawerToggle.onOptionsItemSelected(item))
+            return true;
 
-			case R.id.action_settings:
-				startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
-				return true;
+        // TODO : handle dossier(s) actions
+        // Handle presses on the action bar items
 
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
+        switch (item.getItemId()) {
 
-	// </editor-fold desc="ActionBar">
+            case R.id.action_settings:
+                startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
+                return true;
 
-	// <editor-fold desc="ActionMode">
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-	@Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-		actionMode.setTitleOptionalHint(true);
-		MenuInflater inflater = actionMode.getMenuInflater();
-		inflater.inflate(R.menu.dossier_details_fragment_actions, menu);
+    // </editor-fold desc="ActionBar">
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.contextual_700));
-		}
+    // <editor-fold desc="ActionMode">
 
-		return true;
-	}
+    @Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        actionMode.setTitleOptionalHint(true);
+        MenuInflater inflater = actionMode.getMenuInflater();
+        inflater.inflate(R.menu.dossier_details_fragment_actions, menu);
 
-	@Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.contextual_700));
+        }
 
-		MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        return true;
+    }
 
-		// Default cases
+    @Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 
-		if (fragment == null)
-			return false;
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
 
-		HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
+        // Default cases
 
-		if ((checkedDossiers == null) || (checkedDossiers.isEmpty())) {
-			actionMode.finish();
-			return false;
-		}
+        if (fragment == null)
+            return false;
 
-		// Get available actions from Dossiers
+        HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
 
-		HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
+        if ((checkedDossiers == null) || (checkedDossiers.isEmpty())) {
+            actionMode.finish();
+            return false;
+        }
 
-		HashSet availableActions = new HashSet();
-		availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
-		availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers));
-		availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
+        // Get available actions from Dossiers
 
-		// Compute visibility
+        HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
 
-		actionMode.setTitle(String.format(getString(R.string.action_mode_nb_dossiers), checkedDossiers.size()));
-		menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
-		menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+        HashSet availableActions = new HashSet();
+        availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
+        availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers));
+        availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
 
-		for (Action action : actions) {
+        // Compute visibility
+
+        actionMode.setTitle(String.format(getString(R.string.action_mode_nb_dossiers), checkedDossiers.size()));
+        menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
+        menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+
+        for (Action action : actions) {
 
 //			MenuItem item;
 //			int menuItemId;
@@ -521,289 +518,279 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 //			// If we only have signPapier type, we only have a VISA, actually
 //			boolean isVisible = !(action.equals(Action.SIGNATURE) && !hasSignature);
 //
-			// Set current state
+            // Set current state
 
-			MenuItem item = menu.findItem(action.getMenuItemId());
+            MenuItem item = menu.findItem(action.getMenuItemId());
 
-			if (item != null) {
+            if (item != null) {
 //				item.setTitle(menuTitle);
-				item.setVisible(availableActions.contains(action));
-			}
-		}
+                item.setVisible(availableActions.contains(action));
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+    @Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if (menuFragment == null)
-			return false;
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        if (menuFragment == null)
+            return false;
 
-		Bureau bureau = menuFragment.getSelectedBureau();
-		Action invokedAction = Action.fromId(menuItem.getItemId());
+        Bureau bureau = menuFragment.getSelectedBureau();
+        Action invokedAction = Action.fromId(menuItem.getItemId());
 
-		if ((invokedAction != null) && (bureau != null))
-			launchActionPopup(menuFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
+        if ((invokedAction != null) && (bureau != null))
+            launchActionPopup(menuFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override public void onDestroyActionMode(ActionMode actionMode) {
+    @Override public void onDestroyActionMode(ActionMode actionMode) {
 
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if (menuFragment != null)
-			menuFragment.clearCheckSelection();
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        if (menuFragment != null)
+            menuFragment.clearCheckSelection();
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
-		}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+        }
 
-		mActionMode = null;
-	}
-
-	// </editor-fold desc="ActionMode">
-
-	private void refreshNavigationDrawerHeader() {
-
-		Account account = AccountUtils.SELECTED_ACCOUNT;
-
-		TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
-		TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
-
-		if (navigationDrawerAccountTitle != null)
-			navigationDrawerAccountTitle.setText(account.getTitle());
-
-		if (navigationDrawerAccountSubTitle != null)
-			navigationDrawerAccountSubTitle.setText(account.getLogin());
-
-	}
-
-	private void importCertificate(@NonNull final String url, @Nullable final String password) {
-
-		String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
-		final String certificateLocalPath = new File(getExternalCacheDir(), certificateFileName).getAbsolutePath();
-
-		// Download and import
-
-		new AsyncTask<Void, Void, Void>() {
-
-			private int mErrorMessageResource = -1;
-
-			@Override protected Void doInBackground(Void... params) {
-
-				try {
-					boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(AccountUtils.SELECTED_ACCOUNT, url, certificateLocalPath);
-
-					if (!downloadSuccessful)
-						mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
-				}
-				catch (IParapheurException e) {
-					Crashlytics.logException(e);
-					e.printStackTrace();
-				}
-
-				return null;
-			}
-
-			@Override protected void onPostExecute(Void aVoid) {
-
-				if (mErrorMessageResource == -1) {
-
-					if (password != null) {
-						FileUtils.importCertificate(MainActivity.this, new File(certificateLocalPath), password);
-					}
-					else {
-						DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(new File(certificateLocalPath));
-						actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
-					}
-				}
-				else {
-					Toast.makeText(MainActivity.this, mErrorMessageResource, Toast.LENGTH_SHORT).show();
-				}
-
-				super.onPostExecute(aVoid);
-			}
-
-		}.execute();
-	}
-
-	private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
-
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		DialogFragment actionDialog;
-		ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
-
-		if (action == Action.REJET) {
-			actionDialog = RejectDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(menuFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
-			actionDialog.show(getFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
-		}
-		else if (action == Action.VISA) {
-			actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
-			actionDialog.show(getFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
-		}
-		else if (action == Action.CACHET) {
-			actionDialog = SealDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(menuFragment, SealDialogFragment.REQUEST_CODE_SEAL);
-			actionDialog.show(getFragmentManager(), SealDialogFragment.FRAGMENT_TAG);
-		}
-		else if (action == Action.SIGNATURE) {
-			actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(menuFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
-			actionDialog.show(getFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
-		}
-		else if (action == Action.MAILSEC) {
-			actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
-		}
-		else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
-			actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.setTargetFragment(menuFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
-			actionDialog.show(getFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
-		}
-		else if (action == Action.ARCHIVAGE) {
-			actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId);
-			actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
-		}
-		else {
-			Log.e("Adrien", "UNKNOWN ACTION : " + action);
-		}
-	}
-
-	// <editor-fold desc="AccountFragmentListener">
-
-	@Override public void onAccountSelected(@NonNull Account account) {
-
-		AccountUtils.SELECTED_ACCOUNT = account;
-		refreshNavigationDrawerHeader();
-
-		// Close the drawer
-
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-		else if (mNavigationDrawerAccountViewSwitcher != null)
-			mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
-
-		// If we selected a new account, and we have a Dossier list displayed
-		// We'll want to pop the BackStack to get on the Bureau list
-		// Then , we just update the Bureau with the accurate Account
-
-		MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-		if (menuFragment != null) {
-			menuFragment.onBackPressed();
-			menuFragment.updateBureaux(true);
-		}
-	}
-
-	@Override public void onCreateAccountInvoked() {
-		Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
-		preferencesIntent.putExtra(PreferencesActivity.ARGUMENT_GO_TO_FRAGMENT, PreferencesAccountFragment.class.getSimpleName());
-		startActivityForResult(preferencesIntent, PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
-	}
-
-	// </editor-fold desc="AccountFragmentListener">
-
-	// <editor-fold desc="MenuFragment">
-
-	@Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
-
-		if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
-			mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-
-		DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-		if ((fragment != null)) {
-			fragment.showProgressLayout();
-			fragment.update(dossier, bureauId, null);
-		}
-	}
-
-	@Override public void onDossierCheckedChanged(boolean forceClose) {
-
-		if (mActionMode != null)
-			mActionMode.invalidate();
-		else if (!forceClose)
-			mActionMode = startSupportActionMode(this);
-	}
-
-	// </editor-fold desc="MenuFragment">
-
-	// <editor-fold desc="DossierDetailsFragmentListener">
-
-	@Override public boolean isAnyDrawerOpened() {
-		return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));
-	}
-
-	@Override public void toggleInfoDrawer() {
-
-		if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))
-			mRightDrawerLayout.closeDrawer(GravityCompat.END);
-		else
-			mRightDrawerLayout.openDrawer(GravityCompat.END);
-	}
-
-	@Override public void lockInfoDrawer(boolean lock) {
-
-		if (lock) {
-			mRightDrawerLayout.closeDrawer(GravityCompat.END);
-			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		}
-		else {
-			mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-		}
-	}
-
-	@Override public void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
-		launchActionPopup(CollectionUtils.asSet(dossier), bureauId, action);
-	}
-
-	// </editor-fold desc="DossierDetailsFragmentListener">
-
-	/**
-	 * Listener used on the Drawer Layout used to control the Action Bar content depending
-	 * on the Drawer state.
-	 */
-	private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
-
-		private DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
-			super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
-		}
-
-		@Override public void onDrawerClosed(View view) {
-
-			if (getSupportActionBar() != null) {
-				Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
-				if (selectedAccount != null)
-					getSupportActionBar().setTitle(selectedAccount.getTitle());
-			}
-
-			if (mNavigationDrawerAccountViewSwitcher != null)
-				mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
-
-			// calls onPrepareOptionMenu to show context specific actions
-			invalidateOptionsMenu();
-		}
-
-		@Override public void onDrawerOpened(View drawerView) {
-			if (getSupportActionBar() != null)
-				getSupportActionBar().setTitle(R.string.app_name);
-
-			// calls onPrepareOptionMenu to hide context specific actions
-			invalidateOptionsMenu();
-		}
-
-		@Override public void onDrawerStateChanged(int newState) {
-
-			if (newState == DrawerLayout.STATE_SETTLING)
-				if (mActionMode != null)
-					mActionMode.finish();
-
-			invalidateOptionsMenu();
-		}
-	}
+        mActionMode = null;
+    }
+
+    // </editor-fold desc="ActionMode">
+
+    private void refreshNavigationDrawerHeader() {
+
+        Account account = AccountUtils.SELECTED_ACCOUNT;
+
+        TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
+        TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
+
+        if (navigationDrawerAccountTitle != null)
+            navigationDrawerAccountTitle.setText(account.getTitle());
+
+        if (navigationDrawerAccountSubTitle != null)
+            navigationDrawerAccountSubTitle.setText(account.getLogin());
+
+    }
+
+    private void importCertificate(@NonNull final String url, @Nullable final String password) {
+
+        String certificateFileName = url.substring(url.lastIndexOf('/') + 1);
+        final String certificateLocalPath = new File(getExternalCacheDir(), certificateFileName).getAbsolutePath();
+
+        // Download and import
+
+        new AsyncTask<Void, Void, Void>() {
+
+            private int mErrorMessageResource = -1;
+
+            @Override protected Void doInBackground(Void... params) {
+
+                try {
+                    boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(AccountUtils.SELECTED_ACCOUNT, url, certificateLocalPath);
+
+                    if (!downloadSuccessful)
+                        mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
+                } catch (IParapheurException e) {
+                    Crashlytics.logException(e);
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
+                }
+
+                return null;
+            }
+
+            @Override protected void onPostExecute(Void aVoid) {
+
+                if (mErrorMessageResource == -1) {
+
+                    if (password != null) {
+                        FileUtils.importCertificate(MainActivity.this, new File(certificateLocalPath), password);
+                    } else {
+                        DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(new File(certificateLocalPath));
+                        actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, mErrorMessageResource, Toast.LENGTH_SHORT).show();
+                }
+
+                super.onPostExecute(aVoid);
+            }
+
+        }.execute();
+    }
+
+    private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
+
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        DialogFragment actionDialog;
+        ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
+
+        if (action == Action.REJET) {
+            actionDialog = RejectDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.setTargetFragment(menuFragment, RejectDialogFragment.REQUEST_CODE_REJECT);
+            actionDialog.show(getFragmentManager(), RejectDialogFragment.FRAGMENT_TAG);
+        } else if (action == Action.VISA) {
+            actionDialog = VisaDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.setTargetFragment(menuFragment, VisaDialogFragment.REQUEST_CODE_VISA);
+            actionDialog.show(getFragmentManager(), VisaDialogFragment.FRAGMENT_TAG);
+        } else if (action == Action.CACHET) {
+            actionDialog = SealDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.setTargetFragment(menuFragment, SealDialogFragment.REQUEST_CODE_SEAL);
+            actionDialog.show(getFragmentManager(), SealDialogFragment.FRAGMENT_TAG);
+        } else if (action == Action.SIGNATURE) {
+            actionDialog = SignatureDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.setTargetFragment(menuFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
+            actionDialog.show(getFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
+        } else if (action == Action.MAILSEC) {
+            actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
+        } else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
+            actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.setTargetFragment(menuFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
+            actionDialog.show(getFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
+        } else if (action == Action.ARCHIVAGE) {
+            actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId);
+            actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
+        } else {
+            Log.e("Adrien", "UNKNOWN ACTION : " + action);
+        }
+    }
+
+    // <editor-fold desc="AccountFragmentListener">
+
+    @Override public void onAccountSelected(@NonNull Account account) {
+
+        AccountUtils.SELECTED_ACCOUNT = account;
+        refreshNavigationDrawerHeader();
+
+        // Close the drawer
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+        else if (mNavigationDrawerAccountViewSwitcher != null)
+            mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+
+        // If we selected a new account, and we have a Dossier list displayed
+        // We'll want to pop the BackStack to get on the Bureau list
+        // Then , we just update the Bureau with the accurate Account
+
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
+        if (menuFragment != null) {
+            menuFragment.onBackPressed();
+            menuFragment.updateBureaux(true);
+        }
+    }
+
+    @Override public void onCreateAccountInvoked() {
+        Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
+        preferencesIntent.putExtra(PreferencesActivity.ARGUMENT_GO_TO_FRAGMENT, PreferencesAccountFragment.class.getSimpleName());
+        startActivityForResult(preferencesIntent, PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
+    }
+
+    // </editor-fold desc="AccountFragmentListener">
+
+    // <editor-fold desc="MenuFragment">
+
+    @Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
+
+        if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
+            mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+
+        DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
+        if ((fragment != null)) {
+            fragment.showProgressLayout();
+            fragment.update(dossier, bureauId, null);
+        }
+    }
+
+    @Override public void onDossierCheckedChanged(boolean forceClose) {
+
+        if (mActionMode != null)
+            mActionMode.invalidate();
+        else if (!forceClose)
+            mActionMode = startSupportActionMode(this);
+    }
+
+    // </editor-fold desc="MenuFragment">
+
+    // <editor-fold desc="DossierDetailsFragmentListener">
+
+    @Override public boolean isAnyDrawerOpened() {
+        return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));
+    }
+
+    @Override public void toggleInfoDrawer() {
+
+        if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))
+            mRightDrawerLayout.closeDrawer(GravityCompat.END);
+        else
+            mRightDrawerLayout.openDrawer(GravityCompat.END);
+    }
+
+    @Override public void lockInfoDrawer(boolean lock) {
+
+        if (lock) {
+            mRightDrawerLayout.closeDrawer(GravityCompat.END);
+            mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        } else {
+            mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        }
+    }
+
+    @Override public void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
+        launchActionPopup(CollectionUtils.asSet(dossier), bureauId, action);
+    }
+
+    // </editor-fold desc="DossierDetailsFragmentListener">
+
+    /**
+     * Listener used on the Drawer Layout used to control the Action Bar content depending
+     * on the Drawer state.
+     */
+    private class DossiersActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        private DossiersActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout) {
+            super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
+        }
+
+        @Override public void onDrawerClosed(View view) {
+
+            if (getSupportActionBar() != null) {
+                Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
+                if (selectedAccount != null)
+                    getSupportActionBar().setTitle(selectedAccount.getTitle());
+            }
+
+            if (mNavigationDrawerAccountViewSwitcher != null)
+                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+
+            // calls onPrepareOptionMenu to show context specific actions
+            invalidateOptionsMenu();
+        }
+
+        @Override public void onDrawerOpened(View drawerView) {
+            if (getSupportActionBar() != null)
+                getSupportActionBar().setTitle(R.string.app_name);
+
+            // calls onPrepareOptionMenu to hide context specific actions
+            invalidateOptionsMenu();
+        }
+
+        @Override public void onDrawerStateChanged(int newState) {
+
+            if (newState == DrawerLayout.STATE_SETTLING)
+                if (mActionMode != null)
+                    mActionMode.finish();
+
+            invalidateOptionsMenu();
+        }
+
+    }
 
 }

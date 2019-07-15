@@ -364,7 +364,7 @@ public class SignatureDialogFragment extends DialogFragment {
 
                     if (keystore != null)
                         aliasList.addAll(Collections.list(keystore.aliases()));
-                } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) { e.printStackTrace(); }
+                } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
                 // Inflate spinner
 
@@ -396,7 +396,7 @@ public class SignatureDialogFragment extends DialogFragment {
                             Circuit circuit = RESTClient.INSTANCE.getCircuit(AccountUtils.SELECTED_ACCOUNT, dossier.getId());
                             dossier.setCircuit(circuit);
                         } catch (IParapheurException e) {
-                            e.printStackTrace();
+                            Log.e(LOG_TAG, e.getLocalizedMessage());
                             Crashlytics.logException(e);
                         }
                     }
@@ -472,7 +472,7 @@ public class SignatureDialogFragment extends DialogFragment {
                 try {
                     retrievedSignInfo = RESTClient.INSTANCE.getSignInfo(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId).getHash();
                 } catch (IParapheurException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_not_get_from_server;
                 }
@@ -500,31 +500,31 @@ public class SignatureDialogFragment extends DialogFragment {
                         signValueList.add(signValue);
                     }
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_missing_bks_file;
                 } catch (NoSuchAlgorithmException | KeyStoreException | NoSuchProviderException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_incompatible_device;
                 } catch (UnrecoverableKeyException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_missing_alias_or_wrong_password;
                 } catch (InvalidKeyException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_wrong_password;
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_no_data_to_sign;
                 } catch (SignatureException | IllegalStateException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_unknown_error;
                 } catch (CertificateException | IOException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_error_opening_bks_file;
                 }
@@ -548,7 +548,7 @@ public class SignatureDialogFragment extends DialogFragment {
                 try {
                     RESTClient.INSTANCE.signer(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), signature, mAnnotPub, mAnnotPriv, mBureauId);
                 } catch (IParapheurException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.signature_error_message_not_sent_to_server;
                 }
@@ -611,7 +611,7 @@ public class SignatureDialogFragment extends DialogFragment {
                 try {
                     RESTClient.INSTANCE.signPapier(AccountUtils.SELECTED_ACCOUNT, mDossierList.get(docIndex).getId(), mBureauId);
                 } catch (IParapheurException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getLocalizedMessage());
                     Crashlytics.logException(e);
                     mErrorMessage = R.string.signature_error_message_not_sent_to_server;
                 }

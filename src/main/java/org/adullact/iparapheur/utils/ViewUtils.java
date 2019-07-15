@@ -24,6 +24,7 @@ import android.animation.AnimatorSet;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.PopupMenu;
 
@@ -35,95 +36,98 @@ import java.lang.reflect.Method;
 
 public class ViewUtils extends coop.adullactprojet.mupdffragment.utils.ViewUtils {
 
-	/**
-	 * Animate a flip between two views, the Google way.
-	 * <br/>
-	 * Animators source : http://developer.android.com/training/animation/cardflip.html
-	 * Animation code source : http://developer.android.com/guide/topics/graphics/prop-animation.html
-	 *
-	 * @param context           needed to load some resources
-	 * @param outView           the card-front view
-	 * @param inView            the card-back view
-	 * @param animationListener set on the inView animation
-	 */
-	public static void flip(@NonNull Context context, @NonNull View outView, @NonNull View inView, @Nullable Animator.AnimatorListener animationListener) {
+    private static final String LOG_TAG = "ViewUtils";
 
-		outView.setAlpha(1f);
-		AnimatorSet outAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_left_out);
-		outAnim.setTarget(outView);
-		outAnim.start();
 
-		inView.setAlpha(0f);
-		AnimatorSet inAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_right_in);
-		inAnim.setTarget(inView);
-		inAnim.start();
+    /**
+     * Animate a flip between two views, the Google way.
+     * <br/>
+     * Animators source : http://developer.android.com/training/animation/cardflip.html
+     * Animation code source : http://developer.android.com/guide/topics/graphics/prop-animation.html
+     *
+     * @param context           needed to load some resources
+     * @param outView           the card-front view
+     * @param inView            the card-back view
+     * @param animationListener set on the inView animation
+     */
+    public static void flip(@NonNull Context context, @NonNull View outView, @NonNull View inView, @Nullable Animator.AnimatorListener animationListener) {
 
-		if (animationListener != null)
-			inAnim.addListener(animationListener);
-	}
+        outView.setAlpha(1f);
+        AnimatorSet outAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_left_out);
+        outAnim.setTarget(outView);
+        outAnim.start();
 
-	/**
-	 * Popup menu doesn't show any icons (in Lollipop),
-	 * but an hidden method can be called reflectively to force it.
-	 * Maybe some day, in a future Android version, it woudn't be necessary.
-	 *
-	 * That's not very pretty, but it is in a try/catch, so... Why not.
-	 */
-	public static void setForceShowIcon(@NonNull PopupMenu popupMenu) {
-		try {
-			Field[] fields = popupMenu.getClass().getDeclaredFields();
-			for (Field field : fields) {
-				if ("mPopup".equals(field.getName())) {
-					field.setAccessible(true);
-					Object menuPopupHelper = field.get(popupMenu);
-					Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-					Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-					setForceIcons.invoke(menuPopupHelper, true);
-					break;
-				}
-			}
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
+        inView.setAlpha(0f);
+        AnimatorSet inAnim = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.card_flip_right_in);
+        inAnim.setTarget(inView);
+        inAnim.start();
 
-	/**
-	 * Hide and show a view, executing Runnable on hide.
-	 *
-	 * @param contentView should be invisible on start
-	 */
-	public static void showAfterDelay(@NonNull final View contentView, long delay) {
+        if (animationListener != null)
+            inAnim.addListener(animationListener);
+    }
 
-		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
-		contentView.animate().cancel();
+    /**
+     * Popup menu doesn't show any icons (in Lollipop),
+     * but an hidden method can be called reflectively to force it.
+     * Maybe some day, in a future Android version, it woudn't be necessary.
+     * <p>
+     * That's not very pretty, but it is in a try/catch, so... Why not.
+     */
+    public static void setForceShowIcon(@NonNull PopupMenu popupMenu) {
+        try {
+            Field[] fields = popupMenu.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if ("mPopup".equals(field.getName())) {
+                    field.setAccessible(true);
+                    Object menuPopupHelper = field.get(popupMenu);
+                    Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                    Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                    setForceIcons.invoke(menuPopupHelper, true);
+                    break;
+                }
+            }
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+        }
+    }
 
-		contentView.setAlpha(0f);
-		contentView.setVisibility(View.VISIBLE);
+    /**
+     * Hide and show a view, executing Runnable on hide.
+     *
+     * @param contentView should be invisible on start
+     */
+    public static void showAfterDelay(@NonNull final View contentView, long delay) {
 
-		// Animate the content view to 100% opacity
-		contentView.animate().alpha(1f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(null);
-	}
+        // Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+        contentView.animate().cancel();
 
-	/**
-	 * Hide and show a view, executing Runnable on hide.
-	 *
-	 * @param contentView should be invisible on start
-	 */
-	public static void hideAfterDelay(@NonNull final View contentView, long delay) {
+        contentView.setAlpha(0f);
+        contentView.setVisibility(View.VISIBLE);
 
-		// Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
-		contentView.animate().cancel();
+        // Animate the content view to 100% opacity
+        contentView.animate().alpha(1f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(null);
+    }
 
-		contentView.setAlpha(1f);
+    /**
+     * Hide and show a view, executing Runnable on hide.
+     *
+     * @param contentView should be invisible on start
+     */
+    public static void hideAfterDelay(@NonNull final View contentView, long delay) {
 
-		// Animate the content view to 0% opacity
-		contentView.animate().alpha(0f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(new AnimatorListenerAdapter() {
+        // Cancelling previous animation (overlapping animations produce chaos, fire, and biblical cataclysms)
+        contentView.animate().cancel();
 
-			@Override public void onAnimationEnd(Animator animation) {
-				super.onAnimationEnd(animation);
-				contentView.setVisibility(View.GONE);
-			}
-		});
-	}
+        contentView.setAlpha(1f);
+
+        // Animate the content view to 0% opacity
+        contentView.animate().alpha(0f).setDuration(CONFIG_SHORT_ANIM_TIME).setStartDelay(delay).setListener(new AnimatorListenerAdapter() {
+
+            @Override public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                contentView.setVisibility(View.GONE);
+            }
+        });
+    }
+
 }
