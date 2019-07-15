@@ -74,6 +74,7 @@ public class DownloadDialogFragment extends DialogFragment {
 	private Account mAccount;
 	private DownloadTask mPendingTask;
 
+
 	public static DownloadDialogFragment newInstance(@NonNull Account account) {
 
 		Gson gson = new Gson();
@@ -88,7 +89,9 @@ public class DownloadDialogFragment extends DialogFragment {
 		return fragment;
 	}
 
+
 	// <editor-fold desc="LifeCycle">
+
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,6 +103,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			mAccount = gson.fromJson(data, Account.class);
 		}
 	}
+
 
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -129,6 +133,7 @@ public class DownloadDialogFragment extends DialogFragment {
 		return builder.create();
 	}
 
+
 	@Override public void onResume() {
 		super.onResume();
 
@@ -136,7 +141,9 @@ public class DownloadDialogFragment extends DialogFragment {
 		mPendingTask.execute(mAccount);
 	}
 
+
 	// </editor-fold desc="LifeCycle">
+
 
 	private void onCancelButtonClicked() {
 
@@ -146,6 +153,7 @@ public class DownloadDialogFragment extends DialogFragment {
 		dismissAllowingStateLoss();
 	}
 
+
 	private class DownloadTask extends AsyncTask<Account, Long, IParapheurException> {
 
 		private final Long STEP_BUREAUX_METADATA = 0L;
@@ -153,6 +161,8 @@ public class DownloadDialogFragment extends DialogFragment {
 		private final Long STEP_DOCUMENT_FILES = 2L;
 		private Account mCurrentAccount;
 
+
+		@SuppressWarnings("squid:S2142")
 		@Override protected IParapheurException doInBackground(Account... accounts) {
 
 			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
@@ -382,6 +392,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			return null;
 		}
 
+
 		@Override protected void onProgressUpdate(Long... values) {
 			super.onProgressUpdate(values);
 
@@ -404,6 +415,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			}
 		}
 
+
 		@Override protected void onPostExecute(IParapheurException e) {
 			super.onPostExecute(e);
 
@@ -412,6 +424,7 @@ public class DownloadDialogFragment extends DialogFragment {
 			else
 				dismissAllowingStateLoss();
 		}
+
 	}
 
 }
