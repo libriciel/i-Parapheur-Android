@@ -47,11 +47,6 @@ repositories {
 }
 
 
-def keystorePropertiesFile = rootProject.file("release-keystore.properties")
-def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-
 android {
     compileSdkVersion 28
 
@@ -93,10 +88,17 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
+            def keystoreProperties = new Properties()
+            def keystorePropertiesFile = rootProject.file("release-keystore.properties")
+
+            if (keystorePropertiesFile.canRead()) {
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
         }
     }
 
