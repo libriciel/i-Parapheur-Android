@@ -102,10 +102,10 @@ public class VisaDialogFragment extends DialogFragment {
 
         View view = View.inflate(getActivity(), R.layout.action_dialog_visa, null);
 
-        mPublicAnnotationEditText = (EditText) view.findViewById(R.id.action_visa_public_annotation);
-        mPrivateAnnotationEditText = (EditText) view.findViewById(R.id.action_visa_private_annotation);
-        mPublicAnnotationLabel = (TextView) view.findViewById(R.id.action_visa_public_annotation_label);
-        mPrivateAnnotationLabel = (TextView) view.findViewById(R.id.action_visa_private_annotation_label);
+        mPublicAnnotationEditText = view.findViewById(R.id.action_visa_public_annotation);
+        mPrivateAnnotationEditText = view.findViewById(R.id.action_visa_private_annotation);
+        mPublicAnnotationLabel = view.findViewById(R.id.action_visa_public_annotation_label);
+        mPrivateAnnotationLabel = view.findViewById(R.id.action_visa_private_annotation_label);
 
         // Set listeners
 

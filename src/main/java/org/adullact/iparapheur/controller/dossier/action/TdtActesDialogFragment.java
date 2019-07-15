@@ -64,8 +64,8 @@ public class TdtActesDialogFragment extends ActionDialogFragment {
 	@Override protected View createView() {
 		View layout = super.createView();
 
-		annotationPublique = (TextView) layout.findViewById(R.id.action_import_password);
-		annotationPrivee = (TextView) layout.findViewById(R.id.action_dialog_private_annotation);
+		annotationPublique = layout.findViewById(R.id.action_import_password);
+		annotationPrivee = layout.findViewById(R.id.action_dialog_private_annotation);
 
 		return layout;
 	}

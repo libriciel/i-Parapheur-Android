@@ -117,7 +117,7 @@ public class PreferencesAccountFragment extends Fragment {
     @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.preferences_accounts_fragment, container, false);
 
-        mAccountList = (ListView) v.findViewById(R.id.preferences_accounts_fragment_main_list);
+        mAccountList = v.findViewById(R.id.preferences_accounts_fragment_main_list);
         View floatingButtonAction = v.findViewById(R.id.preferences_accounts_fragment_add_parapheur_floatingactionbutton);
 
         // Set listeners
@@ -349,14 +349,14 @@ public class PreferencesAccountFragment extends Fragment {
 
             // Retrieve entries (a Holder might be overkill for 7 subviews...)
 
-            final EditText titleEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext));
-            final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext));
-            final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
-            final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
-            final ToggleButton enableToggleButton = ((ToggleButton) v.findViewById(R.id.preferences_accounts_fragment_cell_enabled_togglebutton));
-            final Button saveButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
-            final Button deleteButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
-            final Button testButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
+            final EditText titleEditText = v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext);
+            final EditText urlEditText = v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext);
+            final EditText loginEditText = v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext);
+            final EditText passwordEditText = v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext);
+            final ToggleButton enableToggleButton = v.findViewById(R.id.preferences_accounts_fragment_cell_enabled_togglebutton);
+            final Button saveButton = v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
+            final Button deleteButton = v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
+            final Button testButton = v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
 
             // Since we can't easily remove lambda functions with TextView's TextChangeListeners,
             // We have to store a tag to know if the EditText already have a listener

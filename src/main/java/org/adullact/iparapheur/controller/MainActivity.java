@@ -136,11 +136,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         setContentView(R.layout.main_activity);
 
-        mLeftDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_drawer_layout);
-        mRightDrawerLayout = (DrawerLayout) findViewById(R.id.activity_dossiers_right_drawer_layout);
-        mLeftDrawerMenu = (FrameLayout) findViewById(R.id.activity_dossiers_left_drawer);
+        mLeftDrawerLayout = findViewById(R.id.activity_dossiers_drawer_layout);
+        mRightDrawerLayout = findViewById(R.id.activity_dossiers_right_drawer_layout);
+        mLeftDrawerMenu = findViewById(R.id.activity_dossiers_left_drawer);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.menu_toolbar);
+        Toolbar toolbar = findViewById(R.id.menu_toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null)
@@ -152,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
         mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        mNavigationDrawerAccountViewSwitcher = (ViewSwitcher) findViewById(R.id.navigation_drawer_viewswitcher);
+        mNavigationDrawerAccountViewSwitcher = findViewById(R.id.navigation_drawer_viewswitcher);
 
-        ImageButton drawerAccountImageButton = (ImageButton) findViewById(R.id.navigation_drawer_menu_header_account_button);
+        ImageButton drawerAccountImageButton = findViewById(R.id.navigation_drawer_menu_header_account_button);
         if (drawerAccountImageButton != null) {
             drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         // Default FAB visibility
 
         View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher);
-        FloatingActionButton mainFab = (FloatingActionButton) findViewById(R.id.mupdf_main_menu_fabbutton);
+        FloatingActionButton mainFab = findViewById(R.id.mupdf_main_menu_fabbutton);
 
         if (fabSwitcher != null)
             fabSwitcher.setVisibility(View.GONE);
@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
 
-        Toolbar actionsToolbar = (Toolbar) findViewById(R.id.actions_toolbar);
+        Toolbar actionsToolbar = findViewById(R.id.actions_toolbar);
         if (actionsToolbar != null) {
 
             actionsToolbar.getMenu().clear();
@@ -589,8 +589,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         Account account = AccountUtils.SELECTED_ACCOUNT;
 
-        TextView navigationDrawerAccountTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_title);
-        TextView navigationDrawerAccountSubTitle = (TextView) findViewById(R.id.navigation_drawer_menu_header_subtitle);
+        TextView navigationDrawerAccountTitle = findViewById(R.id.navigation_drawer_menu_header_title);
+        TextView navigationDrawerAccountSubTitle = findViewById(R.id.navigation_drawer_menu_header_subtitle);
 
         if (navigationDrawerAccountTitle != null)
             navigationDrawerAccountTitle.setText(account.getTitle());

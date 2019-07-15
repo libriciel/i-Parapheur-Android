@@ -250,7 +250,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
     @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        Toolbar actionsToolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+        Toolbar actionsToolbar = getActivity().findViewById(R.id.actions_toolbar);
 
         if (actionsToolbar != null) {
             actionsToolbar.inflateMenu(R.menu.dossier_details_fragment_icons);
@@ -265,7 +265,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
     @Override public void onPrepareOptionsMenu(Menu menu) {
 
-        Toolbar actions_toolbar = (Toolbar) getActivity().findViewById(R.id.actions_toolbar);
+        Toolbar actions_toolbar = getActivity().findViewById(R.id.actions_toolbar);
 
         // Info item
 
@@ -583,9 +583,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
 
         // Updating info
 
-        ListView circuitView = (ListView) infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
-        TextView title = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_title);
-        TextView typology = (TextView) infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
+        ListView circuitView = infoLayout.findViewById(R.id.fragment_dossier_detail_circuit);
+        TextView title = infoLayout.findViewById(R.id.fragment_dossier_detail_title);
+        TextView typology = infoLayout.findViewById(R.id.fragment_dossier_detail_typologie);
 
         title.setText(mDossier.getName());
         String typeString = mDossier.getType() + " / " + mDossier.getSousType();

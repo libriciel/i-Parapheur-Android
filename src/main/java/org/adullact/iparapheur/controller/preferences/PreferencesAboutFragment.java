@@ -77,7 +77,7 @@ public class PreferencesAboutFragment extends Fragment {
 
         // Set current version in the TextView
 
-        TextView versionTextView = (TextView) v.findViewById(R.id.about_version_number_textview);
+        TextView versionTextView = v.findViewById(R.id.about_version_number_textview);
         String versionText = getString(R.string.about_version_number, currentVersion);
         versionTextView.setText(versionText);
 

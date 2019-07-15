@@ -45,7 +45,7 @@ public class ChooseFilterNameDialogFragment extends DialogFragment {
 	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
 		View content = View.inflate(getActivity(), R.layout.filter_dialog_fragment_filter_name_popup, null);
-		mEditText = (EditText) content.findViewById(R.id.filter_dialog_fragment_filter_name_edittext);
+		mEditText = content.findViewById(R.id.filter_dialog_fragment_filter_name_edittext);
 
 		// Build Popup
 

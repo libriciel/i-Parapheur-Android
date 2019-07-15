@@ -73,8 +73,8 @@ public class AskPasswordDialogFragment extends DialogFragment {
 
 		View view = View.inflate(getActivity(), R.layout.action_dialog_ask_password, null);
 
-		mPasswordEditText = (EditText) view.findViewById(R.id.action_ask_password_edittext);
-		mPasswordLabel = (TextView) view.findViewById(R.id.action_ask_password_label);
+		mPasswordEditText = view.findViewById(R.id.action_ask_password_edittext);
+		mPasswordLabel = view.findViewById(R.id.action_ask_password_label);
 
 		// Set listeners
 
