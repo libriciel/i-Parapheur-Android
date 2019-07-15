@@ -34,6 +34,7 @@ import java.util.Set;
 
 
 public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListener {
+
     INSTANCE;
 
     public static final String PREFS_PREFIX = "filtre_";
@@ -48,11 +49,13 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
     private ArrayList<Filter> filters = null;
     private Filter selectedFilter;
 
+
     public List<Filter> getFilters(@NonNull Context context) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return getFilters(sharedPreferences);
     }
+
 
     public List<Filter> getFilters(@NonNull SharedPreferences sharedPreferences) {
 
@@ -94,6 +97,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
         return filters;
     }
 
+
     public void save(@NonNull Context context, @NonNull Filter filter) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -115,6 +119,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
         filters = null;
         getFilters(sharedPreferences);
     }
+
 
     public void delete(@NonNull Context context, Filter filter) {
 
@@ -140,6 +145,7 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
         getFilters(sharedPreferences);
     }
 
+
     @Override public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.startsWith(PREFS_PREFIX)) {
             filters = null;
@@ -151,17 +157,21 @@ public enum MyFilters implements SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+
     public Filter getFilter(String id) {
         int index = filters.indexOf(new Filter(id));
         return (index != -1) ? filters.get(index) : null;
     }
 
+
     public Filter getSelectedFilter() {
         return selectedFilter;
     }
 
+
     public void selectFilter(@Nullable Filter filter) {
         selectedFilter = filter;
     }
+
 }
 

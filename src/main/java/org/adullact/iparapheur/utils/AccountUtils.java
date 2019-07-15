@@ -30,39 +30,42 @@ import java.util.Comparator;
 
 public class AccountUtils {
 
-	public static final String DEMO_ID = "AccountTest0";
-	public static final String DEMO_TITLE = "iParapheur demo";
-	public static final String DEMO_BASE_URL = "iparapheur-partenaires.libriciel.fr";
-	public static final String DEMO_LOGIN = "admin@demo";
-	public static final String DEMO_PASSWORD = "admin";
+    public static final String DEMO_ID = "AccountTest0";
+    public static final String DEMO_TITLE = "iParapheur demo";
+    public static final String DEMO_BASE_URL = "iparapheur-partenaires.libriciel.fr";
+    public static final String DEMO_LOGIN = "admin@demo";
+    public static final @SuppressWarnings("squid:S2068") String DEMO_PASSWORD = "admin";
 
-	private static final String PREFS_SELECTED_ACCOUNT = "selected_account";
+    private static final String PREFS_SELECTED_ACCOUNT = "selected_account";
 
-	public static Account SELECTED_ACCOUNT = null;
+    public static Account SELECTED_ACCOUNT = null;
 
-	public static String loadSelectedAccountId(@NonNull Context context) {
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-		return sharedPrefs.getString(PREFS_SELECTED_ACCOUNT, null);
-	}
 
-	public static boolean isValid(@NonNull Account account) {
-		return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
-	}
+    public static String loadSelectedAccountId(@NonNull Context context) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPrefs.getString(PREFS_SELECTED_ACCOUNT, null);
+    }
 
-	public static @NonNull Comparator<Account> buildAlphabeticalComparator() {
 
-		return new Comparator<Account>() {
-			@Override public int compare(Account lhs, Account rhs) {
+    public static boolean isValid(@NonNull Account account) {
+        return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
+    }
 
-				if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
-					return Integer.MIN_VALUE;
 
-				if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
-					return Integer.MAX_VALUE;
+    public static @NonNull Comparator<Account> buildAlphabeticalComparator() {
 
-				return lhs.getTitle().compareTo(rhs.getTitle());
-			}
-		};
-	}
+        return new Comparator<Account>() {
+            @Override public int compare(Account lhs, Account rhs) {
+
+                if (TextUtils.equals(lhs.getId(), AccountUtils.DEMO_ID))
+                    return Integer.MIN_VALUE;
+
+                if (TextUtils.equals(rhs.getId(), AccountUtils.DEMO_ID))
+                    return Integer.MAX_VALUE;
+
+                return lhs.getTitle().compareTo(rhs.getTitle());
+            }
+        };
+    }
 
 }
