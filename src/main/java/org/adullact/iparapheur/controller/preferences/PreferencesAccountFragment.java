@@ -73,426 +73,426 @@ import java.util.concurrent.Callable;
  */
 public class PreferencesAccountFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "preferences_account_fragment";
-	public static final String LOG_TAG = "PreferencesAccountFrag";
-
-	private static final String LIST_FIELD_TITLE = "list_field_title";
-	private static final String LIST_FIELD_ID = "list_field_id";
-	private static final String LIST_FIELD_URL = "list_field_url";
-	private static final String LIST_FIELD_LOGIN = "list_field_login";
-	private static final String LIST_FIELD_PASSWORD = "list_field_password";
-	private static final String LIST_FIELD_ACTIVATED = "list_field_activated";
-	private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
-
-	private ListView mAccountList;
-	private List<Map<String, String>> mAccountData;
-	private DatabaseHelper mDatabaseHelper;
-
-	/**
-	 * Use this factory method to create a new instance of
-	 * this fragment using the provided parameters.
-	 *
-	 * @return A new instance of fragment PreferencesMenuFragment.
-	 */
-	public static PreferencesAccountFragment newInstance() {
-		return new PreferencesAccountFragment();
-	}
+    public static final String FRAGMENT_TAG = "preferences_account_fragment";
+    public static final String LOG_TAG = "PreferencesAccountFrag";
+
+    private static final String LIST_FIELD_TITLE = "list_field_title";
+    private static final String LIST_FIELD_ID = "list_field_id";
+    private static final String LIST_FIELD_URL = "list_field_url";
+    private static final String LIST_FIELD_LOGIN = "list_field_login";
+    private static final String LIST_FIELD_PASSWORD = "list_field_password";
+    private static final String LIST_FIELD_ACTIVATED = "list_field_activated";
+    private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
+
+    private ListView mAccountList;
+    private List<Map<String, String>> mAccountData;
+    private DatabaseHelper mDatabaseHelper;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PreferencesMenuFragment.
+     */
+    public static PreferencesAccountFragment newInstance() {
+        return new PreferencesAccountFragment();
+    }
 
-	public PreferencesAccountFragment() {
-		// Required empty public constructor
-	}
+    public PreferencesAccountFragment() {
+        // Required empty public constructor
+    }
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
-		mAccountData = new ArrayList<>();
-		mDatabaseHelper = new DatabaseHelper(getActivity());
+        mAccountData = new ArrayList<>();
+        mDatabaseHelper = new DatabaseHelper(getActivity());
 
-		buildAccountDataMap();
-	}
+        buildAccountDataMap();
+    }
 
-	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.preferences_accounts_fragment, container, false);
+    @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.preferences_accounts_fragment, container, false);
 
-		mAccountList = (ListView) v.findViewById(R.id.preferences_accounts_fragment_main_list);
-		View floatingButtonAction = v.findViewById(R.id.preferences_accounts_fragment_add_parapheur_floatingactionbutton);
+        mAccountList = (ListView) v.findViewById(R.id.preferences_accounts_fragment_main_list);
+        View floatingButtonAction = v.findViewById(R.id.preferences_accounts_fragment_add_parapheur_floatingactionbutton);
 
-		// Set listeners
+        // Set listeners
 
-		floatingButtonAction.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View v) {
-				onAddFloatingButtonClicked();
-			}
-		});
+        floatingButtonAction.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                onAddFloatingButtonClicked();
+            }
+        });
 
-		// Building ListAdapter
+        // Building ListAdapter
 
-		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_URL, LIST_FIELD_LOGIN, LIST_FIELD_PASSWORD};
-		int[] orderedFieldIds = new int[]{
-				R.id.preferences_accounts_fragment_cell_title_edittext,
-				R.id.preferences_accounts_fragment_cell_server_edittext,
-				R.id.preferences_accounts_fragment_cell_login_edittext,
-				R.id.preferences_accounts_fragment_cell_password_edittext
-		};
+        String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_URL, LIST_FIELD_LOGIN, LIST_FIELD_PASSWORD};
+        int[] orderedFieldIds = new int[]{
+                R.id.preferences_accounts_fragment_cell_title_edittext,
+                R.id.preferences_accounts_fragment_cell_server_edittext,
+                R.id.preferences_accounts_fragment_cell_login_edittext,
+                R.id.preferences_accounts_fragment_cell_password_edittext
+        };
 
-		SimpleAdapter accountAdapter = new AccountSimpleAdapter(getActivity(),
-																mAccountData,
-																R.layout.preferences_accounts_fragment_cell,
-																orderedFieldNames,
-																orderedFieldIds
-		);
-		mAccountList.setAdapter(accountAdapter);
+        SimpleAdapter accountAdapter = new AccountSimpleAdapter(getActivity(),
+                mAccountData,
+                R.layout.preferences_accounts_fragment_cell,
+                orderedFieldNames,
+                orderedFieldIds
+        );
+        mAccountList.setAdapter(accountAdapter);
 
-		//
+        //
 
-		return v;
-	}
+        return v;
+    }
 
-	@Override public void onResume() {
-		super.onResume();
+    @Override public void onResume() {
+        super.onResume();
 
-		if (getActivity() instanceof AppCompatActivity) {
-			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-			if (parentActivity.getSupportActionBar() != null)
-				parentActivity.getSupportActionBar().setTitle(R.string.pref_header_accounts);
-		}
-	}
+        if (getActivity() instanceof AppCompatActivity) {
+            AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+            if (parentActivity.getSupportActionBar() != null)
+                parentActivity.getSupportActionBar().setTitle(R.string.pref_header_accounts);
+        }
+    }
 
-	// </editor-fold desc="LifeCycle">
+    // </editor-fold desc="LifeCycle">
 
-	private void onSaveButtonClicked(@NonNull EditText urlEditText, int position) {
+    private void onSaveButtonClicked(@NonNull EditText urlEditText, int position) {
 
-		cleanupUrlEditText(urlEditText);
+        cleanupUrlEditText(urlEditText);
 
-		// Retrieve existing account, or create it
+        // Retrieve existing account, or create it
 
-		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
-		Account currentAccount = null;
+        String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
+        Account currentAccount = null;
 
-		if (!TextUtils.isEmpty(currentId)) {
-			try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
-			catch (SQLException e) { e.printStackTrace(); }
-		}
+        if (!TextUtils.isEmpty(currentId)) {
+            try {
+                currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0);
+            } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
+        }
 
-		if (currentAccount == null) {
-			currentAccount = new Account(UUID.randomUUID().toString());
-			mAccountData.get(position).put(LIST_FIELD_ID, currentAccount.getId());
-		}
+        if (currentAccount == null) {
+            currentAccount = new Account(UUID.randomUUID().toString());
+            mAccountData.get(position).put(LIST_FIELD_ID, currentAccount.getId());
+        }
 
-		// Edit
+        // Edit
 
-		currentAccount.setServerBaseUrl(urlEditText.getText().toString());
-		currentAccount.setTitle(mAccountData.get(position).get(LIST_FIELD_TITLE));
-		currentAccount.setLogin(mAccountData.get(position).get(LIST_FIELD_LOGIN));
-		currentAccount.setPassword(mAccountData.get(position).get(LIST_FIELD_PASSWORD));
+        currentAccount.setServerBaseUrl(urlEditText.getText().toString());
+        currentAccount.setTitle(mAccountData.get(position).get(LIST_FIELD_TITLE));
+        currentAccount.setLogin(mAccountData.get(position).get(LIST_FIELD_LOGIN));
+        currentAccount.setPassword(mAccountData.get(position).get(LIST_FIELD_PASSWORD));
 
-		// Save
+        // Save
 
-		Log.i(LOG_TAG, "Save account " + currentAccount);
-		try { mDatabaseHelper.getAccountDao().createOrUpdate(currentAccount); }
-		catch (SQLException e) { e.printStackTrace(); }
+        Log.i(LOG_TAG, "Save account " + currentAccount);
+        try { mDatabaseHelper.getAccountDao().createOrUpdate(currentAccount); } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
-	}
+        Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
+    }
 
-	private void onDeleteButtonClicked(int position) {
+    private void onDeleteButtonClicked(int position) {
 
-		// Retrieve existing account
+        // Retrieve existing account
 
-		String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
-		Account currentAccount = null;
+        String currentId = mAccountData.get(position).get(LIST_FIELD_ID);
+        Account currentAccount = null;
 
-		try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
-		catch (SQLException e) { e.printStackTrace(); }
+        try {
+            currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0);
+        } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		if (currentAccount == null)
-			return;
+        if (currentAccount == null)
+            return;
 
-		// Delete cascade
+        // Delete cascade
 
-		final Account finalCurrentAccount = currentAccount;
-		final List<Bureau> bureauxToDeleteList = BureauUtils.getDeletableBureauList(finalCurrentAccount, new ArrayList<Bureau>());
-		final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDeleteList);
-		final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
+        final Account finalCurrentAccount = currentAccount;
+        final List<Bureau> bureauxToDeleteList = BureauUtils.getDeletableBureauList(finalCurrentAccount, new ArrayList<Bureau>());
+        final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDeleteList);
+        final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
 
-		Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDeleteList);
-		Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
-		Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
+        Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDeleteList);
+        Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+        Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
-		try {
-			mDatabaseHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
-				@Override public Void call() throws Exception {
+        try {
+            mDatabaseHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
+                @Override public Void call() throws Exception {
 
-					mDatabaseHelper.getDocumentDao().delete(documentToDeleteList);
-					mDatabaseHelper.getDossierDao().delete(dossierToDeleteList);
-					mDatabaseHelper.getBureauDao().delete(bureauxToDeleteList);
-					mDatabaseHelper.getAccountDao().delete(finalCurrentAccount);
+                    mDatabaseHelper.getDocumentDao().delete(documentToDeleteList);
+                    mDatabaseHelper.getDossierDao().delete(dossierToDeleteList);
+                    mDatabaseHelper.getBureauDao().delete(bureauxToDeleteList);
+                    mDatabaseHelper.getAccountDao().delete(finalCurrentAccount);
 
-					return null;
-				}
-			});
-		}
-		catch (Exception e) { e.printStackTrace(); }
+                    return null;
+                }
+            });
+        } catch (Exception e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		// Cleanup files
+        // Cleanup files
 
-		for (Document documentToDelete : documentToDeleteList)
-			//noinspection ResultOfMethodCallIgnored
-			DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+        for (Document documentToDelete : documentToDeleteList)
+            //noinspection ResultOfMethodCallIgnored
+            DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
 
-		for (Dossier dossierToDelete : dossierToDeleteList)
-			//noinspection ResultOfMethodCallIgnored
-			FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
+        for (Dossier dossierToDelete : dossierToDeleteList)
+            //noinspection ResultOfMethodCallIgnored
+            FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
 
-		// Refresh UI
+        // Refresh UI
 
-		mAccountData.remove(position);
-		Log.i(LOG_TAG, "Delete account " + currentAccount);
+        mAccountData.remove(position);
+        Log.i(LOG_TAG, "Delete account " + currentAccount);
 
-		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
-		Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();
-	}
+        ((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
+        Toast.makeText(getActivity(), R.string.pref_account_message_delete_success, Toast.LENGTH_SHORT).show();
+    }
 
-	private void onTestButtonClicked(@NonNull EditText urlEditText, @Nullable String login, @Nullable String password) {
+    private void onTestButtonClicked(@NonNull EditText urlEditText, @Nullable String login, @Nullable String password) {
 
-		cleanupUrlEditText(urlEditText);
-		new TestTask().execute(urlEditText.getText().toString(), login, password);
-	}
+        cleanupUrlEditText(urlEditText);
+        new TestTask().execute(urlEditText.getText().toString(), login, password);
+    }
 
-	private void onAddFloatingButtonClicked() {
+    private void onAddFloatingButtonClicked() {
 
-		Map<String, String> accountData = new HashMap<>();
-		accountData.put(LIST_FIELD_TITLE, "");
-		accountData.put(LIST_FIELD_URL, "");
-		accountData.put(LIST_FIELD_LOGIN, "");
-		accountData.put(LIST_FIELD_PASSWORD, "");
+        Map<String, String> accountData = new HashMap<>();
+        accountData.put(LIST_FIELD_TITLE, "");
+        accountData.put(LIST_FIELD_URL, "");
+        accountData.put(LIST_FIELD_LOGIN, "");
+        accountData.put(LIST_FIELD_PASSWORD, "");
 
-		mAccountData.add(accountData);
-		((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
+        mAccountData.add(accountData);
+        ((SimpleAdapter) mAccountList.getAdapter()).notifyDataSetChanged();
 
-		// Scroll down to the last element programmatically, to make it visible
-		mAccountList.setSelection(mAccountList.getCount() - 1);
-	}
+        // Scroll down to the last element programmatically, to make it visible
+        mAccountList.setSelection(mAccountList.getCount() - 1);
+    }
 
-	private void cleanupUrlEditText(@NonNull EditText urlEditText) {
+    private void cleanupUrlEditText(@NonNull EditText urlEditText) {
 
-		String entryUrl = urlEditText.getText().toString();
-		String fixedUrl = StringUtils.fixUrl(entryUrl);
+        String entryUrl = urlEditText.getText().toString();
+        String fixedUrl = StringUtils.fixUrl(entryUrl);
 
-		urlEditText.setText(fixedUrl);
-	}
+        urlEditText.setText(fixedUrl);
+    }
 
-	public void buildAccountDataMap() {
+    public void buildAccountDataMap() {
 
-		mAccountData.clear();
+        mAccountData.clear();
 
-		// Retrieve and sort Account list (by titles, alphabetically)
+        // Retrieve and sort Account list (by titles, alphabetically)
 
-		List<Account> accountList = new ArrayList<>();
+        List<Account> accountList = new ArrayList<>();
 
-		try { accountList.addAll(mDatabaseHelper.getAccountDao().queryForAll()); }
-		catch (SQLException e) { e.printStackTrace(); }
+        try { accountList.addAll(mDatabaseHelper.getAccountDao().queryForAll()); } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		Collections.sort(accountList, AccountUtils.buildAlphabeticalComparator());
+        Collections.sort(accountList, AccountUtils.buildAlphabeticalComparator());
 
-		// Build map
+        // Build map
 
-		for (Account account : accountList) {
+        for (Account account : accountList) {
 
-			Map<String, String> accountData = new HashMap<>();
-			accountData.put(LIST_FIELD_TITLE, account.getTitle());
-			accountData.put(LIST_FIELD_ID, account.getId());
-			accountData.put(LIST_FIELD_URL, account.getServerBaseUrl());
-			accountData.put(LIST_FIELD_LOGIN, account.getLogin());
-			accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
-			accountData.put(LIST_FIELD_ACTIVATED, String.valueOf(account.isActivated()));
+            Map<String, String> accountData = new HashMap<>();
+            accountData.put(LIST_FIELD_TITLE, account.getTitle());
+            accountData.put(LIST_FIELD_ID, account.getId());
+            accountData.put(LIST_FIELD_URL, account.getServerBaseUrl());
+            accountData.put(LIST_FIELD_LOGIN, account.getLogin());
+            accountData.put(LIST_FIELD_PASSWORD, account.getPassword());
+            accountData.put(LIST_FIELD_ACTIVATED, String.valueOf(account.isActivated()));
 
-			mAccountData.add(accountData);
-		}
-	}
+            mAccountData.add(accountData);
+        }
+    }
 
-	private class AccountSimpleAdapter extends SimpleAdapter {
+    private class AccountSimpleAdapter extends SimpleAdapter {
 
-		/**
-		 * Constructor
-		 *
-		 * @param context  The context where the View associated with this SimpleAdapter is running
-		 * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
-		 *                 Maps contain the data for each row, and should include all the entries specified in
-		 *                 "from"
-		 * @param resource Resource identifier of a view layout that defines the views for this list
-		 *                 item. The layout file should include at least those named views defined in "to"
-		 * @param from     A list of column names that will be added to the Map associated with each
-		 *                 item.
-		 * @param to       The views that should display column in the "from" parameter. These should all be
-		 *                 TextViews. The first N views in this list are given the values of the first N columns
-		 */
-		private AccountSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
-			super(context, data, resource, from, to);
-		}
+        /**
+         * Constructor
+         *
+         * @param context  The context where the View associated with this SimpleAdapter is running
+         * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
+         *                 Maps contain the data for each row, and should include all the entries specified in
+         *                 "from"
+         * @param resource Resource identifier of a view layout that defines the views for this list
+         *                 item. The layout file should include at least those named views defined in "to"
+         * @param from     A list of column names that will be added to the Map associated with each
+         *                 item.
+         * @param to       The views that should display column in the "from" parameter. These should all be
+         *                 TextViews. The first N views in this list are given the values of the first N columns
+         */
+        private AccountSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+            super(context, data, resource, from, to);
+        }
 
-		@Override public View getView(final int position, View convertView, ViewGroup parent) {
+        @Override public View getView(final int position, View convertView, ViewGroup parent) {
 
-			// We reset the Tag before recycling the view, with super, then reassign it
-			// because we don't want to trigger the EditText TextChangedListeners
-			// when the system recycles the views.
+            // We reset the Tag before recycling the view, with super, then reassign it
+            // because we don't want to trigger the EditText TextChangedListeners
+            // when the system recycles the views.
 
-			if (convertView != null)
-				convertView.setTag(LIST_CELL_TAG_POSITION, -1);
+            if (convertView != null)
+                convertView.setTag(LIST_CELL_TAG_POSITION, -1);
 
-			final View v = super.getView(position, convertView, parent);
+            final View v = super.getView(position, convertView, parent);
 
-			v.setTag(LIST_CELL_TAG_POSITION, position);
+            v.setTag(LIST_CELL_TAG_POSITION, position);
 
-			// Retrieve entries (a Holder might be overkill for 7 subviews...)
+            // Retrieve entries (a Holder might be overkill for 7 subviews...)
 
-			final EditText titleEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext));
-			final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext));
-			final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
-			final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
-			final ToggleButton enableToggleButton = ((ToggleButton) v.findViewById(R.id.preferences_accounts_fragment_cell_enabled_togglebutton));
-			final Button saveButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
-			final Button deleteButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
-			final Button testButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
+            final EditText titleEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_title_edittext));
+            final EditText urlEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_server_edittext));
+            final EditText loginEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_login_edittext));
+            final EditText passwordEditText = ((EditText) v.findViewById(R.id.preferences_accounts_fragment_cell_password_edittext));
+            final ToggleButton enableToggleButton = ((ToggleButton) v.findViewById(R.id.preferences_accounts_fragment_cell_enabled_togglebutton));
+            final Button saveButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_save_button);
+            final Button deleteButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_delete_button);
+            final Button testButton = (Button) v.findViewById(R.id.preferences_accounts_fragment_cell_test_button);
 
-			// Since we can't easily remove lambda functions with TextView's TextChangeListeners,
-			// We have to store a tag to know if the EditText already have a listener
-			// (otherwise it will be called one more times every time the view is recycled)
+            // Since we can't easily remove lambda functions with TextView's TextChangeListeners,
+            // We have to store a tag to know if the EditText already have a listener
+            // (otherwise it will be called one more times every time the view is recycled)
 
-			if (convertView == null) {
-				setEditTextListenerToDataMap(v, titleEditText, LIST_FIELD_TITLE);
-				setEditTextListenerToDataMap(v, urlEditText, LIST_FIELD_URL);
-				setEditTextListenerToDataMap(v, loginEditText, LIST_FIELD_LOGIN);
-				setEditTextListenerToDataMap(v, passwordEditText, LIST_FIELD_PASSWORD);
-			}
+            if (convertView == null) {
+                setEditTextListenerToDataMap(v, titleEditText, LIST_FIELD_TITLE);
+                setEditTextListenerToDataMap(v, urlEditText, LIST_FIELD_URL);
+                setEditTextListenerToDataMap(v, loginEditText, LIST_FIELD_LOGIN);
+                setEditTextListenerToDataMap(v, passwordEditText, LIST_FIELD_PASSWORD);
+            }
 
-			// Cell buttons listener
+            // Cell buttons listener
 
-			saveButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View arg0) {
-					onSaveButtonClicked(urlEditText, position);
-				}
-			});
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View arg0) {
+                    onSaveButtonClicked(urlEditText, position);
+                }
+            });
 
-			deleteButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View arg0) {
-					onDeleteButtonClicked(position);
-				}
-			});
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View arg0) {
+                    onDeleteButtonClicked(position);
+                }
+            });
 
-			testButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View arg0) {
-					String login = loginEditText.getText().toString();
-					String password = passwordEditText.getText().toString();
+            testButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View arg0) {
+                    String login = loginEditText.getText().toString();
+                    String password = passwordEditText.getText().toString();
 
-					onTestButtonClicked(urlEditText, login, password);
-				}
-			});
+                    onTestButtonClicked(urlEditText, login, password);
+                }
+            });
 
-			// Demo case
+            // Demo case
 
-			boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
-			boolean isActivated = Boolean.valueOf(mAccountData.get(position).get(LIST_FIELD_ACTIVATED));
+            boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
+            boolean isActivated = Boolean.valueOf(mAccountData.get(position).get(LIST_FIELD_ACTIVATED));
 
-			lockEditText(titleEditText, !isDemoAccount);
-			lockEditText(urlEditText, !isDemoAccount);
-			lockEditText(loginEditText, !isDemoAccount);
-			lockEditText(passwordEditText, !isDemoAccount);
+            lockEditText(titleEditText, !isDemoAccount);
+            lockEditText(urlEditText, !isDemoAccount);
+            lockEditText(loginEditText, !isDemoAccount);
+            lockEditText(passwordEditText, !isDemoAccount);
 
-			deleteButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
-			saveButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
-			enableToggleButton.setVisibility(isDemoAccount ? View.VISIBLE : View.GONE);
+            deleteButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
+            saveButton.setVisibility(isDemoAccount ? View.GONE : View.VISIBLE);
+            enableToggleButton.setVisibility(isDemoAccount ? View.VISIBLE : View.GONE);
 
-			enableToggleButton.setOnCheckedChangeListener(null);
-			enableToggleButton.setChecked(isActivated);
-			enableToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            enableToggleButton.setOnCheckedChangeListener(null);
+            enableToggleButton.setChecked(isActivated);
+            enableToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-				@Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-					boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
-					if (isDemoAccount) {
+                    boolean isDemoAccount = TextUtils.equals(mAccountData.get(position).get(LIST_FIELD_ID), AccountUtils.DEMO_ID);
+                    if (isDemoAccount) {
 
-						int currentPosition = (Integer) v.getTag(LIST_CELL_TAG_POSITION);
-						mAccountData.get(currentPosition).put(LIST_FIELD_ACTIVATED, String.valueOf(isChecked));
+                        int currentPosition = (Integer) v.getTag(LIST_CELL_TAG_POSITION);
+                        mAccountData.get(currentPosition).put(LIST_FIELD_ACTIVATED, String.valueOf(isChecked));
 
-						String currentId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
-						Account currentAccount = null;
+                        String currentId = mAccountData.get(currentPosition).get(LIST_FIELD_ID);
+                        Account currentAccount = null;
 
-						try { currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0); }
-						catch (SQLException e) { e.printStackTrace(); }
+                        try {
+                            currentAccount = mDatabaseHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, currentId).query().get(0);
+                        } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-						if (currentAccount != null) {
-							currentAccount.setActivated(isChecked);
-							try { mDatabaseHelper.getAccountDao().update(currentAccount); }
-							catch (SQLException e) { e.printStackTrace(); }
-						}
-					}
-				}
-			});
+                        if (currentAccount != null) {
+                            currentAccount.setActivated(isChecked);
+                            try { mDatabaseHelper.getAccountDao().update(currentAccount); } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
+                        }
+                    }
+                }
+            });
 
-			//
+            //
 
-			return v;
-		}
+            return v;
+        }
 
-		private void lockEditText(EditText editText, boolean lock) {
-			editText.setFocusable(lock);
-			editText.setFocusableInTouchMode(lock);
-		}
+        private void lockEditText(EditText editText, boolean lock) {
+            editText.setFocusable(lock);
+            editText.setFocusableInTouchMode(lock);
+        }
 
-		private void setEditTextListenerToDataMap(@NonNull final View parentView, @NonNull final EditText editText, @NonNull final String dataMapField) {
+        private void setEditTextListenerToDataMap(@NonNull final View parentView, @NonNull final EditText editText, @NonNull final String dataMapField) {
 
-			editText.addTextChangedListener(
+            editText.addTextChangedListener(
 
-					new TextWatcher() {
+                    new TextWatcher() {
 
-						@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-						@Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+                        @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
-						@Override public void afterTextChanged(Editable s) {
+                        @Override public void afterTextChanged(Editable s) {
 
-							int currentPosition = (Integer) parentView.getTag(LIST_CELL_TAG_POSITION);
-							if (currentPosition != -1)
-								mAccountData.get(currentPosition).put(dataMapField, editText.getText().toString());
-						}
-					});
-		}
+                            int currentPosition = (Integer) parentView.getTag(LIST_CELL_TAG_POSITION);
+                            if (currentPosition != -1)
+                                mAccountData.get(currentPosition).put(dataMapField, editText.getText().toString());
+                        }
+                    });
+        }
 
-	}
+    }
 
-	private class TestTask extends AsyncTask<String, Void, Void> {
+    private class TestTask extends AsyncTask<String, Void, Void> {
 
-		private int mResultMessageRes;
+        private int mResultMessageRes;
 
-		@Override protected Void doInBackground(String... params) {
+        @Override protected Void doInBackground(String... params) {
 
-			Account testAccount = new Account("test");
-			testAccount.setServerBaseUrl(params[0]);
-			testAccount.setLogin(params[1]);
-			testAccount.setPassword(params[2]);
+            Account testAccount = new Account("test");
+            testAccount.setServerBaseUrl(params[0]);
+            testAccount.setLogin(params[1]);
+            testAccount.setPassword(params[2]);
 
-			try {
-				mResultMessageRes = RESTClient.INSTANCE.test(testAccount);
-			}
-			catch (IParapheurException e) {
-				Crashlytics.logException(e);
-				mResultMessageRes = e.getResId();
-				e.printStackTrace();
-			}
+            try {
+                mResultMessageRes = RESTClient.INSTANCE.test(testAccount);
+            } catch (IParapheurException e) {
+                Crashlytics.logException(e);
+                mResultMessageRes = e.getResId();
+                Log.e(LOG_TAG, e.getLocalizedMessage());
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		@Override protected void onPostExecute(Void aVoid) {
+        @Override protected void onPostExecute(Void aVoid) {
 
-			if (getActivity() != null)
-				Toast.makeText(getActivity(), mResultMessageRes, Toast.LENGTH_SHORT).show();
+            if (getActivity() != null)
+                Toast.makeText(getActivity(), mResultMessageRes, Toast.LENGTH_SHORT).show();
 
-			super.onPostExecute(aVoid);
-		}
-	}
+            super.onPostExecute(aVoid);
+        }
+
+    }
+
 }

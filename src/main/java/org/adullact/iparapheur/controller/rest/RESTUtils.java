@@ -121,19 +121,19 @@ public class RESTUtils {
             output.write(body.getBytes());
             res = new RequestResponse(connection);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_malformed_url, url);
         } catch (ProtocolException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_405, null);
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_ssl_failed, null);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_no_internet, null);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_400, null);
         }
 
@@ -166,7 +166,7 @@ public class RESTUtils {
             output.write(body.getBytes());
             res = new RequestResponse(connection, ignoreResponseData);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_malformed_url, url);
         } catch (ProtocolException e) {
             throw new IParapheurException(R.string.http_error_405, null);
@@ -198,16 +198,16 @@ public class RESTUtils {
 
             res = new RequestResponse(connection);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_malformed_url, url);
         } catch (ProtocolException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_405, null);
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_ssl_failed, null);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_400, null);
         }
 
@@ -238,7 +238,7 @@ public class RESTUtils {
 
             res = new RequestResponse(connection, ignoreResponseData);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_malformed_url, url);
         } catch (ProtocolException e) {
             throw new IParapheurException(R.string.http_error_405, null);
@@ -296,7 +296,7 @@ public class RESTUtils {
             requestContent = requestStringer.toString();
         } catch (JSONException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
         }
 
         return requestContent;

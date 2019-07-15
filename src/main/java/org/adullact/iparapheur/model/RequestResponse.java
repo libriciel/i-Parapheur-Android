@@ -17,6 +17,8 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.util.Log;
+
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
@@ -36,6 +38,8 @@ import java.util.Arrays;
 
 
 public class RequestResponse {
+
+    private static final String LOG_TAG = "RequestResponse";
 
     private int code;
     private String error;
@@ -80,15 +84,15 @@ public class RequestResponse {
             }
         } catch (JSONException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
         } catch (UnknownHostException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_404, httpURLConnection.getURL().getHost());
         } catch (IOException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_server_not_configured, null);
         }
     }

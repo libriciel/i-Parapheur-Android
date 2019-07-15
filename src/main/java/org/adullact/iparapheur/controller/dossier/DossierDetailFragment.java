@@ -794,7 +794,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                                 return null;
 
                             curentBureau = fetchedBureauList.get(0);
-                        } catch (SQLException e) { e.printStackTrace(); }
+                        } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
                         if (curentBureau == null)
                             return null;
@@ -827,9 +827,9 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                             }
                         });
                     } catch (IParapheurException e) {
-                        e.printStackTrace();
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
                     } catch (Exception e) {
-                        new IParapheurException(-1, "DB error").printStackTrace();
+                        Log.e(LOG_TAG, new IParapheurException(-1, "DB error").getLocalizedMessage());
                     }
                 }
             } else { // Offline backup
@@ -844,7 +844,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                     List<Document> documents = new ArrayList<>();
                     CollectionUtils.safeAddAll(documents, mDossier.getChildrenDocuments());
                     mDossier.setDocumentList(documents);
-                } catch (SQLException e) { e.printStackTrace(); }
+                } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
             }
 
             // Getting metadata
@@ -861,7 +861,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                 String downloadUrl = DocumentUtils.generateContentUrl(currentDocument);
                 if (downloadUrl != null) {
                     try { RESTClient.INSTANCE.downloadFile(currentAccount, downloadUrl, file.getAbsolutePath()); } catch (IParapheurException e) {
-                        e.printStackTrace();
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
                     }
                 }
             }
@@ -872,13 +872,17 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                 SerializableSparseArray<PageAnnotations> annotations = new SerializableSparseArray<>();
 
                 if (TextUtils.isEmpty(currentAccount.getUserFullName())) {
-                    try { RESTClient.INSTANCE.updateAccountInformations(currentAccount); } catch (IParapheurException e) { e.printStackTrace(); }
+                    try {
+                        RESTClient.INSTANCE.updateAccountInformations(currentAccount);
+                    } catch (IParapheurException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                    }
                 }
 
                 if (DocumentUtils.isMainDocument(mDossier, currentDocument)) {
                     try {
                         annotations = RESTClient.INSTANCE.getAnnotations(currentAccount, mDossier.getId(), currentDocument.getId());
-                    } catch (IParapheurException e) { e.printStackTrace(); }
+                    } catch (IParapheurException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
                 }
                 currentDocument.setPagesAnnotations(annotations);
             }
@@ -917,7 +921,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
             try {
                 mNewId = RESTClient.INSTANCE.createAnnotation(currentAccount, mDossier.getId(), mDocumentId, mCurrentAnnotation, getCurrentPage());
             } catch (IParapheurException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, e.getLocalizedMessage());
                 return false;
             }
 
@@ -951,7 +955,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
             try {
                 RESTClient.INSTANCE.updateAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation, getCurrentPage());
             } catch (IParapheurException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, e.getLocalizedMessage());
                 return false;
             }
 
@@ -982,7 +986,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
             try {
                 RESTClient.INSTANCE.deleteAnnotation(currentAccount, mDossier.getId(), mDocumentId, currentAnnotation.getUuid(), getCurrentPage());
             } catch (IParapheurException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, e.getLocalizedMessage());
                 return false;
             }
 
