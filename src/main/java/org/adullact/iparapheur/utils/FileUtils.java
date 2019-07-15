@@ -59,9 +59,8 @@ public class FileUtils {
 
     private static void copy(@NonNull File src, @NonNull File dst) {
 
-        try {
-            InputStream in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dst);
+        try (InputStream in = new FileInputStream(src);
+             OutputStream out = new FileOutputStream(dst)) {
 
             // Transfer bytes from in to out
             byte[] buf = new byte[1024];
@@ -69,8 +68,7 @@ public class FileUtils {
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-            in.close();
-            out.close();
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
