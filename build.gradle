@@ -12,7 +12,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7'
         classpath 'org.jacoco:org.jacoco.core:0.8.3'
         //noinspection GradleDynamicVersion
@@ -31,7 +31,7 @@ repositories {
 
 def keystorePropertiesFile = rootProject.file("release-keystore.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+//keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 
 android {
@@ -44,7 +44,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
+    // Every muPDF lib build is quite heavy. Some day, we might want to rgeduce the app size, splitting it in 4.
     // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
     // splits {
     //    abi {
@@ -74,18 +74,18 @@ android {
     }
 
     signingConfigs {
-        release {
+        /*release {
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
-        }
+        }*/
     }
 
     buildTypes {
-        release {
+        /*release {
             signingConfig signingConfigs.release
-        }
+        }*/
     }
 }
 
