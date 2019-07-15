@@ -162,14 +162,14 @@ public class DownloadDialogFragment extends DialogFragment {
         private Account mCurrentAccount;
 
 
-        @SuppressWarnings("squid:S2142")
+        @SuppressWarnings({"squid:S2142", "squid:S899"})
         @Override protected IParapheurException doInBackground(Account... accounts) {
 
             final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
             final List<Bureau> bureauxList = new ArrayList<>();
 
             // yes, this method does a little bit of Thread pausing.
-            // It may feel weird, but it bring a way better feeling on download,
+            // It may feel weird, but it brings a way better feeling on download,
             // and this AsyncTask is not on the UI thread anyway.
             //
             // If we're dealing with a fast connection, and an almost empty Parapheur,

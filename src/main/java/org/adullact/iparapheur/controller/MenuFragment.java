@@ -647,6 +647,7 @@ public class MenuFragment extends Fragment {
         }
 
 
+        @SuppressWarnings("squid:S899")
         @Override protected IParapheurException doInBackground(Account... params) {
 
             mCurrentAccount = params[0];
@@ -808,6 +809,7 @@ public class MenuFragment extends Fragment {
         }
 
 
+        @SuppressWarnings("squid:S899")
         @Override protected IParapheurException doInBackground(Account... params) {
 
             mTypology.clear();

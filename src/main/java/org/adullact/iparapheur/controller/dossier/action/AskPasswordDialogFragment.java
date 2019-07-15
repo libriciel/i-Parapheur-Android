@@ -37,13 +37,12 @@ public class AskPasswordDialogFragment extends DialogFragment {
 
 	public static final String FRAGMENT_TAG = "ask_password_dialog_fragment";
 	public static final int REQUEST_CODE_ASK_PASSWORD = 110911;   // Because A-S-K = 19-09-11
-	public static final String RESULT_BUNDLE_EXTRA_PASSWORD = "password";
+	public static final @SuppressWarnings("squid:S2068") String RESULT_BUNDLE_EXTRA_PASSWORD = "password";
 
 	private static final String ARGUMENTS_SELECTED_ALIAS = "selected_alias";
 
 	private EditText mPasswordEditText;
 	private TextView mPasswordLabel;
-
 	private String mSelectedAlias;
 
 	public static AskPasswordDialogFragment newInstance(String alias) {
