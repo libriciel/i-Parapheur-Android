@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     private static final String SCHEME_URI = "iparapheur";
     private static final String SCHEME_URI_IMPORTCERTIFICATE = "importCertificate";
     private static final String SCHEME_URI_IMPORTCERTIFICATE_URL = "AndroidUrl";
-    private static final String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
+    private static final @SuppressWarnings("squid:S2068") String SCHEME_URI_IMPORTCERTIFICATE_PASSWORD = "AndroidPwd";
 
     private DrawerLayout mLeftDrawerLayout;
     private DrawerLayout mRightDrawerLayout;
@@ -121,7 +121,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     private boolean mSouldShowAccountAfterRotation = false;
     private ActionMode mActionMode;                            // The actionMode used when dossiers are checked
 
+
     // <editor-fold desc="LifeCycle">
+
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         contentTransaction.commit();
     }
 
+
     @Override protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
@@ -212,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
     }
 
+
     @Override protected void onStart() {
         super.onStart();
 
@@ -224,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
         }
     }
+
 
     @Override public void onResume() {
         super.onResume();
@@ -294,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
@@ -306,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             }
         }
     }
+
 
     @Override public void onBackPressed() {
 
@@ -381,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         super.onBackPressed();
     }
 
+
     @Override protected void onSaveInstanceState(Bundle outState) {
 
         boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
@@ -393,9 +401,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         super.onSaveInstanceState(outState);
     }
 
+
     // </editor-fold desc="LifeCycle">
 
+
     // <editor-fold desc="ActionBar">
+
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -414,9 +425,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override public boolean onPrepareOptionsMenu(Menu menu) {
         return false;
     }
+
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -440,9 +453,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     // </editor-fold desc="ActionBar">
 
+
     // <editor-fold desc="ActionMode">
+
 
     @Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
         actionMode.setTitleOptionalHint(true);
@@ -458,6 +474,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         return true;
     }
+
 
     @Override public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
 
@@ -531,6 +548,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         return true;
     }
 
+
     @Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
         MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
@@ -545,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         return true;
     }
+
 
     @Override public void onDestroyActionMode(ActionMode actionMode) {
 
@@ -562,7 +581,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         mActionMode = null;
     }
 
+
     // </editor-fold desc="ActionMode">
+
 
     private void refreshNavigationDrawerHeader() {
 
@@ -578,6 +599,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             navigationDrawerAccountSubTitle.setText(account.getLogin());
 
     }
+
 
     private void importCertificate(@NonNull final String url, @Nullable final String password) {
 
@@ -625,6 +647,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }.execute();
     }
 
+
     private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
         MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
@@ -662,7 +685,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     // <editor-fold desc="AccountFragmentListener">
+
 
     @Override public void onAccountSelected(@NonNull Account account) {
 
@@ -687,15 +712,19 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     @Override public void onCreateAccountInvoked() {
         Intent preferencesIntent = new Intent(this, PreferencesActivity.class);
         preferencesIntent.putExtra(PreferencesActivity.ARGUMENT_GO_TO_FRAGMENT, PreferencesAccountFragment.class.getSimpleName());
         startActivityForResult(preferencesIntent, PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
     }
 
+
     // </editor-fold desc="AccountFragmentListener">
 
+
     // <editor-fold desc="MenuFragment">
+
 
     @Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
 
@@ -709,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     @Override public void onDossierCheckedChanged(boolean forceClose) {
 
         if (mActionMode != null)
@@ -717,13 +747,17 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             mActionMode = startSupportActionMode(this);
     }
 
+
     // </editor-fold desc="MenuFragment">
 
+
     // <editor-fold desc="DossierDetailsFragmentListener">
+
 
     @Override public boolean isAnyDrawerOpened() {
         return (mRightDrawerLayout.isDrawerVisible(GravityCompat.END) || mLeftDrawerLayout.isDrawerVisible(GravityCompat.START));
     }
+
 
     @Override public void toggleInfoDrawer() {
 
@@ -732,6 +766,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         else
             mRightDrawerLayout.openDrawer(GravityCompat.END);
     }
+
 
     @Override public void lockInfoDrawer(boolean lock) {
 
@@ -743,9 +778,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         }
     }
 
+
     @Override public void onActionButtonClicked(@NonNull Dossier dossier, @NonNull String bureauId, @NonNull Action action) {
         launchActionPopup(CollectionUtils.asSet(dossier), bureauId, action);
     }
+
 
     // </editor-fold desc="DossierDetailsFragmentListener">
 

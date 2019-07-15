@@ -80,7 +80,7 @@ public class PreferencesAccountFragment extends Fragment {
     private static final String LIST_FIELD_ID = "list_field_id";
     private static final String LIST_FIELD_URL = "list_field_url";
     private static final String LIST_FIELD_LOGIN = "list_field_login";
-    private static final String LIST_FIELD_PASSWORD = "list_field_password";
+    private static final @SuppressWarnings("squid:S2068") String LIST_FIELD_PASSWORD = "list_field_password";
     private static final String LIST_FIELD_ACTIVATED = "list_field_activated";
     private static final int LIST_CELL_TAG_POSITION = 1615190920;    // Because P-O-S-I-T = 16-15-19-09-20
 
@@ -198,6 +198,7 @@ public class PreferencesAccountFragment extends Fragment {
         Toast.makeText(getActivity(), R.string.pref_account_message_save_success, Toast.LENGTH_SHORT).show();
     }
 
+    @SuppressWarnings("squid:S899")
     private void onDeleteButtonClicked(int position) {
 
         // Retrieve existing account
