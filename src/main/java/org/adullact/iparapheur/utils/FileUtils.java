@@ -53,7 +53,7 @@ public class FileUtils {
     private static final String ASSET_CERIFICATES_IMPORT_TUTO = "i-Parapheur_mobile_import_certificats_v1.pdf";
     private static final String DOSSIER_DATA_FOLDER_NAME = "dossiers";
 
-    public static final String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
+    public static final @SuppressWarnings("squid:S2068") String SHARED_PREFERENCES_CERTIFICATES_PASSWORDS = ":iparapheur:shared_preferences_certificates_passwords";
 
 
     private static void copy(@NonNull File src, @NonNull File dst) {
@@ -240,6 +240,7 @@ public class FileUtils {
     /**
      * Creates a file from a steam in the intern cacheDir/temp_files/ directory.
      */
+    @SuppressWarnings("squid:S899")
     private static @Nullable File createFileFromInputStream(Context context, InputStream inputStream, String fileName) {
 
         File fileFolder = new File(context.getCacheDir().getAbsolutePath() + File.separator + "temp_files");
