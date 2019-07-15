@@ -665,7 +665,7 @@ public class MenuFragment extends Fragment {
                 if (fetchedAccountList.size() > 0)
                     mCurrentAccount = fetchedAccountList.get(0);
             } catch (SQLException e) {
-                logger.;
+                Log.e(LOG_TAG, e.getLocalizedMessage());
             }
 
             // Default case
