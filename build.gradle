@@ -103,9 +103,9 @@ android {
     }
 
     buildTypes {
-        /*release {
+        release {
             signingConfig signingConfigs.release
-        }*/
+        }
     }
 
     compileOptions {
