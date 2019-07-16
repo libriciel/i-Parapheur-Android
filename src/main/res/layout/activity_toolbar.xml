@@ -10,14 +10,14 @@
     android:visibility="visible"
     tools:ignore="UnusedAttribute">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/menu_toolbar"
         android:layout_width="@dimen/left_menu_size"
         android:layout_height="?attr/actionBarSize"
         android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:theme="@style/AppTheme.Main.Toolbar" />
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/actions_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

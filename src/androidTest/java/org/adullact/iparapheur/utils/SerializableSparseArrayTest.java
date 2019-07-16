@@ -42,7 +42,8 @@ public class SerializableSparseArrayTest {
     private static byte[] sSerializedBytes;
 
 
-    @Test public void order01_writeObject() throws Exception {
+    @Test
+    public void order01_writeObject() throws Exception {
 
         SerializableSparseArray<String> serializedSparseArray = new SerializableSparseArray<>();
         serializedSparseArray.put(1, null);
@@ -61,7 +62,8 @@ public class SerializableSparseArrayTest {
     }
 
 
-    @Test public void order02_readObject() throws Exception {
+    @Test
+    public void order02_readObject() throws Exception {
 
         ByteArrayInputStream bis = new ByteArrayInputStream(sSerializedBytes);
         ObjectInput in = new ObjectInputStream(bis);
