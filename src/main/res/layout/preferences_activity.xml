@@ -16,7 +16,7 @@
         android:background="@color/grey_50"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/preferences_activity_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,9 +15,9 @@
         android:descendantFocusability="afterDescendants"
         android:divider="@color/grey_200"
         android:paddingTop="8dp"
-        tools:listitem="@layout/preferences_accounts_fragment_cell"/>
+        tools:listitem="@layout/preferences_accounts_fragment_cell" />
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/preferences_accounts_fragment_add_parapheur_floatingactionbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,6 +28,6 @@
         app:backgroundTint="@color/settings_primary_500"
         app:borderWidth="0dp"
         app:elevation="6dp"
-        app:fabSize="normal"/>
+        app:fabSize="normal" />
 
 </FrameLayout>
