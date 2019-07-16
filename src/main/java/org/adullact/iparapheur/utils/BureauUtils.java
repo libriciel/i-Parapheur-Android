@@ -17,8 +17,8 @@
  */
 package org.adullact.iparapheur.utils;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.adullact.iparapheur.model.Account;

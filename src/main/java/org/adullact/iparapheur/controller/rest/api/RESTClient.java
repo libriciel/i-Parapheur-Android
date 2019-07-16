@@ -17,8 +17,8 @@
  */
 package org.adullact.iparapheur.controller.rest.api;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;

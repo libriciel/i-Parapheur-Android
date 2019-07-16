@@ -17,7 +17,7 @@
  */
 package org.adullact.iparapheur.controller.rest.mapper;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.SparseArray;
 
 import com.google.gson.JsonElement;
