@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -37,6 +38,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 @DatabaseTable(tableName = "Account")
 public class Account implements Serializable {
 
