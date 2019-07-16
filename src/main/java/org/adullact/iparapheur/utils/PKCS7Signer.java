@@ -152,7 +152,7 @@ public final class PKCS7Signer {
 
         SignerInfo signerInfo = new SignerInfo(
 
-                new X500Name(StringUtils.fixIssuerDnX500NameStringOrder(certificate.getIssuerDN().getName())),
+                new X500Name(StringsUtils.fixIssuerDnX500NameStringOrder(certificate.getIssuerDN().getName())),
                 serial,
                 digestAlg,
                 authenticatedAttributes,

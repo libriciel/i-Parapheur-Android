@@ -48,7 +48,7 @@ public class AccountUtils {
 
 
     public static boolean isValid(@NonNull Account account) {
-        return StringUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringUtils.isUrlValid(account.getServerBaseUrl());
+        return StringsUtils.areNotEmpty(account.getTitle(), account.getLogin(), account.getPassword()) && StringsUtils.isUrlValid(account.getServerBaseUrl());
     }
 
 

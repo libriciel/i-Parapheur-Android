@@ -80,7 +80,7 @@ import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.sql.SQLException;
@@ -415,8 +415,10 @@ public class MenuFragment extends Fragment {
         if (item.getItemId() == R.id.menu_fragment_filter_selection_item)
             return onFilterItemSelected(item);
 
-        if (item.getItemId() == R.id.menu_fragment_download_item)
-            return onDownloadItemSelected();
+        if (item.getItemId() == R.id.menu_fragment_download_item) {
+            onDownloadItemSelected();
+            return true;
+        }
 
         return getActivity().onOptionsItemSelected(item);
     }
@@ -506,17 +508,14 @@ public class MenuFragment extends Fragment {
     }
 
 
-    private boolean onDownloadItemSelected() {
+    private void onDownloadItemSelected() {
 
         if (!DeviceUtils.isConnected(getActivity())) {
             Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
-            return true;
         } else if (getFragmentManager().findFragmentByTag(DownloadDialogFragment.FRAGMENT_TAG) == null) {
             DialogFragment actionDialog = DownloadDialogFragment.newInstance(AccountUtils.SELECTED_ACCOUNT);
             actionDialog.show(getFragmentManager(), DownloadDialogFragment.FRAGMENT_TAG);
         }
-
-        return true;
     }
 
 
@@ -976,8 +975,8 @@ public class MenuFragment extends Fragment {
 
                     detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
                     detailsTextView.setText(getString(R.string.Sync_date,
-                            StringUtils.getVerySmallDate(currentBureau.getSyncDate()),
-                            StringUtils.getSmallTime(currentBureau.getSyncDate())
+                            StringsUtils.getVerySmallDate(currentBureau.getSyncDate()),
+                            StringsUtils.getSmallTime(currentBureau.getSyncDate())
                     ));
                 } else {
 
@@ -1066,17 +1065,17 @@ public class MenuFragment extends Fragment {
             dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
 
             if ((dossier.getDateLimite() != null) && (new Date().after(dossier.getDateLimite()))) {
-                String lateText = getString(R.string.Late_since, StringUtils.getLocalizedSmallDate(dossier.getDateLimite()));
+                String lateText = getString(R.string.Late_since, StringsUtils.getLocalizedSmallDate(dossier.getDateLimite()));
                 dateTextView.setText(lateText);
                 dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
             } else if (dossier.getSyncDate() != null) {
                 String syncText = getString(R.string.Sync_date,
-                        StringUtils.getVerySmallDate(dossier.getSyncDate()),
-                        StringUtils.getSmallTime(dossier.getSyncDate())
+                        StringsUtils.getVerySmallDate(dossier.getSyncDate()),
+                        StringsUtils.getSmallTime(dossier.getSyncDate())
                 );
                 dateTextView.setText(syncText);
             } else if (dossier.getDateCreation() != null) {
-                String emitSinceText = getString(R.string.Emit_since, StringUtils.getLocalizedSmallDate(dossier.getDateCreation()));
+                String emitSinceText = getString(R.string.Emit_since, StringsUtils.getLocalizedSmallDate(dossier.getDateCreation()));
                 dateTextView.setText(emitSinceText);
             } else {
                 typeTextView.setText(dossier.getType());

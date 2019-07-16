@@ -39,19 +39,19 @@ import lombok.ToString;
 @ToString
 public class Annotation implements Serializable {
 
-    private static final String ID = "id";
-    private static final String IS_SECRETAIRE = "secretaire";
-    private static final String AUTHOR = "author";
-    private static final String DATE = "date";
-    private static final String TYPE = "type";
-    private static final String TEXT = "text";
-    private static final String RECT = "rect";
-    private static final String PEN_COLOR = "penColor";
-    private static final String FILL_COLOR = "fillColor";
-    private static final String TOP_LEFT = "topLeft";
-    private static final String BOTTOM_RIGHT = "bottomRight";
-    private static final String X = "x";
-    private static final String Y = "y";
+    private static final String JSON_KEY_ID = "id";
+    private static final String JSON_KEY_IS_SECRETAIRE = "secretaire";
+    private static final String JSON_KEY_AUTHOR = "author";
+    private static final String JSON_KEY_DATE = "date";
+    private static final String JSON_KEY_TYPE = "type";
+    private static final String JSON_KEY_TEXT = "text";
+    private static final String JSON_KEY_RECT = "rect";
+    private static final String JSON_KEY_PEN_COLOR = "penColor";
+    private static final String JSON_KEY_FILL_COLOR = "fillColor";
+    private static final String JSON_KEY_TOP_LEFT = "topLeft";
+    private static final String JSON_KEY_BOTTOM_RIGHT = "bottomRight";
+    private static final String JSON_KEY_X = "x";
+    private static final String JSON_KEY_Y = "y";
 
     public static final Parcelable.Creator<Annotation> CREATOR = new Parcelable.Creator<Annotation>() {
 
@@ -87,22 +87,22 @@ public class Annotation implements Serializable {
 
         JsonExplorer jsonExplorer = new JsonExplorer(json);
 
-        this.uuid = jsonExplorer.optString(ID);
-        this.author = jsonExplorer.optString(AUTHOR, "");
+        this.uuid = jsonExplorer.optString(JSON_KEY_ID);
+        this.author = jsonExplorer.optString(JSON_KEY_AUTHOR, "");
         this.page = page;
-        this.secretaire = jsonExplorer.optBoolean(IS_SECRETAIRE, false);
-        this.date = jsonExplorer.optString(DATE);
+        this.secretaire = jsonExplorer.optBoolean(JSON_KEY_IS_SECRETAIRE, false);
+        this.date = jsonExplorer.optString(JSON_KEY_DATE);
         this.rect = new RectF(
-                jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(X, 0),
-                jsonExplorer.findObject(RECT).findObject(TOP_LEFT).optLong(Y, 0),
-                jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(X, 0),
-                jsonExplorer.findObject(RECT).findObject(BOTTOM_RIGHT).optLong(Y, 0)
+                jsonExplorer.findObject(JSON_KEY_RECT).findObject(JSON_KEY_TOP_LEFT).optLong(JSON_KEY_X, 0),
+                jsonExplorer.findObject(JSON_KEY_RECT).findObject(JSON_KEY_TOP_LEFT).optLong(JSON_KEY_Y, 0),
+                jsonExplorer.findObject(JSON_KEY_RECT).findObject(JSON_KEY_BOTTOM_RIGHT).optLong(JSON_KEY_X, 0),
+                jsonExplorer.findObject(JSON_KEY_RECT).findObject(JSON_KEY_BOTTOM_RIGHT).optLong(JSON_KEY_Y, 0)
         );
-        this.text = jsonExplorer.optString(TEXT, "");
-        this.type = jsonExplorer.optString(TYPE, "rect");
+        this.text = jsonExplorer.optString(JSON_KEY_TEXT, "");
+        this.type = jsonExplorer.optString(JSON_KEY_TYPE, "rect");
         this.step = step;
-        this.penColor = jsonExplorer.optString(PEN_COLOR, "blue");
-        this.fillColor = jsonExplorer.optString(FILL_COLOR, "undefined");
+        this.penColor = jsonExplorer.optString(JSON_KEY_PEN_COLOR, "blue");
+        this.fillColor = jsonExplorer.optString(JSON_KEY_FILL_COLOR, "undefined");
     }
 
 

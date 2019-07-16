@@ -24,7 +24,7 @@ import com.crashlytics.android.Crashlytics;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +61,7 @@ public class RequestResponse {
                 if (!ignoreResponseData) {
 
                     InputStream is = httpURLConnection.getInputStream();
-                    data = StringUtils.inputStreamToString(is);
+                    data = StringsUtils.inputStreamToString(is);
                     is.close();
 
                     Object json = new JSONTokener(data).nextValue();
@@ -73,7 +73,7 @@ public class RequestResponse {
                 }
             } else {
                 // if code >= 400, response is in errorStream
-                data = StringUtils.inputStreamToString(httpURLConnection.getErrorStream());
+                data = StringsUtils.inputStreamToString(httpURLConnection.getErrorStream());
 
                 Object json = new JSONTokener(data).nextValue();
                 if (json instanceof JSONObject)

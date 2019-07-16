@@ -279,9 +279,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             mSouldShowAccountAfterRotation = false;
             mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
-            if (isDeviceInPortrait)
-                if (mNavigationDrawerAccountViewSwitcher != null)
-                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+            if (isDeviceInPortrait && (mNavigationDrawerAccountViewSwitcher != null)) {
+                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+            }
         } else {
             mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
         }
@@ -314,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     }
 
 
+    @SuppressWarnings("squid:S3776")
     @Override public void onBackPressed() {
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -346,9 +347,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                 // Collapse the FAB
 
                 DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-                if (dossierDetailFragment != null)
-                    if (dossierDetailFragment.onBackPressed())
-                        return;
+                if ((dossierDetailFragment != null) && dossierDetailFragment.onBackPressed())
+                    return;
 
                 // Menu back
 

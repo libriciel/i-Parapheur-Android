@@ -41,7 +41,7 @@ import com.crashlytics.android.Crashlytics;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.PKCS7Signer;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -197,7 +197,7 @@ public class PreferencesCertificatesFragment extends Fragment {
                 Log.e(LOG_TAG, e.getLocalizedMessage());
             }
 
-            String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringUtils.getLocalizedSmallDate(certifExpDate));
+            String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringsUtils.getLocalizedSmallDate(certifExpDate));
             Boolean isExpired = (certifExpDate == null) || (certifExpDate.before(new Date()));
 
             // Mapping results

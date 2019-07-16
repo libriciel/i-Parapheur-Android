@@ -52,7 +52,7 @@ import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.PKCS7Signer;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -494,8 +494,8 @@ public class SignatureDialogFragment extends DialogFragment {
                     for (int signInfoIndex = 0; signInfoIndex < signInfoList.size(); signInfoIndex++) {
                         String signInfo = signInfoList.get(signInfoIndex);
 
-                        String signValue = signer.sign(StringUtils.hexDecode(signInfo));
-                        signValue = StringUtils.utf8SignatureToBase64Ascii(signValue);
+                        String signValue = signer.sign(StringsUtils.hexDecode(signInfo));
+                        signValue = StringsUtils.utf8SignatureToBase64Ascii(signValue);
 
                         signValueList.add(signValue);
                     }
