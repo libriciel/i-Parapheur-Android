@@ -46,7 +46,7 @@ import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFrag
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.State;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -335,7 +335,7 @@ public class FilterDialogFragment extends DialogFragment {
 
 			View checkboxIndeterminate = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox_indeterminate);
 			CheckBox checkbox = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox);
-			Boolean isChecked = StringUtils.nullableBooleanValueOf(mTypologyListGroupData.get(groupPosition), EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
+			Boolean isChecked = StringsUtils.nullableBooleanValueOf(mTypologyListGroupData.get(groupPosition), EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
 
 			checkbox.setOnCheckedChangeListener(null);
 			checkbox.setChecked((isChecked != null) && isChecked);

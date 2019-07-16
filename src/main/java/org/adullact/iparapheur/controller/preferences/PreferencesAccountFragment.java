@@ -54,7 +54,7 @@ import org.adullact.iparapheur.utils.DocumentUtils;
 import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -281,7 +281,7 @@ public class PreferencesAccountFragment extends Fragment {
     private void cleanupUrlEditText(@NonNull EditText urlEditText) {
 
         String entryUrl = urlEditText.getText().toString();
-        String fixedUrl = StringUtils.fixUrl(entryUrl);
+        String fixedUrl = StringsUtils.fixUrl(entryUrl);
 
         urlEditText.setText(fixedUrl);
     }

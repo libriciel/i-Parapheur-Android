@@ -20,7 +20,7 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,14 +107,14 @@ public class Filter implements Parcelable {
             JSONArray jsonTypes = new JSONArray();
             if (typeList != null) {
                 for (String type : typeList) {
-                    jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringUtils.urlEncode(type)));
+                    jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringsUtils.urlEncode(type)));
                 }
             }
             // SOUSTYPES
             JSONArray jsonSousTypes = new JSONArray();
             if (subTypeList != null) {
                 for (String sousType : subTypeList) {
-                    jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringUtils.urlEncode(sousType)));
+                    jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringsUtils.urlEncode(sousType)));
                 }
             }
             //TITRE

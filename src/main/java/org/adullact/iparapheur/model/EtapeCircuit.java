@@ -25,97 +25,69 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@ToString
+@Setter
+@Getter
 public class EtapeCircuit {
 
-	@SerializedName("dateValidation") private Date mDateValidation;
-	@SerializedName("approved") private boolean mIsApproved;
-	@SerializedName("rejected") private boolean mIsRejected;
-	@SerializedName("parapheurName") private String mBureauName;
-	@SerializedName("signataire") private String mSignataire;
-	@SerializedName("actionDemandee") private Action mAction;
-	@SerializedName("annotPub") private String mPublicAnnotation;
+    @SerializedName("dateValidation") private Date dateValidation;
+    @SerializedName("approved") private boolean isApproved;
+    @SerializedName("rejected") private boolean isRejected;
+    @SerializedName("parapheurName") private String bureauName;
+    @SerializedName("signataire") private String signataire;
+    @SerializedName("actionDemandee") private Action action;
+    @SerializedName("annotPub") private String publicAnnotation;
 
-	public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
-						String publicAnnotation) {
 
-		mDateValidation = StringUtils.parseIso8601Date(dateValidation);
-		mIsApproved = isApproved;
-		mIsRejected = isRejected;
-		mBureauName = bureauName;
-		mSignataire = signataire;
-		mAction = (action != null) ? Action.valueOf(action) : Action.VISA;
-		mPublicAnnotation = publicAnnotation;
-	}
+    public EtapeCircuit(String dateValidation, boolean isApproved, boolean isRejected, String bureauName, String signataire, String action,
+                        String publicAnnotation) {
 
-	/**
-	 * Static parser, useful for Unit tests
-	 *
-	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
-	 * @param gson            passed statically to prevent re-creating it.
-	 */
-	public static @Nullable List<EtapeCircuit> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+        this.dateValidation = StringsUtils.parseIso8601Date(dateValidation);
+        this.isApproved = isApproved;
+        this.isRejected = isRejected;
+        this.bureauName = bureauName;
+        this.signataire = signataire;
+        this.action = (action != null) ? Action.valueOf(action) : Action.VISA;
+        this.publicAnnotation = publicAnnotation;
+    }
 
-		Type typologyType = new TypeToken<ArrayList<EtapeCircuit>>() {}.getType();
 
-		try {
-			List<EtapeCircuit> etapeCircuitList = gson.fromJson(jsonArrayString, typologyType);
+    /**
+     * Static parser, useful for Unit tests
+     *
+     * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+     * @param gson            passed statically to prevent re-creating it.
+     */
+    public static @Nullable List<EtapeCircuit> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
-			// Fix default value on parse.
-			// There is no easy way (@annotation) to do it with Gson,
-			// So we're doing it here instead of overriding everything.
-			for (EtapeCircuit etapeCircuit : etapeCircuitList)
-				if (etapeCircuit.getAction() == null)
-					etapeCircuit.setAction(Action.VISA);
+        Type typologyType = new TypeToken<ArrayList<EtapeCircuit>>() {}.getType();
 
-			return etapeCircuitList;
-		}
-		catch (JsonSyntaxException e) {
-			return null;
-		}
-	}
+        try {
+            List<EtapeCircuit> etapeCircuitList = gson.fromJson(jsonArrayString, typologyType);
 
-	// <editor-fold desc="Setters / Getters">
+            // Fix default value on parse.
+            // There is no easy way (@annotation) to do it with Gson,
+            // So we're doing it here instead of overriding everything.
+            for (EtapeCircuit etapeCircuit : etapeCircuitList)
+                if (etapeCircuit.getAction() == null)
+                    etapeCircuit.setAction(Action.VISA);
 
-	public Date getDateValidation() {
-		return mDateValidation;
-	}
+            return etapeCircuitList;
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
+    }
 
-	public boolean isApproved() {
-		return mIsApproved;
-	}
-
-	public boolean isRejected() {
-		return mIsRejected;
-	}
-
-	public String getBureauName() {
-		return mBureauName;
-	}
-
-	public String getSignataire() {
-		return mSignataire;
-	}
-
-	public Action getAction() {
-		return mAction;
-	}
-
-	public void setAction(Action action) {
-		mAction = action;
-	}
-
-	// </editor-fold desc="Setters / Getters">
-
-	@Override public String toString() {
-		return "{EtapeCircuit dateValidation=" + mDateValidation + " isApproved=" + mIsApproved + " isRejected=" + mIsRejected + //
-				" bureauName=" + mBureauName + " signataire=" + mSignataire + " action=" + mAction + " publicAnnot=" + mPublicAnnotation + "}";
-	}
 }

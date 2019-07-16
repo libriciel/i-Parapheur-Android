@@ -62,7 +62,7 @@ import org.adullact.iparapheur.utils.DossierUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.LoadingTask;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.adullact.iparapheur.utils.ViewUtils;
 
 import java.io.File;
@@ -606,7 +606,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                 muPdfAnnotation.getAuthor(),
                 getCurrentPage(),
                 (boolean) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_IS_SECRETAIRE, false),
-                StringUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
+                StringsUtils.serializeToIso8601Date(muPdfAnnotation.getDate()),
                 ViewUtils.translateDpiRect(muPdfAnnotation.getRect(), 144, 150),
                 muPdfAnnotation.getText(),
                 (String) CollectionUtils.opt(muPdfAnnotation.getPayload(), ANNOTATION_PAYLOAD_TYPE, "rect"),
@@ -650,7 +650,7 @@ public class DossierDetailFragment extends MuPDFFragment implements LoadingTask.
                         annotation.getText(),
                         annotation.getAuthor(),
                         null,
-                        StringUtils.parseIso8601Date(annotation.getDate()),
+                        StringsUtils.parseIso8601Date(annotation.getDate()),
                         isLocked,
                         payload
                 ));
