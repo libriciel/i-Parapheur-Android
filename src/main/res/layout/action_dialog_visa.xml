@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:divider="@drawable/spacer"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:showDividers="middle">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/action_visa_public_annotation_label"
@@ -18,7 +19,7 @@
             android:layout_height="match_parent"
             android:text="@string/public_annotation"
             android:textColor="@color/edittext_label_activable"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/action_visa_public_annotation"
@@ -30,7 +31,7 @@
             android:lines="4"
             android:textColor="@color/text_black"
             android:textColorHint="@color/text_black_disabled"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -38,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:baselineAligned="true"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/action_visa_private_annotation_label"
@@ -46,7 +47,7 @@
             android:layout_height="match_parent"
             android:text="@string/private_annotation"
             android:textColor="@color/edittext_label_activable"
-            android:textSize="12sp"/>
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/action_visa_private_annotation"
@@ -58,7 +59,7 @@
             android:lines="4"
             android:textColor="@color/text_black"
             android:textColorHint="@color/text_black_disabled"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

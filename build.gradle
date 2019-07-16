@@ -57,7 +57,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    // Every muPDF lib build is quite heavy. Some day, we might want to reduce the app size, splitting it in 4.
+    // Every muPDF lib build is quite heavy. Some day, we might want to rgeduce the app size, splitting it in 4.
     // But it will be more complex to deal with the Google Play distribution... Right now we keep the universal APK.
     // splits {
     //    abi {
@@ -103,9 +103,9 @@ android {
     }
 
     buildTypes {
-        release {
+        /*release {
             signingConfig signingConfigs.release
-        }
+        }*/
     }
 }
 
@@ -150,7 +150,7 @@ dependencies {
     implementation 'com.j256.ormlite:ormlite-core:5.0'
     implementation 'com.j256.ormlite:ormlite-android:5.0'
     implementation files('libs/android-sun-jarsign-support-1.1.jar')
-    implementation files('libs/mupdf-android-1.1.0.aar')
+    implementation files('libs/mupdf-android-1.2.0.aar')
     implementation('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true
     }
