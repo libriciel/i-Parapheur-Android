@@ -46,9 +46,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import coop.adullactprojet.mupdffragment.utils.StringUtils;
+
 
 @SuppressWarnings("unused")
-public class StringUtils extends coop.adullactprojet.mupdffragment.utils.StringUtils {
+public class StringsUtils extends StringUtils {
 
 
     private static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";

@@ -73,9 +73,9 @@ public class SerializableSparseArrayTest {
         Assert.assertNotNull(deserializedSparseArray);
         Assert.assertNull(deserializedSparseArray.get(0));
         Assert.assertNull(deserializedSparseArray.get(1));
-        Assert.assertEquals(deserializedSparseArray.get(3), "");
-        Assert.assertEquals(deserializedSparseArray.get(4), "Test4");
-        Assert.assertEquals(deserializedSparseArray.get(5), "Test5");
+        Assert.assertEquals("", deserializedSparseArray.get(3));
+        Assert.assertEquals("Test4", deserializedSparseArray.get(4));
+        Assert.assertEquals("Test5", deserializedSparseArray.get(5));
     }
 
 }

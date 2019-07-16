@@ -86,7 +86,7 @@ public class DatabaseHelperTest {
         Account demoAccount = sDbHelper.getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, AccountUtils.DEMO_ID).query().get(0);
         Assert.assertNotNull(demoAccount);
         sDbHelper.getAccountDao().delete(demoAccount);
-        Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 0);
+        Assert.assertEquals(0, sDbHelper.getAccountDao().queryForAll().size());
     }
 
 
@@ -99,10 +99,10 @@ public class DatabaseHelperTest {
 
         // Checks
 
-        Assert.assertEquals(accountDao.getTableName(), "Account");
-        Assert.assertEquals(bureauDao.getTableName(), "Desk");
-        Assert.assertEquals(dossierDao.getTableName(), "Folder");
-        Assert.assertEquals(documentDao.getTableName(), "Document");
+        Assert.assertEquals("Account", accountDao.getTableName());
+        Assert.assertEquals("Desk", bureauDao.getTableName());
+        Assert.assertEquals("Folder", dossierDao.getTableName());
+        Assert.assertEquals("Document", documentDao.getTableName());
     }
 
 
@@ -120,10 +120,10 @@ public class DatabaseHelperTest {
 
         // Checks
 
-        Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 3);
+        Assert.assertEquals(3, sDbHelper.getAccountDao().queryForAll().size());
 
-        Assert.assertEquals(account01db.getApiVersion(), account01.getApiVersion());
-        Assert.assertEquals(account02db.getApiVersion(), account02.getApiVersion());
+        Assert.assertEquals(account01.getApiVersion(), account01db.getApiVersion());
+        Assert.assertEquals(account02.getApiVersion(), account02db.getApiVersion());
         Assert.assertNull(account03db.getApiVersion());
     }
 
@@ -149,19 +149,19 @@ public class DatabaseHelperTest {
 
         // Checks
 
-        Assert.assertEquals(sDbHelper.getBureauDao().queryForAll().size(), 3);
+        Assert.assertEquals(3, sDbHelper.getBureauDao().queryForAll().size());
 
-        Assert.assertEquals(bureau01db.getTitle(), bureau01.getTitle());
-        Assert.assertEquals(bureau02db.getTitle(), bureau02.getTitle());
-        Assert.assertEquals(bureau03db.getTitle(), "");
+        Assert.assertEquals(bureau01.getTitle(), bureau01db.getTitle());
+        Assert.assertEquals(bureau02.getTitle(), bureau02db.getTitle());
+        Assert.assertEquals("", bureau03db.getTitle());
 
         sDbHelper.getAccountDao().update(account01);
         sDbHelper.getAccountDao().update(account02);
         sDbHelper.getAccountDao().update(account03);
 
-        Assert.assertEquals(account01.getChildrenBureaux().size(), 2);
-        Assert.assertEquals(account02.getChildrenBureaux().size(), 1);
-        Assert.assertEquals(account03.getChildrenBureaux().size(), 0);
+        Assert.assertEquals(2, account01.getChildrenBureaux().size());
+        Assert.assertEquals(1, account02.getChildrenBureaux().size());
+        Assert.assertEquals(0, account03.getChildrenBureaux().size());
     }
 
 
@@ -202,28 +202,28 @@ public class DatabaseHelperTest {
 
         // Checks
 
-        Assert.assertEquals(sDbHelper.getDossierDao().queryForAll().size(), 3);
+        Assert.assertEquals(3, sDbHelper.getDossierDao().queryForAll().size());
 
-        Assert.assertEquals(dossier01db.getName(), dossier01.getName());
-        Assert.assertEquals(dossier02db.getName(), dossier02.getName());
-        Assert.assertEquals(dossier03db.getName(), "");
-        Assert.assertEquals(dossier01db.getActionDemandee(), dossier01.getActionDemandee());
-        Assert.assertEquals(dossier02db.getActionDemandee(), dossier02.getActionDemandee());
-        Assert.assertEquals(dossier03db.getActionDemandee(), VISA);
-        Assert.assertEquals(dossier01db.getActions(), dossier01.getActions());
-        Assert.assertEquals(dossier02db.getActions(), dossier02.getActions());
-        Assert.assertEquals(dossier03db.getActions(), dossier03.getActions());
-        Assert.assertEquals(dossier01db.getDateCreation(), dossier01.getDateCreation());
-        Assert.assertEquals(dossier02db.getDateCreation(), dossier02.getDateCreation());
-        Assert.assertEquals(dossier03db.getDateCreation(), dossier03.getDateCreation());
+        Assert.assertEquals(dossier01.getName(), dossier01db.getName());
+        Assert.assertEquals(dossier02.getName(), dossier02db.getName());
+        Assert.assertEquals("", dossier03db.getName());
+        Assert.assertEquals(dossier01.getActionDemandee(), dossier01db.getActionDemandee());
+        Assert.assertEquals(dossier02.getActionDemandee(), dossier02db.getActionDemandee());
+        Assert.assertEquals(VISA, dossier03db.getActionDemandee());
+        Assert.assertEquals(dossier01.getActions(), dossier01db.getActions());
+        Assert.assertEquals(dossier02.getActions(), dossier02db.getActions());
+        Assert.assertEquals(dossier03.getActions(), dossier03db.getActions());
+        Assert.assertEquals(dossier01.getDateCreation(), dossier01db.getDateCreation());
+        Assert.assertEquals(dossier02.getDateCreation(), dossier02db.getDateCreation());
+        Assert.assertEquals(dossier03.getDateCreation(), dossier03db.getDateCreation());
 
         sDbHelper.getBureauDao().update(bureau01);
         sDbHelper.getBureauDao().update(bureau02);
         sDbHelper.getBureauDao().update(bureau03);
 
-        Assert.assertEquals(bureau01.getChildrenDossiers().size(), 2);
-        Assert.assertEquals(bureau02.getChildrenDossiers().size(), 1);
-        Assert.assertEquals(bureau03.getChildrenDossiers().size(), 0);
+        Assert.assertEquals(2, bureau01.getChildrenDossiers().size());
+        Assert.assertEquals(1, bureau02.getChildrenDossiers().size());
+        Assert.assertEquals(0, bureau03.getChildrenDossiers().size());
     }
 
 
@@ -262,22 +262,22 @@ public class DatabaseHelperTest {
 
         // Checks
 
-        Assert.assertEquals(sDbHelper.getDocumentDao().queryForAll().size(), 3);
+        Assert.assertEquals(3, sDbHelper.getDocumentDao().queryForAll().size());
 
-        Assert.assertEquals(document01db.getName(), document01.getName());
-        Assert.assertEquals(document02db.getName(), document02.getName());
-        Assert.assertEquals(document03db.getName(), "");
-        Assert.assertEquals(String.valueOf(document01db.getPagesAnnotations()), String.valueOf(document01.getPagesAnnotations()));
-        Assert.assertEquals(String.valueOf(document02db.getPagesAnnotations()), String.valueOf(document02.getPagesAnnotations()));
-        Assert.assertEquals(String.valueOf(document03db.getPagesAnnotations()), String.valueOf(document03.getPagesAnnotations()));
+        Assert.assertEquals(document01.getName(), document01db.getName());
+        Assert.assertEquals(document02.getName(), document02db.getName());
+        Assert.assertEquals("", document03db.getName());
+        Assert.assertEquals(String.valueOf(document01.getPagesAnnotations()), String.valueOf(document01db.getPagesAnnotations()));
+        Assert.assertEquals(String.valueOf(document02.getPagesAnnotations()), String.valueOf(document02db.getPagesAnnotations()));
+        Assert.assertEquals(String.valueOf(document03.getPagesAnnotations()), String.valueOf(document03db.getPagesAnnotations()));
 
         sDbHelper.getDossierDao().update(dossier01);
         sDbHelper.getDossierDao().update(dossier02);
         sDbHelper.getDossierDao().update(dossier03);
 
-        Assert.assertEquals(dossier01.getChildrenDocuments().size(), 2);
-        Assert.assertEquals(dossier02.getChildrenDocuments().size(), 1);
-        Assert.assertEquals(dossier03.getChildrenDocuments().size(), 0);
+        Assert.assertEquals(2, dossier01.getChildrenDocuments().size());
+        Assert.assertEquals(1, dossier02.getChildrenDocuments().size());
+        Assert.assertEquals(0, dossier03.getChildrenDocuments().size());
     }
 
 
@@ -303,14 +303,14 @@ public class DatabaseHelperTest {
 
         // Check DB
 
-        Assert.assertEquals(myAccounts.getAccounts(context).size(), 1);
-        Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 3);
+        Assert.assertEquals(1, myAccounts.getAccounts(context).size());
+        Assert.assertEquals(3, sDbHelper.getAccountDao().queryForAll().size());
 
         sDbHelper.retrieveLegacyAccounts(InstrumentationRegistry.getTargetContext());
 
         myAccounts.onSharedPreferenceChanged(getDefaultSharedPreferences(context), "account_");
-        Assert.assertEquals(myAccounts.getAccounts(context).size(), 0);
-        Assert.assertEquals(sDbHelper.getAccountDao().queryForAll().size(), 4);
+        Assert.assertEquals(0, myAccounts.getAccounts(context).size());
+        Assert.assertEquals(4, sDbHelper.getAccountDao().queryForAll().size());
 
         // Check Account
 

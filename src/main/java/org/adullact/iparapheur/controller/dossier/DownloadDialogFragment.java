@@ -59,359 +59,367 @@ import java.util.concurrent.Callable;
 
 public class DownloadDialogFragment extends DialogFragment {
 
-	public static final String FRAGMENT_TAG = "download_dialog_fragment";
+    public static final String FRAGMENT_TAG = "download_dialog_fragment";
 
-	private static final String ARGUMENT_ACCOUNT = "account";
-	private static final String LOG_TAG = "DownloadDialogFragment";
+    private static final String ARGUMENT_ACCOUNT = "account";
+    private static final String LOG_TAG = "DownloadDialogFragment";
 
-	private ProgressBar mBureauProgressBar;
-	private ProgressBar mDossierProgressBar;
-	private ProgressBar mDocumentProgressBar;
-	private TextView mBureauProgressTextView;
-	private TextView mDossierProgressTextView;
-	private TextView mDocumentProgressTextView;
+    private ProgressBar mBureauProgressBar;
+    private ProgressBar mDossierProgressBar;
+    private ProgressBar mDocumentProgressBar;
+    private TextView mBureauProgressTextView;
+    private TextView mDossierProgressTextView;
+    private TextView mDocumentProgressTextView;
 
-	private Account mAccount;
-	private DownloadTask mPendingTask;
+    private Account mAccount;
+    private DownloadTask mPendingTask;
 
-	public static DownloadDialogFragment newInstance(@NonNull Account account) {
 
-		Gson gson = new Gson();
-		String data = gson.toJson(account);
+    public static DownloadDialogFragment newInstance(@NonNull Account account) {
 
-		DownloadDialogFragment fragment = new DownloadDialogFragment();
+        Gson gson = new Gson();
+        String data = gson.toJson(account);
 
-		Bundle args = new Bundle();
-		args.putString(ARGUMENT_ACCOUNT, data);
-		fragment.setArguments(args);
+        DownloadDialogFragment fragment = new DownloadDialogFragment();
 
-		return fragment;
-	}
+        Bundle args = new Bundle();
+        args.putString(ARGUMENT_ACCOUNT, data);
+        fragment.setArguments(args);
 
-	// <editor-fold desc="LifeCycle">
+        return fragment;
+    }
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
-		if (getArguments() != null) {
+    // <editor-fold desc="LifeCycle">
 
-			Gson gson = new Gson();
-			String data = getArguments().getString(ARGUMENT_ACCOUNT);
-			mAccount = gson.fromJson(data, Account.class);
-		}
-	}
 
-	@Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// Create view
+        if (getArguments() != null) {
 
-		View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_download, null);
+            Gson gson = new Gson();
+            String data = getArguments().getString(ARGUMENT_ACCOUNT);
+            mAccount = gson.fromJson(data, Account.class);
+        }
+    }
 
-		mBureauProgressBar = (ProgressBar) view.findViewById(R.id.action_download_bureau_progressbar);
-		mDossierProgressBar = (ProgressBar) view.findViewById(R.id.action_download_dossier_progressbar);
-		mDocumentProgressBar = (ProgressBar) view.findViewById(R.id.action_download_document_progressbar);
 
-		mBureauProgressTextView = (TextView) view.findViewById(R.id.action_download_bureau_progress_textview);
-		mDossierProgressTextView = (TextView) view.findViewById(R.id.action_download_dossier_progress_textview);
-		mDocumentProgressTextView = (TextView) view.findViewById(R.id.action_download_document_progress_textview);
+    @Override public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
 
-		// Build Dialog
+        // Create view
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
-		builder.setTitle(getString(R.string.Offline_content));
-		builder.setView(view);
-		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				onCancelButtonClicked();
-			}
-		});
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.action_download, null);
 
-		return builder.create();
-	}
+        mBureauProgressBar = view.findViewById(R.id.action_download_bureau_progressbar);
+        mDossierProgressBar = view.findViewById(R.id.action_download_dossier_progressbar);
+        mDocumentProgressBar = view.findViewById(R.id.action_download_document_progressbar);
 
-	@Override public void onResume() {
-		super.onResume();
+        mBureauProgressTextView = view.findViewById(R.id.action_download_bureau_progress_textview);
+        mDossierProgressTextView = view.findViewById(R.id.action_download_dossier_progress_textview);
+        mDocumentProgressTextView = view.findViewById(R.id.action_download_document_progress_textview);
 
-		mPendingTask = new DownloadTask();
-		mPendingTask.execute(mAccount);
-	}
+        // Build Dialog
 
-	// </editor-fold desc="LifeCycle">
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
+        builder.setTitle(getString(R.string.Offline_content));
+        builder.setView(view);
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                onCancelButtonClicked();
+            }
+        });
 
-	private void onCancelButtonClicked() {
+        return builder.create();
+    }
 
-		if (mPendingTask != null)
-			mPendingTask.cancel(false);
 
-		dismissAllowingStateLoss();
-	}
+    @Override public void onResume() {
+        super.onResume();
 
-	private class DownloadTask extends AsyncTask<Account, Long, IParapheurException> {
+        mPendingTask = new DownloadTask();
+        mPendingTask.execute(mAccount);
+    }
 
-		private final Long STEP_BUREAUX_METADATA = 0L;
-		private final Long STEP_DOSSIERS_METADATA = 1L;
-		private final Long STEP_DOCUMENT_FILES = 2L;
-		private Account mCurrentAccount;
 
-		@Override protected IParapheurException doInBackground(Account... accounts) {
+    // </editor-fold desc="LifeCycle">
 
-			final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-			final List<Bureau> bureauxList = new ArrayList<>();
 
-			// yes, this method does a little bit of Thread pausing.
-			// It may feel weird, but it bring a way better feeling on download,
-			// and this AsyncTask is not on the UI thread anyway.
-			//
-			// If we're dealing with a fast connection, and an almost empty Parapheur,
-			// The popup will flash for a fraction of second.
-			// Those delays are indeed loosing 1.5 second per thread,
-			// but make the UI way more smooth.
-			//
-			// Trust me, I'm an engineer, keep those.
+    private void onCancelButtonClicked() {
 
-			// UI tuning
-			publishProgress(STEP_BUREAUX_METADATA, 0L, 100L);
-			try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+        if (mPendingTask != null)
+            mPendingTask.cancel(false);
 
-			// Refresh DB Account
+        dismissAllowingStateLoss();
+    }
 
-			if (accounts == null || accounts.length == 0)
-				return null;
 
-			try {
-				Account deserializedAccount = accounts[0];
+    private class DownloadTask extends AsyncTask<Account, Long, IParapheurException> {
 
-				Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
-				List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, deserializedAccount.getId()).query();
+        private final Long STEP_BUREAUX_METADATA = 0L;
+        private final Long STEP_DOSSIERS_METADATA = 1L;
+        private final Long STEP_DOCUMENT_FILES = 2L;
+        private Account mCurrentAccount;
 
-				if (fetchedAccountList.isEmpty())
-					return null;
 
-				mCurrentAccount = fetchedAccountList.get(0);
-			}
-			catch (SQLException e) { e.printStackTrace(); }
+        @SuppressWarnings({"squid:S2142", "squid:S899"})
+        @Override protected IParapheurException doInBackground(Account... accounts) {
 
-			if (mCurrentAccount == null)
-				return null;
+            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+            final List<Bureau> bureauxList = new ArrayList<>();
 
-			// Updating Bureaux
+            // yes, this method does a little bit of Thread pausing.
+            // It may feel weird, but it brings a way better feeling on download,
+            // and this AsyncTask is not on the UI thread anyway.
+            //
+            // If we're dealing with a fast connection, and an almost empty Parapheur,
+            // The popup will flash for a fraction of second.
+            // Those delays are indeed loosing 1.5 second per thread,
+            // but make the UI way more smooth.
+            //
+            // Trust me, I'm an engineer, keep those.
 
-			try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); }
-			catch (final IParapheurException exception) { return exception; }
+            // UI tuning
+            publishProgress(STEP_BUREAUX_METADATA, 0L, 100L);
+            try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
 
-			final ArrayList<Dossier> dossierList = new ArrayList<>();
-			List<Dossier> incompleteDossierList = new ArrayList<>();
-			final List<Document> finalDocumentList = new ArrayList<>();
+            // Refresh DB Account
 
-			Long totalBureauxMetadataSize = (long) bureauxList.size();
-			Long progressBureauxMetadataSize = 0L;
+            if (accounts == null || accounts.length == 0)
+                return null;
 
-			for (Bureau bureau : bureauxList) {
-				bureau.setParent(mCurrentAccount);
+            try {
+                Account deserializedAccount = accounts[0];
 
-				Bureau parent = BureauUtils.findInList(bureauxList, bureau.getId());
+                Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
+                List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, deserializedAccount.getId()).query();
 
-				try {
-					List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(mCurrentAccount, bureau.getId(), null);
-					for (Dossier dossier : incompleteDossierTempList)
-						dossier.setParent(parent);
+                if (fetchedAccountList.isEmpty())
+                    return null;
 
-					incompleteDossierList.addAll(incompleteDossierTempList);
-				}
-				catch (IParapheurException e) { e.printStackTrace(); }
+                mCurrentAccount = fetchedAccountList.get(0);
+            } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-				progressBureauxMetadataSize++;
-				publishProgress(STEP_BUREAUX_METADATA, progressBureauxMetadataSize, totalBureauxMetadataSize);
+            if (mCurrentAccount == null)
+                return null;
 
-				if (isCancelled())
-					return new IParapheurException(-1, "Annulation");
-			}
+            // Updating Bureaux
 
-			// UI tuning
-			publishProgress(STEP_BUREAUX_METADATA, 100L, 100L);
-			publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
-			try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
+            try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); } catch (final IParapheurException exception) { return exception; }
 
-			// Updating Dossiers
+            final ArrayList<Dossier> dossierList = new ArrayList<>();
+            List<Dossier> incompleteDossierList = new ArrayList<>();
+            final List<Document> finalDocumentList = new ArrayList<>();
 
-			Long totalDossiersMetadataSize = (long) incompleteDossierList.size();
-			Long progressDossiersMetadataSize = 0L;
+            Long totalBureauxMetadataSize = (long) bureauxList.size();
+            Long progressBureauxMetadataSize = 0L;
 
-			for (Dossier incompleteDossier : incompleteDossierList) {
+            for (Bureau bureau : bureauxList) {
+                bureau.setParent(mCurrentAccount);
 
-				try {
-					Dossier fullDossier = RESTClient.INSTANCE.getDossier(mCurrentAccount, incompleteDossier.getParent().getId(), incompleteDossier.getId());
+                Bureau parent = BureauUtils.findInList(bureauxList, bureau.getId());
 
-					try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mCurrentAccount, incompleteDossier.getId())); }
-					catch (IParapheurException e) { e.printStackTrace(); }
+                try {
+                    List<Dossier> incompleteDossierTempList = RESTClient.INSTANCE.getDossiers(mCurrentAccount, bureau.getId(), null);
+                    for (Dossier dossier : incompleteDossierTempList)
+                        dossier.setParent(parent);
 
-					fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId()));
-					dossierList.add(fullDossier);
+                    incompleteDossierList.addAll(incompleteDossierTempList);
+                } catch (IParapheurException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-					for (Document document : fullDossier.getDocumentList()) {
-						document.setParent(fullDossier);
+                progressBureauxMetadataSize++;
+                publishProgress(STEP_BUREAUX_METADATA, progressBureauxMetadataSize, totalBureauxMetadataSize);
 
-						if (DocumentUtils.isMainDocument(fullDossier, document)) {
-							SerializableSparseArray<PageAnnotations> annotations;
-							annotations = RESTClient.INSTANCE.getAnnotations(mCurrentAccount, fullDossier.getId(), document.getId());
-							document.setPagesAnnotations(annotations);
-						}
+                if (isCancelled())
+                    return new IParapheurException(-1, "Annulation");
+            }
 
-						finalDocumentList.add(document);
+            // UI tuning
+            publishProgress(STEP_BUREAUX_METADATA, 100L, 100L);
+            publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
+            try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
-						if (isCancelled())
-							return new IParapheurException(-1, "Annulation");
-					}
-				}
-				catch (IParapheurException e) { e.printStackTrace(); }
+            // Updating Dossiers
 
-				progressDossiersMetadataSize++;
-				publishProgress(STEP_DOSSIERS_METADATA, progressDossiersMetadataSize, totalDossiersMetadataSize);
-			}
+            Long totalDossiersMetadataSize = (long) incompleteDossierList.size();
+            Long progressDossiersMetadataSize = 0L;
 
-			// Cleanup and save in database
+            for (Dossier incompleteDossier : incompleteDossierList) {
 
-			try {
+                try {
+                    Dossier fullDossier = RESTClient.INSTANCE.getDossier(mCurrentAccount, incompleteDossier.getParent().getId(), incompleteDossier.getId());
 
-				final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-				final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
-				final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
+                    try { fullDossier.setCircuit(RESTClient.INSTANCE.getCircuit(mCurrentAccount, incompleteDossier.getId())); } catch (IParapheurException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                    }
 
-				// Retrieve cascade deletable content
+                    fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId()));
+                    dossierList.add(fullDossier);
 
-				final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(mCurrentAccount, bureauxList);
+                    for (Document document : fullDossier.getDocumentList()) {
+                        document.setParent(fullDossier);
 
-				final List<Dossier> dossierToDeleteList = new ArrayList<>();
-				dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
-				dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
+                        if (DocumentUtils.isMainDocument(fullDossier, document)) {
+                            SerializableSparseArray<PageAnnotations> annotations;
+                            annotations = RESTClient.INSTANCE.getAnnotations(mCurrentAccount, fullDossier.getId(), document.getId());
+                            document.setPagesAnnotations(annotations);
+                        }
 
-				final List<Document> documentToDeleteList = new ArrayList<>();
-				documentToDeleteList.addAll(DocumentUtils.getAllChildrenFrom(dossierToDeleteList));
-				documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(dossierList, finalDocumentList));
+                        finalDocumentList.add(document);
 
-				// Delete
+                        if (isCancelled())
+                            return new IParapheurException(-1, "Annulation");
+                    }
+                } catch (IParapheurException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-				Log.d(LOG_TAG, "delete Bureaux   : " + bureauToDeleteList);
-				Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
-				Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
+                progressDossiersMetadataSize++;
+                publishProgress(STEP_DOSSIERS_METADATA, progressDossiersMetadataSize, totalDossiersMetadataSize);
+            }
 
-				dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
-					@Override public Void call() throws Exception {
+            // Cleanup and save in database
 
-						documentDao.delete(documentToDeleteList);
-						dossierDao.delete(dossierToDeleteList);
-						bureauDao.delete(bureauToDeleteList);
+            try {
 
-						// Create
+                final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
+                final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+                final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
 
-						for (Bureau bureau : bureauxList) {
-							bureau.setSyncDate(new Date());
-							bureauDao.createOrUpdate(bureau);
-						}
+                // Retrieve cascade deletable content
 
-						for (Dossier dossier : dossierList) {
-							dossier.setSyncDate(new Date());
-							dossierDao.createOrUpdate(dossier);
-						}
+                final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(mCurrentAccount, bureauxList);
 
-						for (Document document : finalDocumentList) {
-							document.setSyncDate(new Date());
-							documentDao.createOrUpdate(document);
-						}
+                final List<Dossier> dossierToDeleteList = new ArrayList<>();
+                dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
+                dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
 
-						return null;
-					}
-				});
+                final List<Document> documentToDeleteList = new ArrayList<>();
+                documentToDeleteList.addAll(DocumentUtils.getAllChildrenFrom(dossierToDeleteList));
+                documentToDeleteList.addAll(DocumentUtils.getDeletableDossierList(dossierList, finalDocumentList));
 
-				// Cleanup files
+                // Delete
 
-				for (Document documentToDelete : documentToDeleteList)
-					//noinspection ResultOfMethodCallIgnored
-					DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
+                Log.d(LOG_TAG, "delete Bureaux   : " + bureauToDeleteList);
+                Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+                Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
-				for (Dossier dossierToDelete : dossierToDeleteList)
-					//noinspection ResultOfMethodCallIgnored
-					FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
-			}
-			catch (Exception e) { return new IParapheurException(-1, "DB error"); }
+                dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
+                    @Override public Void call() throws Exception {
 
-			// UI tuning
-			publishProgress(STEP_DOSSIERS_METADATA, 100L, 100L);
-			publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
-			try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
+                        documentDao.delete(documentToDeleteList);
+                        dossierDao.delete(dossierToDeleteList);
+                        bureauDao.delete(bureauToDeleteList);
 
-			// Downloading files
+                        // Create
 
-			List<Document> documentsToDld = new ArrayList<>();
-			for (Dossier dossier : dossierList) {
-				documentsToDld.addAll(dossier.getDocumentList());
-			}
+                        for (Bureau bureau : bureauxList) {
+                            bureau.setSyncDate(new Date());
+                            bureauDao.createOrUpdate(bureau);
+                        }
 
-			Long totalDocumentFileSize = 0L;
-			Long progressDocumentFileSize = 0L;
-			for (Document document : documentsToDld)
-				if (document.getSize() > 0)
-					totalDocumentFileSize += document.getSize();
+                        for (Dossier dossier : dossierList) {
+                            dossier.setSyncDate(new Date());
+                            dossierDao.createOrUpdate(dossier);
+                        }
 
-			if (totalDocumentFileSize > FileUtils.getFreeSpace(getActivity()))
-				return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
+                        for (Document document : finalDocumentList) {
+                            document.setSyncDate(new Date());
+                            documentDao.createOrUpdate(document);
+                        }
 
-			for (Document document : documentsToDld) {
-				String downloadUrl = DocumentUtils.generateContentUrl(document);
+                        return null;
+                    }
+                });
 
-				if (!TextUtils.isEmpty(downloadUrl)) {
-					File documentFile = DocumentUtils.getFile(getActivity(), document.getParent(), document);
+                // Cleanup files
 
-					try { RESTClient.INSTANCE.downloadFile(mCurrentAccount, downloadUrl, documentFile.getAbsolutePath()); }
-					catch (IParapheurException e) { e.printStackTrace(); }
+                for (Document documentToDelete : documentToDeleteList)
+                    //noinspection ResultOfMethodCallIgnored
+                    DocumentUtils.getFile(getActivity(), documentToDelete.getParent(), documentToDelete).delete();
 
-					if (document.getSize() > 0)
-						progressDocumentFileSize += document.getSize();
+                for (Dossier dossierToDelete : dossierToDeleteList)
+                    //noinspection ResultOfMethodCallIgnored
+                    FileUtils.getDirectoryForDossier(getActivity(), dossierToDelete).delete();
+            } catch (Exception e) { return new IParapheurException(-1, "DB error"); }
 
-					publishProgress(STEP_DOCUMENT_FILES, progressDocumentFileSize, totalDocumentFileSize);
+            // UI tuning
+            publishProgress(STEP_DOSSIERS_METADATA, 100L, 100L);
+            publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
+            try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
-					if (isCancelled())
-						return new IParapheurException(-1, "Annulation");
-				}
-			}
+            // Downloading files
 
-			// UI tuning
-			publishProgress(STEP_DOCUMENT_FILES, 100L, 100L);
-			try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+            List<Document> documentsToDld = new ArrayList<>();
+            for (Dossier dossier : dossierList) {
+                documentsToDld.addAll(dossier.getDocumentList());
+            }
 
-			return null;
-		}
+            Long totalDocumentFileSize = 0L;
+            Long progressDocumentFileSize = 0L;
+            for (Document document : documentsToDld)
+                if (document.getSize() > 0)
+                    totalDocumentFileSize += document.getSize();
 
-		@Override protected void onProgressUpdate(Long... values) {
-			super.onProgressUpdate(values);
+            if (totalDocumentFileSize > FileUtils.getFreeSpace(getActivity()))
+                return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
 
-			if ((values.length == 3) && (values[2] != 0)) {
+            for (Document document : documentsToDld) {
+                String downloadUrl = DocumentUtils.generateContentUrl(document);
 
-				int progressPercent = (int) (values[1] * 100 / values[2]);
+                if (!TextUtils.isEmpty(downloadUrl)) {
+                    File documentFile = DocumentUtils.getFile(getActivity(), document.getParent(), document);
 
-				if (values[0].equals(STEP_BUREAUX_METADATA)) {
-					mBureauProgressBar.setProgress(progressPercent);
-					mBureauProgressTextView.setText("" + progressPercent + "%");
-				}
-				else if (values[0].equals(STEP_DOSSIERS_METADATA)) {
-					mDossierProgressBar.setProgress(progressPercent);
-					mDossierProgressTextView.setText("" + progressPercent + "%");
-				}
-				else if (values[0].equals(STEP_DOCUMENT_FILES)) {
-					mDocumentProgressBar.setProgress(progressPercent);
-					mDocumentProgressTextView.setText("" + progressPercent + "%");
-				}
-			}
-		}
+                    try { RESTClient.INSTANCE.downloadFile(mCurrentAccount, downloadUrl, documentFile.getAbsolutePath()); } catch (IParapheurException e) {
+                        Log.e(LOG_TAG, e.getLocalizedMessage());
+                    }
 
-		@Override protected void onPostExecute(IParapheurException e) {
-			super.onPostExecute(e);
+                    if (document.getSize() > 0)
+                        progressDocumentFileSize += document.getSize();
 
-			if (e != null)
-				Log.e("", "" + e.getComplement());
-			else
-				dismissAllowingStateLoss();
-		}
-	}
+                    publishProgress(STEP_DOCUMENT_FILES, progressDocumentFileSize, totalDocumentFileSize);
+
+                    if (isCancelled())
+                        return new IParapheurException(-1, "Annulation");
+                }
+            }
+
+            // UI tuning
+            publishProgress(STEP_DOCUMENT_FILES, 100L, 100L);
+            try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+
+            return null;
+        }
+
+
+        @Override protected void onProgressUpdate(Long... values) {
+            super.onProgressUpdate(values);
+
+            if ((values.length == 3) && (values[2] != 0)) {
+
+                int progressPercent = (int) (values[1] * 100 / values[2]);
+
+                if (values[0].equals(STEP_BUREAUX_METADATA)) {
+                    mBureauProgressBar.setProgress(progressPercent);
+                    mBureauProgressTextView.setText("" + progressPercent + "%");
+                } else if (values[0].equals(STEP_DOSSIERS_METADATA)) {
+                    mDossierProgressBar.setProgress(progressPercent);
+                    mDossierProgressTextView.setText("" + progressPercent + "%");
+                } else if (values[0].equals(STEP_DOCUMENT_FILES)) {
+                    mDocumentProgressBar.setProgress(progressPercent);
+                    mDocumentProgressTextView.setText("" + progressPercent + "%");
+                }
+            }
+        }
+
+
+        @Override protected void onPostExecute(IParapheurException e) {
+            super.onPostExecute(e);
+
+            if (e != null)
+                Log.e("", "" + e.getComplement());
+            else
+                dismissAllowingStateLoss();
+        }
+
+    }
 
 }

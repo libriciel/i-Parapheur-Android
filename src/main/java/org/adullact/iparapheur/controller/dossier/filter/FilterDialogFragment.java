@@ -46,7 +46,7 @@ import org.adullact.iparapheur.controller.preferences.ChooseFilterNameDialogFrag
 import org.adullact.iparapheur.model.Filter;
 import org.adullact.iparapheur.model.ParapheurType;
 import org.adullact.iparapheur.model.State;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -153,9 +153,9 @@ public class FilterDialogFragment extends DialogFragment {
 
 		View content = View.inflate(getActivity(), R.layout.filter_dialog_fragment, null);
 
-		mTitleText = (EditText) content.findViewById(R.id.filter_dialog_titre);
-		mStateSpinner = (Spinner) content.findViewById(R.id.filter_dialog_state_spinner);
-		mTypologyListView = (ExpandableListView) content.findViewById(R.id.filter_dialog_typology);
+		mTitleText = content.findViewById(R.id.filter_dialog_titre);
+		mStateSpinner = content.findViewById(R.id.filter_dialog_state_spinner);
+		mTypologyListView = content.findViewById(R.id.filter_dialog_typology);
 		View label = content.findViewById(R.id.filter_dialog_titre_label);
 
 		// Inflate values
@@ -334,8 +334,8 @@ public class FilterDialogFragment extends DialogFragment {
 			View content = super.getGroupView(groupPosition, isExpanded, convertView, parent);
 
 			View checkboxIndeterminate = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox_indeterminate);
-			CheckBox checkbox = (CheckBox) content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox);
-			Boolean isChecked = StringUtils.nullableBooleanValueOf(mTypologyListGroupData.get(groupPosition), EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
+			CheckBox checkbox = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_type_checkbox);
+			Boolean isChecked = StringsUtils.nullableBooleanValueOf(mTypologyListGroupData.get(groupPosition), EXPANDABLE_LIST_ADAPTER_IS_CHECKED);
 
 			checkbox.setOnCheckedChangeListener(null);
 			checkbox.setChecked((isChecked != null) && isChecked);
@@ -369,7 +369,7 @@ public class FilterDialogFragment extends DialogFragment {
 		@Override public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View content = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
 
-			CheckBox checkbox = (CheckBox) content.findViewById(R.id.filter_dialog_fragment_expandablelistview_subtype_checkbox);
+			CheckBox checkbox = content.findViewById(R.id.filter_dialog_fragment_expandablelistview_subtype_checkbox);
 			boolean isChecked = Boolean.valueOf(mTypologyListChildData.get(groupPosition).get(childPosition).get(EXPANDABLE_LIST_ADAPTER_IS_CHECKED));
 
 			checkbox.setOnCheckedChangeListener(null);

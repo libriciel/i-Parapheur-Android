@@ -29,191 +29,102 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 @DatabaseTable(tableName = "Account")
 public class Account implements Serializable {
 
-	public static final String DB_FIELD_ID = "Id";
-	private static final String DB_FIELD_TITLE = "Title";
-	private static final String DB_FIELD_BASE_URL = "BaseUrl";
-	private static final String DB_FIELD_LOGIN = "Login";
-	private static final String DB_FIELD_PASSWORD = "Password";
-	private static final String DB_FIELD_USER_FULL_NAME = "UserFullName";
-	private static final String DB_FIELD_TENANT = "Tenant";
-	private static final String DB_FIELD_API_VERSION = "ApiVersion";
-	private static final String DB_FIELD_ACTIVATED = "Activated";
-	private static final String DB_FIELD_LAST_REQUEST = "LastRequest";
-	private static final String DB_FIELD_DESKS = "Desks";
+    public static final String DB_FIELD_ID = "Id";
+    private static final String DB_FIELD_TITLE = "Title";
+    private static final String DB_FIELD_BASE_URL = "BaseUrl";
+    private static final String DB_FIELD_LOGIN = "Login";
+    private static final @SuppressWarnings("squid:S2068") String DB_FIELD_PASSWORD = "Password";
+    private static final String DB_FIELD_USER_FULL_NAME = "UserFullName";
+    private static final String DB_FIELD_TENANT = "Tenant";
+    private static final String DB_FIELD_API_VERSION = "ApiVersion";
+    private static final String DB_FIELD_ACTIVATED = "Activated";
+    private static final String DB_FIELD_LAST_REQUEST = "LastRequest";
+    private static final String DB_FIELD_DESKS = "Desks";
 
-	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
-	private String mId;
+    @DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+    private String id;
 
-	@DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
-	private String mTitle;
+    @DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
+    private String title;
 
-	@DatabaseField(columnName = DB_FIELD_BASE_URL, canBeNull = false, defaultValue = "")  //
-	private String mServerBaseUrl;
+    @DatabaseField(columnName = DB_FIELD_BASE_URL, canBeNull = false, defaultValue = "")  //
+    private String serverBaseUrl;
 
-	@DatabaseField(columnName = DB_FIELD_LOGIN, canBeNull = false, defaultValue = "")  //
-	private String mLogin;
+    @DatabaseField(columnName = DB_FIELD_LOGIN, canBeNull = false, defaultValue = "")  //
+    private String login;
 
-	@DatabaseField(columnName = DB_FIELD_PASSWORD, canBeNull = false, defaultValue = "")  //
-	private String mPassword;
+    @DatabaseField(columnName = DB_FIELD_PASSWORD, canBeNull = false, defaultValue = "")  //
+    private String password;
 
-	@DatabaseField(columnName = DB_FIELD_USER_FULL_NAME)  //
-	private String mUserFullName;
+    @DatabaseField(columnName = DB_FIELD_USER_FULL_NAME)  //
+    private String userFullName;
 
-	@DatabaseField(columnName = DB_FIELD_TENANT)  //
-	private String mTenant;
+    @DatabaseField(columnName = DB_FIELD_TENANT)  //
+    private String tenant;
 
-	@DatabaseField(columnName = DB_FIELD_API_VERSION)  //
-	private Integer mApiVersion;
+    @DatabaseField(columnName = DB_FIELD_API_VERSION)  //
+    private Integer apiVersion;
 
-	@DatabaseField(columnName = DB_FIELD_ACTIVATED)  //
-	private boolean mActivated;
+    @DatabaseField(columnName = DB_FIELD_ACTIVATED)  //
+    private boolean activated;
 
-	@DatabaseField(columnName = DB_FIELD_LAST_REQUEST)  //
-	private Date mLastRequest;
+    @DatabaseField(columnName = DB_FIELD_LAST_REQUEST)  //
+    private Date lastRequest;
 
-	@ForeignCollectionField(columnName = DB_FIELD_DESKS)  //
-	private transient ForeignCollection<Bureau> mChildrenBureaux;
+    @ForeignCollectionField(columnName = DB_FIELD_DESKS)  //
+    private transient ForeignCollection<Bureau> childrenBureaux;
 
-	private String mTicket;
+    private String ticket;
 
-	public Account() {}
 
-	public Account(String id) {
-		mId = id;
-		mTitle = "";
-		mServerBaseUrl = "";
-		mLogin = "";
-		mPassword = "";
-		mTenant = null;
-		mActivated = true;
-	}
+    public Account(String id) {
+        this.id = id;
+        title = "";
+        serverBaseUrl = "";
+        login = "";
+        password = "";
+        tenant = null;
+        activated = true;
+    }
 
-	public Account(@NonNull String id, @NonNull String title, @NonNull String serverBaseUrl, @NonNull String login, @NonNull String password,
-				   @Nullable String tenant, @Nullable Integer apiVersion) {
-		mId = id;
-		mTitle = title;
-		mServerBaseUrl = serverBaseUrl;
-		mLogin = login;
-		mPassword = password;
-		mTenant = tenant;
-		mApiVersion = apiVersion;
-		mActivated = true;
-	}
 
-	// <editor-fold desc="Getters / Setters">
+    public Account(@NonNull String id, @NonNull String title, @NonNull String serverBaseUrl, @NonNull String login, @NonNull String password,
+                   @Nullable String tenant, @Nullable Integer apiVersion) {
+        this.id = id;
+        this.title = title;
+        this.serverBaseUrl = serverBaseUrl;
+        this.login = login;
+        this.password = password;
+        this.tenant = tenant;
+        this.apiVersion = apiVersion;
+        this.activated = true;
+    }
 
-	public @NonNull String getId() {
-		return mId;
-	}
 
-	public @NonNull String getTitle() {
-		return mTitle;
-	}
+    @Override public boolean equals(Object o) {
+        if (o instanceof Account) {
+            Account toCompare = (Account) o;
+            return TextUtils.equals(id, toCompare.id);
+        }
+        return false;
+    }
 
-	public void setTitle(@NonNull String title) {
-		mTitle = title;
-	}
 
-	public @NonNull String getServerBaseUrl() {
-		return mServerBaseUrl;
-	}
-
-	public void setServerBaseUrl(@NonNull String url) {
-		mServerBaseUrl = url;
-	}
-
-	public @NonNull String getLogin() {
-		return mLogin;
-	}
-
-	public void setLogin(@NonNull String login) {
-
-		mLogin = login;
-
-		if (login.contains("@"))
-			mTenant = login.substring(login.indexOf("@") + 1);
-	}
-
-	public @Nullable String getTenant() {
-		return mTenant;
-	}
-
-	public @NonNull String getPassword() {
-		return mPassword;
-	}
-
-	public void setPassword(@NonNull String password) {
-		mPassword = password;
-	}
-
-	public String getUserFullName() {
-		return mUserFullName;
-	}
-
-	public void setUserFullName(String userFullName) {
-		mUserFullName = userFullName;
-	}
-
-	public String getTicket() {
-		return mTicket;
-	}
-
-	public void setTicket(String ticket) {
-		mTicket = ticket;
-	}
-
-	public Integer getApiVersion() {
-		return mApiVersion;
-	}
-
-	public void setApiVersion(Integer apiVersion) {
-		mApiVersion = apiVersion;
-	}
-
-	public boolean isActivated() {
-		return mActivated;
-	}
-
-	public void setActivated(boolean activated) {
-		mActivated = activated;
-	}
-
-	public Date getLastRequest() {
-		return mLastRequest;
-	}
-
-	public void setLastRequest(Date lastRequest) {
-		mLastRequest = lastRequest;
-	}
-
-	public void setChildrenBureaux(ForeignCollection<Bureau> childrenBureaux) {
-		mChildrenBureaux = childrenBureaux;
-	}
-
-	public ForeignCollection<Bureau> getChildrenBureaux() {
-		return mChildrenBureaux;
-	}
-
-	// </editor-fold desc="Getters / Setters">
-
-	@Override public boolean equals(Object o) {
-		if (o instanceof Account) {
-			Account toCompare = (Account) o;
-			return TextUtils.equals(mId, toCompare.mId);
-		}
-		return false;
-	}
-
-	@Override public int hashCode() {
-		return mId.hashCode();
-	}
-
-	@Override public String toString() {
-		return "{Account id:" + mId + " title:" + mTitle + " url:" + mServerBaseUrl + " login:" + mLogin + " pass:" + mPassword + "}";
-	}
+    @Override public int hashCode() {
+        return id.hashCode();
+    }
 
 }

@@ -35,137 +35,101 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@Setter
+@Getter
+@ToString
+@NoArgsConstructor
 @DatabaseTable(tableName = "Desk")
 public class Bureau {
 
-	public static final String DB_FIELD_ID = "Id";
-	private static final String DB_FIELD_TITLE = "Title";
-	private static final String DB_FIELD_TODO = "Todo";
-	private static final String DB_FIELD_LATE = "Late";
-	private static final String DB_FIELD_SYNC = "Sync";
-	private static final String DB_FIELD_ACCOUNT = "Account";
-	private static final String DB_FIELD_FOLDERS = "Folders";
+    public static final String DB_FIELD_ID = "Id";
+    private static final String DB_FIELD_TITLE = "Title";
+    private static final String DB_FIELD_TODO = "Todo";
+    private static final String DB_FIELD_LATE = "Late";
+    private static final String DB_FIELD_SYNC = "Sync";
+    private static final String DB_FIELD_ACCOUNT = "Account";
+    private static final String DB_FIELD_FOLDERS = "Folders";
 
-	@DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
-	@SerializedName(value = "id", alternate = {"nodeRef"})  //
-	private String mId;
 
-	@DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
-	@SerializedName("name")  //
-	private String mTitle;
+    @DatabaseField(columnName = DB_FIELD_ID, id = true, index = true)  //
+    @SerializedName(value = "id", alternate = {"nodeRef"})  //
+    private String id;
 
-	@DatabaseField(columnName = DB_FIELD_TODO, defaultValue = "0")  //
-	@SerializedName("a-traiter") //
-	private int mTodoCount;
+    @DatabaseField(columnName = DB_FIELD_TITLE, canBeNull = false, defaultValue = "")  //
+    @SerializedName("name")  //
+    private String title;
 
-	@DatabaseField(columnName = DB_FIELD_LATE, defaultValue = "0")  //
-	@SerializedName("en-retard")  //
-	private int mLateCount;
+    @DatabaseField(columnName = DB_FIELD_TODO, defaultValue = "0")  //
+    @SerializedName("a-traiter") //
+    private int todoCount;
 
-	@DatabaseField(columnName = DB_FIELD_SYNC)  //
-	private Date mSyncDate;
+    @DatabaseField(columnName = DB_FIELD_LATE, defaultValue = "0")  //
+    @SerializedName("en-retard")  //
+    private int lateCount;
 
-	@DatabaseField(columnName = DB_FIELD_ACCOUNT, foreign = true, foreignAutoRefresh = true)  //
-	private transient Account mParent;
+    @DatabaseField(columnName = DB_FIELD_SYNC)  //
+    private Date syncDate;
 
-	@ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
-	private transient ForeignCollection<Dossier> mChildrenDossiers;
+    @DatabaseField(columnName = DB_FIELD_ACCOUNT, foreign = true, foreignAutoRefresh = true)  //
+    private transient Account parent;
 
-	/**
-	 * Static parser, useful for Unit tests
-	 *
-	 * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
-	 * @param gson            passed statically to prevent re-creating it.
-	 */
-	public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
+    @ForeignCollectionField(columnName = DB_FIELD_FOLDERS)  //
+    private transient ForeignCollection<Dossier> childrenDossiers;
 
-		List<Bureau> bureauList;
-		Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
 
-		try { bureauList = gson.fromJson(jsonArrayString, typologyType); }
-		catch (JsonSyntaxException e) { return null; }
+    /**
+     * Static parser, useful for Unit tests
+     *
+     * @param jsonArrayString data as a Json array, serialized with some {@link org.json.JSONArray#toString}.
+     * @param gson            passed statically to prevent re-creating it.
+     */
+    public static @Nullable List<Bureau> fromJsonArray(@NonNull String jsonArrayString, @NonNull Gson gson) {
 
-		// Fixes
+        List<Bureau> bureauList;
+        Type typologyType = new TypeToken<ArrayList<Bureau>>() {}.getType();
 
-		if (bureauList != null)
-			for (Bureau bureau : bureauList)
-				if (bureau.getLateCount() > bureau.getTodoCount())
-					bureau.setLateCount(bureau.getTodoCount());
+        try { bureauList = gson.fromJson(jsonArrayString, typologyType); } catch (JsonSyntaxException e) { return null; }
 
-		//
+        // Fixes
 
-		return bureauList;
-	}
+        if (bureauList != null)
+            for (Bureau bureau : bureauList)
+                if (bureau.getLateCount() > bureau.getTodoCount())
+                    bureau.setLateCount(bureau.getTodoCount());
 
-	public Bureau(String id, String title, int todo, int late) {
+        //
 
-		if (id.contains("workspace://SpacesStore/"))
-			id = id.substring("workspace://SpacesStore/".length());
+        return bureauList;
+    }
 
-		mId = id;
-		mTitle = title;
-		mTodoCount = todo;
-		mLateCount = late;
-		mSyncDate = null;
-	}
 
-	public Bureau() {}
+    public Bureau(String id, String title, int todo, int late) {
 
-	// <editor-fold desc="Setters / Getters">
+        if (id.contains("workspace://SpacesStore/")) {
+            id = id.substring("workspace://SpacesStore/".length());
+        }
 
-	public String getId() {
-		return mId;
-	}
+        this.id = id;
+        this.title = title;
+        this.todoCount = todo;
+        this.lateCount = late;
+        this.syncDate = null;
+    }
 
-	public String getTitle() {
-		return mTitle;
-	}
 
-	public int getTodoCount() {
-		return mTodoCount;
-	}
+    @Override public boolean equals(Object o) {
+        return (o instanceof Bureau) && TextUtils.equals(id, ((Bureau) o).getId());
+    }
 
-	public int getLateCount() {
-		return mLateCount;
-	}
 
-	private void setLateCount(int lateCount) {
-		mLateCount = lateCount;
-	}
-
-	public Account getParent() {
-		return mParent;
-	}
-
-	public void setParent(Account account) {
-		mParent = account;
-	}
-
-	public Date getSyncDate() {
-		return mSyncDate;
-	}
-
-	public void setSyncDate(Date date) {
-		mSyncDate = date;
-	}
-
-	public ForeignCollection<Dossier> getChildrenDossiers() {
-		return mChildrenDossiers;
-	}
-
-	public void setChildrenDossiers(ForeignCollection<Dossier> childrenDossiers) {
-		mChildrenDossiers = childrenDossiers;
-	}
-
-	// </editor-fold desc="Setters / Getters">
-
-	@Override public String toString() {
-		return "{Bureau id=" + mId + " title=" + mTitle + " todo=" + mTodoCount + " late=" + mLateCount + " sync=" + mSyncDate + "}";
-	}
-
-	@Override public boolean equals(Object o) {
-		return (o != null) && (o instanceof Bureau) && TextUtils.equals(mId, ((Bureau) o).getId());
-	}
+    @Override public int hashCode() {
+        return id.hashCode();
+    }
 
 }

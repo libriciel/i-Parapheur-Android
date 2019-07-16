@@ -17,12 +17,14 @@
  */
 package org.adullact.iparapheur.model;
 
+import android.util.Log;
+
 import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +38,8 @@ import java.util.Arrays;
 
 
 public class RequestResponse {
+
+    private static final String LOG_TAG = "RequestResponse";
 
     private int code;
     private String error;
@@ -57,7 +61,7 @@ public class RequestResponse {
                 if (!ignoreResponseData) {
 
                     InputStream is = httpURLConnection.getInputStream();
-                    data = StringUtils.inputStreamToString(is);
+                    data = StringsUtils.inputStreamToString(is);
                     is.close();
 
                     Object json = new JSONTokener(data).nextValue();
@@ -69,7 +73,7 @@ public class RequestResponse {
                 }
             } else {
                 // if code >= 400, response is in errorStream
-                data = StringUtils.inputStreamToString(httpURLConnection.getErrorStream());
+                data = StringsUtils.inputStreamToString(httpURLConnection.getErrorStream());
 
                 Object json = new JSONTokener(data).nextValue();
                 if (json instanceof JSONObject)
@@ -80,15 +84,15 @@ public class RequestResponse {
             }
         } catch (JSONException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
         } catch (UnknownHostException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_404, httpURLConnection.getURL().getHost());
         } catch (IOException e) {
             Crashlytics.logException(e);
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_server_not_configured, null);
         }
     }

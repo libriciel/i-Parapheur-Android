@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -46,208 +47,203 @@ import java.util.Date;
 
 public abstract class RestClientApi implements IParapheurAPI {
 
-	public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
+    private static final String ACTION_LOGIN = "/parapheur/api/login";
+    private static final String LOG_TAG = "RestClientApi";
 
-	private static final String ACTION_LOGIN = "/parapheur/api/login";
+    public static final long SESSION_TIMEOUT = 30 * 60 * 1000L;
 
-	@Override public int test(Account account) throws IParapheurException {
 
-		// Build request
+    @Override public int test(Account account) throws IParapheurException {
 
-		String requestContent = RESTUtils.getAuthenticationJsonData(account);
-		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+        // Build request
 
-		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
+        String requestContent = RESTUtils.getAuthenticationJsonData(account);
+        String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
 
-		// Parse response
+        RequestResponse response = RESTUtils.post(requestUrl, requestContent);
 
-		int messageRes = R.string.http_error_undefined;
+        // Parse response
 
-		if (response == null)
-			messageRes = R.string.http_error_undefined;
-		else if (response.getCode() == HttpURLConnection.HTTP_OK)
-			messageRes = R.string.test_ok;
-		else if (response.getCode() == HttpURLConnection.HTTP_FORBIDDEN)
-			messageRes = R.string.test_forbidden;
-		else if (response.getCode() == HttpURLConnection.HTTP_NOT_FOUND)
-			messageRes = R.string.test_not_found;
-		else if ((response.getCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) && response.getError().contains("Tenant does not exist"))
-			messageRes = R.string.test_tenant_not_exist;
+        int messageRes = R.string.http_error_undefined;
 
-		return messageRes;
-	}
+        if (response == null)
+            messageRes = R.string.http_error_undefined;
+        else if (response.getCode() == HttpURLConnection.HTTP_OK)
+            messageRes = R.string.test_ok;
+        else if (response.getCode() == HttpURLConnection.HTTP_FORBIDDEN)
+            messageRes = R.string.test_forbidden;
+        else if (response.getCode() == HttpURLConnection.HTTP_NOT_FOUND)
+            messageRes = R.string.test_not_found;
+        else if ((response.getCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) && response.getError().contains("Tenant does not exist"))
+            messageRes = R.string.test_tenant_not_exist;
 
-	@Override public String getTicket(Account account) throws IParapheurException {
+        return messageRes;
+    }
 
-		// Default case
+    @Override public String getTicket(Account account) throws IParapheurException {
 
-		if (RESTUtils.hasValidTicket(account))
-			return account.getTicket();
+        // Default case
 
-		// Building request
+        if (RESTUtils.hasValidTicket(account))
+            return account.getTicket();
 
-		String requestContent = RESTUtils.getAuthenticationJsonData(account);
-		String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
+        // Building request
 
-		RequestResponse response = RESTUtils.post(requestUrl, requestContent);
+        String requestContent = RESTUtils.getAuthenticationJsonData(account);
+        String requestUrl = buildUrl(account, ACTION_LOGIN, null, false);
 
-		// Parsing response
+        RequestResponse response = RESTUtils.post(requestUrl, requestContent);
 
-		if (response != null) {
+        // Parsing response
 
-			String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
-			if (TextUtils.isEmpty(responseTicket))
-				throw new IParapheurException(R.string.error_parse, null);
+        if (response != null) {
 
-			account.setTicket(responseTicket);
-		}
+            String responseTicket = new JsonExplorer(response.getResponse()).findObject("data").optString("ticket");
+            if (TextUtils.isEmpty(responseTicket))
+                throw new IParapheurException(R.string.error_parse, null);
 
-		return account.getTicket();
-	}
+            account.setTicket(responseTicket);
+        }
 
-	@Deprecated public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
-		return buildUrl(action, null);
-	}
+        return account.getTicket();
+    }
 
-	@Deprecated public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
-		return buildUrl(AccountUtils.SELECTED_ACCOUNT, action, params, true);
-	}
+    @Deprecated public @NonNull String buildUrl(@NonNull String action) throws IParapheurException {
+        return buildUrl(action, null);
+    }
 
-	public @NonNull String buildUrl(@NonNull Account account, @NonNull String action) throws IParapheurException {
-		return buildUrl(account, action, null, true);
-	}
+    @Deprecated public @NonNull String buildUrl(@NonNull String action, @Nullable String params) throws IParapheurException {
+        return buildUrl(AccountUtils.SELECTED_ACCOUNT, action, params, true);
+    }
 
-	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
-		return buildUrl(account, action, params, withTicket, true);
-	}
+    public @NonNull String buildUrl(@NonNull Account account, @NonNull String action) throws IParapheurException {
+        return buildUrl(account, action, null, true);
+    }
 
-	public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket,
-									boolean withTenant) throws IParapheurException {
+    public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket) throws IParapheurException {
+        return buildUrl(account, action, params, withTicket, true);
+    }
 
-		// Default checks
+    public @NonNull String buildUrl(Account account, @NonNull String action, @Nullable String params, boolean withTicket,
+                                    boolean withTenant) throws IParapheurException {
 
-		if (account == null)
-			throw new IParapheurException(R.string.error_no_account, null);
+        // Default checks
 
-		String ticket = null;
-		if (withTicket)
-			ticket = getTicket(account);
+        if (account == null)
+            throw new IParapheurException(R.string.error_no_account, null);
 
-		if (withTicket && TextUtils.isEmpty(ticket))
-			throw new IParapheurException(R.string.error_no_ticket, null);
+        String ticket = null;
+        if (withTicket)
+            ticket = getTicket(account);
 
-		account.setLastRequest(new Date());
+        if (withTicket && TextUtils.isEmpty(ticket))
+            throw new IParapheurException(R.string.error_no_ticket, null);
 
-		// Build URL
+        account.setLastRequest(new Date());
 
-		StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
+        // Build URL
 
-		if (withTenant && (!TextUtils.isEmpty(account.getTenant())))
-			stringBuilder.append(account.getTenant()).append(".");
+        StringBuilder stringBuilder = new StringBuilder(BASE_PATH);
 
-		stringBuilder.append(account.getServerBaseUrl());
-		stringBuilder.append(action);
+        if (withTenant && (!TextUtils.isEmpty(account.getTenant())))
+            stringBuilder.append(account.getTenant()).append(".");
 
-		if (withTicket)
-			stringBuilder.append("?alf_ticket=").append(ticket);
+        stringBuilder.append(account.getServerBaseUrl());
+        stringBuilder.append(action);
 
-		if (!TextUtils.isEmpty(params))
-			stringBuilder.append("&").append(params);
+        if (withTicket)
+            stringBuilder.append("?alf_ticket=").append(ticket);
 
-		//
+        if (!TextUtils.isEmpty(params))
+            stringBuilder.append("&").append(params);
 
-		return stringBuilder.toString();
-	}
+        //
 
-	@Override public boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException {
+        return stringBuilder.toString();
+    }
 
-		String state = Environment.getExternalStorageState();
+    @Override public boolean downloadFile(@NonNull Account currentAccount, @NonNull String url, @NonNull String path) throws IParapheurException {
 
-		if (!Environment.MEDIA_MOUNTED.equals(state))
-			throw new IParapheurException(R.string.error_no_storage, null);
+        String state = Environment.getExternalStorageState();
 
-		File file = new File(path);
-		String fullUrl = buildUrl(url);
-		FileOutputStream fileOutput = null;
+        if (!Environment.MEDIA_MOUNTED.equals(state))
+            throw new IParapheurException(R.string.error_no_storage, null);
 
-		try {
-			InputStream response = RESTUtils.downloadFile(fullUrl);
-			fileOutput = new FileOutputStream(file);
-			byte[] buffer = new byte[1024];
-			int bufferLength;
+        File file = new File(path);
+        String fullUrl = buildUrl(url);
+        FileOutputStream fileOutput = null;
 
-			while ((bufferLength = response.read(buffer)) > 0)
-				fileOutput.write(buffer, 0, bufferLength);
+        try {
+            InputStream response = RESTUtils.downloadFile(fullUrl);
+            fileOutput = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int bufferLength;
 
-			// Close the output stream when done
-			fileOutput.close();
-		}
-		catch (FileNotFoundException e) {
-			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_file_not_found, null);
-		}
-		catch (IOException e) {
-			Crashlytics.logException(e);
-			throw new IParapheurException(R.string.error_parse, null);
-		}
-		finally {
-			if (fileOutput != null) {
-				try { fileOutput.close(); }
-				catch (IOException logOrIgnore) { logOrIgnore.printStackTrace(); }
-			}
-		}
+            while ((bufferLength = response.read(buffer)) > 0)
+                fileOutput.write(buffer, 0, bufferLength);
 
-		return file.exists();
-	}
+            // Close the output stream when done
+            fileOutput.close();
+        } catch (FileNotFoundException e) {
+            Crashlytics.logException(e);
+            throw new IParapheurException(R.string.error_file_not_found, null);
+        } catch (IOException e) {
+            Crashlytics.logException(e);
+            throw new IParapheurException(R.string.error_parse, null);
+        } finally {
+            if (fileOutput != null) {
+                try { fileOutput.close(); } catch (IOException logOrIgnore) { Log.e(LOG_TAG, logOrIgnore.getLocalizedMessage()); }
+            }
+        }
 
-	@Override public boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString,
-												 @NonNull String certificateLocalPath) throws IParapheurException {
+        return file.exists();
+    }
 
-		InputStream input = null;
-		OutputStream output = null;
-		HttpURLConnection connection = null;
+    @Override public boolean downloadCertificate(@NonNull Account currentAccount, @NonNull String urlString,
+                                                 @NonNull String certificateLocalPath) throws IParapheurException {
 
-		try {
-			URL url = new URL(urlString);
-			connection = (HttpURLConnection) url.openConnection();
-			connection.connect();
+        InputStream input = null;
+        OutputStream output = null;
+        HttpURLConnection connection = null;
 
-			// expect HTTP 200 OK, so we don't mistakenly save error report
-			// instead of the file
-			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
-				throw new HttpException(connection.getResponseCode());
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
 
-			// download the file
-			input = connection.getInputStream();
-			output = new FileOutputStream(certificateLocalPath);
+            // expect HTTP 200 OK, so we don't mistakenly save error report
+            // instead of the file
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                throw new HttpException(connection.getResponseCode());
 
-			byte data[] = new byte[4096];
-			int count;
+            // download the file
+            input = connection.getInputStream();
+            output = new FileOutputStream(certificateLocalPath);
 
-			while ((count = input.read(data)) != -1)
-				output.write(data, 0, count);
-		}
-		catch (HttpException | IOException e) {
-			Crashlytics.logException(e);
-			e.printStackTrace();
-			throw new IParapheurException(R.string.import_error_message_cant_download_certificate, e.getLocalizedMessage());
-		}
-		finally {
+            byte data[] = new byte[4096];
+            int count;
 
-			try {
-				if (output != null)
-					output.close();
+            while ((count = input.read(data)) != -1)
+                output.write(data, 0, count);
+        } catch (HttpException | IOException e) {
+            Crashlytics.logException(e);
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+            throw new IParapheurException(R.string.import_error_message_cant_download_certificate, e.getLocalizedMessage());
+        } finally {
 
-				if (input != null)
-					input.close();
-			}
-			catch (IOException ignored) { }
+            try {
+                if (output != null)
+                    output.close();
 
-			if (connection != null)
-				connection.disconnect();
-		}
+                if (input != null)
+                    input.close();
+            } catch (IOException ignored) { }
 
-		return new File(certificateLocalPath).exists();
-	}
+            if (connection != null)
+                connection.disconnect();
+        }
+
+        return new File(certificateLocalPath).exists();
+    }
 
 }

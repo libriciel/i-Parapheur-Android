@@ -35,7 +35,6 @@ import org.adullact.iparapheur.model.Bureau;
 import org.adullact.iparapheur.model.Document;
 import org.adullact.iparapheur.model.Dossier;
 import org.adullact.iparapheur.utils.AccountUtils;
-import org.adullact.iparapheur.utils.CollectionUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -54,189 +53,188 @@ import static org.adullact.iparapheur.utils.AccountUtils.DEMO_TITLE;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-	public static final String DATABASE_NAME = "iParapheur.db";
-	private static final int DATABASE_VERSION = 1;
+    private static final String LOG_TAG = "DatabaseHelper";
+    private static final int DATABASE_VERSION = 1;
 
-	private Dao<Account, Integer> mAccountDao;
-	private Dao<Bureau, Integer> mBureauDao;
-	private Dao<Dossier, Integer> mDossierDao;
-	private Dao<Document, Integer> mDocumentDao;
+    public static final String DATABASE_NAME = "iParapheur.db";
 
-	public DatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    private Dao<Account, Integer> mAccountDao;
+    private Dao<Bureau, Integer> mBureauDao;
+    private Dao<Dossier, Integer> mDossierDao;
+    private Dao<Document, Integer> mDocumentDao;
 
-		retrieveLegacyAccounts(context);
-		createDefaultDemoAccount();
-		retrieveSelectedAccount(context);
-	}
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
-	// <editor-fold desc="OrmLiteSqliteOpenHelper">
+        retrieveLegacyAccounts(context);
+        createDefaultDemoAccount();
+        retrieveSelectedAccount(context);
+    }
 
-	@Override public void onCreate(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource) {
+    // <editor-fold desc="OrmLiteSqliteOpenHelper">
 
-		try {
-			TableUtils.createTable(connectionSource, Account.class);
-			TableUtils.createTable(connectionSource, Bureau.class);
-			TableUtils.createTable(connectionSource, Dossier.class);
-			TableUtils.createTable(connectionSource, Document.class);
-		}
-		catch (SQLException e) {
-			Log.e(DatabaseHelper.class.getName(), "Unable to create databases", e);
-		}
-	}
+    @Override public void onCreate(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource) {
 
-	@Override public void onUpgrade(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource, int oldVer, int newVer) {
+        try {
+            TableUtils.createTable(connectionSource, Account.class);
+            TableUtils.createTable(connectionSource, Bureau.class);
+            TableUtils.createTable(connectionSource, Dossier.class);
+            TableUtils.createTable(connectionSource, Document.class);
+        } catch (SQLException e) {
+            Log.e(DatabaseHelper.class.getName(), "Unable to create databases", e);
+        }
+    }
 
-		try {
-			// In case of change in database of next version of application, please increase the value of DATABASE_VERSION variable,
-			// then this method will be invoked automatically. Developer needs to handle the upgrade logic here,
-			// i.e. create a new table or a new column to an existing table, take the backups of the existing database etc.
+    @Override public void onUpgrade(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource, int oldVer, int newVer) {
 
-			TableUtils.dropTable(connectionSource, Document.class, true);
-			TableUtils.dropTable(connectionSource, Dossier.class, true);
-			TableUtils.dropTable(connectionSource, Bureau.class, true);
-			TableUtils.dropTable(connectionSource, Account.class, true);
+        try {
+            // In case of change in database of next version of application, please increase the value of DATABASE_VERSION variable,
+            // then this method will be invoked automatically. Developer needs to handle the upgrade logic here,
+            // i.e. create a new table or a new column to an existing table, take the backups of the existing database etc.
 
-			onCreate(sqliteDatabase, connectionSource);
-		}
-		catch (SQLException e) {
-			Log.e(DatabaseHelper.class.getName(), "Unable to upgrade database from version " + oldVer + " to new " + newVer, e);
-		}
-	}
+            TableUtils.dropTable(connectionSource, Document.class, true);
+            TableUtils.dropTable(connectionSource, Dossier.class, true);
+            TableUtils.dropTable(connectionSource, Bureau.class, true);
+            TableUtils.dropTable(connectionSource, Account.class, true);
 
-	// </editor-fold desc="OrmLiteSqliteOpenHelper">
+            onCreate(sqliteDatabase, connectionSource);
+        } catch (SQLException e) {
+            Log.e(DatabaseHelper.class.getName(), "Unable to upgrade database from version " + oldVer + " to new " + newVer, e);
+        }
+    }
 
-	// Create the getDao methods of all database tables to access those from android code.
-	// Insert, delete, read, update everything will be happened through DAOs
+    // </editor-fold desc="OrmLiteSqliteOpenHelper">
 
-	public @NonNull Dao<Account, Integer> getAccountDao() throws SQLException {
+    // Create the getDao methods of all database tables to access those from android code.
+    // Insert, delete, read, update everything will be happened through DAOs
 
-		if (mAccountDao == null)
-			mAccountDao = getDao(Account.class);
+    public @NonNull Dao<Account, Integer> getAccountDao() throws SQLException {
 
-		return mAccountDao;
-	}
+        if (mAccountDao == null)
+            mAccountDao = getDao(Account.class);
 
-	public @NonNull Dao<Bureau, Integer> getBureauDao() throws SQLException {
+        return mAccountDao;
+    }
 
-		if (mBureauDao == null)
-			mBureauDao = getDao(Bureau.class);
+    public @NonNull Dao<Bureau, Integer> getBureauDao() throws SQLException {
 
-		return mBureauDao;
-	}
+        if (mBureauDao == null)
+            mBureauDao = getDao(Bureau.class);
 
-	public @NonNull Dao<Dossier, Integer> getDossierDao() throws SQLException {
+        return mBureauDao;
+    }
 
-		if (mDossierDao == null)
-			mDossierDao = getDao(Dossier.class);
+    public @NonNull Dao<Dossier, Integer> getDossierDao() throws SQLException {
 
-		return mDossierDao;
-	}
+        if (mDossierDao == null)
+            mDossierDao = getDao(Dossier.class);
 
-	public @NonNull Dao<Document, Integer> getDocumentDao() throws SQLException {
+        return mDossierDao;
+    }
 
-		if (mDocumentDao == null)
-			mDocumentDao = getDao(Document.class);
+    public @NonNull Dao<Document, Integer> getDocumentDao() throws SQLException {
 
-		return mDocumentDao;
-	}
+        if (mDocumentDao == null)
+            mDocumentDao = getDao(Document.class);
 
-	// <editor-fold desc="Utils">
+        return mDocumentDao;
+    }
 
-	public void retrieveLegacyAccounts(@NonNull Context context) {
+    // <editor-fold desc="Utils">
 
-		final List<Account> legacyAccountList = new ArrayList<>();
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    public void retrieveLegacyAccounts(@NonNull Context context) {
 
-		// Retrieve data
+        final List<Account> legacyAccountList = new ArrayList<>();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-		for (String pref : sharedPreferences.getAll().keySet()) {
-			if (pref.startsWith("account_")) {
+        // Retrieve data
 
-				String id = pref.substring(pref.indexOf("_") + 1);
-				id = id.substring(0, id.lastIndexOf("_"));
+        for (String pref : sharedPreferences.getAll().keySet()) {
+            if (pref.startsWith("account_")) {
 
-				Account account = new Account(id);
-				account.setTitle(sharedPreferences.getString("account_" + id + "_title", ""));
-				account.setLogin(sharedPreferences.getString("account_" + id + "_login", ""));
-				account.setServerBaseUrl(sharedPreferences.getString("account_" + id + "_url", ""));
-				account.setPassword(sharedPreferences.getString("account_" + id + "_password", ""));
-				account.setActivated(sharedPreferences.getBoolean("account_" + id + "_activated", true));
+                String id = pref.substring(pref.indexOf("_") + 1);
+                id = id.substring(0, id.lastIndexOf("_"));
 
-				legacyAccountList.add(account);
-			}
-		}
+                Account account = new Account(id);
+                account.setTitle(sharedPreferences.getString("account_" + id + "_title", ""));
+                account.setLogin(sharedPreferences.getString("account_" + id + "_login", ""));
+                account.setServerBaseUrl(sharedPreferences.getString("account_" + id + "_url", ""));
+                account.setPassword(sharedPreferences.getString("account_" + id + "_password", ""));
+                account.setActivated(sharedPreferences.getBoolean("account_" + id + "_activated", true));
 
-		// Saving in DataBase...
+                legacyAccountList.add(account);
+            }
+        }
 
-		try {
-			getAccountDao().callBatchTasks(new Callable<Object>() {
+        // Saving in DataBase...
 
-				@Override public Object call() throws Exception {
+        try {
+            getAccountDao().callBatchTasks(new Callable<Object>() {
 
-					for (Account account : legacyAccountList)
-						mAccountDao.createOrUpdate(account);
+                @Override public Object call() throws Exception {
 
-					return null;
-				}
-			});
-		}
-		catch (Exception e) { e.printStackTrace(); }
+                    for (Account account : legacyAccountList)
+                        mAccountDao.createOrUpdate(account);
 
-		// Deleting old data
+                    return null;
+                }
+            });
+        } catch (Exception e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-		for (Account legacyAccount : legacyAccountList) {
-			String id = legacyAccount.getId();
-			editor.remove("account_" + id + "_title");
-			editor.remove("account_" + id + "_url");
-			editor.remove("account_" + id + "_login");
-			editor.remove("account_" + id + "_password");
-			editor.remove("account_" + id + "_activated");
-		}
-		editor.commit();
-	}
+        // Deleting old data
 
-	private void createDefaultDemoAccount() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        for (Account legacyAccount : legacyAccountList) {
+            String id = legacyAccount.getId();
+            editor.remove("account_" + id + "_title");
+            editor.remove("account_" + id + "_url");
+            editor.remove("account_" + id + "_login");
+            editor.remove("account_" + id + "_password");
+            editor.remove("account_" + id + "_activated");
+        }
+        editor.commit();
+    }
 
-		List<Account> demoList = new ArrayList<>();
+    private void createDefaultDemoAccount() {
 
-		try { demoList.addAll(getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query()); }
-		catch (SQLException e) { e.printStackTrace(); }
+        List<Account> demoList = new ArrayList<>();
 
-		if (demoList.isEmpty()) {
+        try { demoList.addAll(getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query()); } catch (SQLException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+        }
 
-			Account demoAccount = new Account(DEMO_ID, DEMO_TITLE, DEMO_BASE_URL, DEMO_LOGIN, DEMO_PASSWORD, null, null);
-			demoAccount.setActivated(true);
+        if (demoList.isEmpty()) {
 
-			try { getAccountDao().createOrUpdate(demoAccount); }
-			catch (SQLException e) { e.printStackTrace(); }
-		}
-	}
+            Account demoAccount = new Account(DEMO_ID, DEMO_TITLE, DEMO_BASE_URL, DEMO_LOGIN, DEMO_PASSWORD, null, null);
+            demoAccount.setActivated(true);
 
-	private void retrieveSelectedAccount(@NonNull Context context) {
+            try { getAccountDao().createOrUpdate(demoAccount); } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
+        }
+    }
 
-		String selectedAccountId = AccountUtils.loadSelectedAccountId(context);
+    private void retrieveSelectedAccount(@NonNull Context context) {
 
-		// Load from DB
+        String selectedAccountId = AccountUtils.loadSelectedAccountId(context);
 
-		List<Account> accountList = new ArrayList<>();
-		try { accountList.addAll(getAccountDao().queryForAll()); }
-		catch (SQLException e) { e.printStackTrace(); }
+        // Load from DB
 
-		for (Account account : accountList)
-			if (TextUtils.equals(selectedAccountId, account.getId())) {
-				AccountUtils.SELECTED_ACCOUNT = account;
-			}
+        List<Account> accountList = new ArrayList<>();
+        try { accountList.addAll(getAccountDao().queryForAll()); } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-		// Default case
+        for (Account account : accountList)
+            if (TextUtils.equals(selectedAccountId, account.getId())) {
+                AccountUtils.SELECTED_ACCOUNT = account;
+            }
 
-		if (AccountUtils.SELECTED_ACCOUNT == null) {
-			try { AccountUtils.SELECTED_ACCOUNT = getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query().get(0); }
-			catch (SQLException e) { e.printStackTrace(); }
-		}
-	}
+        // Default case
 
-	// </editor-fold desc="Utils">
+        if (AccountUtils.SELECTED_ACCOUNT == null) {
+            try {
+                AccountUtils.SELECTED_ACCOUNT = getAccountDao().queryBuilder().where().eq(Account.DB_FIELD_ID, DEMO_ID).query().get(0);
+            } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
+        }
+    }
+
+    // </editor-fold desc="Utils">
 
 }

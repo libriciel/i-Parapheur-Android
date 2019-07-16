@@ -31,94 +31,94 @@ public class StringUtilsTest {
 
     @Test public void areNotEmpty() {
 
-        Assert.assertTrue(StringUtils.areNotEmpty("Test"));
+        Assert.assertTrue(StringsUtils.areNotEmpty("Test"));
 
-        Assert.assertFalse(StringUtils.areNotEmpty(null, "Test"));
-        Assert.assertFalse(StringUtils.areNotEmpty("", "Test"));
-        Assert.assertFalse(StringUtils.areNotEmpty(""));
-        Assert.assertFalse(StringUtils.areNotEmpty(null, ""));
-        Assert.assertFalse(StringUtils.areNotEmpty());
+        Assert.assertFalse(StringsUtils.areNotEmpty(null, "Test"));
+        Assert.assertFalse(StringsUtils.areNotEmpty("", "Test"));
+        Assert.assertFalse(StringsUtils.areNotEmpty(""));
+        Assert.assertFalse(StringsUtils.areNotEmpty(null, ""));
+        Assert.assertFalse(StringsUtils.areNotEmpty());
     }
 
 
     @Test public void endsWithIgnoreCase() {
 
-        Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "test 123"));
-        Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "T 123"));
-        Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", "123"));
-        Assert.assertTrue(StringUtils.endsWithIgnoreCase("test 123", ""));
+        Assert.assertTrue(StringsUtils.endsWithIgnoreCase("test 123", "test 123"));
+        Assert.assertTrue(StringsUtils.endsWithIgnoreCase("test 123", "T 123"));
+        Assert.assertTrue(StringsUtils.endsWithIgnoreCase("test 123", "123"));
+        Assert.assertTrue(StringsUtils.endsWithIgnoreCase("test 123", ""));
 
-        Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", "test 1234"));
-        Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", "2"));
-        Assert.assertFalse(StringUtils.endsWithIgnoreCase("test 123", null));
-        Assert.assertFalse(StringUtils.endsWithIgnoreCase(null, null));
+        Assert.assertFalse(StringsUtils.endsWithIgnoreCase("test 123", "test 1234"));
+        Assert.assertFalse(StringsUtils.endsWithIgnoreCase("test 123", "2"));
+        Assert.assertFalse(StringsUtils.endsWithIgnoreCase("test 123", null));
+        Assert.assertFalse(StringsUtils.endsWithIgnoreCase(null, null));
     }
 
 
     @Test public void parseIso8601Date() {
 
-        Date parsedDate = StringUtils.parseIso8601Date("2016-12-25T23:45:00");
+        Date parsedDate = StringsUtils.parseIso8601Date("2016-12-25T23:45:00");
         Assert.assertNotNull(parsedDate);
 
-        Assert.assertNull(StringUtils.parseIso8601Date("999999"));
-        Assert.assertNull(StringUtils.parseIso8601Date(""));
-        Assert.assertNull(StringUtils.parseIso8601Date(null));
+        Assert.assertNull(StringsUtils.parseIso8601Date("999999"));
+        Assert.assertNull(StringsUtils.parseIso8601Date(""));
+        Assert.assertNull(StringsUtils.parseIso8601Date(null));
     }
 
 
     @Test public void serializeToIso8601Date() {
-        Assert.assertNotNull(StringUtils.serializeToIso8601Date(new Date(1482705900000L)));
+        Assert.assertNotNull(StringsUtils.serializeToIso8601Date(new Date(1482705900000L)));
     }
 
 
     @Test public void fixIssuerDnX500NameStringOrder() {
 
         String input = "OU=ADULLACT-Projet,E=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,O=ADULLACT-Projet,ST=Herault,C=FR";
-        String value = StringUtils.fixIssuerDnX500NameStringOrder(input);
+        String value = StringsUtils.fixIssuerDnX500NameStringOrder(input);
         String expected = "EMAIL=systeme@adullact.org,CN=AC ADULLACT Projet\\, g2,OU=ADULLACT-Projet,O=ADULLACT-Projet,ST=Herault,C=FR";
 
-        Assert.assertEquals(value, expected);
+        Assert.assertEquals(expected, value);
     }
 
 
     @Test public void fixUrl() {
-        Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur/iparapheur.plop//"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("http://parapheur.test.adullact.org/parapheur/test"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("m.parapheur.test.adullact.org/"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("parapheur.test.adullact.org"), "parapheur.test.adullact.org");
-        Assert.assertEquals(StringUtils.fixUrl("https://parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("https://m.parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("https://m-parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("m.parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("m-parapheur"), "parapheur");
-        Assert.assertEquals(StringUtils.fixUrl("parapheur"), "parapheur");
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("https://m.parapheur/iparapheur.plop//"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringsUtils.fixUrl("http://parapheur.test.adullact.org/parapheur/test"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringsUtils.fixUrl("m.parapheur.test.adullact.org/"));
+        Assert.assertEquals("parapheur.test.adullact.org", StringsUtils.fixUrl("parapheur.test.adullact.org"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("https://parapheur"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("https://m.parapheur"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("https://m-parapheur"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("m.parapheur"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("m-parapheur"));
+        Assert.assertEquals("parapheur", StringsUtils.fixUrl("parapheur"));
     }
 
 
     @Test public void getLocalizedSmallDate() {
-        Assert.assertNotNull(StringUtils.getLocalizedSmallDate(new Date(1482705900000L)));
-        Assert.assertEquals(StringUtils.getLocalizedSmallDate(null), "???");
+        Assert.assertNotNull(StringsUtils.getLocalizedSmallDate(new Date(1482705900000L)));
+        Assert.assertEquals("???", StringsUtils.getLocalizedSmallDate(null));
     }
 
 
     @Test public void getVerySmallDate() {
-        Assert.assertEquals(StringUtils.getVerySmallDate(new Date(1482705900000L)), "25/12");
-        Assert.assertEquals(StringUtils.getVerySmallDate(null), "???");
+        Assert.assertEquals("25/12", StringsUtils.getVerySmallDate(new Date(1482705900000L)));
+        Assert.assertEquals("???", StringsUtils.getVerySmallDate(null));
     }
 
 
     @Test public void getSmallTime() {
-        Assert.assertNotNull(StringUtils.getSmallTime(new Date(1482705900000L)));
-        Assert.assertEquals(StringUtils.getSmallTime(null), "???");
+        Assert.assertNotNull(StringsUtils.getSmallTime(new Date(1482705900000L)));
+        Assert.assertEquals("???", StringsUtils.getSmallTime(null));
     }
 
 
     @Test public void isUrlValid() {
-        Assert.assertTrue(StringUtils.isUrlValid("parapheur"));
-        Assert.assertTrue(StringUtils.isUrlValid("parapheur.test.adullact.org"));
-        Assert.assertFalse(StringUtils.isUrlValid(":::::"));
-        Assert.assertFalse(StringUtils.isUrlValid(""));
-        Assert.assertFalse(StringUtils.isUrlValid(null));
+        Assert.assertTrue(StringsUtils.isUrlValid("parapheur"));
+        Assert.assertTrue(StringsUtils.isUrlValid("parapheur.test.adullact.org"));
+        Assert.assertFalse(StringsUtils.isUrlValid(":::::"));
+        Assert.assertFalse(StringsUtils.isUrlValid(""));
+        Assert.assertFalse(StringsUtils.isUrlValid(null));
     }
 
 

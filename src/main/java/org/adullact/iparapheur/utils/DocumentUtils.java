@@ -72,7 +72,7 @@ public class DocumentUtils {
 
 	public static @NonNull File getFile(@NonNull Context context, @NonNull Dossier dossier, @NonNull Document document) {
 
-		String documentName = document.getName() + (StringUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
+		String documentName = document.getName() + (StringsUtils.endsWithIgnoreCase(document.getName(), ".pdf") ? "" : "_visuel.pdf");
 		return new File(FileUtils.getDirectoryForDossier(context, dossier), documentName);
 	}
 
