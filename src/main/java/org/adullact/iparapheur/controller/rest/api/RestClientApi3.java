@@ -41,7 +41,7 @@ import org.adullact.iparapheur.utils.CollectionUtils;
 import org.adullact.iparapheur.utils.IParapheurException;
 import org.adullact.iparapheur.utils.JsonExplorer;
 import org.adullact.iparapheur.utils.SerializableSparseArray;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -167,7 +167,7 @@ public class RestClientApi3 extends RestClientApi {
 			String firstName = json.findObject("data").findObject("properties").optString(USER_INFO_FIRST_NAME);
 			String lastName = json.findObject("data").findObject("properties").optString(USER_INFO_LAST_NAME);
 
-			if (StringUtils.areNotEmpty(firstName, lastName))
+			if (StringsUtils.areNotEmpty(firstName, lastName))
 				currentAccount.setUserFullName(firstName + " " + lastName);
 		}
 

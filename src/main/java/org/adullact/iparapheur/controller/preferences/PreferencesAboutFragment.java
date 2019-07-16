@@ -17,11 +17,12 @@
  */
 package org.adullact.iparapheur.controller.preferences;
 
+import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +32,6 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adullact.iparapheur.R;
 
-import static org.adullact.iparapheur.R.string.about_version_number;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,55 +40,58 @@ import static org.adullact.iparapheur.R.string.about_version_number;
  */
 public class PreferencesAboutFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "preferences_about_fragment";
+    private static final String LOG_TAG = "PreferencesAboutFragment";
+    public static final String FRAGMENT_TAG = "preferences_about_fragment";
 
-	/**
-	 * Use this factory method to create a new instance of
-	 * this fragment using the provided parameters.
-	 *
-	 * @return A new instance of fragment PreferencesMenuFragment.
-	 */
-	public static PreferencesAboutFragment newInstance() {
-		return new PreferencesAboutFragment();
-	}
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PreferencesMenuFragment.
+     */
+    public static PreferencesAboutFragment newInstance() {
+        return new PreferencesAboutFragment();
+    }
 
-	public PreferencesAboutFragment() {
-		// Required empty public constructor
-	}
+    public PreferencesAboutFragment() {
+        // Required empty public constructor
+    }
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
-	}
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
-	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.preferences_about_fragment, container, false);
+    @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.preferences_about_fragment, container, false);
 
-		// Retrieve current version name
+        // Retrieve current version name
 
-		String currentVersion = "1.4";
-		try { currentVersion = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName; }
-		catch (PackageManager.NameNotFoundException e) {
-			Crashlytics.logException(e);
-			e.printStackTrace();
-		}
+        String currentVersion = "1.4";
+        try {
+            currentVersion = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Crashlytics.logException(e);
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+        }
 
-		// Set current version in the TextView
+        // Set current version in the TextView
 
-		TextView versionTextView = (TextView) v.findViewById(R.id.about_version_number_textview);
-		String versionText = getString(R.string.about_version_number, currentVersion);
-		versionTextView.setText(versionText);
+        TextView versionTextView = v.findViewById(R.id.about_version_number_textview);
+        String versionText = getString(R.string.about_version_number, currentVersion);
+        versionTextView.setText(versionText);
 
-		return v;
-	}
+        return v;
+    }
 
-	@Override public void onResume() {
-		super.onResume();
+    @Override public void onResume() {
+        super.onResume();
 
-		if (getActivity() instanceof AppCompatActivity) {
-			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-			if (parentActivity.getSupportActionBar() != null)
-				parentActivity.getSupportActionBar().setTitle(R.string.preferences_header_about);
-		}
-	}
+        if (getActivity() instanceof AppCompatActivity) {
+            AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+            if (parentActivity.getSupportActionBar() != null)
+                parentActivity.getSupportActionBar().setTitle(R.string.preferences_header_about);
+        }
+    }
+
 }

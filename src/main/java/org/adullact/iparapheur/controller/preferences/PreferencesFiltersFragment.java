@@ -84,7 +84,7 @@ public class PreferencesFiltersFragment extends Fragment {
 	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.preferences_certificates_fragment, container, false);
 
-		mFiltersListView = (ListView) v.findViewById(R.id.preferences_certificates_fragment_main_list);
+		mFiltersListView = v.findViewById(R.id.preferences_certificates_fragment_main_list);
 
 		// Building ListAdapter
 
@@ -176,7 +176,7 @@ public class PreferencesFiltersFragment extends Fragment {
 
 			final View v = super.getView(position, convertView, parent);
 
-			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_filters_fragment_cell_delete_imagebutton);
+			final ImageButton deleteButton = v.findViewById(R.id.preferences_filters_fragment_cell_delete_imagebutton);
 			deleteButton.setOnClickListener(new View.OnClickListener() {
 				@Override public void onClick(View arg0) {
 					onDeleteButtonClicked(position);

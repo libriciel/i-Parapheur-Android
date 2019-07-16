@@ -20,7 +20,7 @@ package org.adullact.iparapheur.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,204 +30,141 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class Filter implements Parcelable {
 
-	public static final String REQUEST_JSON_FILTER_TYPE_METIER = "ph:typeMetier";
-	public static final String REQUEST_JSON_FILTER_SOUS_TYPE_METIER = "ph:soustypeMetier";
-	public static final String REQUEST_JSON_FILTER_TITLE = "cm:title";
-	public static final String REQUEST_JSON_FILTER_AND = "and";
-	public static final String REQUEST_JSON_FILTER_OR = "or";
-	public static final String EDIT_FILTER_ID = "edit-filter";
+    public static final String REQUEST_JSON_FILTER_TYPE_METIER = "ph:typeMetier";
+    public static final String REQUEST_JSON_FILTER_SOUS_TYPE_METIER = "ph:soustypeMetier";
+    public static final String REQUEST_JSON_FILTER_TITLE = "cm:title";
+    public static final String REQUEST_JSON_FILTER_AND = "and";
+    public static final String REQUEST_JSON_FILTER_OR = "or";
+    public static final String EDIT_FILTER_ID = "edit-filter";
 
-	private static final State DEFAULT_STATE = State.A_TRAITER;
-	public static Parcelable.Creator<Filter> CREATOR = new Parcelable.Creator<Filter>() {
-		public Filter createFromParcel(Parcel source) {
-			return new Filter(source);
-		}
+    private static final State DEFAULT_STATE = State.A_TRAITER;
 
-		public Filter[] newArray(int size) {
-			return new Filter[size];
-		}
-	};
+    public static final Parcelable.Creator<Filter> CREATOR = new Parcelable.Creator<Filter>() {
+        public Filter createFromParcel(Parcel source) {
+            return new Filter(source);
+        }
 
-	private String mId;
-	private String mName;
+        public Filter[] newArray(int size) {
+            return new Filter[size];
+        }
+    };
 
-	// Filter values
-	private String mTitle;
-	private List<String> mTypeList;
-	private List<String> mSubTypeList;
-	private State mState;
-	private Date mBeginDate;
-	private Date mEndDate;
+    private String id = UUID.randomUUID().toString();
+    private String name;
 
-	public Filter() {
-		mId = UUID.randomUUID().toString();
-		mName = null;
-		mState = DEFAULT_STATE;
-		mTypeList = new ArrayList<>();
-		mSubTypeList = new ArrayList<>();
-	}
+    // Filter values
+    private String title;
+    private List<String> typeList = new ArrayList<>();
+    private List<String> subTypeList = new ArrayList<>();
+    private State state = DEFAULT_STATE;
+    private Date beginDate;
+    private Date endDate;
 
-	public Filter(String id) {
-		mId = id;
-		mName = null;
-		mState = DEFAULT_STATE;
-		mTypeList = new ArrayList<>();
-		mSubTypeList = new ArrayList<>();
-	}
 
-	private Filter(Parcel in) {
-		mId = in.readString();
-		mName = in.readString();
-		mTitle = in.readString();
-		mTypeList = new ArrayList<>();
-		in.readList(mTypeList, String.class.getClassLoader());
-		mSubTypeList = new ArrayList<>();
-		in.readList(mSubTypeList, String.class.getClassLoader());
-		mState = State.values()[in.readInt()];
-		long tmpDateDebut = in.readLong();
-		mBeginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
-		long tmpDateFin = in.readLong();
-		mEndDate = tmpDateFin == -1 ? null : new Date(tmpDateFin);
-	}
+    public Filter(String id) {
+        this.id = id;
+        name = null;
+        state = DEFAULT_STATE;
+        typeList = new ArrayList<>();
+        subTypeList = new ArrayList<>();
+    }
 
-	public String getJSONFilter() {
 
-		JSONObject jsonFilter = new JSONObject();
-		try {
+    private Filter(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        title = in.readString();
+        typeList = new ArrayList<>();
+        in.readList(typeList, String.class.getClassLoader());
+        subTypeList = new ArrayList<>();
+        in.readList(subTypeList, String.class.getClassLoader());
+        state = State.values()[in.readInt()];
+        long tmpDateDebut = in.readLong();
+        beginDate = tmpDateDebut == -1 ? null : new Date(tmpDateDebut);
+        long tmpDateFin = in.readLong();
+        endDate = tmpDateFin == -1 ? null : new Date(tmpDateFin);
+    }
 
-			// TYPES
-			JSONArray jsonTypes = new JSONArray();
-			if (mTypeList != null) {
-				for (String type : mTypeList) {
-					jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringUtils.urlEncode(type)));
-				}
-			}
-			// SOUSTYPES
-			JSONArray jsonSousTypes = new JSONArray();
-			if (mSubTypeList != null) {
-				for (String sousType : mSubTypeList) {
-					jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringUtils.urlEncode(sousType)));
-				}
-			}
-			//TITRE
 
-			JSONArray jsonTitre = new JSONArray();
-			if ((mTitle != null) && (!mTitle.trim().isEmpty())) {
-				jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + mTitle.trim() + "*"));
-			}
+    public String getJSONFilter() {
 
-			// FILTRE FINAL
-			jsonFilter.put(REQUEST_JSON_FILTER_AND, new JSONArray().
-					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTypes)).
-					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonSousTypes)).
-					put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTitre)));
+        JSONObject jsonFilter = new JSONObject();
+        try {
 
-		}
-		catch (JSONException e) {
-			//Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);
-		}
-		return jsonFilter.toString();
-	}
+            // TYPES
+            JSONArray jsonTypes = new JSONArray();
+            if (typeList != null) {
+                for (String type : typeList) {
+                    jsonTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_TYPE_METIER, StringsUtils.urlEncode(type)));
+                }
+            }
+            // SOUSTYPES
+            JSONArray jsonSousTypes = new JSONArray();
+            if (subTypeList != null) {
+                for (String sousType : subTypeList) {
+                    jsonSousTypes.put(new JSONObject().put(REQUEST_JSON_FILTER_SOUS_TYPE_METIER, StringsUtils.urlEncode(sousType)));
+                }
+            }
+            //TITRE
 
-	// <editor-fold desc="Setters / Getters">
+            JSONArray jsonTitre = new JSONArray();
+            if ((title != null) && (!title.trim().isEmpty())) {
+                jsonTitre.put(new JSONObject().put(REQUEST_JSON_FILTER_TITLE, "*" + title.trim() + "*"));
+            }
 
-	public String getId() {
-		return mId;
-	}
+            // FILTRE FINAL
+            jsonFilter.put(REQUEST_JSON_FILTER_AND, new JSONArray().
+                    put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTypes)).
+                    put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonSousTypes)).
+                    put(new JSONObject().put(REQUEST_JSON_FILTER_OR, jsonTitre)));
 
-	public void setId(String id) {
-		mId = id;
-	}
+        } catch (JSONException e) {
+            //Log.w(Filter.class.getSimpleName(), "Erreur lors de la conversion du filtre", e);
+        }
+        return jsonFilter.toString();
+    }
 
-	public String getName() {
-		return mName;
-	}
 
-	public void setName(String name) {
-		mName = name;
-	}
+    @Override public int describeContents() {
+        return 0;
+    }
 
-	public String getTitle() {
-		return mTitle;
-	}
 
-	public void setTitle(String title) {
-		mTitle = title;
-	}
+    @Override public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(title);
+        dest.writeList(typeList);
+        dest.writeList(subTypeList);
+        dest.writeInt(state.ordinal());
+        dest.writeLong(beginDate != null ? beginDate.getTime() : -1);
+        dest.writeLong(endDate != null ? endDate.getTime() : -1);
+    }
 
-	public List<String> getTypeList() {
-		return mTypeList;
-	}
 
-	public void setTypeList(List<String> typeList) {
-		mTypeList = typeList;
-	}
+    @Override public boolean equals(Object o) {
+        if (o instanceof Filter) {
+            Filter toCompare = (Filter) o;
+            return id.equals(toCompare.id);
+        }
+        return false;
+    }
 
-	public List<String> getSubTypeList() {
-		return mSubTypeList;
-	}
 
-	public void setSubTypeList(List<String> subTypeList) {
-		mSubTypeList = subTypeList;
-	}
+    @Override public int hashCode() {
+        return id.hashCode();
+    }
 
-	public State getState() {
-		return mState;
-	}
-
-	public void setState(State state) {
-		mState = state;
-	}
-
-	public Date getBeginDate() {
-		return mBeginDate;
-	}
-
-	public void setBeginDate(long beginDate) {
-		mBeginDate = new Date(beginDate);
-	}
-
-	public Date getEndDate() {
-		return mEndDate;
-	}
-
-	public void setEndDate(long endDate) {
-		mEndDate = new Date(endDate);
-	}
-
-	// </editor-fold desc="Setters / Getters">
-
-	@Override public int describeContents() {
-		return 0;
-	}
-
-	@Override public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(mId);
-		dest.writeString(mName);
-		dest.writeString(mTitle);
-		dest.writeList(mTypeList);
-		dest.writeList(mSubTypeList);
-		dest.writeInt(mState.ordinal());
-		dest.writeLong(mBeginDate != null ? mBeginDate.getTime() : -1);
-		dest.writeLong(mEndDate != null ? mEndDate.getTime() : -1);
-	}
-
-	@Override public boolean equals(Object o) {
-		if (o instanceof Filter) {
-			Filter toCompare = (Filter) o;
-			return mId.equals(toCompare.mId);
-		}
-		return false;
-	}
-
-	@Override public int hashCode() {
-		return mId.hashCode();
-	}
-
-	@Override public String toString() {
-		return "{Filter name=" + mName + "}";
-	}
 }

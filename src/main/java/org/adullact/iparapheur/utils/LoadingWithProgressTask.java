@@ -37,7 +37,7 @@ public abstract class LoadingWithProgressTask extends LoadingTask {
 
     public LoadingWithProgressTask(Activity activity, LoadingTask.DataChangeListener listener) {
         super(activity, listener);
-        progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
+        progressBar = activity.findViewById(R.id.progressBar);
     }
 
 

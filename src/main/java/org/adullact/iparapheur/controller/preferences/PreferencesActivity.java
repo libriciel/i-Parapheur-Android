@@ -37,110 +37,109 @@ import java.util.Map;
 
 public class PreferencesActivity extends AppCompatActivity implements PreferencesMenuFragment.PreferenceMenuFragmentListener {
 
-	public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
-	public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
+    public static final int PREFERENCES_ACTIVITY_REQUEST_CODE = 1001;
+    public static final String ARGUMENT_GO_TO_FRAGMENT = "go_to_fragment";
 
-	private static Map<Class<? extends Fragment>, String> fragmentsTagsMap;
+    private static Map<Class<? extends Fragment>, String> fragmentsTagsMap;
 
-	static {
-		fragmentsTagsMap = new HashMap<>();
-		fragmentsTagsMap.put(PreferencesAccountFragment.class, PreferencesAccountFragment.FRAGMENT_TAG);
-		fragmentsTagsMap.put(PreferencesCertificatesFragment.class, PreferencesCertificatesFragment.FRAGMENT_TAG);
-		fragmentsTagsMap.put(PreferencesAboutFragment.class, PreferencesAboutFragment.FRAGMENT_TAG);
-		fragmentsTagsMap.put(PreferencesLicencesFragment.class, PreferencesLicencesFragment.FRAGMENT_TAG);
-	}
+    static {
+        fragmentsTagsMap = new HashMap<>();
+        fragmentsTagsMap.put(PreferencesAccountFragment.class, PreferencesAccountFragment.FRAGMENT_TAG);
+        fragmentsTagsMap.put(PreferencesCertificatesFragment.class, PreferencesCertificatesFragment.FRAGMENT_TAG);
+        fragmentsTagsMap.put(PreferencesAboutFragment.class, PreferencesAboutFragment.FRAGMENT_TAG);
+        fragmentsTagsMap.put(PreferencesLicencesFragment.class, PreferencesLicencesFragment.FRAGMENT_TAG);
+    }
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		// To have a transparent StatusBar, and a background color behind
+        // To have a transparent StatusBar, and a background color behind
 
-		getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-		setContentView(R.layout.preferences_activity);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        setContentView(R.layout.preferences_activity);
 
-		// ActionBar
+        // ActionBar
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.preferences_activity_toolbar);
-		setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById(R.id.preferences_activity_toolbar);
+        setSupportActionBar(toolbar);
 
-		if (getSupportActionBar() != null)
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// Existing Fragment restoration handling, the Google way
-		// http://developer.android.com/guide/topics/resources/runtime-changes.html
+        // Existing Fragment restoration handling, the Google way
+        // http://developer.android.com/guide/topics/resources/runtime-changes.html
 
-		Fragment retainedFragment = getRetainedFragmentInstance();
-		if (retainedFragment != null) {
+        Fragment retainedFragment = getRetainedFragmentInstance();
+        if (retainedFragment != null) {
 
-			// Clear BackStack before restoring existing fragment (everything over the Menu),
-			// because a wrong BackStack can stay after rotation.
-			String retainedFragmentTag = fragmentsTagsMap.get(retainedFragment.getClass());
-			getFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            // Clear BackStack before restoring existing fragment (everything over the Menu),
+            // because a wrong BackStack can stay after rotation.
+            String retainedFragmentTag = fragmentsTagsMap.get(retainedFragment.getClass());
+            getFragmentManager().popBackStackImmediate(retainedFragmentTag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-			// Rebuild stack
-			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
-			replaceMainFragment(retainedFragment, retainedFragmentTag, true);
-		}
-		else {
-			replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
-		}
-	}
+            // Rebuild stack
+            replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
+            replaceMainFragment(retainedFragment, retainedFragmentTag, true);
+        } else {
+            replaceMainFragment(PreferencesMenuFragment.newInstance(), PreferencesMenuFragment.FRAGMENT_TAG, false);
+        }
+    }
 
-	@Override protected void onStart() {
-		super.onStart();
+    @Override protected void onStart() {
+        super.onStart();
 
-		// Quick access
+        // Quick access
 
-		if (getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT) != null) {
-			String fragmentName = getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT);
+        if (getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT) != null) {
+            String fragmentName = getIntent().getStringExtra(ARGUMENT_GO_TO_FRAGMENT);
 
-			if (TextUtils.equals(fragmentName, PreferencesAccountFragment.class.getSimpleName()))
-				replaceMainFragment(PreferencesAccountFragment.newInstance(), PreferencesAccountFragment.FRAGMENT_TAG, true);
+            if (TextUtils.equals(fragmentName, PreferencesAccountFragment.class.getSimpleName()))
+                replaceMainFragment(PreferencesAccountFragment.newInstance(), PreferencesAccountFragment.FRAGMENT_TAG, true);
 
-			getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
-		}
-	}
+            getIntent().removeExtra(ARGUMENT_GO_TO_FRAGMENT);
+        }
+    }
 
-	// </editor-fold desc="LifeCycle">
+    // </editor-fold desc="LifeCycle">
 
-	// <editor-fold desc="ActionBar">
+    // <editor-fold desc="ActionBar">
 
-	@Override public boolean onOptionsItemSelected(MenuItem item) {
-		onBackPressed();
-		return true;
-	}
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        onBackPressed();
+        return true;
+    }
 
-	// </editor-fold desc="ActionBar">
+    // </editor-fold desc="ActionBar">
 
-	private @Nullable Fragment getRetainedFragmentInstance() {
+    private @Nullable Fragment getRetainedFragmentInstance() {
 
-		FragmentManager fragmentManager = getFragmentManager();
-		for (Map.Entry<Class<? extends Fragment>, String> fragmentTagEntry : fragmentsTagsMap.entrySet())
-			if ((fragmentManager.findFragmentByTag(fragmentTagEntry.getValue())) != null)
-				return fragmentManager.findFragmentByTag(fragmentTagEntry.getValue());
+        FragmentManager fragmentManager = getFragmentManager();
+        for (Map.Entry<Class<? extends Fragment>, String> fragmentTagEntry : fragmentsTagsMap.entrySet())
+            if ((fragmentManager.findFragmentByTag(fragmentTagEntry.getValue())) != null)
+                return fragmentManager.findFragmentByTag(fragmentTagEntry.getValue());
 
-		return null;
-	}
+        return null;
+    }
 
-	private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag, boolean addToBackStack) {
+    private void replaceMainFragment(@NonNull Fragment fragment, @NonNull String tag, boolean addToBackStack) {
 
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		transaction.replace(R.id.preferences_activity_main_layout, fragment, tag);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.preferences_activity_main_layout, fragment, tag);
 
-		if (addToBackStack)
-			transaction.addToBackStack(tag);
+        if (addToBackStack)
+            transaction.addToBackStack(tag);
 
-		transaction.commit();
-	}
+        transaction.commit();
+    }
 
-	// <editor-fold desc="PreferenceMenuFragmentListener">
+    // <editor-fold desc="PreferenceMenuFragmentListener">
 
-	@Override public void onMenuElementClicked(@NonNull Fragment fragment) {
-		String fragmentTag = fragmentsTagsMap.get(fragment.getClass());
-		replaceMainFragment(fragment, fragmentTag, true);
-	}
+    @Override public void onMenuElementClicked(@NonNull Fragment fragment) {
+        String fragmentTag = fragmentsTagsMap.get(fragment.getClass());
+        replaceMainFragment(fragment, fragmentTag, true);
+    }
 
-	// </editor-fold desc="PreferenceMenuFragmentListener">
+    // </editor-fold desc="PreferenceMenuFragmentListener">
 }

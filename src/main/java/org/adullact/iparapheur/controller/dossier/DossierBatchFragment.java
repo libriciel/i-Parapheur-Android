@@ -48,7 +48,7 @@ public class DossierBatchFragment extends Fragment {
 		if ((getArguments() != null) && getArguments().containsKey(DOSSIER)) {
 			this.dossiers.add(getArguments().getString(DOSSIER));
 		}
-		listView = (ListView) view.findViewById(R.id.dossiers_list);
+		listView = view.findViewById(R.id.dossiers_list);
 		listView.setItemsCanFocus(false);
 	}
 

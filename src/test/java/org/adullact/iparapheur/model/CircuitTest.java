@@ -20,7 +20,7 @@ package org.adullact.iparapheur.model;
 import com.google.gson.Gson;
 
 import org.adullact.iparapheur.utils.CollectionUtils;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class CircuitTest {
 
         List<EtapeCircuit> etapes01 = new ArrayList<>();
         etapes01.add(new EtapeCircuit(
-                StringUtils.serializeToIso8601Date(new Date(1478792085680L)),
+                StringsUtils.serializeToIso8601Date(new Date(1478792085680L)),
                 true,
                 false,
                 "Bureau 01",

@@ -41,7 +41,7 @@ import com.crashlytics.android.Crashlytics;
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.utils.FileUtils;
 import org.adullact.iparapheur.utils.PKCS7Signer;
-import org.adullact.iparapheur.utils.StringUtils;
+import org.adullact.iparapheur.utils.StringsUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,215 +62,215 @@ import java.util.Map;
  */
 public class PreferencesCertificatesFragment extends Fragment {
 
-	public static final String FRAGMENT_TAG = "preferences_certificates_fragment";
-	public static final String LOG_TAG = "PrefsCertificatesFrag";
+    public static final String FRAGMENT_TAG = "preferences_certificates_fragment";
+    public static final String LOG_TAG = "PrefsCertificatesFrag";
 
-	private static final String LIST_FIELD_TITLE = "list_field_title";
-	private static final String LIST_FIELD_IS_EXPIRED = "list_field_is_expired";
-	private static final String LIST_FIELD_EXPIRATION_DATE_STRING = "list_field_expiration_date_string";
+    private static final String LIST_FIELD_TITLE = "list_field_title";
+    private static final String LIST_FIELD_IS_EXPIRED = "list_field_is_expired";
+    private static final String LIST_FIELD_EXPIRATION_DATE_STRING = "list_field_expiration_date_string";
 
-	private ListView mCertificatesList;
-	private View mEmptyView;
+    private ListView mCertificatesList;
+    private View mEmptyView;
 
-	private List<Map<String, Object>> mCertificatesData;
+    private List<Map<String, Object>> mCertificatesData;
 
-	/**
-	 * Use this factory method to create a new instance of
-	 * this fragment using the provided parameters.
-	 *
-	 * @return A new instance of fragment PreferencesMenuFragment.
-	 */
-	public static PreferencesCertificatesFragment newInstance() {
-		return new PreferencesCertificatesFragment();
-	}
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment PreferencesMenuFragment.
+     */
+    public static PreferencesCertificatesFragment newInstance() {
+        return new PreferencesCertificatesFragment();
+    }
 
-	public PreferencesCertificatesFragment() {
-		// Required empty public constructor
-	}
+    public PreferencesCertificatesFragment() {
+        // Required empty public constructor
+    }
 
-	// <editor-fold desc="LifeCycle">
+    // <editor-fold desc="LifeCycle">
 
-	@Override public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setRetainInstance(true);
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
-		mCertificatesData = new ArrayList<>();
-		buildCertificatesDataMap();
-	}
+        mCertificatesData = new ArrayList<>();
+        buildCertificatesDataMap();
+    }
 
-	@Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.preferences_certificates_fragment, container, false);
+    @Override public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.preferences_certificates_fragment, container, false);
 
-		mCertificatesList = (ListView) v.findViewById(R.id.preferences_certificates_fragment_main_list);
-		mEmptyView = v.findViewById(R.id.preferences_certificates_fragment_empty_view_linearlayout);
-		Button certificateTutoButton = (Button) v.findViewById(R.id.preferences_certificates_fragment_certificate_tuto_button);
+        mCertificatesList = v.findViewById(R.id.preferences_certificates_fragment_main_list);
+        mEmptyView = v.findViewById(R.id.preferences_certificates_fragment_empty_view_linearlayout);
+        Button certificateTutoButton = v.findViewById(R.id.preferences_certificates_fragment_certificate_tuto_button);
 
-		// Buttons listeners
+        // Buttons listeners
 
-		certificateTutoButton.setOnClickListener(new View.OnClickListener() {
-			@Override public void onClick(View view) {
-				FileUtils.launchCertificateTutoPdfIntent(getActivity());
-			}
-		});
+        certificateTutoButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                FileUtils.launchCertificateTutoPdfIntent(getActivity());
+            }
+        });
 
-		// Building ListAdapter
+        // Building ListAdapter
 
-		String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_EXPIRATION_DATE_STRING};
-		int[] orderedFieldIds = new int[]{
-				R.id.preferences_certificates_fragment_cell_title_textview, R.id.preferences_certificates_fragment_cell_expiration_textview
-		};
+        String[] orderedFieldNames = new String[]{LIST_FIELD_TITLE, LIST_FIELD_EXPIRATION_DATE_STRING};
+        int[] orderedFieldIds = new int[]{
+                R.id.preferences_certificates_fragment_cell_title_textview, R.id.preferences_certificates_fragment_cell_expiration_textview
+        };
 
-		SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(getActivity(),
-																		 mCertificatesData,
-																		 R.layout.preferences_certificates_fragment_cell,
-																		 orderedFieldNames,
-																		 orderedFieldIds
-		);
+        SimpleAdapter certificatesAdapter = new CertificateSimpleAdapter(getActivity(),
+                mCertificatesData,
+                R.layout.preferences_certificates_fragment_cell,
+                orderedFieldNames,
+                orderedFieldIds
+        );
 
-		mCertificatesList.setAdapter(certificatesAdapter);
+        mCertificatesList.setAdapter(certificatesAdapter);
 
-		//
+        //
 
-		checkEmptyViewVisibility();
+        checkEmptyViewVisibility();
 
-		return v;
-	}
+        return v;
+    }
 
-	@Override public void onResume() {
-		super.onResume();
+    @Override public void onResume() {
+        super.onResume();
 
-		if (getActivity() instanceof AppCompatActivity) {
-			AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-			if (parentActivity.getSupportActionBar() != null)
-				parentActivity.getSupportActionBar().setTitle(R.string.pref_header_certificates);
-		}
-	}
+        if (getActivity() instanceof AppCompatActivity) {
+            AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
+            if (parentActivity.getSupportActionBar() != null)
+                parentActivity.getSupportActionBar().setTitle(R.string.pref_header_certificates);
+        }
+    }
 
-	// </editor-fold desc="LifeCycle">
+    // </editor-fold desc="LifeCycle">
 
-	private void onDeleteButtonClicked(int position) {
+    private void onDeleteButtonClicked(int position) {
 
-		// Delete certificate file
+        // Delete certificate file
 
-		String currentFileName = mCertificatesData.get(position).get(LIST_FIELD_TITLE).toString();
-		List<File> certificateList = FileUtils.getBksFromCertificateFolder(getActivity());
+        String currentFileName = mCertificatesData.get(position).get(LIST_FIELD_TITLE).toString();
+        List<File> certificateList = FileUtils.getBksFromCertificateFolder(getActivity());
 
-		boolean success = false;
-		for (File certificate : certificateList)
-			if (TextUtils.equals(certificate.getName(), currentFileName))
-				success = success || certificate.delete();
+        boolean success = false;
+        for (File certificate : certificateList)
+            if (TextUtils.equals(certificate.getName(), currentFileName))
+                success = success || certificate.delete();
 
-		// Refresh UI
+        // Refresh UI
 
-		if (success) {
-			Log.i(LOG_TAG, "Delete certificate " + currentFileName);
-			mCertificatesData.remove(position);
-			checkEmptyViewVisibility();
+        if (success) {
+            Log.i(LOG_TAG, "Delete certificate " + currentFileName);
+            mCertificatesData.remove(position);
+            checkEmptyViewVisibility();
 
-			((SimpleAdapter) mCertificatesList.getAdapter()).notifyDataSetChanged();
-			Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_success, Toast.LENGTH_SHORT).show();
-		}
-		else {
-			Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_failed, Toast.LENGTH_SHORT).show();
-		}
-	}
+            ((SimpleAdapter) mCertificatesList.getAdapter()).notifyDataSetChanged();
+            Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_success, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), R.string.pref_certificates_message_delete_failed, Toast.LENGTH_SHORT).show();
+        }
+    }
 
-	public void buildCertificatesDataMap() {
+    public void buildCertificatesDataMap() {
 
-		mCertificatesData.clear();
+        mCertificatesData.clear();
 
-		List<File> certificatesList = FileUtils.getBksFromCertificateFolder(getActivity());
-		for (File certificate : certificatesList) {
+        List<File> certificatesList = FileUtils.getBksFromCertificateFolder(getActivity());
+        for (File certificate : certificatesList) {
 
-			// Retrieving Certificate expiration date.
-			// And computing every other operation, better here than at runtime in the Adapter.
+            // Retrieving Certificate expiration date.
+            // And computing every other operation, better here than at runtime in the Adapter.
 
-			SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
-			String certificatePassword = settings.getString(certificate.getName(), "");
-			PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
+            SharedPreferences settings = getActivity().getSharedPreferences(FileUtils.SHARED_PREFERENCES_CERTIFICATES_PASSWORDS, 0);
+            String certificatePassword = settings.getString(certificate.getName(), "");
+            PKCS7Signer signer = new PKCS7Signer(certificate.getAbsolutePath(), certificatePassword, "", "");
 
-			Date certifExpDate = null;
-			try {
-				signer.loadKeyStore();
-				certifExpDate = signer.getCertificateExpirationDate();
-			}
-			catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
-				Crashlytics.logException(e);
-				e.printStackTrace();
-			}
+            Date certifExpDate = null;
+            try {
+                signer.loadKeyStore();
+                certifExpDate = signer.getCertificateExpirationDate();
+            } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
+                Crashlytics.logException(e);
+                Log.e(LOG_TAG, e.getLocalizedMessage());
+            }
 
-			String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringUtils.getLocalizedSmallDate(certifExpDate));
-			Boolean isExpired = (certifExpDate == null) || (certifExpDate.before(new Date()));
+            String expString = String.format(getString(R.string.pref_certificates_expiration_date), StringsUtils.getLocalizedSmallDate(certifExpDate));
+            Boolean isExpired = (certifExpDate == null) || (certifExpDate.before(new Date()));
 
-			// Mapping results
+            // Mapping results
 
-			Map<String, Object> certificateData = new HashMap<>();
-			certificateData.put(LIST_FIELD_TITLE, certificate.getName());
-			certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expString);
-			certificateData.put(LIST_FIELD_IS_EXPIRED, isExpired);
-			mCertificatesData.add(certificateData);
-		}
-	}
+            Map<String, Object> certificateData = new HashMap<>();
+            certificateData.put(LIST_FIELD_TITLE, certificate.getName());
+            certificateData.put(LIST_FIELD_EXPIRATION_DATE_STRING, expString);
+            certificateData.put(LIST_FIELD_IS_EXPIRED, isExpired);
+            mCertificatesData.add(certificateData);
+        }
+    }
 
-	private void checkEmptyViewVisibility() {
-		mCertificatesList.setVisibility(mCertificatesData.isEmpty() ? View.GONE : View.VISIBLE);
-		mEmptyView.setVisibility(mCertificatesData.isEmpty() ? View.VISIBLE : View.GONE);
-	}
+    private void checkEmptyViewVisibility() {
+        mCertificatesList.setVisibility(mCertificatesData.isEmpty() ? View.GONE : View.VISIBLE);
+        mEmptyView.setVisibility(mCertificatesData.isEmpty() ? View.VISIBLE : View.GONE);
+    }
 
-	//
+    //
 
-	private class CertificateSimpleAdapter extends SimpleAdapter {
+    private class CertificateSimpleAdapter extends SimpleAdapter {
 
-		private int mRegularColor;
-		private int mErrorColor;
+        private int mRegularColor;
+        private int mErrorColor;
 
-		/**
-		 * Constructor
-		 *
-		 * @param context  The context where the View associated with this SimpleAdapter is running
-		 * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
-		 *                 Maps contain the data for each row, and should include all the entries specified in
-		 *                 "from"
-		 * @param resource Resource identifier of a view layout that defines the views for this list
-		 *                 item. The layout file should include at least those named views defined in "to"
-		 * @param from     A list of column names that will be added to the Map associated with each
-		 *                 item.
-		 * @param to       The views that should display column in the "from" parameter. These should all be
-		 *                 TextViews. The first N views in this list are given the values of the first N columns
-		 */
-		CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
-			super(context, data, resource, from, to);
-			mErrorColor = ContextCompat.getColor(context, R.color.red_500);
-			mRegularColor = ContextCompat.getColor(context, R.color.text_black_secondary);
-		}
+        /**
+         * Constructor
+         *
+         * @param context  The context where the View associated with this SimpleAdapter is running
+         * @param data     A List of Maps. Each entry in the List corresponds to one row in the list. The
+         *                 Maps contain the data for each row, and should include all the entries specified in
+         *                 "from"
+         * @param resource Resource identifier of a view layout that defines the views for this list
+         *                 item. The layout file should include at least those named views defined in "to"
+         * @param from     A list of column names that will be added to the Map associated with each
+         *                 item.
+         * @param to       The views that should display column in the "from" parameter. These should all be
+         *                 TextViews. The first N views in this list are given the values of the first N columns
+         */
+        CertificateSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to) {
+            super(context, data, resource, from, to);
+            mErrorColor = ContextCompat.getColor(context, R.color.red_500);
+            mRegularColor = ContextCompat.getColor(context, R.color.text_black_secondary);
+        }
 
-		@Override public View getView(final int position, View convertView, ViewGroup parent) {
+        @Override public View getView(final int position, View convertView, ViewGroup parent) {
 
-			// We reset the Tag before recycling the view, with super, then reassign it
-			// because we don't want to trigger the EditText TextChangedListeners
-			// when the system recycles the views.
+            // We reset the Tag before recycling the view, with super, then reassign it
+            // because we don't want to trigger the EditText TextChangedListeners
+            // when the system recycles the views.
 
-			final View v = super.getView(position, convertView, parent);
+            final View v = super.getView(position, convertView, parent);
 
-			final ImageButton deleteButton = (ImageButton) v.findViewById(R.id.preferences_certificates_fragment_cell_delete_imagebutton);
-			final TextView expirationTextView = (TextView) v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
+            final ImageButton deleteButton = v.findViewById(R.id.preferences_certificates_fragment_cell_delete_imagebutton);
+            final TextView expirationTextView = v.findViewById(R.id.preferences_certificates_fragment_cell_expiration_textview);
 
-			// Cell buttons listener
+            // Cell buttons listener
 
-			deleteButton.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View arg0) {
-					onDeleteButtonClicked(position);
-				}
-			});
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View arg0) {
+                    onDeleteButtonClicked(position);
+                }
+            });
 
-			// Warns expiration date
+            // Warns expiration date
 
-			Boolean isExpired = (Boolean) mCertificatesData.get(position).get(LIST_FIELD_IS_EXPIRED);
-			expirationTextView.setTextColor(isExpired ? mErrorColor : mRegularColor);
+            Boolean isExpired = (Boolean) mCertificatesData.get(position).get(LIST_FIELD_IS_EXPIRED);
+            expirationTextView.setTextColor(isExpired ? mErrorColor : mRegularColor);
 
-			//
+            //
 
-			return v;
-		}
-	}
+            return v;
+        }
+
+    }
+
 }
