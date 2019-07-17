@@ -9,6 +9,7 @@
 - Enable Auto-import
 - Go to Preferences → Build, Execution, Deployment → Compiler → Annotation Processors
 - Check Enable annotation processing
+- Go to Preferences → Plugins → Search and install `Lombok`
 
 ##### Building :
 
