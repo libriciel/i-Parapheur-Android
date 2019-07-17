@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
@@ -185,10 +185,10 @@ public abstract class RestClientApi implements IParapheurAPI {
             // Close the output stream when done
             fileOutput.close();
         } catch (FileNotFoundException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             throw new IParapheurException(R.string.error_file_not_found, null);
         } catch (IOException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             throw new IParapheurException(R.string.error_parse, null);
         } finally {
             if (fileOutput != null) {
@@ -226,7 +226,7 @@ public abstract class RestClientApi implements IParapheurAPI {
             while ((count = input.read(data)) != -1)
                 output.write(data, 0, count);
         } catch (HttpException | IOException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.import_error_message_cant_download_certificate, e.getLocalizedMessage());
         } finally {

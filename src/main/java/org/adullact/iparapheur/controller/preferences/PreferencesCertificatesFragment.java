@@ -37,7 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.utils.FileUtils;
@@ -194,7 +194,7 @@ public class PreferencesCertificatesFragment extends Fragment {
                 signer.loadKeyStore();
                 certifExpDate = signer.getCertificateExpirationDate();
             } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
-                Crashlytics.logException(e);
+                Sentry.capture(e);
                 Log.e(LOG_TAG, e.getLocalizedMessage());
             }
 

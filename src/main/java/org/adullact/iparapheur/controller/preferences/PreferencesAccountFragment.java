@@ -39,7 +39,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RESTClient;
@@ -478,7 +478,7 @@ public class PreferencesAccountFragment extends Fragment {
             try {
                 mResultMessageRes = RESTClient.INSTANCE.test(testAccount);
             } catch (IParapheurException e) {
-                Crashlytics.logException(e);
+                Sentry.capture(e);
                 mResultMessageRes = e.getResId();
                 Log.e(LOG_TAG, e.getLocalizedMessage());
             }

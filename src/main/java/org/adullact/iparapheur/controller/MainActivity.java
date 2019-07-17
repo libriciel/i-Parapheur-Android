@@ -53,7 +53,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.adullact.iparapheur.R;
@@ -86,6 +85,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
 
 
 /**
@@ -129,6 +131,23 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Sentry setup
+
+        Context ctx = this.getApplicationContext();
+        Sentry.init(
+                "http://5a80a1e017344753bfd6d5f5e1fb993b@10.0.2.2:9000/2",
+                new AndroidSentryClientFactory(ctx)
+        );
+
+        try {
+            throw new UnsupportedOperationException("You shouldn't call this!");
+        } catch (Exception e) {
+            Sentry.capture(e);
+        }
+
+
+        Log.e("TEST", "WWWOWOWOWOWOWO");
 
         // To have a transparent StatusBar, and a background color behind
 
@@ -622,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                     if (!downloadSuccessful)
                         mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
                 } catch (IParapheurException e) {
-                    Crashlytics.logException(e);
+                    Sentry.capture(e);
                     Log.e(LOG_TAG, e.getLocalizedMessage());
                 }
 

@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.api.RestClientApi;
@@ -295,7 +295,7 @@ public class RESTUtils {
 
             requestContent = requestStringer.toString();
         } catch (JSONException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
         }
 

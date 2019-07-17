@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 
@@ -71,7 +71,7 @@ public class PreferencesAboutFragment extends Fragment {
         try {
             currentVersion = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
         }
 

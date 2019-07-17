@@ -24,10 +24,9 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-
 import org.adullact.iparapheur.R;
 
+import io.sentry.Sentry;
 
 
 /**
@@ -72,7 +71,7 @@ public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
             load(params);
         } catch (IParapheurException e) {
             error = activity.getResources().getString(e.getResId(), e.getComplement());
-			Crashlytics.logException(e);
+            Sentry.capture(e);
         }
         return error;
     }
