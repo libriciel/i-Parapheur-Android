@@ -20,11 +20,8 @@ package org.adullact.iparapheur.controller.dossier.action;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +29,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -110,34 +109,20 @@ public class SealDialogFragment extends DialogFragment {
 
         // Set listeners
 
-        mPublicAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override public void onFocusChange(View v, boolean hasFocus) {
-                mPublicAnnotationLabel.setActivated(hasFocus);
-            }
-        });
+        mPublicAnnotationEditText.setOnFocusChangeListener((v, hasFocus) -> mPublicAnnotationLabel.setActivated(hasFocus));
 
-        mPrivateAnnotationEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override public void onFocusChange(View v, boolean hasFocus) {
-                mPrivateAnnotationLabel.setActivated(hasFocus);
-            }
-        });
+        mPrivateAnnotationEditText.setOnFocusChangeListener((v, hasFocus) -> mPrivateAnnotationLabel.setActivated(hasFocus));
 
         // Build Dialog
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
         builder.setView(view);
-        builder.setPositiveButton(R.string.action_seal, new DialogInterface.OnClickListener() {
-            @Override public void onClick(DialogInterface dialog, int which) {
-                // Do nothing here because we override this button in the onStart() to change the close behaviour.
-                // However, we still need this because on older versions of Android :
-                // unless we pass a handler the button doesn't get instantiated
-            }
+        builder.setPositiveButton(R.string.action_seal, (dialog, which) -> {
+            // Do nothing here because we override this button in the onStart() to change the close behaviour.
+            // However, we still need this because on older versions of Android :
+            // unless we pass a handler the button doesn't get instantiated
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                onCancelButtonClicked();
-            }
-        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, id) -> onCancelButtonClicked());
 
         return builder.create();
     }
@@ -151,11 +136,7 @@ public class SealDialogFragment extends DialogFragment {
         AlertDialog dialog = (AlertDialog) getDialog();
         if (dialog != null) {
             Button positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                    onSealButtonClicked();
-                }
-            });
+            positiveButton.setOnClickListener(v -> onSealButtonClicked());
         }
     }
 

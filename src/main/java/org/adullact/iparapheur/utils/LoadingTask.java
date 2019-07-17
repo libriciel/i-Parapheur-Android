@@ -29,6 +29,7 @@ import com.crashlytics.android.Crashlytics;
 import org.adullact.iparapheur.R;
 
 
+
 /**
  * Simple AsyncTask that automatically show a loader in the action bar.
  * If a {@link org.adullact.iparapheur.utils.LoadingTask.DataChangeListener} is defined, this
@@ -39,88 +40,86 @@ import org.adullact.iparapheur.R;
  */
 public abstract class LoadingTask extends AsyncTask<String, Integer, String> {
 
-	protected Activity activity;
-	private DataChangeListener dataListener;
+    protected Activity activity;
+    private DataChangeListener dataListener;
 
-	public LoadingTask(Activity activity, DataChangeListener listener) {
-		this.activity = activity;
-		this.dataListener = listener;
-	}
+    public LoadingTask(Activity activity, DataChangeListener listener) {
+        this.activity = activity;
+        this.dataListener = listener;
+    }
 
-	protected abstract void load(String... params) throws IParapheurException;
+    protected abstract void load(String... params) throws IParapheurException;
 
-	@Override protected void onPreExecute() {
-		if (DeviceUtils.isDebugOffline()) {
-			Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
-			showProgress();
-		}
-		else {
-			ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-			if (networkInfo == null || !networkInfo.isConnected()) {
-				this.cancel(true);
-				Toast.makeText(activity, R.string.network_unreachable, Toast.LENGTH_LONG).show();
-			}
-			else {
-				showProgress();
-			}
-		}
-	}
+    @Override protected void onPreExecute() {
+        if (DeviceUtils.isDebugOffline()) {
+            Toast.makeText(activity, "Attention : Mode Hors Ligne.", Toast.LENGTH_SHORT).show();
+            showProgress();
+        } else {
+            ConnectivityManager connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                this.cancel(true);
+                Toast.makeText(activity, R.string.network_unreachable, Toast.LENGTH_LONG).show();
+            } else {
+                showProgress();
+            }
+        }
+    }
 
-	@Override protected String doInBackground(String... params) {
-		String error = null;
-		try {
-			load(params);
-		}
-		catch (IParapheurException e) {
-			error = activity.getResources().getString(e.getResId(), e.getComplement());
+    @Override protected String doInBackground(String... params) {
+        String error = null;
+        try {
+            load(params);
+        } catch (IParapheurException e) {
+            error = activity.getResources().getString(e.getResId(), e.getComplement());
 			Crashlytics.logException(e);
-		}
-		return error;
-	}
+        }
+        return error;
+    }
 
-	@Override protected void onPostExecute(String error) {
-		hideProgress();
-		if (error != null) {
-			Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
-		}
-		else if (dataListener != null) {
-			dataListener.onDataChanged();
-		}
-	}
+    @Override protected void onPostExecute(String error) {
+        hideProgress();
+        if (error != null) {
+            Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
+        } else if (dataListener != null) {
+            dataListener.onDataChanged();
+        }
+    }
 
-	@Override protected void onCancelled() {
-		hideProgress();
-	}
+    @Override protected void onCancelled() {
+        hideProgress();
+    }
 
-	/**
-	 * Show the indeterminate progress wheel
-	 * Protected so subclasses can override it (ex. for determinate progressBar)
-	 */
-	protected void showProgress() {
-		activity.setProgressBarIndeterminateVisibility(true);
-	}
+    /**
+     * Show the indeterminate progress wheel
+     * Protected so subclasses can override it (ex. for determinate progressBar)
+     */
+    protected void showProgress() {
+        activity.setProgressBarIndeterminateVisibility(true);
+    }
 
-	/**
-	 * Hide the indeterminate progress wheel
-	 * Protected so subclasses can override it (ex. for determinate progressBar)
-	 */
-	protected void hideProgress() {
-		activity.setProgressBarIndeterminateVisibility(false);
-	}
+    /**
+     * Hide the indeterminate progress wheel
+     * Protected so subclasses can override it (ex. for determinate progressBar)
+     */
+    protected void hideProgress() {
+        activity.setProgressBarIndeterminateVisibility(false);
+    }
 
-	/**
-	 * This interface is used by {@link LoadingTask},
-	 * when the task has finished loading its data, the component which holds the data is notified
-	 * with the call of the function onDataChanged().
-	 * Created by jmaire on 04/11/2013.
-	 */
-	public interface DataChangeListener {
+    /**
+     * This interface is used by {@link LoadingTask},
+     * when the task has finished loading its data, the component which holds the data is notified
+     * with the call of the function onDataChanged().
+     * Created by jmaire on 04/11/2013.
+     */
+    public interface DataChangeListener {
 
-		/**
-		 * Used to notify a class that its data has changed. The class should reload the UI in case
-		 * of a Fragment or an Activity.
-		 */
-		void onDataChanged();
-	}
+        /**
+         * Used to notify a class that its data has changed. The class should reload the UI in case
+         * of a Fragment or an Activity.
+         */
+        void onDataChanged();
+
+    }
+
 }
