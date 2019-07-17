@@ -88,6 +88,8 @@ import java.util.Set;
 
 import io.sentry.Sentry;
 import io.sentry.android.AndroidSentryClientFactory;
+import io.sentry.event.BreadcrumbBuilder;
+import io.sentry.event.UserBuilder;
 
 
 /**
@@ -132,22 +134,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Sentry setup
-
         Context ctx = this.getApplicationContext();
         Sentry.init(
                 "http://5a80a1e017344753bfd6d5f5e1fb993b@10.0.2.2:9000/2",
                 new AndroidSentryClientFactory(ctx)
         );
-
-        try {
-            throw new UnsupportedOperationException("You shouldn't call this!");
-        } catch (Exception e) {
-            Sentry.capture(e);
-        }
-
-
-        Log.e("TEST", "WWWOWOWOWOWOWO");
 
         // To have a transparent StatusBar, and a background color behind
 
@@ -253,6 +244,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public void onResume() {
         super.onResume();
+
+        logWithStaticAPI();
 
         // Check possible Scheme URI call.
         // Waiting arguments like :
@@ -604,6 +597,46 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 
     // </editor-fold desc="ActionMode">
+
+    /**
+     * An example method that throws an exception.
+     */
+    void unsafeMethod() {
+        throw new UnsupportedOperationException("You shouldn't call this!");
+    }
+
+    /**
+     * Note that the ``Sentry.init`` method must be called before the static API
+     * is used, otherwise a ``NullPointerException`` will be thrown.
+     */
+    void logWithStaticAPI() {
+        /*
+         Record a breadcrumb in the current context which will be sent
+         with the next event(s). By default the last 100 breadcrumbs are kept.
+         */
+        Sentry.getContext().recordBreadcrumb(
+                new BreadcrumbBuilder().setMessage("User made an action").build()
+        );
+
+        // Set the user in the current context.
+        Sentry.getContext().setUser(
+                new UserBuilder().setEmail("hello@sentry.io").build()
+        );
+
+        /*
+         This sends a simple event to Sentry using the statically stored instance
+         that was created in the ``main`` method.
+         */
+        Sentry.capture("This is a test");
+
+        try {
+            unsafeMethod();
+        } catch (Exception e) {
+            // This sends an exception event to Sentry using the statically stored instance
+            // that was created in the ``main`` method.
+            Sentry.capture(e);
+        }
+    }
 
 
     private void refreshNavigationDrawerHeader() {
