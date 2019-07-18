@@ -34,7 +34,7 @@
         <item name="actionModeStyle">@style/AppTheme.Main.CAB</item>
     </style>
 
-    <style name="AppTheme.Settings" parent="AppTheme.Settings.Base"/>
+    <style name="AppTheme.Settings" parent="AppTheme.Settings.Base" />
 
     <style name="AppTheme.Main.Dialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/secondary_500</item>
@@ -57,5 +57,15 @@
         <item name="background">@color/contextual_500</item>
         <item name="backgroundSplit">@color/contextual_500</item>
     </style>
+
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

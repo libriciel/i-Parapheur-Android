@@ -18,37 +18,64 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
-        android:name=".controller.IParapheurApplication"
         android:allowBackup="true"
-        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".controller.MainActivity"
+            android:name=".ItemListActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Main"
-            android:windowSoftInputMode="adjustPan">
-
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="iparapheur" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.preferences.PreferencesActivity"
-            android:label="@string/Settings"
-            android:theme="@style/AppTheme.Settings"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".ItemDetailActivity"
+            android:label="@string/title_item_detail"
+            android:parentActivityName=".ItemListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ItemListActivity" />
+        </activity>
+
+
+
+        <!--android:name=".controller.IParapheurApplication"-->
+        <!--android:allowBackup="true"-->
+        <!--android:fullBackupContent="true"-->
+        <!--android:icon="@mipmap/ic_launcher"-->
+        <!--android:label="@string/app_name"-->
+        <!--android:theme="@style/AppTheme">-->
+        <!--<activity-->
+            <!--android:name=".controller.MainActivity"-->
+            <!--android:label="@string/app_name"-->
+            <!--android:theme="@style/AppTheme.Main"-->
+            <!--android:windowSoftInputMode="adjustPan">-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.BROWSABLE" />-->
+
+                <!--<data android:scheme="iparapheur" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name=".controller.preferences.PreferencesActivity"-->
+            <!--android:label="@string/Settings"-->
+            <!--android:theme="@style/AppTheme.Settings"-->
+            <!--android:windowSoftInputMode="adjustResize" />-->
 
         <!--<activity-->
         <!--android:name="com.artifex.mupdfdemo.MuPDFActivity"-->

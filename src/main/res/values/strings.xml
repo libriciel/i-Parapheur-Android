@@ -194,4 +194,7 @@
     <string name="action_settings">Settings</string>
     <string name="Settings">Réglages</string>
 
+
+    <string name="title_item_detail">Item Detail</string>
+
 </resources>
