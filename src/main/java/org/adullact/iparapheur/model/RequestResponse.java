@@ -19,7 +19,7 @@ package org.adullact.iparapheur.model;
 
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 
 import org.adullact.iparapheur.R;
 import org.adullact.iparapheur.controller.rest.RESTUtils;
@@ -79,19 +79,19 @@ public class RequestResponse {
                 if (json instanceof JSONObject)
                     this.error = ((JSONObject) json).optString("message", "");
 
-                Crashlytics.logException(new Exception(error));
+                Sentry.capture(new Exception(error));
                 throw RESTUtils.getExceptionForError(this.code, error);
             }
         } catch (JSONException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_parse, Arrays.toString(e.getStackTrace()));
         } catch (UnknownHostException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.http_error_404, httpURLConnection.getURL().getHost());
         } catch (IOException e) {
-            Crashlytics.logException(e);
+            Sentry.capture(e);
             Log.e(LOG_TAG, e.getLocalizedMessage());
             throw new IParapheurException(R.string.error_server_not_configured, null);
         }

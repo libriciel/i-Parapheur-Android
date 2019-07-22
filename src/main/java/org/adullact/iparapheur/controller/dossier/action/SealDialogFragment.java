@@ -48,6 +48,8 @@ import org.adullact.iparapheur.utils.IParapheurException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import io.sentry.Sentry;
+
 
 public class SealDialogFragment extends DialogFragment {
 
@@ -184,7 +186,7 @@ public class SealDialogFragment extends DialogFragment {
                     Log.d(LOG_TAG, "CACHET on : " + dossier.getName());
                 } catch (IParapheurException e) {
                     Log.e(LOG_TAG, e.getLocalizedMessage());
-                    Crashlytics.logException(e);
+                    Sentry.capture(e);
                     mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.visa_error_message_not_sent_to_server;
                 }
 

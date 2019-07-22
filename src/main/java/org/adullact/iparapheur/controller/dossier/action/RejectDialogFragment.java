@@ -33,7 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import io.sentry.Sentry;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -201,7 +201,7 @@ public class RejectDialogFragment extends DialogFragment {
                     Log.d(LOG_TAG, "REJECT on : " + dossier.getName());
                 } catch (IParapheurException e) {
                     Log.e(LOG_TAG, e.getLocalizedMessage());
-                    Crashlytics.logException(e);
+                    Sentry.capture(e);
                     mErrorMessage = (e.getResId() > 0) ? e.getResId() : R.string.reject_error_message_not_sent_to_server;
                 }
 

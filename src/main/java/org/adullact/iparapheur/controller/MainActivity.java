@@ -53,7 +53,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.adullact.iparapheur.R;
@@ -86,6 +85,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
 
 
 /**
@@ -130,6 +132,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Context ctx = this.getApplicationContext();
+        Sentry.init(
+                "https://f4de6f6e80e74c4690dad83616dd4878@sentry.libriciel.fr/6",
+                new AndroidSentryClientFactory(ctx)
+        );
+
         // To have a transparent StatusBar, and a background color behind
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
@@ -158,24 +166,22 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         ImageButton drawerAccountImageButton = findViewById(R.id.navigation_drawer_menu_header_account_button);
         if (drawerAccountImageButton != null) {
-            drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
+            drawerAccountImageButton.setOnClickListener(v -> {
 
-                    if (mNavigationDrawerAccountViewSwitcher == null)
-                        return;
+                if (mNavigationDrawerAccountViewSwitcher == null)
+                    return;
 
-                    boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
-                    if (switchToAccountView)
-                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
-                    else
-                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+                boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
+                if (switchToAccountView)
+                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+                else
+                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-                    View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-                    View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+                View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+                View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
 
-                    filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-                    downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-                }
+                filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+                downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
             });
         }
 
@@ -303,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
@@ -417,11 +424,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
             actionsToolbar.getMenu().clear();
             actionsToolbar.inflateMenu(R.menu.main_activity);
-            actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override public boolean onMenuItemClick(MenuItem item) {
-                    return onOptionsItemSelected(item);
-                }
-            });
+            actionsToolbar.setOnMenuItemClickListener(item -> onOptionsItemSelected(item));
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -622,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                     if (!downloadSuccessful)
                         mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
                 } catch (IParapheurException e) {
-                    Crashlytics.logException(e);
+                    Sentry.capture(e);
                     Log.e(LOG_TAG, e.getLocalizedMessage());
                 }
 

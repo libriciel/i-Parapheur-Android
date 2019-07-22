@@ -19,24 +19,7 @@ package org.adullact.iparapheur.controller;
 
 import android.app.Application;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
-
-import org.adullact.iparapheur.BuildConfig;
-
-import io.fabric.sdk.android.Fabric;
-
 
 public class IParapheurApplication extends Application {
-
-
-    @Override public void onCreate() {
-        super.onCreate();
-
-        // Crashlytics init
-
-        CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
-        Fabric.with(this, new Crashlytics.Builder().core(core).build());
-    }
 
 }
