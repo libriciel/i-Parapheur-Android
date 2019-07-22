@@ -88,8 +88,6 @@ import java.util.Set;
 
 import io.sentry.Sentry;
 import io.sentry.android.AndroidSentryClientFactory;
-import io.sentry.event.BreadcrumbBuilder;
-import io.sentry.event.UserBuilder;
 
 
 /**
@@ -136,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         Context ctx = this.getApplicationContext();
         Sentry.init(
-                "http://5a80a1e017344753bfd6d5f5e1fb993b@10.0.2.2:9000/2",
+                "https://f4de6f6e80e74c4690dad83616dd4878@sentry.libriciel.fr/6",
                 new AndroidSentryClientFactory(ctx)
         );
 
@@ -168,24 +166,22 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         ImageButton drawerAccountImageButton = findViewById(R.id.navigation_drawer_menu_header_account_button);
         if (drawerAccountImageButton != null) {
-            drawerAccountImageButton.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
+            drawerAccountImageButton.setOnClickListener(v -> {
 
-                    if (mNavigationDrawerAccountViewSwitcher == null)
-                        return;
+                if (mNavigationDrawerAccountViewSwitcher == null)
+                    return;
 
-                    boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
-                    if (switchToAccountView)
-                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
-                    else
-                        mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+                boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
+                if (switchToAccountView)
+                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+                else
+                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
-                    View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
-                    View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
+                View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
+                View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
 
-                    filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-                    downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
-                }
+                filterButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
+                downloadButton.setVisibility(switchToAccountView ? View.GONE : View.VISIBLE);
             });
         }
 
@@ -244,8 +240,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public void onResume() {
         super.onResume();
-
-        logWithStaticAPI();
 
         // Check possible Scheme URI call.
         // Waiting arguments like :
@@ -315,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE) {
 
@@ -429,11 +424,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
             actionsToolbar.getMenu().clear();
             actionsToolbar.inflateMenu(R.menu.main_activity);
-            actionsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override public boolean onMenuItemClick(MenuItem item) {
-                    return onOptionsItemSelected(item);
-                }
-            });
+            actionsToolbar.setOnMenuItemClickListener(item -> onOptionsItemSelected(item));
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -597,46 +588,6 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 
     // </editor-fold desc="ActionMode">
-
-    /**
-     * An example method that throws an exception.
-     */
-    void unsafeMethod() {
-        throw new UnsupportedOperationException("You shouldn't call this!");
-    }
-
-    /**
-     * Note that the ``Sentry.init`` method must be called before the static API
-     * is used, otherwise a ``NullPointerException`` will be thrown.
-     */
-    void logWithStaticAPI() {
-        /*
-         Record a breadcrumb in the current context which will be sent
-         with the next event(s). By default the last 100 breadcrumbs are kept.
-         */
-        Sentry.getContext().recordBreadcrumb(
-                new BreadcrumbBuilder().setMessage("User made an action").build()
-        );
-
-        // Set the user in the current context.
-        Sentry.getContext().setUser(
-                new UserBuilder().setEmail("hello@sentry.io").build()
-        );
-
-        /*
-         This sends a simple event to Sentry using the statically stored instance
-         that was created in the ``main`` method.
-         */
-        Sentry.capture("This is a test");
-
-        try {
-            unsafeMethod();
-        } catch (Exception e) {
-            // This sends an exception event to Sentry using the statically stored instance
-            // that was created in the ``main`` method.
-            Sentry.capture(e);
-        }
-    }
 
 
     private void refreshNavigationDrawerHeader() {
