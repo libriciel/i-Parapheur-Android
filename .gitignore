@@ -1,6 +1,5 @@
 .gradle
 /local.properties
-/.idea
 /build
 *.iml
 .DS_Store
@@ -9,3 +8,13 @@ IParapheur-android/manifest-merger-release-report.txt
 mupdffragment
 release-keystore\.properties
 release\.keystore
+
+\.idea/libraries/
+
+\.idea/caches/
+
+\.idea/vcs\.xml
+
+\.idea/gradle\.xml
+
+\.idea/workspace\.xml
