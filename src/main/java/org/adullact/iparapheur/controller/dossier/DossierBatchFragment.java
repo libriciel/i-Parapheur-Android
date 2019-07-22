@@ -32,42 +32,46 @@ import java.util.ArrayList;
 
 public class DossierBatchFragment extends Fragment {
 
-	public static final String DOSSIER = "dossier";
-	private ArrayList<String> dossiers;
-	private ListView listView;
+    public static final String DOSSIER = "dossier";
+    private ArrayList<String> dossiers;
+    private ListView listView;
 
-	public DossierBatchFragment() {
-		this.dossiers = new ArrayList<String>();
-	}
 
-	@Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.dossiers_batch_fragment, container, false);
-	}
+    public DossierBatchFragment() {
+        this.dossiers = new ArrayList<String>();
+    }
 
-	@Override public void onViewCreated(View view, Bundle savedInstanceState) {
-		if ((getArguments() != null) && getArguments().containsKey(DOSSIER)) {
-			this.dossiers.add(getArguments().getString(DOSSIER));
-		}
-		listView = view.findViewById(R.id.dossiers_list);
-		listView.setItemsCanFocus(false);
-	}
 
-	@Override public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
-	}
+    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.dossiers_batch_fragment, container, false);
+    }
 
-	public void addDossier(String dossier) {
-		dossiers.add(dossier);
-		updateView();
-	}
 
-	public void removeDossier(String dossier) {
-		dossiers.remove(dossier);
-		updateView();
-	}
+    @Override public void onViewCreated(View view, Bundle savedInstanceState) {
+        if ((getArguments() != null) && getArguments().containsKey(DOSSIER)) {
+            this.dossiers.add(getArguments().getString(DOSSIER));
+        } listView = view.findViewById(R.id.dossiers_list); listView.setItemsCanFocus(false);
+    }
 
-	private void updateView() {
-		((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
-	}
+
+    @Override public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, this.dossiers));
+    }
+
+
+    public void addDossier(String dossier) {
+        dossiers.add(dossier); updateView();
+    }
+
+
+    public void removeDossier(String dossier) {
+        dossiers.remove(dossier); updateView();
+    }
+
+
+    private void updateView() {
+        ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
+    }
+
 }

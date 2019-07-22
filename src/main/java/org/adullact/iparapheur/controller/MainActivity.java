@@ -103,8 +103,7 @@ import io.sentry.android.AndroidSentryClientFactory;
  * {@link MenuFragment.MenuFragmentListener} interface
  * to listen for item selections.
  */
-public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountListFragmentListener,
-        ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
+public class MainActivity extends AppCompatActivity implements MenuFragment.MenuFragmentListener, AccountListFragment.AccountListFragmentListener, ActionMode.Callback, DossierDetailFragment.DossierDetailsFragmentListener {
 
     private static final String LOG_TAG = "MainActivity";
     private static final String SHARED_PREFERENCES_MAIN = ":iparapheur:shared_preferences_main";
@@ -133,10 +132,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         super.onCreate(savedInstanceState);
 
         Context ctx = this.getApplicationContext();
-        Sentry.init(
-                "https://f4de6f6e80e74c4690dad83616dd4878@sentry.libriciel.fr/6",
-                new AndroidSentryClientFactory(ctx)
-        );
+        Sentry.init("https://f4de6f6e80e74c4690dad83616dd4878@sentry.libriciel.fr/6", new AndroidSentryClientFactory(ctx));
 
         // To have a transparent StatusBar, and a background color behind
 
@@ -146,36 +142,28 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         setContentView(R.layout.main_activity);
 
-        mLeftDrawerLayout = findViewById(R.id.activity_dossiers_drawer_layout);
-        mRightDrawerLayout = findViewById(R.id.activity_dossiers_right_drawer_layout);
+        mLeftDrawerLayout = findViewById(R.id.activity_dossiers_drawer_layout); mRightDrawerLayout = findViewById(R.id.activity_dossiers_right_drawer_layout);
         mLeftDrawerMenu = findViewById(R.id.activity_dossiers_left_drawer);
 
-        Toolbar toolbar = findViewById(R.id.menu_toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById(R.id.menu_toolbar); setSupportActionBar(toolbar);
 
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Drawers
 
-        mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout);
-        mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
+        mLeftDrawerToggle = new DossiersActionBarDrawerToggle(this, mLeftDrawerLayout); mLeftDrawerLayout.addDrawerListener(mLeftDrawerToggle);
         mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         mNavigationDrawerAccountViewSwitcher = findViewById(R.id.navigation_drawer_viewswitcher);
 
-        ImageButton drawerAccountImageButton = findViewById(R.id.navigation_drawer_menu_header_account_button);
-        if (drawerAccountImageButton != null) {
+        ImageButton drawerAccountImageButton = findViewById(R.id.navigation_drawer_menu_header_account_button); if (drawerAccountImageButton != null) {
             drawerAccountImageButton.setOnClickListener(v -> {
 
-                if (mNavigationDrawerAccountViewSwitcher == null)
-                    return;
+                if (mNavigationDrawerAccountViewSwitcher == null) return;
 
                 boolean switchToAccountView = (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 0);
-                if (switchToAccountView)
-                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
-                else
-                    mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+                if (switchToAccountView) mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
+                else mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
                 View filterButton = findViewById(R.id.navigation_drawer_filters_menu_header_filters_imagebutton);
                 View downloadButton = findViewById(R.id.navigation_drawer_filters_menu_header_download_imagebutton);
@@ -188,13 +176,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         // ContentView Fragment restore
 
         Fragment contentFragment = getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-        if (contentFragment == null)
-            contentFragment = new DossierDetailFragment();
-        contentFragment.setRetainInstance(true);
+        if (contentFragment == null) contentFragment = new DossierDetailFragment(); contentFragment.setRetainInstance(true);
 
         FragmentTransaction contentTransaction = getFragmentManager().beginTransaction();
-        contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG);
-        contentTransaction.commit();
+        contentTransaction.replace(R.id.dossier_detail_layout, contentFragment, DossierDetailFragment.FRAGMENT_TAG); contentTransaction.commit();
     }
 
 
@@ -203,24 +188,19 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         // Sync the toggle state after onRestoreInstanceState has occurred.
 
-        mLeftDrawerToggle.syncState();
-        refreshNavigationDrawerHeader();
+        mLeftDrawerToggle.syncState(); refreshNavigationDrawerHeader();
 
         // Default FAB visibility
 
-        View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher);
-        FloatingActionButton mainFab = findViewById(R.id.mupdf_main_menu_fabbutton);
+        View fabSwitcher = findViewById(R.id.mupdf_main_fab_viewswitcher); FloatingActionButton mainFab = findViewById(R.id.mupdf_main_menu_fabbutton);
 
-        if (fabSwitcher != null)
-            fabSwitcher.setVisibility(View.GONE);
+        if (fabSwitcher != null) fabSwitcher.setVisibility(View.GONE);
 
-        if (mainFab != null)
-            mainFab.hide();
+        if (mainFab != null) mainFab.hide();
 
         //
 
-        if (savedInstanceState != null)
-            mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
+        if (savedInstanceState != null) mSouldShowAccountAfterRotation = savedInstanceState.getBoolean(SAVED_STATE_SHOULD_SHOW_ACCOUNT_AFTER_ROTATION);
     }
 
 
@@ -229,10 +209,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         // Starting checks
 
-        List<File> certificatesFoundList = FileUtils.getBksFromDownloadFolder();
-        if (!certificatesFoundList.isEmpty()) {
-            File certificateFound = certificatesFoundList.get(0);
-            DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
+        List<File> certificatesFoundList = FileUtils.getBksFromDownloadFolder(); if (!certificatesFoundList.isEmpty()) {
+            File certificateFound = certificatesFoundList.get(0); DialogFragment actionDialog = ImportCertificatesDialogFragment.newInstance(certificateFound);
             actionDialog.show(getFragmentManager(), ImportCertificatesDialogFragment.FRAGMENT_TAG);
         }
     }
@@ -248,8 +226,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         //                               &AndroidPwd=bma                                                    (optional)
         //                               &iOsUrl=https%3A%2F%2Fcurl.adullact.org%2FSUZI2%2Fbma.p12          (ignored)
         //                               &iOsPwd=bma                                                        (ignored)
-        Uri schemeUri = getIntent().getData();
-        boolean isValidUriScheme = (schemeUri != null && TextUtils.equals(schemeUri.getScheme(), SCHEME_URI));
+        Uri schemeUri = getIntent().getData(); boolean isValidUriScheme = (schemeUri != null && TextUtils.equals(schemeUri.getScheme(), SCHEME_URI));
 
         if (isValidUriScheme) {
             if (TextUtils.equals(schemeUri.getHost(), SCHEME_URI_IMPORTCERTIFICATE)) {
@@ -257,10 +234,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                 String certifUrl = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_URL);
                 String certifPassword = schemeUri.getQueryParameter(SCHEME_URI_IMPORTCERTIFICATE_PASSWORD);
 
-                if (!TextUtils.isEmpty(certifUrl))
-                    importCertificate(certifUrl, certifPassword);
-                else
-                    Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
+                if (!TextUtils.isEmpty(certifUrl)) importCertificate(certifUrl, certifPassword);
+                else Toast.makeText(this, R.string.import_error_message_incorrect_scheme, Toast.LENGTH_SHORT).show();
             }
 
             // If we let the intent data, it can try to re-import certificate, back from history.
@@ -279,13 +254,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
             // Registering the fact that the user knows the drawer
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true);
-            editor.apply();
+            SharedPreferences.Editor editor = settings.edit(); editor.putBoolean(SHARED_PREFERENCES_IS_DRAWER_KNOWN, true); editor.apply();
         } else if (mSouldShowAccountAfterRotation) {
 
-            mSouldShowAccountAfterRotation = false;
-            mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+            mSouldShowAccountAfterRotation = false; mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
 
             if (isDeviceInPortrait && (mNavigationDrawerAccountViewSwitcher != null)) {
                 mNavigationDrawerAccountViewSwitcher.setDisplayedChild(1);
@@ -300,10 +272,8 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         if ((menuFragment != null) && !menuFragment.getCheckedDossiers().isEmpty()) {
             mActionMode = startSupportActionMode(this);
 
-            if (isDeviceInPortrait)
-                mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
-            else
-                mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+            if (isDeviceInPortrait) mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
+            else mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
         }
     }
 
@@ -323,16 +293,14 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     }
 
 
-    @SuppressWarnings("squid:S3776")
-    @Override public void onBackPressed() {
+    @SuppressWarnings("squid:S3776") @Override public void onBackPressed() {
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
             // Drawer account back
 
             if (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1) {
-                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
-                return;
+                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0); return;
             }
 
             if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
@@ -340,15 +308,12 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                 // Menu back
 
                 MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-                if (bureauxFragment != null)
-                    if (bureauxFragment.onBackPressed())
-                        return;
+                if (bureauxFragment != null) if (bureauxFragment.onBackPressed()) return;
 
                 // Close the drawer
 
                 if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
-                    mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-                    return;
+                    mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu); return;
                 }
 
             } else {
@@ -356,16 +321,13 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
                 // Collapse the FAB
 
                 DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-                if ((dossierDetailFragment != null) && dossierDetailFragment.onBackPressed())
-                    return;
+                if ((dossierDetailFragment != null) && dossierDetailFragment.onBackPressed()) return;
 
                 // Menu back
 
-                MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-                if (bureauxFragment != null) {
+                MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG); if (bureauxFragment != null) {
                     if (bureauxFragment.onBackPressed()) {
-                        mLeftDrawerLayout.openDrawer(mLeftDrawerMenu);
-                        return;
+                        mLeftDrawerLayout.openDrawer(mLeftDrawerMenu); return;
                     }
                 }
 
@@ -375,23 +337,18 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             // First, close the drawer
 
             if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) {
-                mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-                return;
+                mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu); return;
             }
 
             // Collapse the FAB
 
             DossierDetailFragment dossierDetailFragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
-            if (dossierDetailFragment != null)
-                if (dossierDetailFragment.onBackPressed())
-                    return;
+            if (dossierDetailFragment != null) if (dossierDetailFragment.onBackPressed()) return;
 
             // Then, try to pop backstack
 
             MenuFragment bureauxFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-            if (bureauxFragment != null)
-                if (bureauxFragment.onBackPressed())
-                    return;
+            if (bureauxFragment != null) if (bureauxFragment.onBackPressed()) return;
         }
 
         super.onBackPressed();
@@ -400,8 +357,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override protected void onSaveInstanceState(Bundle outState) {
 
-        boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu);
-        boolean isInLandscape = mNavigationDrawerAccountViewSwitcher == null;
+        boolean isDrawerOpened = mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu); boolean isInLandscape = mNavigationDrawerAccountViewSwitcher == null;
         boolean isAccountViewSelected = (mNavigationDrawerAccountViewSwitcher != null) && (mNavigationDrawerAccountViewSwitcher.getDisplayedChild() == 1);
         boolean isAccountShown = isDrawerOpened && (isInLandscape || isAccountViewSelected);
 
@@ -419,11 +375,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
 
-        Toolbar actionsToolbar = findViewById(R.id.actions_toolbar);
-        if (actionsToolbar != null) {
+        Toolbar actionsToolbar = findViewById(R.id.actions_toolbar); if (actionsToolbar != null) {
 
-            actionsToolbar.getMenu().clear();
-            actionsToolbar.inflateMenu(R.menu.main_activity);
+            actionsToolbar.getMenu().clear(); actionsToolbar.inflateMenu(R.menu.main_activity);
             actionsToolbar.setOnMenuItemClickListener(item -> onOptionsItemSelected(item));
         }
 
@@ -441,8 +395,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
 
-        if (mLeftDrawerToggle.onOptionsItemSelected(item))
-            return true;
+        if (mLeftDrawerToggle.onOptionsItemSelected(item)) return true;
 
         // TODO : handle dossier(s) actions
         // Handle presses on the action bar items
@@ -450,8 +403,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         switch (item.getItemId()) {
 
             case R.id.action_settings:
-                startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE);
-                return true;
+                startActivityForResult(new Intent(this, PreferencesActivity.class), PreferencesActivity.PREFERENCES_ACTIVITY_REQUEST_CODE); return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -466,13 +418,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
 
     @Override public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        actionMode.setTitleOptionalHint(true);
-        MenuInflater inflater = actionMode.getMenuInflater();
+        actionMode.setTitleOptionalHint(true); MenuInflater inflater = actionMode.getMenuInflater();
         inflater.inflate(R.menu.dossier_details_fragment_actions, menu);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            Window window = getWindow(); window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.contextual_700));
         }
@@ -487,30 +437,25 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
         // Default cases
 
-        if (fragment == null)
-            return false;
+        if (fragment == null) return false;
 
         HashSet<Dossier> checkedDossiers = fragment.getCheckedDossiers();
 
         if ((checkedDossiers == null) || (checkedDossiers.isEmpty())) {
-            actionMode.finish();
-            return false;
+            actionMode.finish(); return false;
         }
 
         // Get available actions from Dossiers
 
         HashSet<Action> actions = new HashSet<>(Arrays.asList(Action.values()));
 
-        HashSet availableActions = new HashSet();
-        availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
-        availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers));
-        availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
+        HashSet availableActions = new HashSet(); availableActions.add(ActionUtils.computePositiveAction(checkedDossiers));
+        availableActions.add(ActionUtils.computeNegativeAction(checkedDossiers)); availableActions.addAll(ActionUtils.computeSecondaryActions(checkedDossiers));
 
         // Compute visibility
 
         actionMode.setTitle(String.format(getString(R.string.action_mode_nb_dossiers), checkedDossiers.size()));
-        menu.setGroupVisible(R.id.dossiers_menu_main_actions, false);
-        menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
+        menu.setGroupVisible(R.id.dossiers_menu_main_actions, false); menu.setGroupVisible(R.id.dossiers_menu_other_actions, false);
 
         for (Action action : actions) {
 
@@ -556,15 +501,11 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
 
-        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-        if (menuFragment == null)
-            return false;
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG); if (menuFragment == null) return false;
 
-        Bureau bureau = menuFragment.getSelectedBureau();
-        Action invokedAction = Action.fromId(menuItem.getItemId());
+        Bureau bureau = menuFragment.getSelectedBureau(); Action invokedAction = Action.fromId(menuItem.getItemId());
 
-        if ((invokedAction != null) && (bureau != null))
-            launchActionPopup(menuFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
+        if ((invokedAction != null) && (bureau != null)) launchActionPopup(menuFragment.getCheckedDossiers(), bureau.getId(), invokedAction);
 
         return true;
     }
@@ -573,12 +514,10 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
     @Override public void onDestroyActionMode(ActionMode actionMode) {
 
         MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-        if (menuFragment != null)
-            menuFragment.clearCheckSelection();
+        if (menuFragment != null) menuFragment.clearCheckSelection();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            Window window = getWindow(); window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
         }
@@ -597,11 +536,9 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
         TextView navigationDrawerAccountTitle = findViewById(R.id.navigation_drawer_menu_header_title);
         TextView navigationDrawerAccountSubTitle = findViewById(R.id.navigation_drawer_menu_header_subtitle);
 
-        if (navigationDrawerAccountTitle != null)
-            navigationDrawerAccountTitle.setText(account.getTitle());
+        if (navigationDrawerAccountTitle != null) navigationDrawerAccountTitle.setText(account.getTitle());
 
-        if (navigationDrawerAccountSubTitle != null)
-            navigationDrawerAccountSubTitle.setText(account.getLogin());
+        if (navigationDrawerAccountSubTitle != null) navigationDrawerAccountSubTitle.setText(account.getLogin());
 
     }
 
@@ -617,20 +554,20 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
             private int mErrorMessageResource = -1;
 
+
             @Override protected Void doInBackground(Void... params) {
 
                 try {
                     boolean downloadSuccessful = RESTClient.INSTANCE.downloadCertificate(AccountUtils.SELECTED_ACCOUNT, url, certificateLocalPath);
 
-                    if (!downloadSuccessful)
-                        mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
+                    if (!downloadSuccessful) mErrorMessageResource = R.string.import_error_message_cant_download_certificate;
                 } catch (IParapheurException e) {
-                    Sentry.capture(e);
-                    Log.e(LOG_TAG, e.getLocalizedMessage());
+                    Sentry.capture(e); Log.e(LOG_TAG, e.getLocalizedMessage());
                 }
 
                 return null;
             }
+
 
             @Override protected void onPostExecute(Void aVoid) {
 
@@ -655,8 +592,7 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     private void launchActionPopup(@NonNull Set<Dossier> dossierSet, @NonNull String bureauId, @NonNull Action action) {
 
-        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-        DialogFragment actionDialog;
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG); DialogFragment actionDialog;
         ArrayList<Dossier> dossierList = new ArrayList<>(dossierSet);
 
         if (action == Action.REJET) {
@@ -676,15 +612,13 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             actionDialog.setTargetFragment(menuFragment, SignatureDialogFragment.REQUEST_CODE_SIGNATURE);
             actionDialog.show(getFragmentManager(), SignatureDialogFragment.FRAGMENT_TAG);
         } else if (action == Action.MAILSEC) {
-            actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId);
-            actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
+            actionDialog = MailSecDialogFragment.newInstance(dossierList, bureauId); actionDialog.show(getFragmentManager(), "MailSecDialogFragment");
         } else if ((action == Action.TDT) || (action == Action.TDT_HELIOS) || (action == Action.TDT_ACTES)) {
             actionDialog = TdtActesDialogFragment.newInstance(dossierList, bureauId);
             actionDialog.setTargetFragment(menuFragment, TdtActesDialogFragment.REQUEST_CODE_ACTES);
             actionDialog.show(getFragmentManager(), TdtActesDialogFragment.FRAGMENT_TAG);
         } else if (action == Action.ARCHIVAGE) {
-            actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId);
-            actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
+            actionDialog = ArchivageDialogFragment.newInstance(dossierList, bureauId); actionDialog.show(getFragmentManager(), "ArchivageDialogFragment");
         } else {
             Log.e("Adrien", "UNKNOWN ACTION : " + action);
         }
@@ -696,24 +630,19 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public void onAccountSelected(@NonNull Account account) {
 
-        AccountUtils.SELECTED_ACCOUNT = account;
-        refreshNavigationDrawerHeader();
+        AccountUtils.SELECTED_ACCOUNT = account; refreshNavigationDrawerHeader();
 
         // Close the drawer
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-            mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
-        else if (mNavigationDrawerAccountViewSwitcher != null)
-            mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+        else if (mNavigationDrawerAccountViewSwitcher != null) mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
         // If we selected a new account, and we have a Dossier list displayed
         // We'll want to pop the BackStack to get on the Bureau list
         // Then , we just update the Bureau with the accurate Account
 
-        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG);
-        if (menuFragment != null) {
-            menuFragment.onBackPressed();
-            menuFragment.updateBureaux(true);
+        MenuFragment menuFragment = (MenuFragment) getFragmentManager().findFragmentByTag(MenuFragment.FRAGMENT_TAG); if (menuFragment != null) {
+            menuFragment.onBackPressed(); menuFragment.updateBureaux(true);
         }
     }
 
@@ -733,23 +662,19 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public void onDossierListFragmentSelected(@NonNull Dossier dossier, @NonNull String bureauId) {
 
-        if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu))
-            mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
+        if (mLeftDrawerLayout.isDrawerOpen(mLeftDrawerMenu)) mLeftDrawerLayout.closeDrawer(mLeftDrawerMenu);
 
         DossierDetailFragment fragment = (DossierDetailFragment) getFragmentManager().findFragmentByTag(DossierDetailFragment.FRAGMENT_TAG);
         if ((fragment != null)) {
-            fragment.showProgressLayout();
-            fragment.update(dossier, bureauId, null);
+            fragment.showProgressLayout(); fragment.update(dossier, bureauId, null);
         }
     }
 
 
     @Override public void onDossierCheckedChanged(boolean forceClose) {
 
-        if (mActionMode != null)
-            mActionMode.invalidate();
-        else if (!forceClose)
-            mActionMode = startSupportActionMode(this);
+        if (mActionMode != null) mActionMode.invalidate();
+        else if (!forceClose) mActionMode = startSupportActionMode(this);
     }
 
 
@@ -766,18 +691,15 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
 
     @Override public void toggleInfoDrawer() {
 
-        if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END))
-            mRightDrawerLayout.closeDrawer(GravityCompat.END);
-        else
-            mRightDrawerLayout.openDrawer(GravityCompat.END);
+        if (mRightDrawerLayout.isDrawerOpen(GravityCompat.END)) mRightDrawerLayout.closeDrawer(GravityCompat.END);
+        else mRightDrawerLayout.openDrawer(GravityCompat.END);
     }
 
 
     @Override public void lockInfoDrawer(boolean lock) {
 
         if (lock) {
-            mRightDrawerLayout.closeDrawer(GravityCompat.END);
-            mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mRightDrawerLayout.closeDrawer(GravityCompat.END); mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         } else {
             mRightDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
@@ -801,34 +723,32 @@ public class MainActivity extends AppCompatActivity implements MenuFragment.Menu
             super(activity, drawerLayout, (Toolbar) activity.findViewById(R.id.menu_toolbar), R.string.drawer_open, R.string.drawer_close);
         }
 
+
         @Override public void onDrawerClosed(View view) {
 
             if (getSupportActionBar() != null) {
                 Account selectedAccount = AccountUtils.SELECTED_ACCOUNT;
-                if (selectedAccount != null)
-                    getSupportActionBar().setTitle(selectedAccount.getTitle());
+                if (selectedAccount != null) getSupportActionBar().setTitle(selectedAccount.getTitle());
             }
 
-            if (mNavigationDrawerAccountViewSwitcher != null)
-                mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
+            if (mNavigationDrawerAccountViewSwitcher != null) mNavigationDrawerAccountViewSwitcher.setDisplayedChild(0);
 
             // calls onPrepareOptionMenu to show context specific actions
             invalidateOptionsMenu();
         }
 
+
         @Override public void onDrawerOpened(View drawerView) {
-            if (getSupportActionBar() != null)
-                getSupportActionBar().setTitle(R.string.app_name);
+            if (getSupportActionBar() != null) getSupportActionBar().setTitle(R.string.app_name);
 
             // calls onPrepareOptionMenu to hide context specific actions
             invalidateOptionsMenu();
         }
 
+
         @Override public void onDrawerStateChanged(int newState) {
 
-            if (newState == DrawerLayout.STATE_SETTLING)
-                if (mActionMode != null)
-                    mActionMode.finish();
+            if (newState == DrawerLayout.STATE_SETTLING) if (mActionMode != null) mActionMode.finish();
 
             invalidateOptionsMenu();
         }

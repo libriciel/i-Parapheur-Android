@@ -134,18 +134,15 @@ public class MenuFragment extends Fragment {
 
 
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.menu_fragment, container, false);
-        setRetainInstance(true);
+        View view = inflater.inflate(R.layout.menu_fragment, container, false); setRetainInstance(true);
 
         // Retrieve Views
 
         mViewSwitcher = view.findViewById(R.id.menu_fragment_viewswitcher);
         mBureauSwipeRefreshLayout = view.findViewById(R.id.menu_fragment_bureaux_swiperefreshlayout);
         mDossierSwipeRefreshLayout = view.findViewById(R.id.menu_fragment_dossiers_swiperefreshlayout);
-        mBureauListView = view.findViewById(R.id.menu_fragment_bureaux_listview);
-        mDossierListView = view.findViewById(R.id.menu_fragment_dossier_listview);
-        mBureauEmptyView = view.findViewById(R.id.menu_fragment_bureaux_empty);
-        mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
+        mBureauListView = view.findViewById(R.id.menu_fragment_bureaux_listview); mDossierListView = view.findViewById(R.id.menu_fragment_dossier_listview);
+        mBureauEmptyView = view.findViewById(R.id.menu_fragment_bureaux_empty); mDossierEmptyView = view.findViewById(R.id.menu_fragment_dossier_empty);
         mDossierEmptyFiltersAlertView = view.findViewById(R.id.menu_fragment_dossier_empty_filter_alert_textview);
 
         // Setting up listeners, etc
@@ -157,21 +154,18 @@ public class MenuFragment extends Fragment {
             }
         });
 
-        mBureauListView.setEmptyView(mBureauEmptyView);
-        mBureauListView.setAdapter(new BureauListAdapter(getActivity()));
+        mBureauListView.setEmptyView(mBureauEmptyView); mBureauListView.setAdapter(new BureauListAdapter(getActivity()));
         mBureauListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 onBureauClicked(position);
             }
-        });
-        mBureauListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        }); mBureauListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
 
             @Override public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int topRowVerticalPosition = (mBureauListView.getChildCount() == 0) ? 0 : mBureauListView.getChildAt(0).getTop();
-                boolean onTop = (firstVisibleItem == 0) && (topRowVerticalPosition >= 0);
-                boolean isDisabled = mBureauEmptyView.getVisibility() == View.VISIBLE;
+                boolean onTop = (firstVisibleItem == 0) && (topRowVerticalPosition >= 0); boolean isDisabled = mBureauEmptyView.getVisibility() == View.VISIBLE;
                 mBureauSwipeRefreshLayout.setEnabled(isDisabled || onTop);
             }
         });
@@ -179,41 +173,34 @@ public class MenuFragment extends Fragment {
         mDossierSwipeRefreshLayout.setColorSchemeResources(R.color.secondary_500, R.color.secondary_300, R.color.secondary_700);
         mDossierSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override public void onRefresh() {
-                if (mSelectedBureau != null)
-                    executeAsyncTask(new DossiersLoadingTask());
+                if (mSelectedBureau != null) executeAsyncTask(new DossiersLoadingTask());
             }
         });
 
-        mDossierListView.setEmptyView(mDossierEmptyView);
-        mDossierListView.setAdapter(new DossierListAdapter(getActivity()));
+        mDossierListView.setEmptyView(mDossierEmptyView); mDossierListView.setAdapter(new DossierListAdapter(getActivity()));
         mDossierListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 onDossierClicked(position);
             }
-        });
-        mDossierListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        }); mDossierListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             @Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
 
             @Override public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 int topRowVerticalPosition = (mDossierListView.getChildCount() == 0) ? 0 : mDossierListView.getChildAt(0).getTop();
                 boolean onTop = (firstVisibleItem == 0) && (topRowVerticalPosition >= 0);
-                boolean isDisabled = mDossierEmptyView.getVisibility() == View.VISIBLE;
-                mDossierSwipeRefreshLayout.setEnabled(isDisabled || onTop);
+                boolean isDisabled = mDossierEmptyView.getVisibility() == View.VISIBLE; mDossierSwipeRefreshLayout.setEnabled(isDisabled || onTop);
             }
         });
 
         // Restore previous state, in case of rotation
 
         if (mBureauList.isEmpty()) {
-            mBureauListView.setVisibility(View.INVISIBLE);
-            mBureauEmptyView.setVisibility(View.VISIBLE);
+            mBureauListView.setVisibility(View.INVISIBLE); mBureauEmptyView.setVisibility(View.VISIBLE);
         } else {
-            mBureauListView.setVisibility(View.VISIBLE);
-            mBureauEmptyView.setVisibility(View.INVISIBLE);
+            mBureauListView.setVisibility(View.VISIBLE); mBureauEmptyView.setVisibility(View.INVISIBLE);
 
-            if (mSelectedBureau != null)
-                mViewSwitcher.setDisplayedChild(1);
+            if (mSelectedBureau != null) mViewSwitcher.setDisplayedChild(1);
         }
 
         //
@@ -223,8 +210,7 @@ public class MenuFragment extends Fragment {
 
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
+        super.onActivityCreated(savedInstanceState); setHasOptionsMenu(true);
 
         // These buttons aren't directly in this Fragment,
         // they are's in the navigation drawer. But we need to inflate them anyway.
@@ -234,16 +220,13 @@ public class MenuFragment extends Fragment {
             filterListButton.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
 
-                    PopupMenu popup = new PopupMenu(getActivity(), filterListButton);
-                    inflateFilterSubMenu(popup.getMenu());
-                    ViewUtils.setForceShowIcon(popup);
+                    PopupMenu popup = new PopupMenu(getActivity(), filterListButton); inflateFilterSubMenu(popup.getMenu()); ViewUtils.setForceShowIcon(popup);
 
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override public boolean onMenuItemClick(MenuItem item) {
                             return onFilterItemSelected(item);
                         }
-                    });
-                    popup.show();
+                    }); popup.show();
                 }
             });
         }
@@ -269,8 +252,7 @@ public class MenuFragment extends Fragment {
             case FilterDialogFragment.REQUEST_CODE_FILTER:
 
                 if (resultCode == Activity.RESULT_OK) {
-                    executeAsyncTask(new DossiersLoadingTask());
-                    getActivity().invalidateOptionsMenu();
+                    executeAsyncTask(new DossiersLoadingTask()); getActivity().invalidateOptionsMenu();
                 }
 
                 break;
@@ -285,8 +267,7 @@ public class MenuFragment extends Fragment {
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         public void run() {
 
-                            mCheckedDossiers.clear();
-                            ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+                            mCheckedDossiers.clear(); ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
                             executeAsyncTask(new DossiersLoadingTask());
 
@@ -307,14 +288,12 @@ public class MenuFragment extends Fragment {
 
         Log.i("Adrien", "account :: " + AccountUtils.SELECTED_ACCOUNT);
 
-        if (mBureauList.isEmpty())
-            updateBureaux(true);
+        if (mBureauList.isEmpty()) updateBureaux(true);
     }
 
 
     @Override public void onResume() {
-        getActivity().invalidateOptionsMenu();
-        super.onResume();
+        getActivity().invalidateOptionsMenu(); super.onResume();
     }
 
     /**
@@ -329,8 +308,7 @@ public class MenuFragment extends Fragment {
         if (mViewSwitcher.getDisplayedChild() == 1) {
 
             mViewSwitcher.setInAnimation(getActivity(), android.R.anim.slide_in_left);
-            mViewSwitcher.setOutAnimation(getActivity(), android.R.anim.slide_out_right);
-            mViewSwitcher.setDisplayedChild(0);
+            mViewSwitcher.setOutAnimation(getActivity(), android.R.anim.slide_out_right); mViewSwitcher.setDisplayedChild(0);
 
             // Fore some reason, the bureau list view is empty on a ViewSwitcher flip
             // Calling the adapter refresh fixes it...
@@ -354,9 +332,7 @@ public class MenuFragment extends Fragment {
     @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        Toolbar menuToolbar = getActivity().findViewById(R.id.menu_toolbar);
-        if (menuToolbar != null)
-            menuToolbar.inflateMenu(R.menu.menu_fragment);
+        Toolbar menuToolbar = getActivity().findViewById(R.id.menu_toolbar); if (menuToolbar != null) menuToolbar.inflateMenu(R.menu.menu_fragment);
     }
 
 
@@ -366,8 +342,7 @@ public class MenuFragment extends Fragment {
 
         // Compute main  icon visibility
 
-        boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1);
-        boolean isBureauList = (mViewSwitcher.getDisplayedChild() == 0);
+        boolean isDossierList = (mViewSwitcher.getDisplayedChild() == 1); boolean isBureauList = (mViewSwitcher.getDisplayedChild() == 0);
         boolean isInLandscape = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
         boolean isListFiltered = (MyFilters.INSTANCE.getSelectedFilter() != null);
         boolean hasBureaux = (!mBureauList.isEmpty()) && (!mBureauSwipeRefreshLayout.isRefreshing());
@@ -399,8 +374,7 @@ public class MenuFragment extends Fragment {
 
         //
 
-        mDossierEmptyFiltersAlertView.setVisibility(isListFiltered ? View.VISIBLE : View.INVISIBLE);
-        super.onPrepareOptionsMenu(menu);
+        mDossierEmptyFiltersAlertView.setVisibility(isListFiltered ? View.VISIBLE : View.INVISIBLE); super.onPrepareOptionsMenu(menu);
     }
 
 
@@ -408,17 +382,14 @@ public class MenuFragment extends Fragment {
 
         if (Arrays.asList(R.id.action_no_filter, R.id.action_add_filter, R.id.action_filter).contains(item.getItemId())) {
             if (!DeviceUtils.isConnected(getActivity())) {
-                Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
-                return true;
+                Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show(); return true;
             }
         }
 
-        if (item.getItemId() == R.id.menu_fragment_filter_selection_item)
-            return onFilterItemSelected(item);
+        if (item.getItemId() == R.id.menu_fragment_filter_selection_item) return onFilterItemSelected(item);
 
         if (item.getItemId() == R.id.menu_fragment_download_item) {
-            onDownloadItemSelected();
-            return true;
+            onDownloadItemSelected(); return true;
         }
 
         return getActivity().onOptionsItemSelected(item);
@@ -432,12 +403,10 @@ public class MenuFragment extends Fragment {
 
         // No filter button (if any filter is available)
 
-        List<Filter> filterList = MyFilters.INSTANCE.getFilters(getActivity());
-        menu.clear();
+        List<Filter> filterList = MyFilters.INSTANCE.getFilters(getActivity()); menu.clear();
 
         if (!filterList.isEmpty()) {
-            MenuItem item = menu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter);
-            item.setIcon(R.drawable.ic_filter_remove_outline_black_24dp);
+            MenuItem item = menu.add(Menu.NONE, R.id.action_no_filter, 1, R.string.No_filter); item.setIcon(R.drawable.ic_filter_remove_outline_black_24dp);
         }
 
         // Inflate Filters
@@ -446,8 +415,7 @@ public class MenuFragment extends Fragment {
 
         for (Filter filter : filterList) {
 
-            MenuItem item = menu.add(Menu.NONE, R.id.action_filter, 2, filter.getName());
-            item.setIcon(R.drawable.ic_filter_outline_black_24dp);
+            MenuItem item = menu.add(Menu.NONE, R.id.action_filter, 2, filter.getName()); item.setIcon(R.drawable.ic_filter_outline_black_24dp);
 
             mDisplayedFilters.put(item, filter);
         }
@@ -457,8 +425,7 @@ public class MenuFragment extends Fragment {
         MenuItem addMenuItem = menu.add(Menu.NONE, R.id.action_add_filter, 3, R.string.Add_filter);
         SpannableString addMenuItemString = new SpannableString(addMenuItem.getTitle());
         addMenuItemString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.grey_600)), 0, addMenuItemString.length(), 0);
-        addMenuItem.setTitle(addMenuItemString);
-        addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
+        addMenuItem.setTitle(addMenuItemString); addMenuItem.setIcon(R.drawable.ic_add_circle_grey600_24dp);
     }
 
 
@@ -466,8 +433,7 @@ public class MenuFragment extends Fragment {
 
         if (Arrays.asList(R.id.action_no_filter, R.id.action_add_filter, R.id.action_filter).contains(item.getItemId())) {
             if (!DeviceUtils.isConnected(getActivity())) {
-                Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show();
-                return true;
+                Toast.makeText(getActivity(), R.string.Action_unavailable_offline, Toast.LENGTH_LONG).show(); return true;
             }
         }
 
@@ -475,32 +441,23 @@ public class MenuFragment extends Fragment {
 
             case R.id.action_no_filter:
 
-                MyFilters.INSTANCE.selectFilter(null);
-                getActivity().invalidateOptionsMenu();
-                executeAsyncTask(new DossiersLoadingTask());
+                MyFilters.INSTANCE.selectFilter(null); getActivity().invalidateOptionsMenu(); executeAsyncTask(new DossiersLoadingTask());
 
                 return true;
 
             case R.id.action_add_filter:
 
-                Filter filter = MyFilters.INSTANCE.getSelectedFilter();
-                if (filter == null)
-                    filter = new Filter();
+                Filter filter = MyFilters.INSTANCE.getSelectedFilter(); if (filter == null) filter = new Filter();
 
-                FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology);
-                filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER);
-                filterDialog.show(getActivity().getFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
+                FilterDialogFragment filterDialog = FilterDialogFragment.newInstance(filter, mTypology); filterDialog.setTargetFragment(this, FilterDialogFragment.REQUEST_CODE_FILTER); filterDialog.show(getActivity().getFragmentManager(), FilterDialogFragment.FRAGMENT_TAG);
 
                 return true;
 
             case R.id.action_filter:
 
-                Filter currentFilter = mDisplayedFilters.get(item);
-                if (currentFilter != null) {
-                    MyFilters.INSTANCE.selectFilter(currentFilter);
-                    getActivity().invalidateOptionsMenu();
-                    executeAsyncTask(new DossiersLoadingTask());
-                }
+                Filter currentFilter = mDisplayedFilters.get(item); if (currentFilter != null) {
+                MyFilters.INSTANCE.selectFilter(currentFilter); getActivity().invalidateOptionsMenu(); executeAsyncTask(new DossiersLoadingTask());
+            }
 
                 return true;
         }
@@ -531,20 +488,16 @@ public class MenuFragment extends Fragment {
 
 
     public void clearCheckSelection() {
-        mCheckedDossiers.clear();
-        ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+        mCheckedDossiers.clear(); ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
     }
 
 
     public void updateBureaux(boolean forceReload) {
 
-        if (forceReload)
-            mBureauList.clear();
+        if (forceReload) mBureauList.clear();
 
         if ((mBureauList.isEmpty()) && (AccountUtils.SELECTED_ACCOUNT != null)) {
-            mBureauListView.setVisibility(View.INVISIBLE);
-            mBureauEmptyView.setVisibility(View.VISIBLE);
-            executeAsyncTask(new BureauxLoadingTask());
+            mBureauListView.setVisibility(View.INVISIBLE); mBureauEmptyView.setVisibility(View.VISIBLE); executeAsyncTask(new BureauxLoadingTask());
         }
     }
 
@@ -557,8 +510,7 @@ public class MenuFragment extends Fragment {
         // We want to have a selected state only on the selected Dossier's Bureau.
         // The bureau will be selected in #onDossierClicked
 
-        int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
-        mBureauListView.setItemChecked(displayedBureauPosition, true);
+        int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau); mBureauListView.setItemChecked(displayedBureauPosition, true);
 
         // Switching to Dossiers list
 
@@ -568,16 +520,13 @@ public class MenuFragment extends Fragment {
 
             // Cleanup previous views data
 
-            mDossierList.clear();
-            ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
+            mDossierList.clear(); ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
             // Update bureau
 
-            mSelectedBureau = bureauClicked;
-            executeAsyncTask(new DossiersLoadingTask());
+            mSelectedBureau = bureauClicked; executeAsyncTask(new DossiersLoadingTask());
 
-            mViewSwitcher.setInAnimation(getActivity(), R.anim.slide_in_right);
-            mViewSwitcher.setOutAnimation(getActivity(), R.anim.slide_out_left);
+            mViewSwitcher.setInAnimation(getActivity(), R.anim.slide_in_right); mViewSwitcher.setOutAnimation(getActivity(), R.anim.slide_out_left);
             mViewSwitcher.setDisplayedChild(1);
         } else {
             mSelectedBureau = null;
@@ -589,14 +538,12 @@ public class MenuFragment extends Fragment {
 
         // Reselect filter
 
-        if (mDossierList.get(position) == mDisplayedDossier)
-            return;
+        if (mDossierList.get(position) == mDisplayedDossier) return;
 
         // Refreshing Bureau list, to have a selected state
         // only on the selected Dossier's Bureau.
 
-        mDisplayedBureau = mSelectedBureau;
-        int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
+        mDisplayedBureau = mSelectedBureau; int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
         mBureauListView.setItemChecked(displayedBureauPosition, true);
 
         // Saving it in case of back and forth in menuing
@@ -606,18 +553,15 @@ public class MenuFragment extends Fragment {
         // Callback
 
         Dossier selectedDossier = ((DossierListAdapter) mDossierListView.getAdapter()).getItem(position);
-        if (selectedDossier != null)
-            ((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
+        if (selectedDossier != null) ((MenuFragmentListener) getActivity()).onDossierListFragmentSelected(selectedDossier, mSelectedBureau.getId());
     }
 
 
     private void executeAsyncTask(@NonNull AsyncTask<Account, ?, ?> task) {
 
-        if (mPendingAsyncTask != null)
-            mPendingAsyncTask.cancel(false);
+        if (mPendingAsyncTask != null) mPendingAsyncTask.cancel(false);
 
-        mPendingAsyncTask = task;
-        mPendingAsyncTask.execute(AccountUtils.SELECTED_ACCOUNT);
+        mPendingAsyncTask = task; mPendingAsyncTask.execute(AccountUtils.SELECTED_ACCOUNT);
     }
 
 
@@ -642,37 +586,28 @@ public class MenuFragment extends Fragment {
 
 
         @Override protected void onPreExecute() {
-            super.onPreExecute();
-            mBureauSwipeRefreshLayout.setRefreshing(true);
+            super.onPreExecute(); mBureauSwipeRefreshLayout.setRefreshing(true);
         }
 
 
-        @SuppressWarnings("squid:S899")
-        @Override protected IParapheurException doInBackground(Account... params) {
+        @SuppressWarnings("squid:S899") @Override protected IParapheurException doInBackground(Account... params) {
 
-            mCurrentAccount = params[0];
-            if (mCurrentAccount == null)
-                return new IParapheurException(-1, "No account selected");
+            mCurrentAccount = params[0]; if (mCurrentAccount == null) return new IParapheurException(-1, "No account selected");
 
             // Update Account from DB
 
-            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-            Dao<Account, Integer> accountDao = null;
-            try {
-                accountDao = dbHelper.getAccountDao();
-                String selectedId = mCurrentAccount.getId();
+            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity()); Dao<Account, Integer> accountDao = null; try {
+                accountDao = dbHelper.getAccountDao(); String selectedId = mCurrentAccount.getId();
                 List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, selectedId).query();
 
-                if (fetchedAccountList.size() > 0)
-                    mCurrentAccount = fetchedAccountList.get(0);
+                if (fetchedAccountList.size() > 0) mCurrentAccount = fetchedAccountList.get(0);
             } catch (SQLException e) {
                 Log.e(LOG_TAG, e.getLocalizedMessage());
             }
 
             // Default case
 
-            if ((mCurrentAccount == null) || (accountDao == null))
-                return null;
+            if ((mCurrentAccount == null) || (accountDao == null)) return null;
 
             //
 
@@ -680,12 +615,10 @@ public class MenuFragment extends Fragment {
 
                 // Check Api version
 
-                Integer currentApi = mCurrentAccount.getApiVersion();
-                if ((currentApi == null) || (currentApi < RESTClient.API_VERSION_MAX)) {
+                Integer currentApi = mCurrentAccount.getApiVersion(); if ((currentApi == null) || (currentApi < RESTClient.API_VERSION_MAX)) {
                     Log.d(LOG_TAG, "current API : " + currentApi + ", checking for update...");
 
-                    int newApi = 0;
-                    try {
+                    int newApi = 0; try {
                         newApi = RESTClient.INSTANCE.getApiVersion(mCurrentAccount);
                     } catch (IParapheurException e) {
                         Log.e(LOG_TAG, e.getLocalizedMessage());
@@ -697,8 +630,7 @@ public class MenuFragment extends Fragment {
                     }
                 }
 
-                if (mCurrentAccount.getApiVersion() == null)
-                    return null;
+                if (mCurrentAccount.getApiVersion() == null) return null;
 
                 // Download data
 
@@ -706,8 +638,7 @@ public class MenuFragment extends Fragment {
 
                 try { bureauList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); } catch (final IParapheurException exception) { return exception; }
 
-                mBureauList.clear();
-                mBureauList.addAll(bureauList);
+                mBureauList.clear(); mBureauList.addAll(bureauList);
 
                 // Cleanup and save in Database
 
@@ -719,21 +650,17 @@ public class MenuFragment extends Fragment {
                     final List<Dossier> dossierToDeleteList = DossierUtils.getAllChildrenFrom(bureauxToDelete);
                     final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
 
-                    Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDelete);
-                    Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+                    Log.d(LOG_TAG, "delete Bureaux   : " + bureauxToDelete); Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
                     Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
                     dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
                         @Override public Void call() throws Exception {
 
-                            dbHelper.getDocumentDao().delete(documentToDeleteList);
-                            dbHelper.getDossierDao().delete(dossierToDeleteList);
+                            dbHelper.getDocumentDao().delete(documentToDeleteList); dbHelper.getDossierDao().delete(dossierToDeleteList);
                             dbHelper.getBureauDao().delete(bureauxToDelete);
 
                             for (Bureau newBureau : bureauList) {
-                                newBureau.setSyncDate(new Date());
-                                newBureau.setParent(mCurrentAccount);
-                                dbHelper.getBureauDao().createOrUpdate(newBureau);
+                                newBureau.setSyncDate(new Date()); newBureau.setParent(mCurrentAccount); dbHelper.getBureauDao().createOrUpdate(newBureau);
                             }
 
                             return null;
@@ -754,9 +681,7 @@ public class MenuFragment extends Fragment {
 
                 // Offline backup
 
-                mBureauList.clear();
-                ForeignCollection<Bureau> bureauForeignList = mCurrentAccount.getChildrenBureaux();
-                mBureauList.addAll(bureauForeignList);
+                mBureauList.clear(); ForeignCollection<Bureau> bureauForeignList = mCurrentAccount.getChildrenBureaux(); mBureauList.addAll(bureauForeignList);
             }
 
             return null;
@@ -768,30 +693,24 @@ public class MenuFragment extends Fragment {
 
             mPendingAsyncTask = null;
 
-            if (isCancelled())
-                return;
+            if (isCancelled()) return;
 
-            Collections.sort(mBureauList, BureauUtils.buildAlphabeticalComparator());
-            ((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
+            Collections.sort(mBureauList, BureauUtils.buildAlphabeticalComparator()); ((BureauListAdapter) mBureauListView.getAdapter()).notifyDataSetChanged();
 
             // Retrieving previous state
 
-            int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau);
-            mBureauListView.setItemChecked(displayedBureauPosition, true);
+            int displayedBureauPosition = mBureauList.indexOf(mDisplayedBureau); mBureauListView.setItemChecked(displayedBureauPosition, true);
 
             // Refreshing views state
 
-            getActivity().invalidateOptionsMenu();
-            mBureauSwipeRefreshLayout.setRefreshing(false);
+            getActivity().invalidateOptionsMenu(); mBureauSwipeRefreshLayout.setRefreshing(false);
 
-            if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty())
-                ViewUtils.crossfade(mBureauListView, mBureauEmptyView);
+            if ((mBureauEmptyView.getVisibility() == View.VISIBLE) && !mBureauList.isEmpty()) ViewUtils.crossfade(mBureauListView, mBureauEmptyView);
 
             // Error management
 
             if (exception != null) {
-                String message = getString(exception.getResId());
-                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                String message = getString(exception.getResId()); Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -804,28 +723,22 @@ public class MenuFragment extends Fragment {
 
 
         @Override protected void onPreExecute() {
-            super.onPreExecute();
-            mDossierSwipeRefreshLayout.setRefreshing(true);
+            super.onPreExecute(); mDossierSwipeRefreshLayout.setRefreshing(true);
         }
 
 
-        @SuppressWarnings("squid:S899")
-        @Override protected IParapheurException doInBackground(Account... params) {
+        @SuppressWarnings("squid:S899") @Override protected IParapheurException doInBackground(Account... params) {
 
-            mTypology.clear();
-            mCurrentAccount = AccountUtils.SELECTED_ACCOUNT;
-            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+            mTypology.clear(); mCurrentAccount = AccountUtils.SELECTED_ACCOUNT; final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
             Filter currentFilter = MyFilters.INSTANCE.getSelectedFilter();
 
             if (DeviceUtils.isConnected(getActivity())) {
 
-                List<Dossier> fetchedDossierList = new ArrayList<>();
-                try {
+                List<Dossier> fetchedDossierList = new ArrayList<>(); try {
                     fetchedDossierList.addAll(RESTClient.INSTANCE.getDossiers(mCurrentAccount, mSelectedBureau.getId(), currentFilter));
                 } catch (IParapheurException exception) { return exception; }
 
-                mDossierList.clear();
-                mDossierList.addAll(fetchedDossierList);
+                mDossierList.clear(); mDossierList.addAll(fetchedDossierList);
 
                 try { mTypology.addAll(RESTClient.INSTANCE.getTypologie(mCurrentAccount)); } catch (IParapheurException exception) {
                     return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage());
@@ -835,9 +748,7 @@ public class MenuFragment extends Fragment {
 
                 if (currentFilter == null) {
 
-                    final List<Dossier> dossierToDeleteList = DossierUtils.getDeletableDossierList(Collections.singletonList(mSelectedBureau),
-                            fetchedDossierList
-                    );
+                    final List<Dossier> dossierToDeleteList = DossierUtils.getDeletableDossierList(Collections.singletonList(mSelectedBureau), fetchedDossierList);
                     final List<Document> documentToDeleteList = DocumentUtils.getAllChildrenFrom(dossierToDeleteList);
 
                     Log.d("BureauxLoadingTask", "delete Dossiers  : " + dossierToDeleteList);
@@ -848,9 +759,7 @@ public class MenuFragment extends Fragment {
                     try {
                         dbHelper.getBureauDao().callBatchTasks(new Callable<Void>() {
                             @Override public Void call() throws Exception {
-                                dbHelper.getDocumentDao().delete(documentToDeleteList);
-                                dbHelper.getDossierDao().delete(dossierToDeleteList);
-                                return null;
+                                dbHelper.getDocumentDao().delete(documentToDeleteList); dbHelper.getDossierDao().delete(dossierToDeleteList); return null;
                             }
                         });
                     } catch (Exception exception) { return new IParapheurException(R.string.Error_on_typology_update, exception.getLocalizedMessage()); }
@@ -871,19 +780,15 @@ public class MenuFragment extends Fragment {
 
                     // Update bureau from DB
 
-                    Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-                    String selectedId = mSelectedBureau.getId();
+                    Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao(); String selectedId = mSelectedBureau.getId();
                     List<Bureau> fetchedBureauList = bureauDao.queryBuilder().where().eq(Bureau.DB_FIELD_ID, selectedId).query();
 
-                    if (fetchedBureauList.size() > 0)
-                        mSelectedBureau = fetchedBureauList.get(0);
-                    else
-                        return null;
+                    if (fetchedBureauList.size() > 0) mSelectedBureau = fetchedBureauList.get(0);
+                    else return null;
 
                     //Update List
 
-                    mDossierList.clear();
-                    mDossierList.addAll(mSelectedBureau.getChildrenDossiers());
+                    mDossierList.clear(); mDossierList.addAll(mSelectedBureau.getChildrenDossiers());
                 } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
             }
 
@@ -894,31 +799,25 @@ public class MenuFragment extends Fragment {
         @Override protected void onPostExecute(IParapheurException exception) {
             super.onPostExecute(exception);
 
-            mPendingAsyncTask = null;
-            if (isCancelled())
-                return;
+            mPendingAsyncTask = null; if (isCancelled()) return;
 
             Collections.sort(mDossierList, DossierUtils.buildCreationDateComparator());
             ((DossierListAdapter) mDossierListView.getAdapter()).notifyDataSetChanged();
 
             // Retrieving previous state
 
-            int displayedDossierPosition = mDossierList.indexOf(mDisplayedDossier);
-            mDossierListView.setItemChecked(displayedDossierPosition, true);
+            int displayedDossierPosition = mDossierList.indexOf(mDisplayedDossier); mDossierListView.setItemChecked(displayedDossierPosition, true);
 
             // Refreshing views state
 
-            getActivity().invalidateOptionsMenu();
-            mDossierSwipeRefreshLayout.setRefreshing(false);
+            getActivity().invalidateOptionsMenu(); mDossierSwipeRefreshLayout.setRefreshing(false);
 
-            if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty())
-                ViewUtils.crossfade(mDossierListView, mDossierEmptyView);
+            if ((mDossierEmptyView.getVisibility() == View.VISIBLE) && !mDossierList.isEmpty()) ViewUtils.crossfade(mDossierListView, mDossierEmptyView);
 
             // Error management
 
             if (exception != null) {
-                String message = getString(exception.getResId());
-                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                String message = getString(exception.getResId()); Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -941,8 +840,7 @@ public class MenuFragment extends Fragment {
             TextView todoCountTextView = cell.findViewById(R.id.bureau_list_cell_todo);
             TextView detailsTextView = cell.findViewById(R.id.bureau_list_cell_details);
 
-            Bureau currentBureau = getItem(position);
-            if (currentBureau != null) {
+            Bureau currentBureau = getItem(position); if (currentBureau != null) {
 
                 bureauTitleTextView.setText(currentBureau.getTitle());
 
@@ -952,61 +850,44 @@ public class MenuFragment extends Fragment {
 
                     // Color
 
-                    if (currentBureau.getLateCount() > 0)
-                        todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
-                    else
-                        todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+                    if (currentBureau.getLateCount() > 0) todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
+                    else todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
 
                     // To do text
 
-                    if (currentBureau.getTodoCount() == 0)
-                        todoCountTextView.setText(R.string.no_dossier);
-                    else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() == 0))
-                        todoCountTextView.setText(R.string.one_dossier);
-                    else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() > 0))
-                        todoCountTextView.setText(R.string.one_late_dossier);
+                    if (currentBureau.getTodoCount() == 0) todoCountTextView.setText(R.string.no_dossier);
+                    else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() == 0)) todoCountTextView.setText(R.string.one_dossier);
+                    else if ((currentBureau.getTodoCount() == 1) && (currentBureau.getLateCount() > 0)) todoCountTextView.setText(R.string.one_late_dossier);
                     else if (currentBureau.getLateCount() == currentBureau.getTodoCount())
                         todoCountTextView.setText(getString(R.string.nb_late_dossiers, currentBureau.getTodoCount()));
                     else if (currentBureau.getLateCount() > 0)
                         todoCountTextView.setText(getString(R.string.nb_dossiers_nb_late, currentBureau.getTodoCount(), currentBureau.getLateCount()));
-                    else
-                        todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
+                    else todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
 
                     // Sync date
 
                     detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
-                    detailsTextView.setText(getString(R.string.Sync_date,
-                            StringsUtils.getVerySmallDate(currentBureau.getSyncDate()),
-                            StringsUtils.getSmallTime(currentBureau.getSyncDate())
-                    ));
+                    detailsTextView.setText(getString(R.string.Sync_date, StringsUtils.getVerySmallDate(currentBureau.getSyncDate()), StringsUtils.getSmallTime(currentBureau.getSyncDate())));
                 } else {
 
                     // Color
 
                     todoCountTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
 
-                    if (currentBureau.getLateCount() > 0)
-                        detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
-                    else
-                        detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
+                    if (currentBureau.getLateCount() > 0) detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
+                    else detailsTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
 
                     // To do text
 
-                    if (currentBureau.getTodoCount() == 0)
-                        todoCountTextView.setText(R.string.no_dossier);
-                    else if (currentBureau.getTodoCount() == 1)
-                        todoCountTextView.setText(R.string.one_dossier);
-                    else
-                        todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
+                    if (currentBureau.getTodoCount() == 0) todoCountTextView.setText(R.string.no_dossier);
+                    else if (currentBureau.getTodoCount() == 1) todoCountTextView.setText(R.string.one_dossier);
+                    else todoCountTextView.setText(getString(R.string.nb_dossiers, currentBureau.getTodoCount()));
 
                     // Late text
 
-                    if (currentBureau.getLateCount() == 0)
-                        detailsTextView.setText(R.string.no_late_dossier);
-                    else if (currentBureau.getLateCount() == 1)
-                        detailsTextView.setText(R.string.one_late_dossier);
-                    else
-                        detailsTextView.setText(getString(R.string.nb_late_dossiers, currentBureau.getLateCount()));
+                    if (currentBureau.getLateCount() == 0) detailsTextView.setText(R.string.no_late_dossier);
+                    else if (currentBureau.getLateCount() == 1) detailsTextView.setText(R.string.one_late_dossier);
+                    else detailsTextView.setText(getString(R.string.nb_late_dossiers, currentBureau.getLateCount()));
                 }
             }
 
@@ -1046,8 +927,7 @@ public class MenuFragment extends Fragment {
 
         @Override public @NonNull View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-            final View cellView = super.getView(position, convertView, parent);
-            Dossier dossier = mDossierList.get(position);
+            final View cellView = super.getView(position, convertView, parent); Dossier dossier = mDossierList.get(position);
             boolean isChecked = mCheckedDossiers.contains(dossier);
 
             // Text
@@ -1058,29 +938,23 @@ public class MenuFragment extends Fragment {
 
             String typologyText = String.format("%s / %s", dossier.getType(), dossier.getSousType());
 
-            typeTextView.setText(typologyText);
-            nameTextView.setText(dossier.getName());
+            typeTextView.setText(typologyText); nameTextView.setText(dossier.getName());
 
             // Date text
 
             dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.text_black_secondary));
 
             if ((dossier.getDateLimite() != null) && (new Date().after(dossier.getDateLimite()))) {
-                String lateText = getString(R.string.Late_since, StringsUtils.getLocalizedSmallDate(dossier.getDateLimite()));
-                dateTextView.setText(lateText);
+                String lateText = getString(R.string.Late_since, StringsUtils.getLocalizedSmallDate(dossier.getDateLimite())); dateTextView.setText(lateText);
                 dateTextView.setTextColor(ContextCompat.getColor(getActivity(), R.color.red_500));
             } else if (dossier.getSyncDate() != null) {
-                String syncText = getString(R.string.Sync_date,
-                        StringsUtils.getVerySmallDate(dossier.getSyncDate()),
-                        StringsUtils.getSmallTime(dossier.getSyncDate())
-                );
+                String syncText = getString(R.string.Sync_date, StringsUtils.getVerySmallDate(dossier.getSyncDate()), StringsUtils.getSmallTime(dossier.getSyncDate()));
                 dateTextView.setText(syncText);
             } else if (dossier.getDateCreation() != null) {
                 String emitSinceText = getString(R.string.Emit_since, StringsUtils.getLocalizedSmallDate(dossier.getDateCreation()));
                 dateTextView.setText(emitSinceText);
             } else {
-                typeTextView.setText(dossier.getType());
-                dateTextView.setText(dossier.getSousType());
+                typeTextView.setText(dossier.getType()); dateTextView.setText(dossier.getSousType());
             }
 
             // CheckBox
@@ -1088,9 +962,7 @@ public class MenuFragment extends Fragment {
             View checkableLayout = cellView.findViewById(R.id.dossiers_list_item_checkable_layout);
 
             if (DossierUtils.haveActions(mDossierList.get(position))) {
-                checkableLayout.setVisibility(View.VISIBLE);
-                checkableLayout.setTag(position);
-                checkableLayout.setOnClickListener(new View.OnClickListener() {
+                checkableLayout.setVisibility(View.VISIBLE); checkableLayout.setTag(position); checkableLayout.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         toggleSelection(view);
                     }
@@ -1113,28 +985,22 @@ public class MenuFragment extends Fragment {
                         iconImageView.setImageResource(R.drawable.ic_sign_24dp);
                     else if (actionName.contentEquals(getString(R.string.action_signer)) && dossier.isSignPapier())
                         iconImageView.setImageResource(R.drawable.ic_visa_24dp);
-                    else if (actionName.contentEquals(getString(R.string.action_viser)))
-                        iconImageView.setImageResource(R.drawable.ic_visa_24dp);
-                    else if (actionName.contentEquals(getString(R.string.action_seal)))
-                        iconImageView.setImageResource(R.drawable.ic_cachet_color_24dp);
-                    else if (actionName.contentEquals(getString(R.string.action_archiver)))
-                        iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
-                    else if (actionName.contentEquals(getString(R.string.action_mailsec)))
-                        iconImageView.setImageResource(R.drawable.ic_mailsec_24dp);
+                    else if (actionName.contentEquals(getString(R.string.action_viser))) iconImageView.setImageResource(R.drawable.ic_visa_24dp);
+                    else if (actionName.contentEquals(getString(R.string.action_seal))) iconImageView.setImageResource(R.drawable.ic_cachet_color_24dp);
+                    else if (actionName.contentEquals(getString(R.string.action_archiver))) iconImageView.setImageResource(R.drawable.ic_archivage_24dp);
+                    else if (actionName.contentEquals(getString(R.string.action_mailsec))) iconImageView.setImageResource(R.drawable.ic_mailsec_24dp);
                     else if (actionName.startsWith(getString(R.string.action_tdt))) // using startsWith, to catch helios and actes
                         iconImageView.setImageResource(R.drawable.ic_tdt_24dp);
 
                     View iconImageViewContainer = cellView.findViewById(R.id.dossiers_list_item_image_main_container);
                     View selectorImageviewContainer = cellView.findViewById(R.id.dossiers_list_item_image_selector_container);
-                    iconImageViewContainer.setAlpha(isChecked ? 0f : 1f);
-                    selectorImageviewContainer.setAlpha(isChecked ? 1f : 0f);
+                    iconImageViewContainer.setAlpha(isChecked ? 0f : 1f); selectorImageviewContainer.setAlpha(isChecked ? 1f : 0f);
                 }
             }
 
             // Click events
 
-            View selectableLayout = cellView.findViewById(R.id.dossiers_list_item_selectable_layout);
-            selectableLayout.setTag(position);
+            View selectableLayout = cellView.findViewById(R.id.dossiers_list_item_selectable_layout); selectableLayout.setTag(position);
 //			selectableLayout.setOnClickListener(this);
 
             return cellView;
@@ -1163,13 +1029,11 @@ public class MenuFragment extends Fragment {
 
         private void toggleSelection(View view) {
 
-            if (mDossierSwipeRefreshLayout.isRefreshing())
-                return;
+            if (mDossierSwipeRefreshLayout.isRefreshing()) return;
 
             // Toggle checked state, and animate
 
-            Dossier dossier = mDossierList.get((Integer) view.getTag());
-            View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
+            Dossier dossier = mDossierList.get((Integer) view.getTag()); View mainView = view.findViewById(R.id.dossiers_list_item_image_main_container);
             View selectorView = view.findViewById(R.id.dossiers_list_item_image_selector_container);
 
             if (mCheckedDossiers.contains(dossier)) {
@@ -1190,8 +1054,7 @@ public class MenuFragment extends Fragment {
                     @Override public void onAnimationRepeat(Animator animator) { }
                 });
             } else {
-                mCheckedDossiers.add(dossier);
-                ViewUtils.flip(getActivity(), mainView, selectorView, null);
+                mCheckedDossiers.add(dossier); ViewUtils.flip(getActivity(), mainView, selectorView, null);
                 ((MenuFragmentListener) getActivity()).onDossierCheckedChanged(mCheckedDossiers.isEmpty());
             }
         }

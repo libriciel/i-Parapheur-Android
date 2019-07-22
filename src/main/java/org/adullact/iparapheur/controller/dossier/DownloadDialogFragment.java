@@ -22,14 +22,15 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
@@ -77,14 +78,11 @@ public class DownloadDialogFragment extends DialogFragment {
 
     public static DownloadDialogFragment newInstance(@NonNull Account account) {
 
-        Gson gson = new Gson();
-        String data = gson.toJson(account);
+        Gson gson = new Gson(); String data = gson.toJson(account);
 
         DownloadDialogFragment fragment = new DownloadDialogFragment();
 
-        Bundle args = new Bundle();
-        args.putString(ARGUMENT_ACCOUNT, data);
-        fragment.setArguments(args);
+        Bundle args = new Bundle(); args.putString(ARGUMENT_ACCOUNT, data); fragment.setArguments(args);
 
         return fragment;
     }
@@ -98,9 +96,7 @@ public class DownloadDialogFragment extends DialogFragment {
 
         if (getArguments() != null) {
 
-            Gson gson = new Gson();
-            String data = getArguments().getString(ARGUMENT_ACCOUNT);
-            mAccount = gson.fromJson(data, Account.class);
+            Gson gson = new Gson(); String data = getArguments().getString(ARGUMENT_ACCOUNT); mAccount = gson.fromJson(data, Account.class);
         }
     }
 
@@ -122,8 +118,7 @@ public class DownloadDialogFragment extends DialogFragment {
         // Build Dialog
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Main_Dialog);
-        builder.setTitle(getString(R.string.Offline_content));
-        builder.setView(view);
+        builder.setTitle(getString(R.string.Offline_content)); builder.setView(view);
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 onCancelButtonClicked();
@@ -137,8 +132,7 @@ public class DownloadDialogFragment extends DialogFragment {
     @Override public void onResume() {
         super.onResume();
 
-        mPendingTask = new DownloadTask();
-        mPendingTask.execute(mAccount);
+        mPendingTask = new DownloadTask(); mPendingTask.execute(mAccount);
     }
 
 
@@ -147,8 +141,7 @@ public class DownloadDialogFragment extends DialogFragment {
 
     private void onCancelButtonClicked() {
 
-        if (mPendingTask != null)
-            mPendingTask.cancel(false);
+        if (mPendingTask != null) mPendingTask.cancel(false);
 
         dismissAllowingStateLoss();
     }
@@ -162,11 +155,9 @@ public class DownloadDialogFragment extends DialogFragment {
         private Account mCurrentAccount;
 
 
-        @SuppressWarnings({"squid:S2142", "squid:S899"})
-        @Override protected IParapheurException doInBackground(Account... accounts) {
+        @SuppressWarnings({"squid:S2142", "squid:S899"}) @Override protected IParapheurException doInBackground(Account... accounts) {
 
-            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-            final List<Bureau> bureauxList = new ArrayList<>();
+            final DatabaseHelper dbHelper = new DatabaseHelper(getActivity()); final List<Bureau> bureauxList = new ArrayList<>();
 
             // yes, this method does a little bit of Thread pausing.
             // It may feel weird, but it brings a way better feeling on download,
@@ -180,13 +171,11 @@ public class DownloadDialogFragment extends DialogFragment {
             // Trust me, I'm an engineer, keep those.
 
             // UI tuning
-            publishProgress(STEP_BUREAUX_METADATA, 0L, 100L);
-            try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+            publishProgress(STEP_BUREAUX_METADATA, 0L, 100L); try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
 
             // Refresh DB Account
 
-            if (accounts == null || accounts.length == 0)
-                return null;
+            if (accounts == null || accounts.length == 0) return null;
 
             try {
                 Account deserializedAccount = accounts[0];
@@ -194,25 +183,21 @@ public class DownloadDialogFragment extends DialogFragment {
                 Dao<Account, Integer> accountDao = dbHelper.getAccountDao();
                 List<Account> fetchedAccountList = accountDao.queryBuilder().where().eq(Account.DB_FIELD_ID, deserializedAccount.getId()).query();
 
-                if (fetchedAccountList.isEmpty())
-                    return null;
+                if (fetchedAccountList.isEmpty()) return null;
 
                 mCurrentAccount = fetchedAccountList.get(0);
             } catch (SQLException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-            if (mCurrentAccount == null)
-                return null;
+            if (mCurrentAccount == null) return null;
 
             // Updating Bureaux
 
             try { bureauxList.addAll(RESTClient.INSTANCE.getBureaux(mCurrentAccount)); } catch (final IParapheurException exception) { return exception; }
 
-            final ArrayList<Dossier> dossierList = new ArrayList<>();
-            List<Dossier> incompleteDossierList = new ArrayList<>();
+            final ArrayList<Dossier> dossierList = new ArrayList<>(); List<Dossier> incompleteDossierList = new ArrayList<>();
             final List<Document> finalDocumentList = new ArrayList<>();
 
-            Long totalBureauxMetadataSize = (long) bureauxList.size();
-            Long progressBureauxMetadataSize = 0L;
+            Long totalBureauxMetadataSize = (long) bureauxList.size(); Long progressBureauxMetadataSize = 0L;
 
             for (Bureau bureau : bureauxList) {
                 bureau.setParent(mCurrentAccount);
@@ -227,22 +212,18 @@ public class DownloadDialogFragment extends DialogFragment {
                     incompleteDossierList.addAll(incompleteDossierTempList);
                 } catch (IParapheurException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-                progressBureauxMetadataSize++;
-                publishProgress(STEP_BUREAUX_METADATA, progressBureauxMetadataSize, totalBureauxMetadataSize);
+                progressBureauxMetadataSize++; publishProgress(STEP_BUREAUX_METADATA, progressBureauxMetadataSize, totalBureauxMetadataSize);
 
-                if (isCancelled())
-                    return new IParapheurException(-1, "Annulation");
+                if (isCancelled()) return new IParapheurException(-1, "Annulation");
             }
 
             // UI tuning
-            publishProgress(STEP_BUREAUX_METADATA, 100L, 100L);
-            publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
+            publishProgress(STEP_BUREAUX_METADATA, 100L, 100L); publishProgress(STEP_DOSSIERS_METADATA, 0L, 100L);
             try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
             // Updating Dossiers
 
-            Long totalDossiersMetadataSize = (long) incompleteDossierList.size();
-            Long progressDossiersMetadataSize = 0L;
+            Long totalDossiersMetadataSize = (long) incompleteDossierList.size(); Long progressDossiersMetadataSize = 0L;
 
             for (Dossier incompleteDossier : incompleteDossierList) {
 
@@ -253,8 +234,7 @@ public class DownloadDialogFragment extends DialogFragment {
                         Log.e(LOG_TAG, e.getLocalizedMessage());
                     }
 
-                    fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId()));
-                    dossierList.add(fullDossier);
+                    fullDossier.setParent(BureauUtils.findInList(bureauxList, incompleteDossier.getParent().getId())); dossierList.add(fullDossier);
 
                     for (Document document : fullDossier.getDocumentList()) {
                         document.setParent(fullDossier);
@@ -267,29 +247,25 @@ public class DownloadDialogFragment extends DialogFragment {
 
                         finalDocumentList.add(document);
 
-                        if (isCancelled())
-                            return new IParapheurException(-1, "Annulation");
+                        if (isCancelled()) return new IParapheurException(-1, "Annulation");
                     }
                 } catch (IParapheurException e) { Log.e(LOG_TAG, e.getLocalizedMessage()); }
 
-                progressDossiersMetadataSize++;
-                publishProgress(STEP_DOSSIERS_METADATA, progressDossiersMetadataSize, totalDossiersMetadataSize);
+                progressDossiersMetadataSize++; publishProgress(STEP_DOSSIERS_METADATA, progressDossiersMetadataSize, totalDossiersMetadataSize);
             }
 
             // Cleanup and save in database
 
             try {
 
-                final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao();
-                final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
+                final Dao<Bureau, Integer> bureauDao = dbHelper.getBureauDao(); final Dao<Dossier, Integer> dossierDao = dbHelper.getDossierDao();
                 final Dao<Document, Integer> documentDao = dbHelper.getDocumentDao();
 
                 // Retrieve cascade deletable content
 
                 final List<Bureau> bureauToDeleteList = BureauUtils.getDeletableBureauList(mCurrentAccount, bureauxList);
 
-                final List<Dossier> dossierToDeleteList = new ArrayList<>();
-                dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
+                final List<Dossier> dossierToDeleteList = new ArrayList<>(); dossierToDeleteList.addAll(DossierUtils.getAllChildrenFrom(bureauToDeleteList));
                 dossierToDeleteList.addAll(DossierUtils.getDeletableDossierList(bureauxList, dossierList));
 
                 final List<Document> documentToDeleteList = new ArrayList<>();
@@ -298,32 +274,26 @@ public class DownloadDialogFragment extends DialogFragment {
 
                 // Delete
 
-                Log.d(LOG_TAG, "delete Bureaux   : " + bureauToDeleteList);
-                Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
+                Log.d(LOG_TAG, "delete Bureaux   : " + bureauToDeleteList); Log.d(LOG_TAG, "delete Dossiers  : " + dossierToDeleteList);
                 Log.d(LOG_TAG, "delete Documents : " + documentToDeleteList);
 
                 dbHelper.getDossierDao().callBatchTasks(new Callable<Void>() {
                     @Override public Void call() throws Exception {
 
-                        documentDao.delete(documentToDeleteList);
-                        dossierDao.delete(dossierToDeleteList);
-                        bureauDao.delete(bureauToDeleteList);
+                        documentDao.delete(documentToDeleteList); dossierDao.delete(dossierToDeleteList); bureauDao.delete(bureauToDeleteList);
 
                         // Create
 
                         for (Bureau bureau : bureauxList) {
-                            bureau.setSyncDate(new Date());
-                            bureauDao.createOrUpdate(bureau);
+                            bureau.setSyncDate(new Date()); bureauDao.createOrUpdate(bureau);
                         }
 
                         for (Dossier dossier : dossierList) {
-                            dossier.setSyncDate(new Date());
-                            dossierDao.createOrUpdate(dossier);
+                            dossier.setSyncDate(new Date()); dossierDao.createOrUpdate(dossier);
                         }
 
                         for (Document document : finalDocumentList) {
-                            document.setSyncDate(new Date());
-                            documentDao.createOrUpdate(document);
+                            document.setSyncDate(new Date()); documentDao.createOrUpdate(document);
                         }
 
                         return null;
@@ -342,22 +312,17 @@ public class DownloadDialogFragment extends DialogFragment {
             } catch (Exception e) { return new IParapheurException(-1, "DB error"); }
 
             // UI tuning
-            publishProgress(STEP_DOSSIERS_METADATA, 100L, 100L);
-            publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
+            publishProgress(STEP_DOSSIERS_METADATA, 100L, 100L); publishProgress(STEP_DOCUMENT_FILES, 0L, 100L);
             try { Thread.sleep(250); } catch (InterruptedException e) { /* not used */ }
 
             // Downloading files
 
-            List<Document> documentsToDld = new ArrayList<>();
-            for (Dossier dossier : dossierList) {
+            List<Document> documentsToDld = new ArrayList<>(); for (Dossier dossier : dossierList) {
                 documentsToDld.addAll(dossier.getDocumentList());
             }
 
-            Long totalDocumentFileSize = 0L;
-            Long progressDocumentFileSize = 0L;
-            for (Document document : documentsToDld)
-                if (document.getSize() > 0)
-                    totalDocumentFileSize += document.getSize();
+            Long totalDocumentFileSize = 0L; Long progressDocumentFileSize = 0L; for (Document document : documentsToDld)
+                if (document.getSize() > 0) totalDocumentFileSize += document.getSize();
 
             if (totalDocumentFileSize > FileUtils.getFreeSpace(getActivity()))
                 return new IParapheurException(0, "Téléchargement impossible, espace insuffisant");
@@ -372,19 +337,16 @@ public class DownloadDialogFragment extends DialogFragment {
                         Log.e(LOG_TAG, e.getLocalizedMessage());
                     }
 
-                    if (document.getSize() > 0)
-                        progressDocumentFileSize += document.getSize();
+                    if (document.getSize() > 0) progressDocumentFileSize += document.getSize();
 
                     publishProgress(STEP_DOCUMENT_FILES, progressDocumentFileSize, totalDocumentFileSize);
 
-                    if (isCancelled())
-                        return new IParapheurException(-1, "Annulation");
+                    if (isCancelled()) return new IParapheurException(-1, "Annulation");
                 }
             }
 
             // UI tuning
-            publishProgress(STEP_DOCUMENT_FILES, 100L, 100L);
-            try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
+            publishProgress(STEP_DOCUMENT_FILES, 100L, 100L); try { Thread.sleep(500); } catch (InterruptedException e) { /* not used */ }
 
             return null;
         }
@@ -398,14 +360,11 @@ public class DownloadDialogFragment extends DialogFragment {
                 int progressPercent = (int) (values[1] * 100 / values[2]);
 
                 if (values[0].equals(STEP_BUREAUX_METADATA)) {
-                    mBureauProgressBar.setProgress(progressPercent);
-                    mBureauProgressTextView.setText("" + progressPercent + "%");
+                    mBureauProgressBar.setProgress(progressPercent); mBureauProgressTextView.setText("" + progressPercent + "%");
                 } else if (values[0].equals(STEP_DOSSIERS_METADATA)) {
-                    mDossierProgressBar.setProgress(progressPercent);
-                    mDossierProgressTextView.setText("" + progressPercent + "%");
+                    mDossierProgressBar.setProgress(progressPercent); mDossierProgressTextView.setText("" + progressPercent + "%");
                 } else if (values[0].equals(STEP_DOCUMENT_FILES)) {
-                    mDocumentProgressBar.setProgress(progressPercent);
-                    mDocumentProgressTextView.setText("" + progressPercent + "%");
+                    mDocumentProgressBar.setProgress(progressPercent); mDocumentProgressTextView.setText("" + progressPercent + "%");
                 }
             }
         }
@@ -414,10 +373,8 @@ public class DownloadDialogFragment extends DialogFragment {
         @Override protected void onPostExecute(IParapheurException e) {
             super.onPostExecute(e);
 
-            if (e != null)
-                Log.e("", "" + e.getComplement());
-            else
-                dismissAllowingStateLoss();
+            if (e != null) Log.e("", "" + e.getComplement());
+            else dismissAllowingStateLoss();
         }
 
     }
