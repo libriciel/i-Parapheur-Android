@@ -39,6 +39,9 @@ repositories {
     google()
     mavenCentral()
     jcenter()
+    maven {
+        url 'http://archiva.libriciel.fr/archiva/repository/internal'
+    }
 }
 
 
@@ -150,9 +153,9 @@ dependencies {
     implementation 'com.j256.ormlite:ormlite-core:5.0'
     implementation 'com.j256.ormlite:ormlite-android:5.0'
     implementation files('libs/android-sun-jarsign-support-1.1.jar')
-    implementation files('libs/mupdf-android-1.2.0.aar')
     implementation 'io.sentry:sentry-android:1.7.24'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
+    implementation 'coop.libriciel:mupdf-android:1.1.1'
 }
 
 
